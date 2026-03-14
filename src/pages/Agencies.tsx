@@ -105,7 +105,7 @@ const Agencies = () => {
                 <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">
                   Bookings
                 </p>
-                <p className="text-[15px] font-bold font-display text-foreground mt-1 tabular-nums">
+                <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">
                   {agency.total_bookings.toLocaleString()}
                 </p>
               </div>
@@ -113,7 +113,7 @@ const Agencies = () => {
                 <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">
                   Revenue
                 </p>
-                <p className="text-[15px] font-bold font-display text-foreground mt-1 tabular-nums">
+                <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">
                   €{agency.revenue.toLocaleString()}
                 </p>
               </div>

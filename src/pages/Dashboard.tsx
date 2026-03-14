@@ -142,7 +142,7 @@ const Dashboard = () => {
                     </p>
                   </td>
                   <td className="px-7 py-4 text-right">
-                    <p className="text-[14px] font-bold font-display text-foreground tabular-nums">
+                    <p className="text-[14px] font-bold text-foreground tabular-nums">
                       €{agency.revenue.toLocaleString()}
                     </p>
                   </td>
