@@ -2,21 +2,38 @@ import { cn } from '@/lib/utils';
 
 type Status = 'active' | 'inactive' | 'pending';
 
-const statusStyles: Record<Status, string> = {
-  active: 'bg-success/15 text-success border-success/20',
-  inactive: 'bg-muted text-muted-foreground border-border',
-  pending: 'bg-warning/15 text-warning border-warning/20',
+const statusConfig: Record<Status, { bg: string; dot: string; text: string }> = {
+  active: {
+    bg: 'bg-success/10',
+    dot: 'bg-success',
+    text: 'text-success',
+  },
+  inactive: {
+    bg: 'bg-muted',
+    dot: 'bg-muted-foreground',
+    text: 'text-muted-foreground',
+  },
+  pending: {
+    bg: 'bg-warning/10',
+    dot: 'bg-warning',
+    text: 'text-warning',
+  },
 };
 
-const AgencyStatusBadge = ({ status }: { status: Status }) => (
-  <span
-    className={cn(
-      'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold capitalize',
-      statusStyles[status]
-    )}
-  >
-    {status}
-  </span>
-);
+const AgencyStatusBadge = ({ status }: { status: Status }) => {
+  const config = statusConfig[status];
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize',
+        config.bg,
+        config.text
+      )}
+    >
+      <span className={cn('h-1.5 w-1.5 rounded-full', config.dot)} />
+      {status}
+    </span>
+  );
+};
 
 export default AgencyStatusBadge;
