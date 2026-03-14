@@ -89,17 +89,20 @@ const AdminSidebar = () => {
       <div className="p-5 px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-accent text-[11px] font-bold text-accent-foreground shadow-sm">
-            SA
+            {user?.email?.charAt(0).toUpperCase() ?? 'SA'}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[13px] font-semibold text-sidebar-accent-foreground truncate leading-none">
               Super Admin
             </p>
             <p className="text-[10px] text-sidebar-foreground truncate mt-1">
-              admin@travelhub.io
+              {user?.email ?? 'admin@travelhub.io'}
             </p>
           </div>
-          <button className="flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-colors">
+          <button
+            onClick={signOut}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-colors"
+          >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
