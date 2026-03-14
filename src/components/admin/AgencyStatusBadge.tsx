@@ -2,21 +2,24 @@ import { cn } from '@/lib/utils';
 
 type Status = 'active' | 'inactive' | 'pending';
 
-const statusConfig: Record<Status, { bg: string; dot: string; text: string }> = {
+const statusConfig: Record<Status, { bg: string; dot: string; text: string; label: string }> = {
   active: {
-    bg: 'bg-success/10',
+    bg: 'bg-success/8',
     dot: 'bg-success',
     text: 'text-success',
+    label: 'Active',
   },
   inactive: {
     bg: 'bg-muted',
     dot: 'bg-muted-foreground',
     text: 'text-muted-foreground',
+    label: 'Inactive',
   },
   pending: {
-    bg: 'bg-warning/10',
-    dot: 'bg-warning',
-    text: 'text-warning',
+    bg: 'bg-accent/8',
+    dot: 'bg-accent',
+    text: 'text-accent',
+    label: 'Pending',
   },
 };
 
@@ -25,13 +28,13 @@ const AgencyStatusBadge = ({ status }: { status: Status }) => {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize',
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold',
         config.bg,
         config.text
       )}
     >
       <span className={cn('h-1.5 w-1.5 rounded-full', config.dot)} />
-      {status}
+      {config.label}
     </span>
   );
 };
