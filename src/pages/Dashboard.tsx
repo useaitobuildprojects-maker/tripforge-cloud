@@ -1,4 +1,4 @@
-import { Building2, Globe, DollarSign, TrendingUp } from 'lucide-react';
+import { Building2, Globe, DollarSign, TrendingUp, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StatCard from '@/components/admin/StatCard';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
@@ -10,17 +10,26 @@ const Dashboard = () => {
   const recentAgencies = mockAgencies.slice(0, 4);
 
   return (
-    <div className="space-y-8 max-w-[1200px]">
+    <div className="space-y-10 max-w-[1200px]">
       {/* Header */}
-      <div>
-        <h1 className="text-[26px] font-display font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Platform overview across all agencies
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">
+          Overview
         </p>
-      </div>
+        <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">
+          Dashboard
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1.5 font-light">
+          Monitor your platform performance across all travel agencies
+        </p>
+      </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Agencies"
           value={mockStats.total_agencies.toString()}
@@ -51,40 +60,44 @@ const Dashboard = () => {
 
       {/* Recent Agencies Table */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.5 }}
-        className="bg-card rounded-lg card-premium overflow-hidden"
+        transition={{ delay: 0.4, duration: 0.55 }}
+        className="card-premium rounded-xl overflow-hidden"
       >
-        <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex items-center justify-between px-7 py-6">
           <div>
-            <h2 className="text-[15px] font-display font-bold text-foreground">Recent Agencies</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Latest agencies on the platform</p>
+            <h2 className="text-lg font-display font-bold text-foreground">Recent Agencies</h2>
+            <p className="text-[13px] text-muted-foreground mt-0.5 font-light">
+              Latest agencies added to the platform
+            </p>
           </div>
           <Link
             to="/agencies"
-            className="text-xs font-semibold text-accent hover:text-accent/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-accent/5"
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-accent hover:text-accent/80 transition-colors px-4 py-2 rounded-lg hover:bg-accent/5"
           >
-            View all →
+            View all
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-t border-border">
-                <th className="px-6 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em] bg-secondary/50">
+              <tr className="border-t border-border/70">
+                <th className="px-7 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">
                   Agency
                 </th>
-                <th className="px-6 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em] bg-secondary/50">
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em] bg-secondary/50">
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">
                   Services
                 </th>
-                <th className="px-6 py-3 text-left text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em] bg-secondary/50">
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">
                   Location
                 </th>
-                <th className="px-6 py-3 text-right text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.12em] bg-secondary/50">
+                <th className="px-7 py-3.5 text-right text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">
                   Revenue
                 </th>
               </tr>
@@ -95,17 +108,19 @@ const Dashboard = () => {
                   key={agency.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 + i * 0.06 }}
-                  className="border-t border-border/50 hover:bg-secondary/30 transition-colors cursor-pointer"
+                  transition={{ delay: 0.45 + i * 0.07 }}
+                  className="border-t border-border/40 hover:bg-accent/3 transition-colors cursor-pointer group"
                 >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-accent text-accent-foreground font-bold text-sm shrink-0">
+                  <td className="px-7 py-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-accent text-accent-foreground font-bold text-sm shrink-0 shadow-sm">
                         {agency.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-foreground">{agency.name}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                        <p className="text-[13px] font-semibold text-foreground group-hover:text-accent transition-colors">
+                          {agency.name}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 font-light">
                           {agency.domain || 'No domain assigned'}
                         </p>
                       </div>
@@ -115,19 +130,19 @@ const Dashboard = () => {
                     <AgencyStatusBadge status={agency.status} />
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1.5">
                       {agency.services.map((s) => (
                         <ServiceBadge key={s} service={s} />
                       ))}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-foreground">
+                    <p className="text-[13px] text-foreground">
                       {agency.city}, {agency.country}
                     </p>
                   </td>
-                  <td className="px-6 py-4 text-right">
-                    <p className="text-sm font-bold font-display text-foreground">
+                  <td className="px-7 py-4 text-right">
+                    <p className="text-[14px] font-bold font-display text-foreground tabular-nums">
                       €{agency.revenue.toLocaleString()}
                     </p>
                   </td>

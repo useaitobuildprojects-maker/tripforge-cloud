@@ -1,43 +1,44 @@
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, ChevronDown } from 'lucide-react';
 
 const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-background">
       <AdminSidebar />
-      <main className="ml-64 min-h-screen">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-card/90 backdrop-blur-md px-8">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <main className="ml-[270px] min-h-screen">
+        <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-border bg-card/95 backdrop-blur-lg px-8">
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-accent" />
               <input
                 type="text"
-                placeholder="Search..."
-                className="h-9 w-64 rounded-lg border border-border bg-background pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent/50 focus:border-accent/50 transition-colors"
+                placeholder="Search anything..."
+                className="h-10 w-72 rounded-xl border border-border bg-background/80 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all duration-200"
               />
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground hover:text-foreground hover:border-accent/30 transition-colors">
-              <Bell className="h-4 w-4" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
+          <div className="flex items-center gap-5">
+            <button className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background/80 text-muted-foreground hover:text-foreground hover:border-accent/25 hover:bg-card transition-all duration-200">
+              <Bell className="h-[18px] w-[18px]" />
+              <span className="absolute -top-1 -right-1 flex h-[18px] w-[18px] items-center justify-center rounded-full gradient-accent text-[8px] font-bold text-accent-foreground shadow-sm">
                 3
               </span>
             </button>
-            <div className="h-6 w-px bg-border" />
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full gradient-accent text-[11px] font-bold text-accent-foreground">
+            <div className="h-8 w-px bg-border" />
+            <button className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-secondary/60 transition-colors duration-200 -mr-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-accent text-[11px] font-bold text-accent-foreground shadow-sm">
                 SA
               </div>
-              <div className="hidden sm:block">
+              <div className="text-left hidden sm:block">
                 <p className="text-[13px] font-semibold text-foreground leading-none">Super Admin</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">admin@travelhub.io</p>
+                <p className="text-[10px] text-muted-foreground mt-1">admin@travelhub.io</p>
               </div>
-            </div>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground ml-1 hidden sm:block" />
+            </button>
           </div>
         </header>
-        <div className="p-8">
+        <div className="p-8 lg:p-10">
           <Outlet />
         </div>
       </main>
