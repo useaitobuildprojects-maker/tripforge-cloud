@@ -131,7 +131,7 @@
 
   .gold-line {
     height: 2px;
-    background: linear-gradient(90deg, hsl(36 78% 50%), hsl(36 78% 50% / 0));
+    background: hsl(36 78% 50%);
   }
 
   .gold-glow {
