@@ -92,22 +92,20 @@
   }
 
   .gradient-primary {
-    background: linear-gradient(145deg, hsl(225 38% 16%), hsl(225 32% 22%));
+    background: hsl(225 38% 16%);
   }
 
   .gradient-accent {
-    background: linear-gradient(145deg, hsl(36 78% 54%), hsl(30 72% 46%));
+    background: hsl(36 78% 50%);
   }
 
   .gradient-sidebar {
-    background: linear-gradient(180deg, hsl(225 40% 14%), hsl(225 38% 9%));
+    background: hsl(225 38% 12%);
   }
 
   .text-gradient {
-    background: linear-gradient(135deg, hsl(36 78% 50%), hsl(30 72% 42%));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(36 78% 50%);
+    -webkit-text-fill-color: unset;
   }
 
   .card-elevated {
@@ -133,7 +131,7 @@
 
   .gold-line {
     height: 2px;
-    background: linear-gradient(90deg, hsl(36 78% 50%), hsl(36 78% 50% / 0));
+    background: hsl(36 78% 50%);
   }
 
   .gold-glow {
