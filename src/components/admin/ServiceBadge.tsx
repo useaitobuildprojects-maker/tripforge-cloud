@@ -12,7 +12,7 @@ const ServiceBadge = ({ service }: { service: ServiceType }) => {
   const Icon = iconMap[service];
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-2 py-1 text-[11px] font-medium text-secondary-foreground">
+    <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
       <Icon className="h-3 w-3" />
       {SERVICE_LABELS[service]}
     </span>
