@@ -6,7 +6,7 @@ import {
   Settings,
   Users,
   BarChart3,
-  Crown,
+  Car,
   LogOut,
   ChevronRight,
 } from 'lucide-react';
