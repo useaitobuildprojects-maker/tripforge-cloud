@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import { Bell, Search, ChevronDown } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLayout = () => {
   return (
