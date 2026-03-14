@@ -4,7 +4,7 @@ import { Bell, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLayout = () => {
-  return (
+  const { user } = useAuth();
     <div className="min-h-screen bg-background">
       <AdminSidebar />
       <main className="ml-[270px] min-h-screen">
