@@ -4,32 +4,35 @@ import StatCard from '@/components/admin/StatCard';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
 import { mockAgencies, mockStats } from '@/data/mock-agencies';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const recentAgencies = mockAgencies.slice(0, 4);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-[1200px]">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-extrabold text-foreground tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Platform overview across all agencies
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Agencies"
           value={mockStats.total_agencies.toString()}
           icon={Building2}
+          iconColor="bg-primary/10"
           index={0}
         />
         <StatCard
           title="Active Agencies"
           value={mockStats.active_agencies.toString()}
           icon={TrendingUp}
+          iconColor="bg-success/10"
           index={1}
         />
         <StatCard
@@ -37,6 +40,7 @@ const Dashboard = () => {
           value={mockStats.total_bookings.toLocaleString()}
           change={mockStats.bookings_growth}
           icon={Globe}
+          iconColor="bg-accent/10"
           index={2}
         />
         <StatCard
@@ -44,43 +48,47 @@ const Dashboard = () => {
           value={`€${(mockStats.total_revenue / 1000).toFixed(0)}k`}
           change={mockStats.revenue_growth}
           icon={DollarSign}
+          iconColor="bg-primary/10"
           index={3}
         />
       </div>
 
       {/* Recent Agencies Table */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.4 }}
-        className="glass rounded-xl"
+        transition={{ delay: 0.35, duration: 0.45 }}
+        className="glass rounded-xl card-elevated overflow-hidden"
       >
-        <div className="flex items-center justify-between p-5 border-b border-border/50">
-          <h2 className="text-sm font-semibold text-foreground">Recent Agencies</h2>
-          <a
-            href="/agencies"
-            className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+        <div className="flex items-center justify-between px-6 py-5">
+          <div>
+            <h2 className="text-sm font-bold text-foreground">Recent Agencies</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Latest agencies on the platform</p>
+          </div>
+          <Link
+            to="/agencies"
+            className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/5"
           >
             View all →
-          </a>
+          </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border/30">
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <tr className="border-t border-border">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
                   Agency
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
                   Status
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
                   Services
                 </th>
-                <th className="px-5 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
                   Location
                 </th>
-                <th className="px-5 py-3 text-right text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40">
                   Revenue
                 </th>
               </tr>
@@ -92,33 +100,38 @@ const Dashboard = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.4 + i * 0.06 }}
-                  className="border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors"
+                  className="border-t border-border/60 hover:bg-muted/30 transition-colors"
                 >
-                  <td className="px-5 py-4">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{agency.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {agency.domain || 'No domain'}
-                      </p>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/8 text-primary font-bold text-sm shrink-0">
+                        {agency.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{agency.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {agency.domain || 'No domain assigned'}
+                        </p>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-6 py-4">
                     <AgencyStatusBadge status={agency.status} />
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-1">
                       {agency.services.map((s) => (
                         <ServiceBadge key={s} service={s} />
                       ))}
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-6 py-4">
                     <p className="text-sm text-foreground">
                       {agency.city}, {agency.country}
                     </p>
                   </td>
-                  <td className="px-5 py-4 text-right">
-                    <p className="text-sm font-semibold text-foreground">
+                  <td className="px-6 py-4 text-right">
+                    <p className="text-sm font-bold text-foreground">
                       €{agency.revenue.toLocaleString()}
                     </p>
                   </td>
