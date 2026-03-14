@@ -26,7 +26,7 @@ const StatCard = ({ title, value, change, icon: Icon, index = 0 }: StatCardProps
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">
             {title}
           </p>
-          <p className="text-[32px] font-display font-bold text-foreground leading-none tracking-tight">
+          <p className="text-[32px] font-sans font-extrabold text-foreground leading-none tracking-tight tabular-nums">
             {value}
           </p>
         </div>
