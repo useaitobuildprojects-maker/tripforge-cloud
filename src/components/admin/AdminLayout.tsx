@@ -29,11 +29,11 @@ const AdminLayout = () => {
             <div className="h-8 w-px bg-border" />
             <button className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-secondary/60 transition-colors duration-200 -mr-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-accent text-[11px] font-bold text-accent-foreground shadow-sm">
-                SA
+                {user?.email?.charAt(0).toUpperCase() ?? 'SA'}
               </div>
               <div className="text-left hidden sm:block">
                 <p className="text-[13px] font-semibold text-foreground leading-none">Super Admin</p>
-                <p className="text-[10px] text-muted-foreground mt-1">admin@travelhub.io</p>
+                <p className="text-[10px] text-muted-foreground mt-1">{user?.email ?? ''}</p>
               </div>
               <ChevronDown className="h-3.5 w-3.5 text-muted-foreground ml-1 hidden sm:block" />
             </button>
