@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Filter, ExternalLink, MapPin, SlidersHorizontal } from 'lucide-react';
+import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
-import { mockAgencies } from '@/data/mock-agencies';
+import { useAgencies } from '@/hooks/use-agencies';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Agencies = () => {
   const [search, setSearch] = useState('');
+  const { data: agencies = [], isLoading } = useAgencies();
 
-  const filtered = mockAgencies.filter(
+  const filtered = agencies.filter(
     (a) =>
       a.name.toLowerCase().includes(search.toLowerCase()) ||
       a.city.toLowerCase().includes(search.toLowerCase()) ||
@@ -26,15 +28,9 @@ const Agencies = () => {
         className="flex items-end justify-between"
       >
         <div>
-          <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">
-            Management
-          </p>
-          <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">
-            Agencies
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1.5 font-light">
-            Manage all travel agencies on the platform
-          </p>
+          <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">Management</p>
+          <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">Agencies</h1>
+          <p className="text-sm text-muted-foreground mt-1.5 font-light">Manage all travel agencies on the platform</p>
         </div>
         <Button className="gradient-accent text-accent-foreground gap-2 shadow-md hover:shadow-lg hover:opacity-95 transition-all font-semibold h-11 px-5 rounded-xl">
           <Plus className="h-4 w-4" />
@@ -66,75 +62,71 @@ const Agencies = () => {
 
       {/* Agency Cards Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((agency, i) => (
-          <motion.div
-            key={agency.id}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 + i * 0.07, duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
-            className="card-premium rounded-xl p-6 cursor-pointer group"
-          >
-            <div className="flex items-start justify-between mb-5">
-              <div className="flex items-center gap-3.5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-accent text-accent-foreground font-bold text-base shadow-sm">
-                  {agency.name.charAt(0)}
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-[240px] rounded-xl" />
+          ))
+        ) : filtered.length === 0 ? (
+          <div className="col-span-full text-center py-16">
+            <p className="text-sm text-muted-foreground">
+              {search ? 'No agencies match your search.' : 'No agencies yet. Add your first agency to get started.'}
+            </p>
+          </div>
+        ) : (
+          filtered.map((agency, i) => (
+            <motion.div
+              key={agency.id}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.07, duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }}
+              className="card-premium rounded-xl p-6 cursor-pointer group"
+            >
+              <div className="flex items-start justify-between mb-5">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-accent text-accent-foreground font-bold text-base shadow-sm">
+                    {agency.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="text-[14px] font-bold text-foreground group-hover:text-accent transition-colors duration-200">
+                      {agency.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <MapPin className="h-3 w-3 text-muted-foreground" />
+                      <p className="text-[11px] text-muted-foreground font-light">{agency.city}, {agency.country}</p>
+                    </div>
+                  </div>
+                </div>
+                <AgencyStatusBadge status={agency.status} />
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 mb-6">
+                {agency.services.map((s) => <ServiceBadge key={s} service={s} />)}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 pt-5 border-t border-border/50">
+                <div>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">Bookings</p>
+                  <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">{agency.total_bookings.toLocaleString()}</p>
                 </div>
                 <div>
-                  <h3 className="text-[14px] font-bold text-foreground group-hover:text-accent transition-colors duration-200">
-                    {agency.name}
-                  </h3>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <MapPin className="h-3 w-3 text-muted-foreground" />
-                    <p className="text-[11px] text-muted-foreground font-light">
-                      {agency.city}, {agency.country}
-                    </p>
-                  </div>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">Revenue</p>
+                  <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">€{agency.revenue.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">Domain</p>
+                  {agency.domain ? (
+                    <div className="flex items-center gap-1 mt-1">
+                      <ExternalLink className="h-3 w-3 text-accent" />
+                      <p className="text-[11px] font-semibold text-accent truncate">{agency.domain}</p>
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground mt-1 italic">Not set</p>
+                  )}
                 </div>
               </div>
-              <AgencyStatusBadge status={agency.status} />
-            </div>
-
-            <div className="flex flex-wrap gap-1.5 mb-6">
-              {agency.services.map((s) => (
-                <ServiceBadge key={s} service={s} />
-              ))}
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 pt-5 border-t border-border/50">
-              <div>
-                <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">
-                  Bookings
-                </p>
-                <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">
-                  {agency.total_bookings.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">
-                  Revenue
-                </p>
-                <p className="text-[15px] font-extrabold text-foreground mt-1 tabular-nums">
-                  €{agency.revenue.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-[9px] text-muted-foreground uppercase tracking-[0.15em] font-semibold">
-                  Domain
-                </p>
-                {agency.domain ? (
-                  <div className="flex items-center gap-1 mt-1">
-                    <ExternalLink className="h-3 w-3 text-accent" />
-                    <p className="text-[11px] font-semibold text-accent truncate">
-                      {agency.domain}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-[11px] text-muted-foreground mt-1 italic">Not set</p>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        )}
       </div>
     </div>
   );
