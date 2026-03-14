@@ -24,6 +24,7 @@ const navItems = [
 
 const AdminSidebar = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-[270px] flex-col gradient-sidebar sidebar-glow">
