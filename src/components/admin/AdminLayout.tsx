@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const AdminLayout = () => {
   const { user } = useAuth();
+  return (
     <div className="min-h-screen bg-background">
       <AdminSidebar />
       <main className="ml-[270px] min-h-screen">
