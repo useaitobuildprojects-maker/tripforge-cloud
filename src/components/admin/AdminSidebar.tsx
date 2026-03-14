@@ -31,7 +31,7 @@ const AdminSidebar = () => {
       {/* Logo */}
       <div className="flex h-[76px] items-center gap-3.5 px-7">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-accent gold-glow">
-          <Crown className="h-5 w-5 text-accent-foreground" />
+          <Car className="h-5 w-5 text-accent-foreground" />
         </div>
         <div>
           <h1 className="text-base font-display font-bold text-sidebar-accent-foreground tracking-wide leading-none">
