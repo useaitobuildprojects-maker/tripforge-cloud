@@ -1,0 +1,40 @@
+export type ServiceType = 'car_rental' | 'private_driver' | 'hotel' | 'travel_package';
+
+export interface Agency {
+  id: string;
+  name: string;
+  slug: string;
+  domain: string | null;
+  logo_url: string | null;
+  status: 'active' | 'inactive' | 'pending';
+  services: ServiceType[];
+  country: string;
+  city: string;
+  contact_email: string;
+  created_at: string;
+  total_bookings: number;
+  revenue: number;
+}
+
+export interface DashboardStats {
+  total_agencies: number;
+  active_agencies: number;
+  total_bookings: number;
+  total_revenue: number;
+  bookings_growth: number;
+  revenue_growth: number;
+}
+
+export const SERVICE_LABELS: Record<ServiceType, string> = {
+  car_rental: 'Car Rentals',
+  private_driver: 'Private Drivers',
+  hotel: 'Hotels',
+  travel_package: 'Travel Packages',
+};
+
+export const SERVICE_ICONS: Record<ServiceType, string> = {
+  car_rental: 'Car',
+  private_driver: 'UserCheck',
+  hotel: 'Hotel',
+  travel_package: 'Globe',
+};
