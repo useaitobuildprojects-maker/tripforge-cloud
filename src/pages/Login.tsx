@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Car, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -39,7 +39,7 @@ const Login = () => {
         {/* Logo */}
         <div className="flex flex-col items-center mb-10">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl gradient-accent gold-glow mb-5">
-            <Crown className="h-7 w-7 text-accent-foreground" />
+            <Car className="h-7 w-7 text-accent-foreground" />
           </div>
           <h1 className="text-[28px] font-display font-bold text-foreground">TravelHub</h1>
           <p className="text-sm text-muted-foreground mt-1.5 font-light">
