@@ -14,6 +14,7 @@ import AgencyAdminLayout from "./components/agency-admin/AgencyAdminLayout";
 import AgencyAdminDashboard from "./pages/agency-admin/AgencyAdminDashboard";
 import AgencyAdminBookings from "./pages/agency-admin/AgencyAdminBookings";
 import AgencyAdminSettings from "./pages/agency-admin/AgencyAdminSettings";
+import AgencyAdminDrivers from "./pages/agency-admin/AgencyAdminDrivers";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
                   <Route index element={<AgencyAdminDashboard />} />
                   <Route path="bookings" element={<AgencyAdminBookings />} />
+                  <Route path="drivers" element={<AgencyAdminDrivers />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" />} />
                   <Route path="settings" element={<AgencyAdminSettings />} />
                 </Route>
