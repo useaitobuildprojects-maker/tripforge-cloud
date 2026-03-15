@@ -15,6 +15,7 @@ import AgencyAdminDashboard from "./pages/agency-admin/AgencyAdminDashboard";
 import AgencyAdminBookings from "./pages/agency-admin/AgencyAdminBookings";
 import AgencyAdminSettings from "./pages/agency-admin/AgencyAdminSettings";
 import AgencyAdminDrivers from "./pages/agency-admin/AgencyAdminDrivers";
+import AgencyAdminVehicles from "./pages/agency-admin/AgencyAdminVehicles";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
