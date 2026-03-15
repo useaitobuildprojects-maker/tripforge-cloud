@@ -27,6 +27,7 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
   const navItems = [
     { to: base, icon: LayoutDashboard, label: 'Dashboard', exact: true },
     { to: `${base}/bookings`, icon: CalendarDays, label: 'Bookings' },
+    { to: `${base}/drivers`, icon: Users, label: 'Drivers' },
     { to: `${base}/analytics`, icon: BarChart3, label: 'Analytics' },
     { to: `${base}/settings`, icon: Settings, label: 'Settings' },
   ];
