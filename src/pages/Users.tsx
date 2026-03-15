@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Users as UsersIcon, Shield, ShieldCheck } from 'lucide-react';
 import { useUsers } from '@/hooks/use-users';
 import { Skeleton } from '@/components/ui/skeleton';
+import CreateUserDialog from '@/components/admin/CreateUserDialog';
 
 const roleConfig: Record<string, { label: string; icon: typeof Shield; color: string }> = {
   super_admin: { label: 'Super Admin', icon: ShieldCheck, color: 'text-accent' },
