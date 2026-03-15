@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
