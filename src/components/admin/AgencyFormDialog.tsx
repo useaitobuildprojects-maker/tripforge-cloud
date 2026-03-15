@@ -30,6 +30,9 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
     country: '',
     city: '',
     contact_email: '',
+    meta_title: '',
+    meta_description: '',
+    og_image: '',
   });
 
   useEffect(() => {
