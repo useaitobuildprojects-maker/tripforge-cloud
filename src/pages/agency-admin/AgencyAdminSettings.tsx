@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
-import { Agency, SERVICE_LABELS, ServiceType } from '@/types/agency';
+import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry } from '@/types/agency';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'hotel', 'travel_package'];
+const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
+
+const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
 
 const AgencyAdminSettings = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
@@ -21,9 +25,16 @@ const AgencyAdminSettings = () => {
     country: agency.country,
     domain: agency.domain ?? '',
     services: agency.services as string[],
-    meta_title: agency.meta_title ?? '',
-    meta_description: agency.meta_description ?? '',
-    og_image: agency.og_image ?? '',
+  });
+
+  const [pageSeo, setPageSeo] = useState<Record<StorefrontPage, PageSeoEntry>>(() => {
+    const existing = agency.page_seo ?? {};
+    return {
+      home: { meta_title: existing.home?.meta_title ?? agency.meta_title ?? '', meta_description: existing.home?.meta_description ?? agency.meta_description ?? '', og_image: existing.home?.og_image ?? agency.og_image ?? '' },
+      fleet: { ...emptyPageSeo(), ...existing.fleet },
+      contact: { ...emptyPageSeo(), ...existing.contact },
+      about: { ...emptyPageSeo(), ...existing.about },
+    };
   });
 
   const toggleService = (service: string) => {
@@ -35,7 +46,24 @@ const AgencyAdminSettings = () => {
     }));
   };
 
+  const updatePageSeo = (page: StorefrontPage, field: keyof PageSeoEntry, value: string) => {
+    setPageSeo((prev) => ({ ...prev, [page]: { ...prev[page], [field]: value } }));
+  };
+
   const handleSave = async () => {
+    // Clean page_seo: only include entries with at least one value
+    const cleanedPageSeo: PageSeo = {};
+    for (const page of seoPages) {
+      const entry = pageSeo[page];
+      if (entry.meta_title || entry.meta_description || entry.og_image) {
+        cleanedPageSeo[page] = {
+          ...(entry.meta_title && { meta_title: entry.meta_title }),
+          ...(entry.meta_description && { meta_description: entry.meta_description }),
+          ...(entry.og_image && { og_image: entry.og_image }),
+        };
+      }
+    }
+
     await updateAgency.mutateAsync({
       id: agency.id,
       name: form.name,
@@ -46,9 +74,11 @@ const AgencyAdminSettings = () => {
       country: form.country,
       services: form.services,
       domain: form.domain || undefined,
-      meta_title: form.meta_title || undefined,
-      meta_description: form.meta_description || undefined,
-      og_image: form.og_image || undefined,
+      // Keep legacy fields from home page SEO
+      meta_title: pageSeo.home.meta_title || undefined,
+      meta_description: pageSeo.home.meta_description || undefined,
+      og_image: pageSeo.home.og_image || undefined,
+      page_seo: Object.keys(cleanedPageSeo).length > 0 ? cleanedPageSeo : undefined,
     });
   };
 
@@ -62,6 +92,7 @@ const AgencyAdminSettings = () => {
         </p>
       </motion.div>
 
+      {/* General Info */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -107,7 +138,7 @@ const AgencyAdminSettings = () => {
         </div>
       </motion.div>
 
-      {/* SEO Settings */}
+      {/* Per-Page SEO Settings */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,28 +146,61 @@ const AgencyAdminSettings = () => {
         className="card-premium rounded-xl p-7 space-y-6"
       >
         <h2 className="text-lg font-display font-bold text-foreground">SEO & Meta Tags</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="meta_title">Meta Title <span className="text-muted-foreground font-normal">(max 60 chars)</span></Label>
-            <Input id="meta_title" value={form.meta_title} onChange={(e) => setForm((f) => ({ ...f, meta_title: e.target.value }))} maxLength={60} placeholder="e.g. Best Car Rental in Paris" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="meta_desc">Meta Description <span className="text-muted-foreground font-normal">(max 160 chars)</span></Label>
-            <textarea
-              id="meta_desc"
-              value={form.meta_description}
-              onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))}
-              maxLength={160}
-              rows={2}
-              placeholder="Describe your agency..."
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="og_image">OG Image URL</Label>
-            <Input id="og_image" value={form.og_image} onChange={(e) => setForm((f) => ({ ...f, og_image: e.target.value }))} placeholder="https://..." />
-          </div>
-        </div>
+        <p className="text-sm text-muted-foreground -mt-3">
+          Configure SEO settings individually for each storefront page.
+        </p>
+
+        <Tabs defaultValue="home" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            {seoPages.map((page) => (
+              <TabsTrigger key={page} value={page} className="text-xs">
+                {PAGE_LABELS[page]}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {seoPages.map((page) => (
+            <TabsContent key={page} value={page} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor={`${page}-title`}>
+                  Meta Title <span className="text-muted-foreground font-normal">(max 60 chars)</span>
+                </Label>
+                <Input
+                  id={`${page}-title`}
+                  value={pageSeo[page].meta_title ?? ''}
+                  onChange={(e) => updatePageSeo(page, 'meta_title', e.target.value)}
+                  maxLength={60}
+                  placeholder={`e.g. ${PAGE_LABELS[page]} | ${agency.name}`}
+                />
+                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_title ?? '').length}/60 characters</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`${page}-desc`}>
+                  Meta Description <span className="text-muted-foreground font-normal">(max 160 chars)</span>
+                </Label>
+                <textarea
+                  id={`${page}-desc`}
+                  value={pageSeo[page].meta_description ?? ''}
+                  onChange={(e) => updatePageSeo(page, 'meta_description', e.target.value)}
+                  maxLength={160}
+                  rows={2}
+                  placeholder={`Describe the ${PAGE_LABELS[page].toLowerCase()} page...`}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_description ?? '').length}/160 characters</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`${page}-og`}>OG Image URL</Label>
+                <Input
+                  id={`${page}-og`}
+                  value={pageSeo[page].og_image ?? ''}
+                  onChange={(e) => updatePageSeo(page, 'og_image', e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
       </motion.div>
 
       <div className="flex justify-end">
