@@ -1,6 +1,6 @@
 import { Outlet, useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
+import { useFavicon } from '@/hooks/use-favicon';
 import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
