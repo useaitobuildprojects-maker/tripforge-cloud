@@ -8,6 +8,7 @@ const mapAgency = (a: any): Agency => ({
   slug: a.slug,
   domain: a.domain,
   logo_url: a.logo_url,
+  favicon_url: a.favicon_url ?? null,
   status: a.status,
   services: a.services ?? [],
   country: a.country,
