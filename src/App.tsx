@@ -9,6 +9,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import StorefrontLayout from "./components/storefront/StorefrontLayout";
 import StorefrontHome from "./pages/storefront/StorefrontHome";
+import AgencyAdminLayout from "./components/agency-admin/AgencyAdminLayout";
+import AgencyAdminDashboard from "./pages/agency-admin/AgencyAdminDashboard";
+import AgencyAdminBookings from "./pages/agency-admin/AgencyAdminBookings";
+import AgencyAdminSettings from "./pages/agency-admin/AgencyAdminSettings";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
@@ -43,6 +47,13 @@ const App = () => (
                 <Route path="/users" element={<Users />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/settings" element={<ComingSoon title="Settings" />} />
+              </Route>
+              {/* Agency Admin Dashboard — isolated per agency */}
+              <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
+                <Route index element={<AgencyAdminDashboard />} />
+                <Route path="bookings" element={<AgencyAdminBookings />} />
+                <Route path="analytics" element={<ComingSoon title="Analytics" />} />
+                <Route path="settings" element={<AgencyAdminSettings />} />
               </Route>
               {/* Agency public storefronts */}
               <Route path="/agency/:slug" element={<StorefrontLayout />}>

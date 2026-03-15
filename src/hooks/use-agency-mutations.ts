@@ -11,6 +11,9 @@ interface CreateAgencyInput {
   country: string;
   city: string;
   contact_email: string;
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
 }
 
 export const useCreateAgency = () => {
