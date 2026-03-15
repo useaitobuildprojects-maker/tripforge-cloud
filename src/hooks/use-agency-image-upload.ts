@@ -1,18 +1,17 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useUpdateAgency } from '@/hooks/use-agency-mutations';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export const useAgencyImageUpload = () => {
   const [uploading, setUploading] = useState(false);
-  const updateAgency = useUpdateAgency();
+  const queryClient = useQueryClient();
 
   const uploadImage = async (
     agencyId: string,
     agencySlug: string,
     file: File,
     type: 'logo' | 'favicon',
-    currentAgency: { slug: string; name: string; status: 'active' | 'inactive' | 'pending'; services: string[]; country: string; city: string; contact_email: string }
   ) => {
     setUploading(true);
     try {
@@ -31,17 +30,16 @@ export const useAgencyImageUpload = () => {
 
       const field = type === 'logo' ? 'logo_url' : 'favicon_url';
 
-      await updateAgency.mutateAsync({
-        id: agencyId,
-        slug: currentAgency.slug,
-        name: currentAgency.name,
-        status: currentAgency.status,
-        services: currentAgency.services,
-        country: currentAgency.country,
-        city: currentAgency.city,
-        contact_email: currentAgency.contact_email,
-        [field]: publicUrl,
-      });
+      const { error: updateError } = await supabase
+        .from('agencies')
+        .update({ [field]: publicUrl })
+        .eq('id', agencyId);
+
+      if (updateError) throw updateError;
+
+      queryClient.invalidateQueries({ queryKey: ['agencies'] });
+      queryClient.invalidateQueries({ queryKey: ['agency-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['agency'] });
 
       toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} uploaded successfully`);
       return publicUrl;
