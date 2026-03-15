@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import DomainRouter from "@/components/DomainRouter";
 import AdminLayout from "./components/admin/AdminLayout";
 import StorefrontLayout from "./components/storefront/StorefrontLayout";
 import StorefrontHome from "./pages/storefront/StorefrontHome";
