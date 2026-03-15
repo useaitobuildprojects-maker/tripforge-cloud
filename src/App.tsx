@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,38 +21,40 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              element={
-                <ProtectedRoute>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/agencies" element={<Agencies />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<ComingSoon title="Settings" />} />
-            </Route>
-            {/* Agency public storefronts */}
-            <Route path="/agency/:slug" element={<StorefrontLayout />}>
-              <Route index element={<StorefrontHome />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/agencies" element={<Agencies />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/settings" element={<ComingSoon title="Settings" />} />
+              </Route>
+              {/* Agency public storefronts */}
+              <Route path="/agency/:slug" element={<StorefrontLayout />}>
+                <Route index element={<StorefrontHome />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;

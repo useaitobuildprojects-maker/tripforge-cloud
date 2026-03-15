@@ -30,22 +30,20 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
     country: '',
     city: '',
     contact_email: '',
+    meta_title: '',
+    meta_description: '',
+    og_image: '',
   });
 
   useEffect(() => {
     if (agency) {
       setForm({
-        name: agency.name,
-        slug: agency.slug,
-        domain: agency.domain ?? '',
-        status: agency.status,
-        services: agency.services,
-        country: agency.country,
-        city: agency.city,
-        contact_email: agency.contact_email,
+        name: agency.name, slug: agency.slug, domain: agency.domain ?? '', status: agency.status,
+        services: agency.services, country: agency.country, city: agency.city, contact_email: agency.contact_email,
+        meta_title: agency.meta_title ?? '', meta_description: agency.meta_description ?? '', og_image: agency.og_image ?? '',
       });
     } else {
-      setForm({ name: '', slug: '', domain: '', status: 'pending', services: [], country: '', city: '', contact_email: '' });
+      setForm({ name: '', slug: '', domain: '', status: 'pending', services: [], country: '', city: '', contact_email: '', meta_title: '', meta_description: '', og_image: '' });
     }
   }, [agency, open]);
 
@@ -65,7 +63,13 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...form, domain: form.domain || undefined };
+    const payload = {
+      ...form,
+      domain: form.domain || undefined,
+      meta_title: form.meta_title || undefined,
+      meta_description: form.meta_description || undefined,
+      og_image: form.og_image || undefined,
+    };
 
     if (isEditing && agency) {
       await updateAgency.mutateAsync({ id: agency.id, ...payload });
@@ -103,8 +107,9 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
               <Input id="email" type="email" value={form.contact_email} onChange={(e) => setForm((f) => ({ ...f, contact_email: e.target.value }))} required placeholder="contact@agency.com" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="domain">Domain (optional)</Label>
-              <Input id="domain" value={form.domain} onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} placeholder="agency.travelhub.com" />
+              <Label htmlFor="domain">Custom Domain</Label>
+              <Input id="domain" value={form.domain} onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} placeholder="www.majestic-rentals.com" />
+              <p className="text-[10px] text-muted-foreground">Agency will be accessible at this domain</p>
             </div>
           </div>
 
@@ -140,6 +145,23 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
                   <span className="text-sm text-foreground">{SERVICE_LABELS[service]}</span>
                 </label>
               ))}
+            </div>
+          </div>
+
+          {/* SEO Settings */}
+          <div className="space-y-3 pt-2 border-t border-border">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">SEO & Meta Tags</Label>
+            <div className="space-y-2">
+              <Label htmlFor="meta_title">Meta Title <span className="text-muted-foreground font-normal">(max 60 chars)</span></Label>
+              <Input id="meta_title" value={form.meta_title} onChange={(e) => setForm((f) => ({ ...f, meta_title: e.target.value }))} placeholder="e.g. Majestic Car Rental | Salzburg" maxLength={60} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="meta_desc">Meta Description <span className="text-muted-foreground font-normal">(max 160 chars)</span></Label>
+              <textarea id="meta_desc" value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))} placeholder="Rent premium cars in Salzburg..." maxLength={160} rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="og_image">OG Image URL</Label>
+              <Input id="og_image" value={form.og_image} onChange={(e) => setForm((f) => ({ ...f, og_image: e.target.value }))} placeholder="https://..." />
             </div>
           </div>
 
