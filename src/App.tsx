@@ -33,35 +33,37 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/agencies" element={<Agencies />} />
-                <Route path="/bookings" element={<Bookings />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/settings" element={<ComingSoon title="Settings" />} />
-              </Route>
-              {/* Agency Admin Dashboard — isolated per agency */}
-              <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
-                <Route index element={<AgencyAdminDashboard />} />
-                <Route path="bookings" element={<AgencyAdminBookings />} />
-                <Route path="analytics" element={<ComingSoon title="Analytics" />} />
-                <Route path="settings" element={<AgencyAdminSettings />} />
-              </Route>
-              {/* Agency public storefronts */}
-              <Route path="/agency/:slug" element={<StorefrontLayout />}>
-                <Route index element={<StorefrontHome />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <DomainRouter>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  element={
+                    <ProtectedRoute>
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/agencies" element={<Agencies />} />
+                  <Route path="/bookings" element={<Bookings />} />
+                  <Route path="/users" element={<Users />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/settings" element={<ComingSoon title="Settings" />} />
+                </Route>
+                {/* Agency Admin Dashboard — isolated per agency */}
+                <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
+                  <Route index element={<AgencyAdminDashboard />} />
+                  <Route path="bookings" element={<AgencyAdminBookings />} />
+                  <Route path="analytics" element={<ComingSoon title="Analytics" />} />
+                  <Route path="settings" element={<AgencyAdminSettings />} />
+                </Route>
+                {/* Agency public storefronts */}
+                <Route path="/agency/:slug" element={<StorefrontLayout />}>
+                  <Route index element={<StorefrontHome />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </DomainRouter>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
