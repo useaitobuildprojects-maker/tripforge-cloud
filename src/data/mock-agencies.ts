@@ -2,19 +2,9 @@ import { Agency, DashboardStats } from '@/types/agency';
 
 export const mockAgencies: Agency[] = [
   {
-    id: '1',
-    name: 'EuroRide Express',
-    slug: 'euroride',
-    domain: 'euroride.travel',
-    logo_url: null,
-    status: 'active',
-    services: ['car_rental', 'private_driver'],
-    country: 'France',
-    city: 'Paris',
-    contact_email: 'admin@euroride.travel',
-    created_at: '2024-11-15',
-    total_bookings: 1243,
-    revenue: 187500,
+    id: '1', name: 'EuroRide Express', slug: 'euroride', domain: 'euroride.travel', logo_url: null, status: 'active',
+    services: ['car_rental', 'private_driver'], country: 'France', city: 'Paris', contact_email: 'admin@euroride.travel',
+    created_at: '2024-11-15', total_bookings: 1243, revenue: 187500, meta_title: null, meta_description: null, og_image: null,
   },
   {
     id: '2',
