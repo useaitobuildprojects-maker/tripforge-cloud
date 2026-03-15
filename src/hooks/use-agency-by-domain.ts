@@ -27,6 +27,7 @@ const PLATFORM_HOSTS = [
   '127.0.0.1',
   'lovable.app',
   'lovable.dev',
+  'lovableproject.com',
   'tripforge-cloud.lovable.app',
 ];
 
