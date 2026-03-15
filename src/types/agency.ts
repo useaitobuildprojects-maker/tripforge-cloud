@@ -1,5 +1,15 @@
 export type ServiceType = 'car_rental' | 'private_driver' | 'hotel' | 'travel_package';
 
+export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
+
+export interface PageSeoEntry {
+  meta_title?: string;
+  meta_description?: string;
+  og_image?: string;
+}
+
+export type PageSeo = Partial<Record<StorefrontPage, PageSeoEntry>>;
+
 export interface Agency {
   id: string;
   name: string;
@@ -17,6 +27,7 @@ export interface Agency {
   meta_title: string | null;
   meta_description: string | null;
   og_image: string | null;
+  page_seo: PageSeo | null;
 }
 
 export interface DashboardStats {
@@ -40,4 +51,11 @@ export const SERVICE_ICONS: Record<ServiceType, string> = {
   private_driver: 'UserCheck',
   hotel: 'Hotel',
   travel_package: 'Globe',
+};
+
+export const PAGE_LABELS: Record<StorefrontPage, string> = {
+  home: 'Home',
+  fleet: 'Fleet / Services',
+  contact: 'Contact',
+  about: 'About Us',
 };
