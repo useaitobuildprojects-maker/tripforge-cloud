@@ -1,5 +1,6 @@
 import { Outlet, useParams, Navigate } from 'react-router-dom';
 import { Bell, Search, ChevronDown } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgencyAdmin } from '@/hooks/use-agency-admin';
 import AgencyAdminSidebar from './AgencyAdminSidebar';

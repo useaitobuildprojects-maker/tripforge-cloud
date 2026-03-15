@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
-import { Upload, Image, Globe } from 'lucide-react';
+import { Upload, Image } from 'lucide-react';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'hotel', 'travel_package'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
