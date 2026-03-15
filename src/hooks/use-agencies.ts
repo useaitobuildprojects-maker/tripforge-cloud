@@ -16,6 +16,9 @@ const mapAgency = (a: any): Agency => ({
   created_at: a.created_at,
   total_bookings: a.total_bookings ?? 0,
   revenue: Number(a.revenue) ?? 0,
+  meta_title: a.meta_title ?? null,
+  meta_description: a.meta_description ?? null,
+  og_image: a.og_image ?? null,
 });
 
 export const useAgencies = () => {
