@@ -113,9 +113,13 @@ const StorefrontLayout = () => {
           </div>
           <div className="border-t border-border mt-10 pt-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground font-bold text-xs">
-                {agency.name.charAt(0)}
-              </div>
+              {agency.logo_url ? (
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-8 w-8 rounded object-contain" />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground font-bold text-xs">
+                  {agency.name.charAt(0)}
+                </div>
+              )}
               <span className="text-sm font-semibold">{agency.name}</span>
             </div>
             <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
