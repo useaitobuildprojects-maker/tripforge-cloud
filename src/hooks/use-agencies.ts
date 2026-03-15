@@ -2,6 +2,22 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Agency, DashboardStats } from '@/types/agency';
 
+const mapAgency = (a: any): Agency => ({
+  id: a.id,
+  name: a.name,
+  slug: a.slug,
+  domain: a.domain,
+  logo_url: a.logo_url,
+  status: a.status,
+  services: a.services ?? [],
+  country: a.country,
+  city: a.city,
+  contact_email: a.contact_email,
+  created_at: a.created_at,
+  total_bookings: a.total_bookings ?? 0,
+  revenue: Number(a.revenue) ?? 0,
+});
+
 export const useAgencies = () => {
   return useQuery({
     queryKey: ['agencies'],
@@ -12,23 +28,25 @@ export const useAgencies = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      return (data ?? []).map((a: any) => ({
-        id: a.id,
-        name: a.name,
-        slug: a.slug,
-        domain: a.domain,
-        logo_url: a.logo_url,
-        status: a.status,
-        services: a.services ?? [],
-        country: a.country,
-        city: a.city,
-        contact_email: a.contact_email,
-        created_at: a.created_at,
-        total_bookings: a.total_bookings ?? 0,
-        revenue: Number(a.revenue) ?? 0,
-      }));
+      return (data ?? []).map(mapAgency);
     },
+  });
+};
+
+export const useAgencyBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ['agency', slug],
+    queryFn: async (): Promise<Agency | null> => {
+      const { data, error } = await supabase
+        .from('agencies')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data ? mapAgency(data) : null;
+    },
+    enabled: !!slug,
   });
 };
 

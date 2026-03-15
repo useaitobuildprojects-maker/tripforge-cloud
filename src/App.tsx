@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
+import StorefrontLayout from "./components/storefront/StorefrontLayout";
+import StorefrontHome from "./pages/storefront/StorefrontHome";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
@@ -39,6 +41,10 @@ const App = () => (
               <Route path="/users" element={<Users />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<ComingSoon title="Settings" />} />
+            </Route>
+            {/* Agency public storefronts */}
+            <Route path="/agency/:slug" element={<StorefrontLayout />}>
+              <Route index element={<StorefrontHome />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
