@@ -22,19 +22,9 @@ export const mockAgencies: Agency[] = [
     created_at: '2025-03-01', total_bookings: 0, revenue: 0, meta_title: null, meta_description: null, og_image: null,
   },
   {
-    id: '5',
-    name: 'Nordic Wheels',
-    slug: 'nordicwheels',
-    domain: 'nordicwheels.no',
-    logo_url: null,
-    status: 'inactive',
-    services: ['car_rental'],
-    country: 'Norway',
-    city: 'Oslo',
-    contact_email: 'support@nordicwheels.no',
-    created_at: '2024-06-05',
-    total_bookings: 389,
-    revenue: 67200,
+    id: '5', name: 'Nordic Wheels', slug: 'nordicwheels', domain: 'nordicwheels.no', logo_url: null, status: 'inactive',
+    services: ['car_rental'], country: 'Norway', city: 'Oslo', contact_email: 'support@nordicwheels.no',
+    created_at: '2024-06-05', total_bookings: 389, revenue: 67200, meta_title: null, meta_description: null, og_image: null,
   },
 ];
 
