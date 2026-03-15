@@ -1,0 +1,32 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface Vehicle {
+  id: string;
+  agency_id: string;
+  brand: string;
+  model: string;
+  year: number;
+  license_plate: string | null;
+  vin: string | null;
+  status: 'available' | 'rented' | 'maintenance';
+  photo_url: string | null;
+  created_at: string;
+}
+
+export const useAgencyVehicles = (agencyId: string | undefined) => {
+  return useQuery({
+    queryKey: ['vehicles', agencyId],
+    queryFn: async (): Promise<Vehicle[]> => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('*')
+        .eq('agency_id', agencyId!)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data ?? []) as Vehicle[];
+    },
+    enabled: !!agencyId,
+  });
+};
