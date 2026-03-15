@@ -14,6 +14,9 @@ export interface Agency {
   created_at: string;
   total_bookings: number;
   revenue: number;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_image: string | null;
 }
 
 export interface DashboardStats {
