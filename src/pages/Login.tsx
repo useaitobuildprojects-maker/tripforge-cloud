@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Car, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,9 +24,42 @@ const Login = () => {
     if (error) {
       setError(error.message);
       setLoading(false);
-    } else {
-      navigate('/');
+      return;
     }
+
+    // Check user role and redirect accordingly
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (roleData?.role === 'agency_admin') {
+        // Find the agency this user belongs to
+        const { data: memberData } = await supabase
+          .from('agency_members')
+          .select('agency_id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (memberData?.agency_id) {
+          const { data: agencyData } = await supabase
+            .from('agencies')
+            .select('slug')
+            .eq('id', memberData.agency_id)
+            .maybeSingle();
+
+          if (agencyData?.slug) {
+            navigate(`/agency/${agencyData.slug}/admin`);
+            return;
+          }
+        }
+      }
+    }
+
+    navigate('/');
   };
 
   return (
