@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry } from '@/types/agency';
@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateAgency } from '@/hooks/use-agency-mutations';
+import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
+import { Upload, Image, Globe } from 'lucide-react';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'hotel', 'travel_package'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];

@@ -16,6 +16,8 @@ interface CreateAgencyInput {
   meta_description?: string;
   og_image?: string;
   page_seo?: PageSeo;
+  logo_url?: string;
+  favicon_url?: string;
 }
 
 export const useCreateAgency = () => {
