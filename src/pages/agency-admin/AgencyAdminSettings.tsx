@@ -19,7 +19,21 @@ const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: ''
 const AgencyAdminSettings = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const updateAgency = useUpdateAgency();
+  const { uploadImage, uploading } = useAgencyImageUpload();
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
 
+  const [logoPreview, setLogoPreview] = useState<string | null>(agency.logo_url);
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(agency.favicon_url);
+
+  const handleImageUpload = async (file: File, type: 'logo' | 'favicon') => {
+    const agencyData = { slug: agency.slug, name: agency.name, status: agency.status, services: agency.services as string[], country: agency.country, city: agency.city, contact_email: agency.contact_email };
+    const url = await uploadImage(agency.id, agency.slug, file, type, agencyData);
+    if (url) {
+      if (type === 'logo') setLogoPreview(url);
+      else setFaviconPreview(url);
+    }
+  };
   const [form, setForm] = useState({
     name: agency.name,
     contact_email: agency.contact_email,
