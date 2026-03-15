@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
@@ -73,6 +74,9 @@ const Agencies = () => {
           filtered.map((agency, i) => (
             <motion.div key={agency.id} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.07, duration: 0.5, ease: [0.22, 0.61, 0.36, 1] }} className="card-premium rounded-xl p-6 cursor-pointer group relative">
               <div className="absolute top-4 right-4 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Link to={`/agency/${agency.slug}`} target="_blank" className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/80 hover:bg-accent/20 text-muted-foreground hover:text-accent transition-all" title="View Storefront">
+                  <Eye className="h-3.5 w-3.5" />
+                </Link>
                 <button onClick={(e) => { e.stopPropagation(); handleEdit(agency); }} className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary/80 hover:bg-accent/20 text-muted-foreground hover:text-accent transition-all">
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
