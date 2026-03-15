@@ -7,6 +7,7 @@ import {
   LogOut,
   ChevronRight,
   BarChart3,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
