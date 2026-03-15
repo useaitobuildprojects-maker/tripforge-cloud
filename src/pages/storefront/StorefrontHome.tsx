@@ -3,6 +3,7 @@ import { Agency } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 
 const StorefrontHome = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
@@ -22,6 +23,12 @@ const StorefrontHome = () => {
 
   return (
     <div>
+      <StorefrontSeo
+        agency={agency}
+        page="home"
+        fallbackTitle={agency.meta_title || `${agency.name} | ${agency.city}, ${agency.country}`}
+        fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
+      />
       {/* Hero Section */}
       <section className="relative bg-primary overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
