@@ -107,8 +107,9 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
               <Input id="email" type="email" value={form.contact_email} onChange={(e) => setForm((f) => ({ ...f, contact_email: e.target.value }))} required placeholder="contact@agency.com" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="domain">Domain (optional)</Label>
-              <Input id="domain" value={form.domain} onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} placeholder="agency.travelhub.com" />
+              <Label htmlFor="domain">Custom Domain</Label>
+              <Input id="domain" value={form.domain} onChange={(e) => setForm((f) => ({ ...f, domain: e.target.value }))} placeholder="www.majestic-rentals.com" />
+              <p className="text-[10px] text-muted-foreground">Agency will be accessible at this domain</p>
             </div>
           </div>
 
