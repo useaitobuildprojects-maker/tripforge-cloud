@@ -143,7 +143,7 @@ const AgencyAdminSettings = () => {
 
           {/* Favicon */}
           <div className="space-y-3">
-            <Label className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Favicon</Label>
+            <Label>Favicon</Label>
             <div
               onClick={() => faviconInputRef.current?.click()}
               className="relative group cursor-pointer rounded-xl border-2 border-dashed border-border hover:border-accent h-32 flex items-center justify-center bg-secondary/20 transition-colors overflow-hidden"

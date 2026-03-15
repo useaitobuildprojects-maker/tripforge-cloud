@@ -16,7 +16,7 @@ export const useAgencyImageUpload = () => {
     setUploading(true);
     try {
       const ext = file.name.split('.').pop();
-      const filePath = `${agencySlug}/${type}.${ext}`;
+      const filePath = `${agencySlug}/${type}-${Date.now()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('agency-assets')
