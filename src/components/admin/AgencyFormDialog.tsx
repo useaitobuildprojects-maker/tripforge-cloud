@@ -38,17 +38,12 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
   useEffect(() => {
     if (agency) {
       setForm({
-        name: agency.name,
-        slug: agency.slug,
-        domain: agency.domain ?? '',
-        status: agency.status,
-        services: agency.services,
-        country: agency.country,
-        city: agency.city,
-        contact_email: agency.contact_email,
+        name: agency.name, slug: agency.slug, domain: agency.domain ?? '', status: agency.status,
+        services: agency.services, country: agency.country, city: agency.city, contact_email: agency.contact_email,
+        meta_title: agency.meta_title ?? '', meta_description: agency.meta_description ?? '', og_image: agency.og_image ?? '',
       });
     } else {
-      setForm({ name: '', slug: '', domain: '', status: 'pending', services: [], country: '', city: '', contact_email: '' });
+      setForm({ name: '', slug: '', domain: '', status: 'pending', services: [], country: '', city: '', contact_email: '', meta_title: '', meta_description: '', og_image: '' });
     }
   }, [agency, open]);
 
