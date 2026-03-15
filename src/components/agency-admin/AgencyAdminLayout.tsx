@@ -1,5 +1,6 @@
 import { Outlet, useParams, Navigate } from 'react-router-dom';
 import { Bell, Search, ChevronDown } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgencyAdmin } from '@/hooks/use-agency-admin';
 import AgencyAdminSidebar from './AgencyAdminSidebar';
@@ -35,6 +36,11 @@ const AgencyAdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {agency.favicon_url && (
+        <Helmet>
+          <link rel="icon" type="image/png" href={agency.favicon_url} />
+        </Helmet>
+      )}
       <AgencyAdminSidebar agency={agency} />
       <main className="ml-[270px] min-h-screen">
         <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-border bg-card/95 backdrop-blur-lg px-8">
