@@ -16,6 +16,7 @@ export interface Agency {
   slug: string;
   domain: string | null;
   logo_url: string | null;
+  favicon_url: string | null;
   status: 'active' | 'inactive' | 'pending';
   services: ServiceType[];
   country: string;

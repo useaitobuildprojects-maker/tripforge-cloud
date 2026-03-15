@@ -1,4 +1,5 @@
 import { Outlet, useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -29,14 +30,25 @@ const StorefrontLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Favicon */}
+      {agency.favicon_url && (
+        <Helmet>
+          <link rel="icon" type="image/png" href={agency.favicon_url} />
+        </Helmet>
+      )}
+
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to={`/agency/${slug}`} className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-                {agency.name.charAt(0)}
-              </div>
+              {agency.logo_url ? (
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-10 rounded-lg object-contain" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
+                  {agency.name.charAt(0)}
+                </div>
+              )}
               <div>
                 <span className="text-lg font-bold text-foreground tracking-tight">{agency.name}</span>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-[0.15em] -mt-0.5">
@@ -101,9 +113,13 @@ const StorefrontLayout = () => {
           </div>
           <div className="border-t border-border mt-10 pt-6 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground font-bold text-xs">
-                {agency.name.charAt(0)}
-              </div>
+              {agency.logo_url ? (
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-8 w-8 rounded object-contain" />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded bg-accent text-accent-foreground font-bold text-xs">
+                  {agency.name.charAt(0)}
+                </div>
+              )}
               <span className="text-sm font-semibold">{agency.name}</span>
             </div>
             <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
