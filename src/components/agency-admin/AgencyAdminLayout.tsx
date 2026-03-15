@@ -11,6 +11,9 @@ const AgencyAdminLayout = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: agency, isLoading } = useAgencyAdmin(slug ?? '');
 
+  // Hooks must be called before any early returns
+  useFavicon(agency?.favicon_url);
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -33,8 +36,6 @@ const AgencyAdminLayout = () => {
       </div>
     );
   }
-
-  useFavicon(agency.favicon_url);
 
   return (
     <div className="min-h-screen bg-background">
