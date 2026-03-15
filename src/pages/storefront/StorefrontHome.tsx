@@ -3,6 +3,7 @@ import { Agency } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 
 const StorefrontHome = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
