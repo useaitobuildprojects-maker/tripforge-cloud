@@ -108,6 +108,68 @@ const AgencyAdminSettings = () => {
         </p>
       </motion.div>
 
+      {/* Branding — Logo & Favicon */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="card-premium rounded-xl p-7 space-y-6"
+      >
+        <h2 className="text-lg font-display font-bold text-foreground">Branding</h2>
+        <div className="grid grid-cols-2 gap-6">
+          {/* Logo */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-1.5"><Image className="h-3.5 w-3.5" /> Logo</Label>
+            <div
+              onClick={() => logoInputRef.current?.click()}
+              className="relative group cursor-pointer rounded-xl border-2 border-dashed border-border hover:border-accent h-32 flex items-center justify-center bg-secondary/20 transition-colors overflow-hidden"
+            >
+              {logoPreview ? (
+                <>
+                  <img src={logoPreview} alt="Agency logo" className="h-full w-full object-contain p-3" />
+                  <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Upload className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-1.5" />
+                  <p className="text-xs text-muted-foreground">Click to upload logo</p>
+                </div>
+              )}
+            </div>
+            <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'logo'); }} />
+            <p className="text-[10px] text-muted-foreground">Recommended: 400×400px, PNG or SVG</p>
+          </div>
+
+          {/* Favicon */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-1.5"><Globe className="h-3.5 w-3.5" /> Favicon</Label>
+            <div
+              onClick={() => faviconInputRef.current?.click()}
+              className="relative group cursor-pointer rounded-xl border-2 border-dashed border-border hover:border-accent h-32 flex items-center justify-center bg-secondary/20 transition-colors overflow-hidden"
+            >
+              {faviconPreview ? (
+                <>
+                  <img src={faviconPreview} alt="Favicon" className="h-16 w-16 object-contain" />
+                  <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Upload className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                </>
+              ) : (
+                <div className="text-center">
+                  <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-1.5" />
+                  <p className="text-xs text-muted-foreground">Click to upload favicon</p>
+                </div>
+              )}
+            </div>
+            <input ref={faviconInputRef} type="file" accept="image/png,image/x-icon,image/svg+xml" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'favicon'); }} />
+            <p className="text-[10px] text-muted-foreground">Recommended: 32×32px, PNG or ICO</p>
+          </div>
+        </div>
+        {uploading && <p className="text-xs text-accent animate-pulse">Uploading...</p>}
+      </motion.div>
+
       {/* General Info */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
