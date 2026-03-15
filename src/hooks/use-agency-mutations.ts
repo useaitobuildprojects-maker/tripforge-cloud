@@ -52,7 +52,7 @@ export const useUpdateAgency = () => {
         .update(input)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
