@@ -28,14 +28,10 @@ const StorefrontLayout = () => {
     );
   }
 
+  useFavicon(agency.favicon_url);
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Favicon */}
-      {agency.favicon_url && (
-        <Helmet>
-          <link rel="icon" type="image/png" href={agency.favicon_url} />
-        </Helmet>
-      )}
 
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
