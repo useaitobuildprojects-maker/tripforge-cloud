@@ -57,6 +57,7 @@ const App = () => (
                   <Route index element={<AgencyAdminDashboard />} />
                   <Route path="bookings" element={<AgencyAdminBookings />} />
                   <Route path="drivers" element={<AgencyAdminDrivers />} />
+                  <Route path="vehicles" element={<AgencyAdminVehicles />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" />} />
                   <Route path="settings" element={<AgencyAdminSettings />} />
                 </Route>
