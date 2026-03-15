@@ -23,6 +23,12 @@ const StorefrontHome = () => {
 
   return (
     <div>
+      <StorefrontSeo
+        agency={agency}
+        page="home"
+        fallbackTitle={agency.meta_title || `${agency.name} | ${agency.city}, ${agency.country}`}
+        fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
+      />
       {/* Hero Section */}
       <section className="relative bg-primary overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
