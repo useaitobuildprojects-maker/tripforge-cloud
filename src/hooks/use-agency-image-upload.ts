@@ -30,12 +30,15 @@ export const useAgencyImageUpload = () => {
 
       const field = type === 'logo' ? 'logo_url' : 'favicon_url';
 
-      const { error: updateError } = await supabase
+      const { data: updatedAgency, error: updateError } = await supabase
         .from('agencies')
         .update({ [field]: publicUrl })
-        .eq('id', agencyId);
+        .eq('id', agencyId)
+        .select('id')
+        .maybeSingle();
 
       if (updateError) throw updateError;
+      if (!updatedAgency) throw new Error('Update blocked by access policy. Please verify agency update permissions.');
 
       queryClient.invalidateQueries({ queryKey: ['agencies'] });
       queryClient.invalidateQueries({ queryKey: ['agency-admin'] });

@@ -8,6 +8,8 @@ const StorefrontLayout = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: agency, isLoading } = useAgencyBySlug(slug ?? '');
 
+  useFavicon(agency?.favicon_url);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -27,8 +29,6 @@ const StorefrontLayout = () => {
       </div>
     );
   }
-
-  useFavicon(agency.favicon_url);
 
   return (
     <div className="min-h-screen bg-background">
