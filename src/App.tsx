@@ -15,6 +15,7 @@ import AgencyAdminDashboard from "./pages/agency-admin/AgencyAdminDashboard";
 import AgencyAdminBookings from "./pages/agency-admin/AgencyAdminBookings";
 import AgencyAdminSettings from "./pages/agency-admin/AgencyAdminSettings";
 import AgencyAdminDrivers from "./pages/agency-admin/AgencyAdminDrivers";
+import AgencyAdminVehicles from "./pages/agency-admin/AgencyAdminVehicles";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
@@ -56,6 +57,7 @@ const App = () => (
                   <Route index element={<AgencyAdminDashboard />} />
                   <Route path="bookings" element={<AgencyAdminBookings />} />
                   <Route path="drivers" element={<AgencyAdminDrivers />} />
+                  <Route path="vehicles" element={<AgencyAdminVehicles />} />
                   <Route path="analytics" element={<ComingSoon title="Analytics" />} />
                   <Route path="settings" element={<AgencyAdminSettings />} />
                 </Route>
