@@ -67,6 +67,9 @@ const App = () => (
                 {/* Agency public storefronts */}
                 <Route path="/agency/:slug" element={<StorefrontLayout />}>
                   <Route index element={<StorefrontHome />} />
+                  <Route path="fleet" element={<StorefrontFleet />} />
+                  <Route path="contact" element={<StorefrontContact />} />
+                  <Route path="about" element={<StorefrontAbout />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>

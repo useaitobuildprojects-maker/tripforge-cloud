@@ -20,6 +20,7 @@ const mapAgency = (a: any): Agency => ({
   meta_title: a.meta_title ?? null,
   meta_description: a.meta_description ?? null,
   og_image: a.og_image ?? null,
+  page_seo: a.page_seo ?? null,
 });
 
 /** Fetch the agency that the current user administrates (by slug + RLS) */
