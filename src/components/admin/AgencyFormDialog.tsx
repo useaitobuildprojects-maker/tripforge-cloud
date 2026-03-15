@@ -63,7 +63,13 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { ...form, domain: form.domain || undefined };
+    const payload = {
+      ...form,
+      domain: form.domain || undefined,
+      meta_title: form.meta_title || undefined,
+      meta_description: form.meta_description || undefined,
+      og_image: form.og_image || undefined,
+    };
 
     if (isEditing && agency) {
       await updateAgency.mutateAsync({ id: agency.id, ...payload });
