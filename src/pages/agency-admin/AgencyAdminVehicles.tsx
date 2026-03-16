@@ -72,7 +72,7 @@ const AgencyAdminVehicles = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * i, duration: 0.4 }}
-                className="card-premium rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+                className="card-premium rounded-xl overflow-hidden hover:shadow-md transition-shadow group"
               >
                 {/* Photo */}
                 <div className="h-40 bg-muted/30 flex items-center justify-center overflow-hidden">
