@@ -20,6 +20,7 @@ const AgencyAdminVehicles = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: vehicles = [], isLoading } = useAgencyVehicles(agency.id);
   const [search, setSearch] = useState('');
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
 
   const filtered = vehicles.filter((v) =>
     `${v.brand} ${v.model}`.toLowerCase().includes(search.toLowerCase()) ||
