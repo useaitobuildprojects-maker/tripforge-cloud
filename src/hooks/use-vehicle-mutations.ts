@@ -32,6 +32,40 @@ export const useCreateVehicle = () => {
   });
 };
 
+interface UpdateVehicleInput {
+  id: string;
+  agency_id: string;
+  brand: string;
+  model: string;
+  year: number;
+  license_plate: string | null;
+  vin: string | null;
+  status: string;
+}
+
+export const useUpdateVehicle = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, agency_id, ...input }: UpdateVehicleInput) => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .update(input)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['vehicles', variables.agency_id] });
+      toast.success('Vehicle updated successfully');
+    },
+    onError: (err: Error) => {
+      toast.error(`Failed to update vehicle: ${err.message}`);
+    },
+  });
+};
+
 export const useUploadVehiclePhoto = () => {
   return useMutation({
     mutationFn: async ({ file, agencyId }: { file: File; agencyId: string }) => {

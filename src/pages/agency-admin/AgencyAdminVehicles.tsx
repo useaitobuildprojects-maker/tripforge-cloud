@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAgencyVehicles } from '@/hooks/use-vehicles';
+import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
+import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -18,6 +20,7 @@ const AgencyAdminVehicles = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: vehicles = [], isLoading } = useAgencyVehicles(agency.id);
   const [search, setSearch] = useState('');
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
 
   const filtered = vehicles.filter((v) =>
     `${v.brand} ${v.model}`.toLowerCase().includes(search.toLowerCase()) ||
@@ -69,7 +72,7 @@ const AgencyAdminVehicles = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * i, duration: 0.4 }}
-                className="card-premium rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+                className="card-premium rounded-xl overflow-hidden hover:shadow-md transition-shadow group"
               >
                 {/* Photo */}
                 <div className="h-40 bg-muted/30 flex items-center justify-center overflow-hidden">
@@ -86,10 +89,20 @@ const AgencyAdminVehicles = () => {
                       <h3 className="text-sm font-semibold text-foreground">{vehicle.brand} {vehicle.model}</h3>
                       <p className="text-xs text-muted-foreground">{vehicle.year}</p>
                     </div>
-                    <Badge variant="outline" className={`text-[10px] ${status.className}`}>
-                      <Circle className="h-2 w-2 mr-1 fill-current" />
-                      {status.label}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setEditingVehicle(vehicle)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Badge variant="outline" className={`text-[10px] ${status.className}`}>
+                        <Circle className="h-2 w-2 mr-1 fill-current" />
+                        {status.label}
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5 text-[13px]">
@@ -112,6 +125,12 @@ const AgencyAdminVehicles = () => {
           })}
         </div>
       )}
+
+      <EditVehicleDialog
+        vehicle={editingVehicle}
+        open={!!editingVehicle}
+        onOpenChange={(open) => !open && setEditingVehicle(null)}
+      />
     </div>
   );
 };
