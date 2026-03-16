@@ -20,6 +20,7 @@ const AgencyAdminDrivers = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: drivers = [], isLoading } = useAgencyDrivers(agency.id);
   const [search, setSearch] = useState('');
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
 
   const filtered = drivers.filter((d) =>
     d.full_name.toLowerCase().includes(search.toLowerCase()) ||
