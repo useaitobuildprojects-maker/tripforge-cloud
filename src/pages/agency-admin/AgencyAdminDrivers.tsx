@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Plus, UserCheck, Circle, Search } from 'lucide-react';
+import { MapPin, Phone, Mail, UserCheck, Circle, Search, Pencil } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAgencyDrivers } from '@/hooks/use-drivers';
+import { useAgencyDrivers, Driver } from '@/hooks/use-drivers';
 import CreateDriverDialog from '@/components/agency-admin/CreateDriverDialog';
+import EditDriverDialog from '@/components/agency-admin/EditDriverDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
