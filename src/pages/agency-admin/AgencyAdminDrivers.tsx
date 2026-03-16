@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Plus, UserCheck, Circle, Search } from 'lucide-react';
+import { MapPin, Phone, Mail, UserCheck, Circle, Search, Pencil } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAgencyDrivers } from '@/hooks/use-drivers';
+import { useAgencyDrivers, Driver } from '@/hooks/use-drivers';
 import CreateDriverDialog from '@/components/agency-admin/CreateDriverDialog';
+import EditDriverDialog from '@/components/agency-admin/EditDriverDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -19,6 +20,7 @@ const AgencyAdminDrivers = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: drivers = [], isLoading } = useAgencyDrivers(agency.id);
   const [search, setSearch] = useState('');
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
 
   const filtered = drivers.filter((d) =>
     d.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -70,7 +72,7 @@ const AgencyAdminDrivers = () => {
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * i, duration: 0.4 }}
-                className="card-premium rounded-xl p-6 hover:shadow-md transition-shadow"
+                className="card-premium rounded-xl p-6 hover:shadow-md transition-shadow group"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -85,6 +87,14 @@ const AgencyAdminDrivers = () => {
                       </Badge>
                     </div>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => setEditingDriver(driver)}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
 
                 <div className="space-y-2.5 text-[13px]">
@@ -116,6 +126,12 @@ const AgencyAdminDrivers = () => {
           })}
         </div>
       )}
+
+      <EditDriverDialog
+        driver={editingDriver}
+        open={!!editingDriver}
+        onOpenChange={(open) => !open && setEditingDriver(null)}
+      />
     </div>
   );
 };
