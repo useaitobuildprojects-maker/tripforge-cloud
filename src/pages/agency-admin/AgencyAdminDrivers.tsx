@@ -126,6 +126,12 @@ const AgencyAdminDrivers = () => {
           })}
         </div>
       )}
+
+      <EditDriverDialog
+        driver={editingDriver}
+        open={!!editingDriver}
+        onOpenChange={(open) => !open && setEditingDriver(null)}
+      />
     </div>
   );
 };
