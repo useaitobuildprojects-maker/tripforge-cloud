@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAgencyVehicles } from '@/hooks/use-vehicles';
+import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
+import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
