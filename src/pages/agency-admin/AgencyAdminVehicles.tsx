@@ -89,10 +89,20 @@ const AgencyAdminVehicles = () => {
                       <h3 className="text-sm font-semibold text-foreground">{vehicle.brand} {vehicle.model}</h3>
                       <p className="text-xs text-muted-foreground">{vehicle.year}</p>
                     </div>
-                    <Badge variant="outline" className={`text-[10px] ${status.className}`}>
-                      <Circle className="h-2 w-2 mr-1 fill-current" />
-                      {status.label}
-                    </Badge>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setEditingVehicle(vehicle)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Badge variant="outline" className={`text-[10px] ${status.className}`}>
+                        <Circle className="h-2 w-2 mr-1 fill-current" />
+                        {status.label}
+                      </Badge>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5 text-[13px]">
