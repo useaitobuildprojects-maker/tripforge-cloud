@@ -16,6 +16,42 @@ const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
 
+const OgImageUpload = ({ currentUrl, agencyId, agencySlug, onUploaded }: { currentUrl: string; agencyId: string; agencySlug: string; onUploaded: (url: string) => void }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { uploadImage, uploading } = useAgencyImageUpload();
+
+  const handleFile = async (file: File) => {
+    const url = await uploadImage(agencyId, agencySlug, file, 'og');
+    if (url) onUploaded(url);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div
+        onClick={() => inputRef.current?.click()}
+        className="relative group cursor-pointer rounded-xl border-2 border-dashed border-border hover:border-accent h-32 flex items-center justify-center bg-secondary/20 transition-colors overflow-hidden"
+      >
+        {currentUrl ? (
+          <>
+            <img src={currentUrl} alt="OG preview" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Upload className="h-5 w-5 text-muted-foreground" />
+            </div>
+          </>
+        ) : (
+          <div className="text-center">
+            <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-1.5" />
+            <p className="text-xs text-muted-foreground">Click to upload OG image</p>
+          </div>
+        )}
+      </div>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+      {uploading && <p className="text-xs text-accent animate-pulse">Uploading...</p>}
+      <p className="text-[10px] text-muted-foreground">Recommended: 1200×630px for social media previews</p>
+    </div>
+  );
+};
+
 const AgencyAdminSettings = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const updateAgency = useUpdateAgency();
