@@ -13,7 +13,7 @@ const CreateDriverDialog = ({ agencyId }: { agencyId: string }) => {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [baseLocation, setBaseLocation] = useState('');
-  const [status, setStatus] = useState<'available' | 'busy' | 'offline'>('available');
+  const [status, setStatus] = useState<'available' | 'on_trip' | 'offline'>('available');
 
   const createDriver = useCreateDriver();
 
