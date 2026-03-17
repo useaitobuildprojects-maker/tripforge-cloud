@@ -17,7 +17,7 @@ const StorefrontSeo = ({ agency, page, fallbackTitle, fallbackDescription }: Sto
   const canonicalUrl = agency.domain ? `https://${agency.domain}` : undefined;
 
   return (
-    <Helmet>
+    <Helmet key={page}>
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta name="robots" content="index, follow" />
