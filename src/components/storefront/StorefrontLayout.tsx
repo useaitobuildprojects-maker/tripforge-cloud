@@ -76,6 +76,9 @@ const StorefrontLayout = () => {
             </nav>
 
             <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9" title="Share this page">
+                <Share2 className="h-4 w-4" />
+              </Button>
               <Link to={`/agency/${slug}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Register</Link>
               <Link to={`/agency/${slug}`} className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">Sign in</Link>
             </div>
