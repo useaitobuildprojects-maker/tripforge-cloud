@@ -1,8 +1,11 @@
-import { Outlet, useParams, Link } from 'react-router-dom';
+import { Outlet, useParams, useLocation, Link } from 'react-router-dom';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { useFavicon } from '@/hooks/use-favicon';
-import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube, Share2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { getShareUrl } from '@/lib/share-url';
+import { toast } from 'sonner';
 
 const StorefrontLayout = () => {
   const { slug } = useParams<{ slug: string }>();
