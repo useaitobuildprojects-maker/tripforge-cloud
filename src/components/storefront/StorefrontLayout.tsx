@@ -1,12 +1,27 @@
-import { Outlet, useParams, Link } from 'react-router-dom';
+import { Outlet, useParams, useLocation, Link } from 'react-router-dom';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { useFavicon } from '@/hooks/use-favicon';
-import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube, Share2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { getShareUrl } from '@/lib/share-url';
+import { toast } from 'sonner';
 
 const StorefrontLayout = () => {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const { data: agency, isLoading } = useAgencyBySlug(slug ?? '');
+
+  // Determine current page from pathname
+  const pathParts = location.pathname.split('/');
+  const currentPage = pathParts[pathParts.length - 1] || 'home';
+  const page = ['fleet', 'contact', 'about'].includes(currentPage) ? currentPage : 'home';
+
+  const handleShare = () => {
+    const shareUrl = getShareUrl(slug ?? '', page);
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Share link copied to clipboard!');
+  };
 
   useFavicon(agency?.favicon_url);
 
@@ -61,6 +76,9 @@ const StorefrontLayout = () => {
             </nav>
 
             <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9" title="Share this page">
+                <Share2 className="h-4 w-4" />
+              </Button>
               <Link to={`/agency/${slug}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">Register</Link>
               <Link to={`/agency/${slug}`} className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">Sign in</Link>
             </div>
