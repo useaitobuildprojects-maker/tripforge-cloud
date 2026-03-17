@@ -18,10 +18,11 @@ Deno.serve(async (req: Request) => {
   try {
     const url = new URL(req.url);
     const slug = url.searchParams.get("slug");
-    const page = url.searchParams.get("page") || "home";
+    const rawPage = url.searchParams.get("page") || "home";
+    const page = ["home", "fleet", "contact", "about"].includes(rawPage) ? rawPage : "home";
 
     if (!slug) {
-      return new Response("Missing slug parameter", { status: 400 });
+      return new Response("Missing slug parameter", { status: 400, headers: corsHeaders });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -33,7 +34,7 @@ Deno.serve(async (req: Request) => {
       .single();
 
     if (error || !agency) {
-      return new Response("Agency not found", { status: 404 });
+      return new Response("Agency not found", { status: 404, headers: corsHeaders });
     }
 
     // Resolve per-page SEO, falling back to agency-level then defaults
@@ -52,6 +53,13 @@ Deno.serve(async (req: Request) => {
     const pagePath = page === "home" ? "" : `/${page}`;
     const realUrl = `${SITE_URL}/agency/${agency.slug}${pagePath}`;
 
+    // Humans should get an immediate HTTP redirect.
+    const userAgent = (req.headers.get("user-agent") || "").toLowerCase();
+    if (!isSocialCrawler(userAgent)) {
+      return Response.redirect(realUrl, 302);
+    }
+
+    // Social crawlers should receive HTML with OG/Twitter metadata.
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -68,11 +76,9 @@ Deno.serve(async (req: Request) => {
   <meta name="twitter:title" content="${escapeHtml(title)}" />
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   ${ogImage ? `<meta name="twitter:image" content="${escapeHtml(ogImage)}" />` : ""}
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(realUrl)}" />
 </head>
 <body>
   <p>Redirecting to <a href="${escapeHtml(realUrl)}">${escapeHtml(agency.name)}</a>...</p>
-  <script>window.location.replace("${realUrl}");</script>
 </body>
 </html>`;
 
@@ -84,7 +90,8 @@ Deno.serve(async (req: Request) => {
       },
     });
   } catch (err) {
-    return new Response(`Error: ${err.message}`, { status: 500 });
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return new Response(`Error: ${message}`, { status: 500, headers: corsHeaders });
   }
 });
 
@@ -95,4 +102,17 @@ function escapeHtml(str: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+function isSocialCrawler(userAgent: string): boolean {
+  return [
+    "whatsapp",
+    "facebookexternalhit",
+    "twitterbot",
+    "linkedinbot",
+    "telegrambot",
+    "slackbot",
+    "discordbot",
+    "skypeuripreview",
+  ].some((bot) => userAgent.includes(bot));
 }
