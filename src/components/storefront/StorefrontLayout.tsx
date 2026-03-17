@@ -9,7 +9,19 @@ import { toast } from 'sonner';
 
 const StorefrontLayout = () => {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const { data: agency, isLoading } = useAgencyBySlug(slug ?? '');
+
+  // Determine current page from pathname
+  const pathParts = location.pathname.split('/');
+  const currentPage = pathParts[pathParts.length - 1] || 'home';
+  const page = ['fleet', 'contact', 'about'].includes(currentPage) ? currentPage : 'home';
+
+  const handleShare = () => {
+    const shareUrl = getShareUrl(slug ?? '', page);
+    navigator.clipboard.writeText(shareUrl);
+    toast.success('Share link copied to clipboard!');
+  };
 
   useFavicon(agency?.favicon_url);
 
