@@ -267,12 +267,12 @@ const AgencyAdminSettings = () => {
                 <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_description ?? '').length}/160 characters</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`${page}-og`}>OG Image URL</Label>
-                <Input
-                  id={`${page}-og`}
-                  value={pageSeo[page].og_image ?? ''}
-                  onChange={(e) => updatePageSeo(page, 'og_image', e.target.value)}
-                  placeholder="https://..."
+                <Label>OG Image</Label>
+                <OgImageUpload
+                  currentUrl={pageSeo[page].og_image ?? ''}
+                  agencyId={agency.id}
+                  agencySlug={agency.slug}
+                  onUploaded={(url) => updatePageSeo(page, 'og_image', url)}
                 />
               </div>
             </TabsContent>
