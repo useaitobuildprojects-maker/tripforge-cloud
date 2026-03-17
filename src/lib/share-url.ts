@@ -5,5 +5,5 @@ const SUPABASE_URL = 'https://uypsjomkikkvbmutsjkt.supabase.co';
  * The edge function serves HTML with correct meta then redirects to the real page.
  */
 export const getShareUrl = (slug: string, page: string = 'home'): string => {
-  return `${SUPABASE_URL}/functions/v1/og-image?slug=${encodeURIComponent(slug)}&page=${encodeURIComponent(page)}`;
+  return `${SUPABASE_URL}/functions/v1/bright-action?slug=${encodeURIComponent(slug)}&page=${encodeURIComponent(page)}`;
 };
