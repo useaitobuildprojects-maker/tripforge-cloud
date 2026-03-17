@@ -11,7 +11,7 @@ export const useAgencyImageUpload = () => {
     agencyId: string,
     agencySlug: string,
     file: File,
-    type: 'logo' | 'favicon',
+    type: 'logo' | 'favicon' | 'og',
   ) => {
     setUploading(true);
     try {
