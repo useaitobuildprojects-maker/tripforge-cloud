@@ -1,0 +1,2 @@
+[functions.og-image]
+verify_jwt = false
