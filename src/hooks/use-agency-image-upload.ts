@@ -11,7 +11,7 @@ export const useAgencyImageUpload = () => {
     agencyId: string,
     agencySlug: string,
     file: File,
-    type: 'logo' | 'favicon',
+    type: 'logo' | 'favicon' | 'og',
   ) => {
     setUploading(true);
     try {
@@ -28,23 +28,27 @@ export const useAgencyImageUpload = () => {
         .from('agency-assets')
         .getPublicUrl(filePath);
 
-      const field = type === 'logo' ? 'logo_url' : 'favicon_url';
+      // For logo/favicon, update the agency record directly
+      if (type !== 'og') {
+        const field = type === 'logo' ? 'logo_url' : 'favicon_url';
 
-      const { data: updatedAgency, error: updateError } = await supabase
-        .from('agencies')
-        .update({ [field]: publicUrl })
-        .eq('id', agencyId)
-        .select('id')
-        .maybeSingle();
+        const { data: updatedAgency, error: updateError } = await supabase
+          .from('agencies')
+          .update({ [field]: publicUrl })
+          .eq('id', agencyId)
+          .select('id')
+          .maybeSingle();
 
-      if (updateError) throw updateError;
-      if (!updatedAgency) throw new Error('Update blocked by access policy. Please verify agency update permissions.');
+        if (updateError) throw updateError;
+        if (!updatedAgency) throw new Error('Update blocked by access policy. Please verify agency update permissions.');
+      }
 
       queryClient.invalidateQueries({ queryKey: ['agencies'] });
       queryClient.invalidateQueries({ queryKey: ['agency-admin'] });
       queryClient.invalidateQueries({ queryKey: ['agency'] });
 
-      toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} uploaded successfully`);
+      const label = type === 'logo' ? 'Logo' : type === 'favicon' ? 'Favicon' : 'OG Image';
+      toast.success(`${label} uploaded successfully`);
       return publicUrl;
     } catch (error: any) {
       toast.error(`Failed to upload ${type}: ${error.message}`);
