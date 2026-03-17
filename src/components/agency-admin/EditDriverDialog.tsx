@@ -76,13 +76,13 @@ const EditDriverDialog = ({ driver, open, onOpenChange }: EditDriverDialogProps)
           </div>
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select value={status} onValueChange={(v) => setStatus(v as 'available' | 'busy' | 'offline')}>
+            <Select value={status} onValueChange={(v) => setStatus(v as 'available' | 'on_trip' | 'offline')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="busy">On Trip</SelectItem>
+                <SelectItem value="on_trip">On Trip</SelectItem>
                 <SelectItem value="offline">Offline</SelectItem>
               </SelectContent>
             </Select>

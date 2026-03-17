@@ -10,7 +10,7 @@ export interface Driver {
   base_location: string | null;
   current_lat: number | null;
   current_lng: number | null;
-  status: 'available' | 'busy' | 'offline';
+  status: 'available' | 'on_trip' | 'offline';
   created_at: string;
 }
 

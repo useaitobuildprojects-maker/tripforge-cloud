@@ -12,7 +12,7 @@ import EditDriverDialog from '@/components/agency-admin/EditDriverDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
-  busy: { label: 'On Trip', className: 'bg-accent/10 text-accent border-accent/20' },
+  on_trip: { label: 'On Trip', className: 'bg-accent/10 text-accent border-accent/20' },
   offline: { label: 'Offline', className: 'bg-muted text-muted-foreground border-border' },
 };
 
