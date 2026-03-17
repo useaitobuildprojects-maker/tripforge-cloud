@@ -43,14 +43,12 @@ export const useAgencyImageUpload = () => {
         if (!updatedAgency) throw new Error('Update blocked by access policy. Please verify agency update permissions.');
       }
 
-      if (updateError) throw updateError;
-      if (!updatedAgency) throw new Error('Update blocked by access policy. Please verify agency update permissions.');
-
       queryClient.invalidateQueries({ queryKey: ['agencies'] });
       queryClient.invalidateQueries({ queryKey: ['agency-admin'] });
       queryClient.invalidateQueries({ queryKey: ['agency'] });
 
-      toast.success(`${type === 'logo' ? 'Logo' : 'Favicon'} uploaded successfully`);
+      const label = type === 'logo' ? 'Logo' : type === 'favicon' ? 'Favicon' : 'OG Image';
+      toast.success(`${label} uploaded successfully`);
       return publicUrl;
     } catch (error: any) {
       toast.error(`Failed to upload ${type}: ${error.message}`);
