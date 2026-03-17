@@ -8,7 +8,7 @@ interface CreateDriverInput {
   phone?: string;
   email?: string;
   base_location?: string;
-  status: 'available' | 'busy' | 'offline';
+  status: 'available' | 'on_trip' | 'offline';
 }
 
 export const useCreateDriver = () => {
@@ -40,7 +40,7 @@ interface UpdateDriverInput {
   phone: string | null;
   email: string | null;
   base_location: string | null;
-  status: 'available' | 'busy' | 'offline';
+  status: 'available' | 'on_trip' | 'offline';
 }
 
 export const useUpdateDriver = () => {
