@@ -103,3 +103,16 @@ function escapeHtml(str: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+function isSocialCrawler(userAgent: string): boolean {
+  return [
+    "whatsapp",
+    "facebookexternalhit",
+    "twitterbot",
+    "linkedinbot",
+    "telegrambot",
+    "slackbot",
+    "discordbot",
+    "skypeuripreview",
+  ].some((bot) => userAgent.includes(bot));
+}
