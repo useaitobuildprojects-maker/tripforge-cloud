@@ -141,7 +141,7 @@ const StorefrontHome = () => {
 
       {/* Car Listings */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Best Cars & Deals</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Cars & Deals</h2>
         <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">Find the perfect car for your journey with competitive prices and top-quality vehicles.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sampleCars.map((car, i) => (
