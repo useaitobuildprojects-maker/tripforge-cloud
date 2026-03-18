@@ -49,7 +49,7 @@ const StorefrontHome = () => {
       {/* Search Bar */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          className={`p-5 md:p-6 ${ts.searchBarClass}`}>
+          className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
           <div className="flex items-center gap-6 mb-4">
             <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
               <input type="radio" name="trip" defaultChecked className="accent-accent" /> Pick-up
