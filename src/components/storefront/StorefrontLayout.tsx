@@ -46,9 +46,14 @@ const StorefrontLayout = () => {
   }
 
   const ts = getTemplateStyles(agency.storefront_template);
+  const btnColor = agency.button_color ?? '#c8a951';
+  const bgColor = agency.background_color ?? undefined;
+
+  // Build inline custom style for the storefront
+  const customStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : {};
 
   return (
-    <div className={`min-h-screen ${ts.bodyClass}`}>
+    <div className={`min-h-screen ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
 
       {/* Navigation */}
       <header className={`sticky top-0 z-50 ${ts.headerClass}`}>
@@ -82,14 +87,14 @@ const StorefrontLayout = () => {
                 <Share2 className="h-4 w-4" />
               </Button>
               <Link to={`/agency/${slug}`} className="text-sm opacity-60 hover:opacity-100 transition-opacity">Register</Link>
-              <Link to={`/agency/${slug}`} className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${ts.primaryBtnClass}`}>Sign in</Link>
+              <Link to={`/agency/${slug}`} className="text-sm font-medium px-4 py-2 rounded-lg transition-colors text-white" style={{ backgroundColor: btnColor }}>Sign in</Link>
             </div>
           </div>
         </div>
       </header>
 
       {/* Page Content */}
-      <Outlet context={{ agency, templateStyles: ts }} />
+      <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor }} />
 
       {/* Footer */}
       <footer className={ts.footerClass}>

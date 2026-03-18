@@ -1,7 +1,7 @@
 export type ServiceType = 'car_rental' | 'private_driver' | 'limousine_services' | 'apartment' | 'car_driver';
 
 export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
-export type StorefrontTemplate = 'classic' | 'modern-dark' | 'elegant';
+export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant';
 
 export interface PageSeoEntry {
   meta_title?: string;
@@ -31,6 +31,8 @@ export interface Agency {
   og_image: string | null;
   page_seo: PageSeo | null;
   storefront_template: StorefrontTemplate;
+  button_color: string | null;
+  background_color: string | null;
 }
 
 export interface DashboardStats {

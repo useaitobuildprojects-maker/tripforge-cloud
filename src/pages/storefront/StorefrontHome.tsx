@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontHome = () => {
-  const { agency, templateStyles: ts } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles }>();
+  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -84,7 +84,7 @@ const StorefrontHome = () => {
               </div>
             </div>
             <div>
-              <Button className={`w-full h-11 rounded-lg font-semibold gap-2 ${ts.primaryBtnClass}`}>
+              <Button className="w-full h-11 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
                 <Search className="h-4 w-4" /> Search
               </Button>
             </div>
@@ -168,7 +168,7 @@ const StorefrontHome = () => {
                     <span className="text-xs opacity-50 line-through">${(car.price * 1.2).toLocaleString()}</span>
                     <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
                   </div>
-                  <Button size="sm" className={`rounded-lg text-xs h-9 px-4 ${ts.primaryBtnClass}`}>
+                  <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
                     Book now
                   </Button>
                 </div>

@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontFleet = () => {
-  const { agency, templateStyles: ts } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles }>();
+  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -71,7 +71,7 @@ const StorefrontFleet = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-lg font-bold">${car.price}<span className="text-xs font-normal opacity-50">/day</span></p>
-                  <Button size="sm" className={`rounded-lg ${ts.primaryBtnClass}`}>Book Now</Button>
+                  <Button size="sm" className="rounded-lg text-white" style={{ backgroundColor: buttonColor }}>Book Now</Button>
                 </div>
               </div>
             </motion.div>
