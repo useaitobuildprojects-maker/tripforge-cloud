@@ -146,7 +146,7 @@ const StorefrontHome = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sampleCars.map((car, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`}>
+              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
               <div className="h-44 flex items-center justify-center opacity-30">
                 <Car className="h-16 w-16" />
               </div>
