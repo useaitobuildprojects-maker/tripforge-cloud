@@ -32,14 +32,14 @@ const StorefrontHome = () => {
       />
 
       {/* Hero Section */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`}>
-        {ts.heroOverlayClass && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} />}
+      <section className={`relative overflow-hidden ${ts.heroClass}`} style={ts.heroStyle}>
+        {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`}>
+            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>
               {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
-            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`}>
+            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>
               {cfg.hero_subtitle || `Discover the best deals on car rentals at ${agency.name} in ${agency.city}`}
             </p>
           </motion.div>
@@ -49,7 +49,7 @@ const StorefrontHome = () => {
       {/* Search Bar */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          className={`p-5 md:p-6 ${ts.searchBarClass}`}>
+          className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
           <div className="flex items-center gap-6 mb-4">
             <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
               <input type="radio" name="trip" defaultChecked className="accent-accent" /> Pick-up
@@ -102,8 +102,8 @@ const StorefrontHome = () => {
             { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off your vehicle at convenient locations across the region.' },
           ].map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              className={`text-center p-8 rounded-2xl transition-shadow ${ts.cardClass} ${ts.cardHoverClass}`}>
-              <div className={`inline-flex items-center justify-center h-16 w-16 rounded-full mb-5 ${ts.iconBgClass}`}>
+              className={`text-center p-8 rounded-2xl transition-shadow ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
+              <div className={`inline-flex items-center justify-center h-16 w-16 rounded-full mb-5 ${ts.iconBgClass}`} style={ts.iconBgStyle}>
                 <item.icon className="h-7 w-7" />
               </div>
               <h3 className="text-lg font-bold mb-2">{item.title}</h3>
@@ -115,19 +115,19 @@ const StorefrontHome = () => {
 
       {/* Featured Car */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`}>
-          {ts.heroOverlayClass && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} />}
+        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative' }}>
+          {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
           <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
             <div className="flex-1">
-              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`}>Best Offer</span>
-              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`}>Hyundai Tucson 2021 SUV</h3>
-              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`}>$200,000 / day</p>
+              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>Best Offer</span>
+              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>Hyundai Tucson 2021 SUV</h3>
+              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>$200,000 / day</p>
               <p className="text-2xl font-bold text-accent">$150,000 / day</p>
               <div className="flex items-center gap-1 mt-3">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                 ))}
-                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`}>(450 recommends)</span>
+                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>(450 recommends)</span>
               </div>
             </div>
             <div className="flex-1 flex items-center justify-center">
@@ -146,7 +146,7 @@ const StorefrontHome = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sampleCars.map((car, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`}>
+              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
               <div className="h-44 flex items-center justify-center opacity-30">
                 <Car className="h-16 w-16" />
               </div>
@@ -184,7 +184,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* Blog Section */}
-      <section className={`py-20 ${ts.sectionAltClass}`}>
+      <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Blog</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
@@ -193,7 +193,7 @@ const StorefrontHome = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((_, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`}>
+                className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
                 <div className="h-48 opacity-10 bg-current" />
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
@@ -223,7 +223,7 @@ const StorefrontHome = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className={`p-6 rounded-2xl border ${i === 1 ? ts.testimonialHighlightClass : ts.testimonialNormalClass}`}>
+              className={`p-6 rounded-2xl border ${i === 1 ? ts.testimonialHighlightClass : ts.testimonialNormalClass}`} style={i === 1 ? ts.testimonialHighlightStyle : ts.testimonialNormalStyle}>
               <div className="flex items-center gap-3 mb-4">
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-bold ${i === 1 ? 'bg-white/20' : 'opacity-30 bg-current'}`}>
                   {t.name.split(' ').map(n => n[0]).join('')}
