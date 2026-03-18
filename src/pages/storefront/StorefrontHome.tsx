@@ -168,7 +168,7 @@ const StorefrontHome = () => {
                     <span className="text-xs opacity-50 line-through">${(car.price * 1.2).toLocaleString()}</span>
                     <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
                   </div>
-                  <Button size="sm" className={`rounded-lg text-xs h-9 px-4 ${ts.primaryBtnClass}`}>
+                  <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
                     Book now
                   </Button>
                 </div>

@@ -71,7 +71,7 @@ const StorefrontFleet = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-lg font-bold">${car.price}<span className="text-xs font-normal opacity-50">/day</span></p>
-                  <Button size="sm" className={`rounded-lg ${ts.primaryBtnClass}`}>Book Now</Button>
+                  <Button size="sm" className="rounded-lg text-white" style={{ backgroundColor: buttonColor }}>Book Now</Button>
                 </div>
               </div>
             </motion.div>
