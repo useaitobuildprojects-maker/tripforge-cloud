@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 import { Car, Users, Fuel, Settings2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
+import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontFleet = () => {
-  const { agency } = useOutletContext<{ agency: Agency }>();
+  const { agency, templateStyles: ts } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles }>();
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -27,11 +28,11 @@ const StorefrontFleet = () => {
       />
 
       {/* Hero */}
-      <section className="bg-primary/5 py-16">
+      <section className={`py-16 ${ts.subHeroClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Our Fleet</h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">Our Fleet</h1>
+            <p className="opacity-60 max-w-2xl mx-auto">
               Explore our carefully curated selection of premium vehicles, ready for your next adventure in {agency.city}.
             </p>
           </motion.div>
@@ -47,30 +48,30 @@ const StorefrontFleet = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              className={`overflow-hidden transition-shadow ${ts.cardClass} ${ts.cardHoverClass}`}
             >
-              <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
-                <Car className="h-16 w-16 text-gray-300" />
+              <div className="h-48 flex items-center justify-center opacity-20">
+                <Car className="h-16 w-16" />
               </div>
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-foreground">{car.name}</h3>
-                  <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">{car.type}</span>
+                  <h3 className="font-bold">{car.name}</h3>
+                  <span className="text-xs px-2 py-0.5 rounded-full opacity-60 border border-current/20">{car.type}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mb-3">{car.year}</p>
+                <p className="text-xs opacity-50 mb-3">{car.year}</p>
                 <div className="flex items-center gap-1 mb-3">
                   <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{car.rating}</span>
-                  <span className="text-xs text-muted-foreground">({car.reviews})</span>
+                  <span className="text-xs opacity-50">({car.reviews})</span>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+                <div className="flex items-center gap-4 text-xs opacity-50 mb-4">
                   <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{car.seats}</span>
                   <span className="flex items-center gap-1"><Settings2 className="h-3.5 w-3.5" />{car.transmission}</span>
                   <span className="flex items-center gap-1"><Fuel className="h-3.5 w-3.5" />{car.fuel}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-lg font-bold text-foreground">${car.price}<span className="text-xs font-normal text-muted-foreground">/day</span></p>
-                  <Button size="sm" className="rounded-lg">Book Now</Button>
+                  <p className="text-lg font-bold">${car.price}<span className="text-xs font-normal opacity-50">/day</span></p>
+                  <Button size="sm" className={`rounded-lg ${ts.primaryBtnClass}`}>Book Now</Button>
                 </div>
               </div>
             </motion.div>
