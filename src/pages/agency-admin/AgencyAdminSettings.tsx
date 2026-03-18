@@ -70,6 +70,8 @@ const AgencyAdminSettings = () => {
       else setFaviconPreview(url);
     }
   };
+  const [selectedTemplate, setSelectedTemplate] = useState<StorefrontTemplate>(agency.storefront_template ?? 'classic');
+
   const [form, setForm] = useState({
     name: agency.name,
     contact_email: agency.contact_email,
