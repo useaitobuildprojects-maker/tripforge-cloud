@@ -223,7 +223,7 @@ const StorefrontHome = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className={`p-6 rounded-2xl border ${i === 1 ? ts.testimonialHighlightClass : ts.testimonialNormalClass}`}>
+              className={`p-6 rounded-2xl border ${i === 1 ? ts.testimonialHighlightClass : ts.testimonialNormalClass}`} style={i === 1 ? ts.testimonialHighlightStyle : ts.testimonialNormalStyle}>
               <div className="flex items-center gap-3 mb-4">
                 <div className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-bold ${i === 1 ? 'bg-white/20' : 'opacity-30 bg-current'}`}>
                   {t.name.split(' ').map(n => n[0]).join('')}
