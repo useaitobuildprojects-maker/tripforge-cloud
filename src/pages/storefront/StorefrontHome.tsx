@@ -184,7 +184,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* Blog Section */}
-      <section className={`py-20 ${ts.sectionAltClass}`}>
+      <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Blog</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
@@ -193,7 +193,7 @@ const StorefrontHome = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((_, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`}>
+                className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
                 <div className="h-48 opacity-10 bg-current" />
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
