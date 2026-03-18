@@ -186,7 +186,7 @@ const StorefrontHome = () => {
       {/* Blog Section */}
       <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Blog</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Blog</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
             Discover the latest news and useful articles about car rental and travel tips
           </p>
