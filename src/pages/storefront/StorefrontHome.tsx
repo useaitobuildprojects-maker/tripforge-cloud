@@ -37,10 +37,10 @@ const StorefrontHome = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
             <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`}>
-              Promote Mobility: Rent a Car<br />Tailored to Your Needs
+              {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
             <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`}>
-              Discover the best deals on car rentals at {agency.name} in {agency.city}
+              {cfg.hero_subtitle || `Discover the best deals on car rentals at ${agency.name} in ${agency.city}`}
             </p>
           </motion.div>
         </div>
