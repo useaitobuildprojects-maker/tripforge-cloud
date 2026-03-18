@@ -11,6 +11,7 @@ import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
+import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
