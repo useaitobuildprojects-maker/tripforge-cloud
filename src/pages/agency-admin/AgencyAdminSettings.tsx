@@ -140,6 +140,7 @@ const AgencyAdminSettings = () => {
       storefront_template: selectedTemplate,
       button_color: buttonColor,
       background_color: bgColor,
+      storefront_config: storefrontConfig,
     });
   };
 
