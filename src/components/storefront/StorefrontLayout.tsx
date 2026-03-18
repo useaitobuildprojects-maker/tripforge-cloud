@@ -109,10 +109,17 @@ const StorefrontLayout = () => {
                 Your trusted partner for premium car rentals and travel services in {agency.city}, {agency.country}.
               </p>
               <div className="flex items-center gap-4">
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Facebook className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Twitter className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Instagram className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Youtube className="h-5 w-5" /></a>
+                {cfg.facebook_url && <a href={cfg.facebook_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Facebook className="h-5 w-5" /></a>}
+                {cfg.twitter_url && <a href={cfg.twitter_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Twitter className="h-5 w-5" /></a>}
+                {cfg.instagram_url && <a href={cfg.instagram_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Instagram className="h-5 w-5" /></a>}
+                {cfg.whatsapp_number && <a href={`https://wa.me/${encodeURIComponent(cfg.whatsapp_number.replace(/[^0-9+]/g, ''))}`} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><MessageCircle className="h-5 w-5" /></a>}
+                {!cfg.facebook_url && !cfg.twitter_url && !cfg.instagram_url && !cfg.whatsapp_number && (
+                  <>
+                    <span className="opacity-30"><Facebook className="h-5 w-5" /></span>
+                    <span className="opacity-30"><Twitter className="h-5 w-5" /></span>
+                    <span className="opacity-30"><Instagram className="h-5 w-5" /></span>
+                  </>
+                )}
               </div>
             </div>
             <div>
