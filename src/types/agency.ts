@@ -30,6 +30,7 @@ export interface Agency {
   meta_description: string | null;
   og_image: string | null;
   page_seo: PageSeo | null;
+  storefront_template: StorefrontTemplate;
 }
 
 export interface DashboardStats {
