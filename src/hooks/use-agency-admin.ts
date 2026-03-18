@@ -22,6 +22,7 @@ const mapAgency = (a: any): Agency => ({
   meta_description: a.meta_description ?? null,
   og_image: a.og_image ?? null,
   page_seo: a.page_seo ?? null,
+  storefront_template: a.storefront_template ?? 'classic',
 });
 
 /** Fetch the agency that the current user administrates (by slug + RLS) */

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
-import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry } from '@/types/agency';
+import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry, StorefrontTemplate } from '@/types/agency';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
+import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
@@ -69,6 +70,8 @@ const AgencyAdminSettings = () => {
       else setFaviconPreview(url);
     }
   };
+  const [selectedTemplate, setSelectedTemplate] = useState<StorefrontTemplate>(agency.storefront_template ?? 'classic');
+
   const [form, setForm] = useState({
     name: agency.name,
     contact_email: agency.contact_email,
@@ -130,6 +133,7 @@ const AgencyAdminSettings = () => {
       meta_description: pageSeo.home.meta_description || undefined,
       og_image: pageSeo.home.og_image || undefined,
       page_seo: Object.keys(cleanedPageSeo).length > 0 ? cleanedPageSeo : undefined,
+      storefront_template: selectedTemplate,
     });
   };
 
@@ -141,6 +145,20 @@ const AgencyAdminSettings = () => {
         <p className="text-sm text-muted-foreground mt-1.5 font-light">
           Manage your agency profile and storefront settings
         </p>
+      </motion.div>
+
+      {/* Storefront Template */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="card-premium rounded-xl p-7 space-y-6"
+      >
+        <div>
+          <h2 className="text-lg font-display font-bold text-foreground">Storefront Template</h2>
+          <p className="text-sm text-muted-foreground mt-1">Choose a design template for your public website</p>
+        </div>
+        <TemplatePicker value={selectedTemplate} onChange={setSelectedTemplate} />
       </motion.div>
 
       {/* Branding — Logo & Favicon */}
