@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, ExternalLink, MapPin, SlidersHorizontal, Pencil, Trash2, Eye, Car, CircleDot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
 import AgencyFormDialog from '@/components/admin/AgencyFormDialog';
 import DeleteAgencyDialog from '@/components/admin/DeleteAgencyDialog';
 import { useAgencies } from '@/hooks/use-agencies';
+import { useAllVehicles } from '@/hooks/use-vehicles';
 import { Agency } from '@/types/agency';
 import { Skeleton } from '@/components/ui/skeleton';
 
