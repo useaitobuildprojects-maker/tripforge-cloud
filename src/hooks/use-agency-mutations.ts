@@ -18,6 +18,7 @@ interface CreateAgencyInput {
   page_seo?: PageSeo;
   logo_url?: string;
   favicon_url?: string;
+  storefront_template?: StorefrontTemplate;
 }
 
 export const useCreateAgency = () => {

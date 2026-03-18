@@ -147,6 +147,20 @@ const AgencyAdminSettings = () => {
         </p>
       </motion.div>
 
+      {/* Storefront Template */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="card-premium rounded-xl p-7 space-y-6"
+      >
+        <div>
+          <h2 className="text-lg font-display font-bold text-foreground">Storefront Template</h2>
+          <p className="text-sm text-muted-foreground mt-1">Choose a design template for your public website</p>
+        </div>
+        <TemplatePicker value={selectedTemplate} onChange={setSelectedTemplate} />
+      </motion.div>
+
       {/* Branding — Logo & Favicon */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
