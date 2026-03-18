@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Car, Users, Fuel, Settings2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontFleet = () => {
-  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
+  const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },

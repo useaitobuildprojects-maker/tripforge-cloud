@@ -1,7 +1,7 @@
 import { Outlet, useParams, useLocation, Link } from 'react-router-dom';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { useFavicon } from '@/hooks/use-favicon';
-import { Mail, MapPin, Facebook, Twitter, Instagram, Youtube, Share2 } from 'lucide-react';
+import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getShareUrl } from '@/lib/share-url';
@@ -48,12 +48,15 @@ const StorefrontLayout = () => {
   const ts = getTemplateStyles(agency.storefront_template);
   const btnColor = agency.button_color ?? '#c8a951';
   const bgColor = agency.background_color ?? undefined;
+  const cfg = agency.storefront_config ?? {};
 
-  // Build inline custom style for the storefront
+  // Font class mapping
+  const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
+
   const customStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : {};
 
   return (
-    <div className={`min-h-screen ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
+    <div className={`min-h-screen ${fontClass} ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
 
       {/* Navigation */}
       <header className={`sticky top-0 z-50 ${ts.headerClass}`}>
@@ -94,7 +97,7 @@ const StorefrontLayout = () => {
       </header>
 
       {/* Page Content */}
-      <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor }} />
+      <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
       {/* Footer */}
       <footer className={ts.footerClass}>
@@ -106,10 +109,17 @@ const StorefrontLayout = () => {
                 Your trusted partner for premium car rentals and travel services in {agency.city}, {agency.country}.
               </p>
               <div className="flex items-center gap-4">
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Facebook className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Twitter className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Instagram className="h-5 w-5" /></a>
-                <a href="#" className="opacity-50 hover:opacity-100 transition-opacity"><Youtube className="h-5 w-5" /></a>
+                {cfg.facebook_url && <a href={cfg.facebook_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Facebook className="h-5 w-5" /></a>}
+                {cfg.twitter_url && <a href={cfg.twitter_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Twitter className="h-5 w-5" /></a>}
+                {cfg.instagram_url && <a href={cfg.instagram_url} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><Instagram className="h-5 w-5" /></a>}
+                {cfg.whatsapp_number && <a href={`https://wa.me/${encodeURIComponent(cfg.whatsapp_number.replace(/[^0-9+]/g, ''))}`} target="_blank" rel="noopener noreferrer" className="opacity-50 hover:opacity-100 transition-opacity"><MessageCircle className="h-5 w-5" /></a>}
+                {!cfg.facebook_url && !cfg.twitter_url && !cfg.instagram_url && !cfg.whatsapp_number && (
+                  <>
+                    <span className="opacity-30"><Facebook className="h-5 w-5" /></span>
+                    <span className="opacity-30"><Twitter className="h-5 w-5" /></span>
+                    <span className="opacity-30"><Instagram className="h-5 w-5" /></span>
+                  </>
+                )}
               </div>
             </div>
             <div>

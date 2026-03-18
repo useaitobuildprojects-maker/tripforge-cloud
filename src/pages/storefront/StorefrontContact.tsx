@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Clock, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontContact = () => {
-  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
+  const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   return (
     <div>
@@ -41,8 +41,9 @@ const StorefrontContact = () => {
                 {[
                   { icon: Mail, title: 'Email', value: agency.contact_email },
                   { icon: MapPin, title: 'Location', value: `${agency.city}, ${agency.country}` },
-                  { icon: Phone, title: 'Phone', value: '+1 (555) 000-0000' },
-                  { icon: Clock, title: 'Working Hours', value: 'Mon–Fri: 8:00 AM – 8:00 PM' },
+                  { icon: Phone, title: 'Phone', value: cfg.phone || '+1 (555) 000-0000' },
+                  { icon: Clock, title: 'Working Hours', value: cfg.working_hours || 'Mon–Fri: 8:00 AM – 8:00 PM' },
+                  ...(cfg.working_hours_weekend ? [{ icon: Clock, title: 'Weekend Hours', value: cfg.working_hours_weekend }] : []),
                 ].map((item) => (
                   <div key={item.title} className="flex items-start gap-4">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${ts.iconBgClass}`}>

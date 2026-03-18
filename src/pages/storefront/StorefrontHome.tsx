@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontHome = () => {
-  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
+  const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -37,10 +37,10 @@ const StorefrontHome = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
             <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`}>
-              Promote Mobility: Rent a Car<br />Tailored to Your Needs
+              {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
             <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`}>
-              Discover the best deals on car rentals at {agency.name} in {agency.city}
+              {cfg.hero_subtitle || `Discover the best deals on car rentals at ${agency.name} in ${agency.city}`}
             </p>
           </motion.div>
         </div>
@@ -169,7 +169,7 @@ const StorefrontHome = () => {
                     <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
                   </div>
                   <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
-                    Book now
+                    {cfg.cta_text || 'Book now'}
                   </Button>
                 </div>
               </div>

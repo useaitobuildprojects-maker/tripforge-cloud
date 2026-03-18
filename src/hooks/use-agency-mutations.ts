@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { PageSeo, StorefrontTemplate } from '@/types/agency';
+import { PageSeo, StorefrontTemplate, StorefrontConfig } from '@/types/agency';
 import { toast } from 'sonner';
 
 interface CreateAgencyInput {
@@ -21,6 +21,7 @@ interface CreateAgencyInput {
   storefront_template?: StorefrontTemplate;
   button_color?: string;
   background_color?: string;
+  storefront_config?: StorefrontConfig;
 }
 
 export const useCreateAgency = () => {

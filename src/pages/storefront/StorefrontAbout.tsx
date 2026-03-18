@@ -1,12 +1,12 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Shield, Award, Users, Clock } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontAbout = () => {
-  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
+  const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const values = [
     { icon: Shield, title: 'Trust & Safety', desc: 'Every vehicle is thoroughly inspected and insured for your peace of mind.' },
