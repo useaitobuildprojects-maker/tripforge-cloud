@@ -19,6 +19,8 @@ interface CreateAgencyInput {
   logo_url?: string;
   favicon_url?: string;
   storefront_template?: StorefrontTemplate;
+  button_color?: string;
+  background_color?: string;
 }
 
 export const useCreateAgency = () => {
