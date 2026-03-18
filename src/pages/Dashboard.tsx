@@ -14,7 +14,6 @@ const Dashboard = () => {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: vehicles = [], isLoading: vehiclesLoading } = useAllVehicles();
   const recentAgencies = agencies.slice(0, 4);
-  const recentAgencies = agencies.slice(0, 4);
 
   const defaultStats = { total_agencies: 0, active_agencies: 0, total_bookings: 0, total_revenue: 0, bookings_growth: 0, revenue_growth: 0 };
   const s = stats ?? defaultStats;
