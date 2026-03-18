@@ -399,12 +399,8 @@ const AgencyAdminSettings = () => {
         </Tabs>
       </motion.div>
 
-      {/* Storefront Content Config */}
-      <StorefrontConfigEditor
-        config={storefrontConfig}
-        onChange={setStorefrontConfig}
-        agencyName={agency.name}
-      />
+
+
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
