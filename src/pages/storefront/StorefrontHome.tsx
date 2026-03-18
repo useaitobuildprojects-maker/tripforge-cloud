@@ -169,7 +169,7 @@ const StorefrontHome = () => {
                     <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
                   </div>
                   <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
-                    Book now
+                    {cfg.cta_text || 'Book now'}
                   </Button>
                 </div>
               </div>
