@@ -58,21 +58,21 @@ const minimalStyles: TemplateStyles = {
 };
 
 const elegantStyles: TemplateStyles = {
-  headerClass: 'bg-[#faf8f5] border-b border-[#e8ddd0]',
-  footerClass: 'bg-[#f5f0eb] border-t border-[#e8ddd0] text-[#2c1810]',
+  headerClass: 'bg-[#faf8f5] border-b border-[#e0d3c3] shadow-sm',
+  footerClass: 'bg-[#2c1810] border-t border-[#3d2316] text-[#faf8f5]',
   bodyClass: 'bg-[#f5f0eb]',
   heroClass: 'bg-[#2c1810]',
-  heroOverlayClass: 'bg-gradient-to-br from-[#2c1810] via-[#3d2316] to-[#4a2c1a]',
-  heroTitleClass: 'text-[#faf8f5] font-serif',
-  heroSubtitleClass: 'text-[#faf8f5]/50',
-  cardClass: 'bg-[#faf8f5] border border-[#e8ddd0] rounded-xl',
-  cardHoverClass: 'hover:shadow-lg',
-  sectionAltClass: 'bg-[#f0e8de]',
+  heroOverlayClass: 'bg-gradient-to-br from-[#1a0e08] via-[#2c1810] to-[#3d2316]',
+  heroTitleClass: 'text-white font-serif',
+  heroSubtitleClass: 'text-[#d4c5b3]',
+  cardClass: 'bg-[#faf8f5] border border-[#e0d3c3] rounded-xl shadow-sm',
+  cardHoverClass: 'hover:shadow-lg hover:border-[#c8a951]/30',
+  sectionAltClass: 'bg-[#efe6d8]',
   primaryBtnClass: '',
-  testimonialHighlightClass: 'bg-[#2c1810] text-[#faf8f5] border-[#4a2c1a]',
-  testimonialNormalClass: 'bg-[#faf8f5] border-[#e8ddd0]',
-  searchBarClass: 'bg-[#faf8f5] rounded-2xl shadow-xl border border-[#e8ddd0]',
-  iconBgClass: 'bg-[#b8860b]/10 text-[#b8860b]',
+  testimonialHighlightClass: 'bg-[#2c1810] text-[#faf8f5] border-[#3d2316]',
+  testimonialNormalClass: 'bg-[#faf8f5] border-[#e0d3c3]',
+  searchBarClass: 'bg-[#faf8f5] rounded-2xl shadow-xl border border-[#e0d3c3]',
+  iconBgClass: 'bg-[#c8a951]/15 text-[#b8860b]',
   subHeroClass: 'bg-[#2c1810]/5',
 };
 
