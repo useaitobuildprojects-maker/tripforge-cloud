@@ -1,4 +1,4 @@
-export type ServiceType = 'car_rental' | 'private_driver' | 'hotel' | 'travel_package';
+export type ServiceType = 'car_rental' | 'private_driver' | 'limousine_services' | 'apartment' | 'car_driver';
 
 export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
 
@@ -41,17 +41,19 @@ export interface DashboardStats {
 }
 
 export const SERVICE_LABELS: Record<ServiceType, string> = {
-  car_rental: 'Car Rentals',
-  private_driver: 'Private Drivers',
-  hotel: 'Hotels',
-  travel_package: 'Travel Packages',
+  car_rental: 'Car Rental',
+  private_driver: 'Private Driver',
+  limousine_services: 'Limousine Services',
+  apartment: 'Apartment',
+  car_driver: 'Car Driver',
 };
 
 export const SERVICE_ICONS: Record<ServiceType, string> = {
   car_rental: 'Car',
   private_driver: 'UserCheck',
-  hotel: 'Hotel',
-  travel_package: 'Globe',
+  limousine_services: 'Crown',
+  apartment: 'Building',
+  car_driver: 'Truck',
 };
 
 export const PAGE_LABELS: Record<StorefrontPage, string> = {

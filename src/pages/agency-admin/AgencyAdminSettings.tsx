@@ -11,7 +11,7 @@ import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 
-const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'hotel', 'travel_package'];
+const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
