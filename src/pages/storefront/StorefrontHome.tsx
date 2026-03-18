@@ -32,14 +32,14 @@ const StorefrontHome = () => {
       />
 
       {/* Hero Section */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`} style={ts.heroStyle}>
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
+        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>
+            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
               {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
-            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>
+            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
               {cfg.hero_subtitle || `Discover the best deals on car rentals at ${agency.name} in ${agency.city}`}
             </p>
           </motion.div>
@@ -94,7 +94,7 @@ const StorefrontHome = () => {
 
       {/* Why Choose Us */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Why Choose Us</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Why Choose Us</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { icon: Phone, title: 'Customer Support', desc: 'Our dedicated team is available 24/7 to assist you with any questions or issues.' },
@@ -115,13 +115,13 @@ const StorefrontHome = () => {
 
       {/* Featured Car */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative' }}>
-          {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
+          {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
           <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
             <div className="flex-1">
-              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>Best Offer</span>
-              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>Hyundai Tucson 2021 SUV</h3>
-              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>$200,000 / day</p>
+              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>Best Offer</span>
+              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>Hyundai Tucson 2021 SUV</h3>
+              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>$200,000 / day</p>
               <p className="text-2xl font-bold text-accent">$150,000 / day</p>
               <div className="flex items-center gap-1 mt-3">
                 {[...Array(5)].map((_, i) => (
@@ -141,7 +141,7 @@ const StorefrontHome = () => {
 
       {/* Car Listings */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Best Cars & Deals</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Cars & Deals</h2>
         <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">Find the perfect car for your journey with competitive prices and top-quality vehicles.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {sampleCars.map((car, i) => (
@@ -186,7 +186,7 @@ const StorefrontHome = () => {
       {/* Blog Section */}
       <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Blog</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Blog</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
             Discover the latest news and useful articles about car rental and travel tips
           </p>
@@ -216,7 +216,7 @@ const StorefrontHome = () => {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3">Trusted by Thousands of Happy Customers</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Trusted by Thousands of Happy Customers</h2>
         <p className="text-center text-sm opacity-60 mb-12 max-w-lg mx-auto">
           Our customers' opinions help us improve your experience and offer the best services
         </p>

@@ -53,13 +53,24 @@ const StorefrontLayout = () => {
   // Font class mapping
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
 
+  // Build styles with color overrides from config
+  const headerStyle: React.CSSProperties = {
+    ...(ts.headerStyle ?? {}),
+    ...(cfg.nav_bg_color ? { backgroundColor: cfg.nav_bg_color } : {}),
+    ...(cfg.nav_text_color ? { color: cfg.nav_text_color } : {}),
+  };
+  const footerStyle: React.CSSProperties = {
+    ...(ts.footerStyle ?? {}),
+    ...(cfg.footer_bg_color ? { backgroundColor: cfg.footer_bg_color } : {}),
+    ...(cfg.footer_text_color ? { color: cfg.footer_text_color } : {}),
+  };
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : (ts.bodyStyle ?? {});
 
   return (
     <div className={`min-h-screen ${fontClass} ${!bgColor ? ts.bodyClass : ''}`} style={bodyStyle}>
 
       {/* Navigation */}
-      <header className={`sticky top-0 z-50 ${ts.headerClass}`} style={ts.headerStyle}>
+      <header className={`sticky top-0 z-50 ${ts.headerClass}`} style={headerStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to={`/agency/${slug}`} className="flex items-center gap-3">
@@ -100,7 +111,7 @@ const StorefrontLayout = () => {
       <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
       {/* Footer */}
-      <footer className={ts.footerClass} style={ts.footerStyle}>
+      <footer className={ts.footerClass} style={footerStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>

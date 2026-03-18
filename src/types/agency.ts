@@ -11,6 +11,15 @@ export interface StorefrontConfig {
   cta_text?: string;
   // Font
   font?: StorefrontFont;
+  // Color overrides
+  nav_bg_color?: string;
+  nav_text_color?: string;
+  hero_bg_color?: string;
+  hero_text_color?: string;
+  hero_subtitle_color?: string;
+  footer_bg_color?: string;
+  footer_text_color?: string;
+  heading_color?: string;
   // Social links
   facebook_url?: string;
   instagram_url?: string;
