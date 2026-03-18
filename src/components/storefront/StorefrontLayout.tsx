@@ -46,9 +46,14 @@ const StorefrontLayout = () => {
   }
 
   const ts = getTemplateStyles(agency.storefront_template);
+  const btnColor = agency.button_color ?? '#c8a951';
+  const bgColor = agency.background_color ?? undefined;
+
+  // Build inline custom style for the storefront
+  const customStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : {};
 
   return (
-    <div className={`min-h-screen ${ts.bodyClass}`}>
+    <div className={`min-h-screen ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
 
       {/* Navigation */}
       <header className={`sticky top-0 z-50 ${ts.headerClass}`}>
