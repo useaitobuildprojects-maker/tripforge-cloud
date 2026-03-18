@@ -102,8 +102,8 @@ const StorefrontHome = () => {
             { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off your vehicle at convenient locations across the region.' },
           ].map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              className={`text-center p-8 rounded-2xl transition-shadow ${ts.cardClass} ${ts.cardHoverClass}`}>
-              <div className={`inline-flex items-center justify-center h-16 w-16 rounded-full mb-5 ${ts.iconBgClass}`}>
+              className={`text-center p-8 rounded-2xl transition-shadow ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
+              <div className={`inline-flex items-center justify-center h-16 w-16 rounded-full mb-5 ${ts.iconBgClass}`} style={ts.iconBgStyle}>
                 <item.icon className="h-7 w-7" />
               </div>
               <h3 className="text-lg font-bold mb-2">{item.title}</h3>
