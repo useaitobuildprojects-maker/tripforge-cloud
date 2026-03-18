@@ -71,6 +71,8 @@ const AgencyAdminSettings = () => {
     }
   };
   const [selectedTemplate, setSelectedTemplate] = useState<StorefrontTemplate>(agency.storefront_template ?? 'classic');
+  const [buttonColor, setButtonColor] = useState(agency.button_color ?? '#c8a951');
+  const [bgColor, setBgColor] = useState(agency.background_color ?? '#ffffff');
 
   const [form, setForm] = useState({
     name: agency.name,
