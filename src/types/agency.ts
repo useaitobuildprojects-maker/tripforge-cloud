@@ -2,6 +2,25 @@ export type ServiceType = 'car_rental' | 'private_driver' | 'limousine_services'
 
 export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
 export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant';
+export type StorefrontFont = 'sans' | 'serif' | 'modern' | 'rounded';
+
+export interface StorefrontConfig {
+  // Hero
+  hero_title?: string;
+  hero_subtitle?: string;
+  cta_text?: string;
+  // Font
+  font?: StorefrontFont;
+  // Social links
+  facebook_url?: string;
+  instagram_url?: string;
+  twitter_url?: string;
+  whatsapp_number?: string;
+  // Contact details
+  phone?: string;
+  working_hours?: string;
+  working_hours_weekend?: string;
+}
 
 export interface PageSeoEntry {
   meta_title?: string;
@@ -33,7 +52,15 @@ export interface Agency {
   storefront_template: StorefrontTemplate;
   button_color: string | null;
   background_color: string | null;
+  storefront_config: StorefrontConfig | null;
 }
+
+export const FONT_OPTIONS: { id: StorefrontFont; name: string; preview: string }[] = [
+  { id: 'sans', name: 'Sans Serif', preview: 'font-sans' },
+  { id: 'serif', name: 'Serif', preview: 'font-serif' },
+  { id: 'modern', name: 'Modern', preview: 'font-sans tracking-tight' },
+  { id: 'rounded', name: 'Rounded', preview: 'font-sans' },
+];
 
 export interface DashboardStats {
   total_agencies: number;
