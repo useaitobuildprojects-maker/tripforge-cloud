@@ -2,20 +2,33 @@ import { StorefrontTemplate } from '@/types/agency';
 
 export interface TemplateStyles {
   headerClass: string;
+  headerStyle?: React.CSSProperties;
   footerClass: string;
+  footerStyle?: React.CSSProperties;
   bodyClass: string;
+  bodyStyle?: React.CSSProperties;
   heroClass: string;
+  heroStyle?: React.CSSProperties;
   heroOverlayClass: string;
+  heroOverlayStyle?: React.CSSProperties;
   heroTitleClass: string;
+  heroTitleStyle?: React.CSSProperties;
   heroSubtitleClass: string;
+  heroSubtitleStyle?: React.CSSProperties;
   cardClass: string;
+  cardStyle?: React.CSSProperties;
   cardHoverClass: string;
   sectionAltClass: string;
+  sectionAltStyle?: React.CSSProperties;
   primaryBtnClass: string;
   testimonialHighlightClass: string;
+  testimonialHighlightStyle?: React.CSSProperties;
   testimonialNormalClass: string;
+  testimonialNormalStyle?: React.CSSProperties;
   searchBarClass: string;
+  searchBarStyle?: React.CSSProperties;
   iconBgClass: string;
+  iconBgStyle?: React.CSSProperties;
   subHeroClass: string;
 }
 
@@ -58,47 +71,70 @@ const minimalStyles: TemplateStyles = {
 };
 
 const elegantStyles: TemplateStyles = {
-  headerClass: 'bg-[#faf8f5] border-b border-[#e0d3c3] shadow-sm',
-  footerClass: 'bg-[#2c1810] border-t border-[#3d2316] text-[#faf8f5]',
-  bodyClass: 'bg-[#f5f0eb]',
-  heroClass: 'bg-[#2c1810]',
-  heroOverlayClass: 'bg-gradient-to-br from-[#1a0e08] via-[#2c1810] to-[#3d2316]',
-  heroTitleClass: 'text-white font-serif',
-  heroSubtitleClass: 'text-[#d4c5b3]',
-  cardClass: 'bg-[#faf8f5] border border-[#e0d3c3] rounded-xl shadow-sm',
-  cardHoverClass: 'hover:shadow-lg hover:border-[#c8a951]/30',
-  sectionAltClass: 'bg-[#efe6d8]',
+  headerClass: 'border-b shadow-sm',
+  headerStyle: { backgroundColor: '#faf8f5', borderColor: '#e0d3c3' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#2c1810', borderColor: '#3d2316', color: '#faf8f5' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#f5f0eb' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#2c1810' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(to bottom right, #1a0e08, #2c1810, #3d2316)' },
+  heroTitleClass: 'font-serif',
+  heroTitleStyle: { color: '#ffffff' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: '#d4c5b3' },
+  cardClass: 'rounded-xl shadow-sm',
+  cardStyle: { backgroundColor: '#faf8f5', borderWidth: '1px', borderColor: '#e0d3c3' },
+  cardHoverClass: 'hover:shadow-lg',
+  sectionAltClass: '',
+  sectionAltStyle: { backgroundColor: '#efe6d8' },
   primaryBtnClass: '',
-  testimonialHighlightClass: 'bg-[#2c1810] text-[#faf8f5] border-[#3d2316]',
-  testimonialNormalClass: 'bg-[#faf8f5] border-[#e0d3c3]',
-  searchBarClass: 'bg-[#faf8f5] rounded-2xl shadow-xl border border-[#e0d3c3]',
-  iconBgClass: 'bg-[#c8a951]/15 text-[#b8860b]',
-  subHeroClass: 'bg-[#2c1810]/5',
+  testimonialHighlightClass: 'rounded-2xl',
+  testimonialHighlightStyle: { backgroundColor: '#2c1810', color: '#faf8f5', borderColor: '#3d2316' },
+  testimonialNormalClass: 'rounded-2xl',
+  testimonialNormalStyle: { backgroundColor: '#faf8f5', borderColor: '#e0d3c3' },
+  searchBarClass: 'rounded-2xl shadow-xl',
+  searchBarStyle: { backgroundColor: '#faf8f5', borderWidth: '1px', borderColor: '#e0d3c3' },
+  iconBgClass: '',
+  iconBgStyle: { backgroundColor: 'rgba(200, 169, 81, 0.15)', color: '#b8860b' },
+  subHeroClass: '',
 };
 
 const corporateStyles: TemplateStyles = {
-  headerClass: 'bg-[#1e3a5f] border-b border-[#2d4a6f] text-white',
-  footerClass: 'bg-[#1e3a5f] border-t border-[#2d4a6f] text-white',
-  bodyClass: 'bg-[#f8fafc]',
-  heroClass: 'bg-[#1e3a5f]',
-  heroOverlayClass: 'bg-gradient-to-br from-[#1e3a5f] via-[#254b75] to-[#1e3a5f]',
-  heroTitleClass: 'text-white',
-  heroSubtitleClass: 'text-white/50',
+  headerClass: 'border-b',
+  headerStyle: { backgroundColor: '#1e3a5f', borderColor: '#2d4a6f', color: '#ffffff' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#1e3a5f', borderColor: '#2d4a6f', color: '#ffffff' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#f8fafc' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#1e3a5f' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(to bottom right, #1e3a5f, #254b75, #1e3a5f)' },
+  heroTitleClass: '',
+  heroTitleStyle: { color: '#ffffff' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: 'rgba(255,255,255,0.5)' },
   cardClass: 'bg-white border border-gray-200 rounded-xl shadow-sm',
   cardHoverClass: 'hover:shadow-lg hover:border-blue-200',
   sectionAltClass: 'bg-blue-50/50',
   primaryBtnClass: '',
-  testimonialHighlightClass: 'bg-[#1e3a5f] text-white border-[#2d4a6f]',
+  testimonialHighlightClass: '',
+  testimonialHighlightStyle: { backgroundColor: '#1e3a5f', color: '#ffffff', borderColor: '#2d4a6f' },
   testimonialNormalClass: 'bg-white border-gray-200',
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-200',
-  iconBgClass: 'bg-blue-50 text-[#1e3a5f]',
+  iconBgClass: 'bg-blue-50',
+  iconBgStyle: { color: '#1e3a5f' },
   subHeroClass: 'bg-blue-50/50',
 };
 
 const freshStyles: TemplateStyles = {
   headerClass: 'bg-white border-b border-green-100',
   footerClass: 'bg-green-50 border-t border-green-100 text-green-900',
-  bodyClass: 'bg-[#fafffe]',
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#fafffe' },
   heroClass: 'bg-green-50',
   heroOverlayClass: '',
   heroTitleClass: 'text-green-900',
@@ -115,18 +151,26 @@ const freshStyles: TemplateStyles = {
 };
 
 const coastalStyles: TemplateStyles = {
-  headerClass: 'bg-[#f0f9ff] border-b border-sky-200',
-  footerClass: 'bg-[#0c4a6e] border-t border-sky-800 text-sky-100',
-  bodyClass: 'bg-[#f0f9ff]',
-  heroClass: 'bg-[#0c4a6e]',
-  heroOverlayClass: 'bg-gradient-to-br from-[#0c4a6e] via-[#0e5a85] to-[#0369a1]',
-  heroTitleClass: 'text-white',
-  heroSubtitleClass: 'text-sky-200/60',
+  headerClass: 'border-b border-sky-200',
+  headerStyle: { backgroundColor: '#f0f9ff' },
+  footerClass: 'border-t border-sky-800',
+  footerStyle: { backgroundColor: '#0c4a6e', color: '#e0f2fe' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#f0f9ff' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#0c4a6e' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(to bottom right, #0c4a6e, #0e5a85, #0369a1)' },
+  heroTitleClass: '',
+  heroTitleStyle: { color: '#ffffff' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: 'rgba(186, 230, 253, 0.6)' },
   cardClass: 'bg-white border border-sky-100 rounded-xl',
   cardHoverClass: 'hover:shadow-md hover:border-sky-200',
   sectionAltClass: 'bg-sky-50',
   primaryBtnClass: '',
-  testimonialHighlightClass: 'bg-[#0c4a6e] text-white border-sky-800',
+  testimonialHighlightClass: '',
+  testimonialHighlightStyle: { backgroundColor: '#0c4a6e', color: '#ffffff', borderColor: '#075985' },
   testimonialNormalClass: 'bg-white border-sky-100',
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-sky-100',
   iconBgClass: 'bg-sky-50 text-sky-700',
