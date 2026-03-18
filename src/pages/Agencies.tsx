@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const Agencies = () => {
   const [search, setSearch] = useState('');
   const { data: agencies = [], isLoading } = useAgencies();
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useAllVehicles();
   const [formOpen, setFormOpen] = useState(false);
   const [editingAgency, setEditingAgency] = useState<Agency | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
