@@ -1,4 +1,4 @@
-export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant';
+export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant' | 'corporate' | 'fresh' | 'coastal';
 
 export interface TemplateConfig {
   id: StorefrontTemplate;
@@ -52,6 +52,45 @@ export const STOREFRONT_TEMPLATES: TemplateConfig[] = [
       cardBg: '#faf8f5',
       accent: '#b8860b',
       bodyBg: '#f5f0eb',
+    },
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate',
+    description: 'Polished navy blue header with a structured, business-ready layout',
+    preview: {
+      headerBg: '#1e3a5f',
+      heroBg: '#1e3a5f',
+      heroText: '#ffffff',
+      cardBg: '#ffffff',
+      accent: '#2563eb',
+      bodyBg: '#f8fafc',
+    },
+  },
+  {
+    id: 'fresh',
+    name: 'Fresh',
+    description: 'Bright green accents with airy whites for a modern, eco-friendly vibe',
+    preview: {
+      headerBg: '#ffffff',
+      heroBg: '#f0fdf4',
+      heroText: '#14532d',
+      cardBg: '#ffffff',
+      accent: '#16a34a',
+      bodyBg: '#fafffe',
+    },
+  },
+  {
+    id: 'coastal',
+    name: 'Coastal',
+    description: 'Soft ocean blues and sandy tones for a relaxed, travel-inspired feel',
+    preview: {
+      headerBg: '#f0f9ff',
+      heroBg: '#0c4a6e',
+      heroText: '#f0f9ff',
+      cardBg: '#f0f9ff',
+      accent: '#0ea5e9',
+      bodyBg: '#f0f9ff',
     },
   },
 ];

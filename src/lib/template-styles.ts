@@ -30,7 +30,7 @@ const classicStyles: TemplateStyles = {
   cardClass: 'bg-white border border-gray-100 rounded-xl shadow-sm',
   cardHoverClass: 'hover:shadow-lg',
   sectionAltClass: 'bg-gray-50',
-  primaryBtnClass: '', // will use custom colors
+  primaryBtnClass: '',
   testimonialHighlightClass: 'bg-primary text-white border-primary',
   testimonialNormalClass: 'bg-white border-gray-100',
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-100',
@@ -76,10 +76,70 @@ const elegantStyles: TemplateStyles = {
   subHeroClass: 'bg-[#2c1810]/5',
 };
 
+const corporateStyles: TemplateStyles = {
+  headerClass: 'bg-[#1e3a5f] border-b border-[#2d4a6f] text-white',
+  footerClass: 'bg-[#1e3a5f] border-t border-[#2d4a6f] text-white',
+  bodyClass: 'bg-[#f8fafc]',
+  heroClass: 'bg-[#1e3a5f]',
+  heroOverlayClass: 'bg-gradient-to-br from-[#1e3a5f] via-[#254b75] to-[#1e3a5f]',
+  heroTitleClass: 'text-white',
+  heroSubtitleClass: 'text-white/50',
+  cardClass: 'bg-white border border-gray-200 rounded-xl shadow-sm',
+  cardHoverClass: 'hover:shadow-lg hover:border-blue-200',
+  sectionAltClass: 'bg-blue-50/50',
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'bg-[#1e3a5f] text-white border-[#2d4a6f]',
+  testimonialNormalClass: 'bg-white border-gray-200',
+  searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-200',
+  iconBgClass: 'bg-blue-50 text-[#1e3a5f]',
+  subHeroClass: 'bg-blue-50/50',
+};
+
+const freshStyles: TemplateStyles = {
+  headerClass: 'bg-white border-b border-green-100',
+  footerClass: 'bg-green-50 border-t border-green-100 text-green-900',
+  bodyClass: 'bg-[#fafffe]',
+  heroClass: 'bg-green-50',
+  heroOverlayClass: '',
+  heroTitleClass: 'text-green-900',
+  heroSubtitleClass: 'text-green-700/60',
+  cardClass: 'bg-white border border-green-100 rounded-xl',
+  cardHoverClass: 'hover:shadow-md hover:border-green-200',
+  sectionAltClass: 'bg-green-50/60',
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'bg-green-600 text-white border-green-600',
+  testimonialNormalClass: 'bg-white border-green-100',
+  searchBarClass: 'bg-white rounded-2xl shadow-lg border border-green-100',
+  iconBgClass: 'bg-green-50 text-green-700',
+  subHeroClass: 'bg-green-50/60',
+};
+
+const coastalStyles: TemplateStyles = {
+  headerClass: 'bg-[#f0f9ff] border-b border-sky-200',
+  footerClass: 'bg-[#0c4a6e] border-t border-sky-800 text-sky-100',
+  bodyClass: 'bg-[#f0f9ff]',
+  heroClass: 'bg-[#0c4a6e]',
+  heroOverlayClass: 'bg-gradient-to-br from-[#0c4a6e] via-[#0e5a85] to-[#0369a1]',
+  heroTitleClass: 'text-white',
+  heroSubtitleClass: 'text-sky-200/60',
+  cardClass: 'bg-white border border-sky-100 rounded-xl',
+  cardHoverClass: 'hover:shadow-md hover:border-sky-200',
+  sectionAltClass: 'bg-sky-50',
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'bg-[#0c4a6e] text-white border-sky-800',
+  testimonialNormalClass: 'bg-white border-sky-100',
+  searchBarClass: 'bg-white rounded-2xl shadow-xl border border-sky-100',
+  iconBgClass: 'bg-sky-50 text-sky-700',
+  subHeroClass: 'bg-sky-50',
+};
+
 const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
   classic: classicStyles,
   minimal: minimalStyles,
   elegant: elegantStyles,
+  corporate: corporateStyles,
+  fresh: freshStyles,
+  coastal: coastalStyles,
 };
 
 export const getTemplateStyles = (template: StorefrontTemplate): TemplateStyles => {
