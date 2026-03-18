@@ -121,13 +121,13 @@ const StorefrontHome = () => {
             <div className="flex-1">
               <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>Best Offer</span>
               <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>Hyundai Tucson 2021 SUV</h3>
-              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`}>$200,000 / day</p>
+              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>$200,000 / day</p>
               <p className="text-2xl font-bold text-accent">$150,000 / day</p>
               <div className="flex items-center gap-1 mt-3">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-4 w-4 fill-accent text-accent" />
                 ))}
-                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`}>(450 recommends)</span>
+                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>(450 recommends)</span>
               </div>
             </div>
             <div className="flex-1 flex items-center justify-center">
