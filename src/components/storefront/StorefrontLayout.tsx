@@ -94,7 +94,7 @@ const StorefrontLayout = () => {
       </header>
 
       {/* Page Content */}
-      <Outlet context={{ agency, templateStyles: ts }} />
+      <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor }} />
 
       {/* Footer */}
       <footer className={ts.footerClass}>
