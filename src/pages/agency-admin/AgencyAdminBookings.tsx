@@ -15,13 +15,15 @@ const AgencyAdminBookings = () => {
   const seeded = useRef(false);
 
   useEffect(() => {
-    if (!seeded.current && !isLoading && (!bookings || bookings.length === 0)) {
+    if (!seeded.current && !isLoading && (!bookings || bookings.length === 0) && agency.slug === 'atlas-travel') {
       seeded.current = true;
+      console.log('🚀 Starting seed...');
       seedAtlasTravelBookings().then(() => {
+        console.log('🚀 Seed complete, refreshing...');
         queryClient.invalidateQueries({ queryKey: ['agency-bookings'] });
-      });
+      }).catch(e => console.error('Seed failed:', e));
     }
-  }, [isLoading, bookings, queryClient]);
+  }, [isLoading, bookings, queryClient, agency.slug]);
 
   return (
     <div className="space-y-8 max-w-[1200px]">
