@@ -22,6 +22,7 @@ import AgencyAdminVehicles from "./pages/agency-admin/AgencyAdminVehicles";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
+import Vehicles from "./pages/Vehicles";
 import Users from "./pages/Users";
 import Analytics from "./pages/Analytics";
 import ComingSoon from "./pages/ComingSoon";
@@ -50,6 +51,7 @@ const App = () => (
                 >
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/agencies" element={<Agencies />} />
+                  <Route path="/vehicles" element={<Vehicles />} />
                   <Route path="/bookings" element={<Bookings />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/analytics" element={<Analytics />} />
