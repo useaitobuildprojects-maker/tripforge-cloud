@@ -32,14 +32,14 @@ const StorefrontHome = () => {
       />
 
       {/* Hero Section */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`} style={ts.heroStyle}>
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
+        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>
+            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
               {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
-            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>
+            <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
               {cfg.hero_subtitle || `Discover the best deals on car rentals at ${agency.name} in ${agency.city}`}
             </p>
           </motion.div>
