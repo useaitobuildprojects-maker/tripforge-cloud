@@ -22,6 +22,7 @@ import AgencyAdminVehicles from "./pages/agency-admin/AgencyAdminVehicles";
 import Dashboard from "./pages/Dashboard";
 import Agencies from "./pages/Agencies";
 import Bookings from "./pages/Bookings";
+import Vehicles from "./pages/Vehicles";
 import Users from "./pages/Users";
 import Analytics from "./pages/Analytics";
 import ComingSoon from "./pages/ComingSoon";
