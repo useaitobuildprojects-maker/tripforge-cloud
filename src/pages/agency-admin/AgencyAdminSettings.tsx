@@ -133,6 +133,7 @@ const AgencyAdminSettings = () => {
       meta_description: pageSeo.home.meta_description || undefined,
       og_image: pageSeo.home.og_image || undefined,
       page_seo: Object.keys(cleanedPageSeo).length > 0 ? cleanedPageSeo : undefined,
+      storefront_template: selectedTemplate,
     });
   };
 
