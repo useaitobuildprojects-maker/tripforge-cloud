@@ -22,6 +22,8 @@ const mapAgency = (a: any): Agency => ({
   og_image: a.og_image ?? null,
   page_seo: a.page_seo ?? null,
   storefront_template: a.storefront_template ?? 'classic',
+  button_color: a.button_color ?? null,
+  background_color: a.background_color ?? null,
 });
 
 export const useAgencies = () => {
