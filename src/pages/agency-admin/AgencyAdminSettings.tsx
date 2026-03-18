@@ -219,7 +219,12 @@ const AgencyAdminSettings = () => {
         </div>
       </motion.div>
 
-
+      {/* Storefront Content Config */}
+      <StorefrontConfigEditor
+        config={storefrontConfig}
+        onChange={setStorefrontConfig}
+        agencyName={agency.name}
+      />
 
       {/* Branding — Logo & Favicon */}
       <motion.div
