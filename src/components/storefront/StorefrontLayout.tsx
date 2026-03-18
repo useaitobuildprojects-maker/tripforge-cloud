@@ -87,7 +87,7 @@ const StorefrontLayout = () => {
                 <Share2 className="h-4 w-4" />
               </Button>
               <Link to={`/agency/${slug}`} className="text-sm opacity-60 hover:opacity-100 transition-opacity">Register</Link>
-              <Link to={`/agency/${slug}`} className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${ts.primaryBtnClass}`}>Sign in</Link>
+              <Link to={`/agency/${slug}`} className="text-sm font-medium px-4 py-2 rounded-lg transition-colors text-white" style={{ backgroundColor: btnColor }}>Sign in</Link>
             </div>
           </div>
         </div>
