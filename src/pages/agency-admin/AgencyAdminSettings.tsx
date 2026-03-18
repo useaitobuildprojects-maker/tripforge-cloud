@@ -136,6 +136,8 @@ const AgencyAdminSettings = () => {
       og_image: pageSeo.home.og_image || undefined,
       page_seo: Object.keys(cleanedPageSeo).length > 0 ? cleanedPageSeo : undefined,
       storefront_template: selectedTemplate,
+      button_color: buttonColor,
+      background_color: bgColor,
     });
   };
 
