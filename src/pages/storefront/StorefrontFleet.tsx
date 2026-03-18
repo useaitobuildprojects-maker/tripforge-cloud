@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Car, Users, Fuel, Settings2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
