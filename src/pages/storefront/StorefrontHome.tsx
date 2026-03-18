@@ -94,7 +94,7 @@ const StorefrontHome = () => {
 
       {/* Why Choose Us */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Why Choose Us</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Why Choose Us</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { icon: Phone, title: 'Customer Support', desc: 'Our dedicated team is available 24/7 to assist you with any questions or issues.' },
