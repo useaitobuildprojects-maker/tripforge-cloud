@@ -14,7 +14,7 @@ export const mockAgencies: Agency[] = [
   {
     id: '3', name: 'Alpine Adventures', slug: 'alpine', domain: 'alpine-adventures.eu', logo_url: null, status: 'active',
     services: ['car_rental', 'apartment', 'car_driver'], country: 'Switzerland', city: 'Zurich', contact_email: 'info@alpine-adventures.eu',
-    created_at: '2025-01-10', total_bookings: 562, revenue: 312800, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'elegant', button_color: null, background_color: null,
+    created_at: '2025-01-10', total_bookings: 562, revenue: 312800, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'elegant', button_color: null, background_color: null, storefront_config: null,
   },
   {
     id: '4', name: 'Adriatic Transfers', slug: 'adriatic', domain: null, logo_url: null, status: 'pending',
