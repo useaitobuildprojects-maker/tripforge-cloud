@@ -9,7 +9,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
 const StorefrontContact = () => {
-  const { agency, templateStyles: ts, buttonColor } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string }>();
+  const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   return (
     <div>
