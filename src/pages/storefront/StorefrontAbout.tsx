@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom';
-import { Agency } from '@/types/agency';
+import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Shield, Award, Users, Clock } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
