@@ -163,6 +163,57 @@ const AgencyAdminSettings = () => {
           <p className="text-sm text-muted-foreground mt-1">Choose a design template for your public website</p>
         </div>
         <TemplatePicker value={selectedTemplate} onChange={setSelectedTemplate} />
+
+        {/* Color Customization */}
+        <div className="pt-4 border-t border-border space-y-4">
+          <h3 className="text-sm font-semibold text-foreground">Custom Colors</h3>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label>Button Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={buttonColor}
+                  onChange={(e) => setButtonColor(e.target.value)}
+                  className="h-10 w-14 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
+                />
+                <Input
+                  value={buttonColor}
+                  onChange={(e) => setButtonColor(e.target.value)}
+                  placeholder="#c8a951"
+                  className="font-mono text-xs flex-1"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">Applied to all CTA buttons on your storefront</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Background Color</Label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={bgColor}
+                  onChange={(e) => setBgColor(e.target.value)}
+                  className="h-10 w-14 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
+                />
+                <Input
+                  value={bgColor}
+                  onChange={(e) => setBgColor(e.target.value)}
+                  placeholder="#ffffff"
+                  className="font-mono text-xs flex-1"
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">Main background color of your storefront pages</p>
+            </div>
+          </div>
+          {/* Live preview strip */}
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
+            <span className="text-xs text-muted-foreground">Preview:</span>
+            <div className="h-8 flex-1 rounded" style={{ backgroundColor: bgColor }} />
+            <button className="px-4 py-1.5 rounded-lg text-white text-xs font-semibold" style={{ backgroundColor: buttonColor }}>
+              Book Now
+            </button>
+          </div>
+        </div>
       </motion.div>
 
       {/* Branding — Logo & Favicon */}
