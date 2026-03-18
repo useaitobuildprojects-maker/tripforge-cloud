@@ -1,29 +1,13 @@
-import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { CalendarDays, Info } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { useAgencyBookings } from '@/hooks/use-agency-admin';
 import { Skeleton } from '@/components/ui/skeleton';
-import { seedAtlasTravelBookings } from '@/lib/seed-bookings';
-import { useQueryClient } from '@tanstack/react-query';
 
 const AgencyAdminBookings = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: bookings, isLoading, isError } = useAgencyBookings(agency.id);
-  const queryClient = useQueryClient();
-  const seeded = useRef(false);
-
-  useEffect(() => {
-    if (!seeded.current && !isLoading && (!bookings || bookings.length === 0) && agency.slug === 'atlas-travel') {
-      seeded.current = true;
-      console.log('🚀 Starting seed...');
-      seedAtlasTravelBookings().then(() => {
-        console.log('🚀 Seed complete, refreshing...');
-        queryClient.invalidateQueries({ queryKey: ['agency-bookings'] });
-      }).catch(e => console.error('Seed failed:', e));
-    }
-  }, [isLoading, bookings, queryClient, agency.slug]);
 
   return (
     <div className="space-y-8 max-w-[1200px]">
