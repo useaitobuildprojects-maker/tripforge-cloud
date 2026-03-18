@@ -51,8 +51,9 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
 export const SERVICE_ICONS: Record<ServiceType, string> = {
   car_rental: 'Car',
   private_driver: 'UserCheck',
-  hotel: 'Hotel',
-  travel_package: 'Globe',
+  limousine_services: 'Crown',
+  apartment: 'Building',
+  car_driver: 'Truck',
 };
 
 export const PAGE_LABELS: Record<StorefrontPage, string> = {
