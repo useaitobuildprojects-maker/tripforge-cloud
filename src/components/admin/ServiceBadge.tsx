@@ -1,7 +1,7 @@
-import { Car, UserCheck, Crown, Building, Truck } from 'lucide-react';
+import { Car, UserCheck, Crown, Building, Truck, HelpCircle } from 'lucide-react';
 import { ServiceType, SERVICE_LABELS } from '@/types/agency';
 
-const iconMap: Record<ServiceType, any> = {
+const iconMap: Record<string, any> = {
   car_rental: Car,
   private_driver: UserCheck,
   limousine_services: Crown,
@@ -10,12 +10,13 @@ const iconMap: Record<ServiceType, any> = {
 };
 
 const ServiceBadge = ({ service }: { service: ServiceType }) => {
-  const Icon = iconMap[service];
+  const Icon = iconMap[service] || HelpCircle;
+  const label = SERVICE_LABELS[service] || service;
 
   return (
     <span className="inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
       <Icon className="h-3 w-3" />
-      {SERVICE_LABELS[service]}
+      {label}
     </span>
   );
 };
