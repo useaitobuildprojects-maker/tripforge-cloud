@@ -115,13 +115,13 @@ const StorefrontHome = () => {
 
       {/* Featured Car */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative' }}>
-          {(ts.heroOverlayClass || ts.heroOverlayStyle) && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
+          {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
           <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
             <div className="flex-1">
-              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>Best Offer</span>
-              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={ts.heroTitleStyle}>Hyundai Tucson 2021 SUV</h3>
-              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>$200,000 / day</p>
+              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>Best Offer</span>
+              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>Hyundai Tucson 2021 SUV</h3>
+              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>$200,000 / day</p>
               <p className="text-2xl font-bold text-accent">$150,000 / day</p>
               <div className="flex items-center gap-1 mt-3">
                 {[...Array(5)].map((_, i) => (
