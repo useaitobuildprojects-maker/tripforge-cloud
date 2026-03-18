@@ -1,4 +1,4 @@
-export type ServiceType = 'car_rental' | 'private_driver' | 'hotel' | 'travel_package';
+export type ServiceType = 'car_rental' | 'private_driver' | 'limousine_services' | 'apartment' | 'car_driver';
 
 export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
 
