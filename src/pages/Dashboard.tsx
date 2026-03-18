@@ -1,11 +1,13 @@
-import { Building2, Globe, DollarSign, TrendingUp, ArrowRight } from 'lucide-react';
+import { Building2, Globe, DollarSign, TrendingUp, ArrowRight, Car, CircleDot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StatCard from '@/components/admin/StatCard';
 import AgencyStatusBadge from '@/components/admin/AgencyStatusBadge';
 import ServiceBadge from '@/components/admin/ServiceBadge';
 import { useAgencies, useDashboardStats } from '@/hooks/use-agencies';
+import { useAllVehicles } from '@/hooks/use-vehicles';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 const Dashboard = () => {
   const { data: agencies = [], isLoading: agenciesLoading } = useAgencies();

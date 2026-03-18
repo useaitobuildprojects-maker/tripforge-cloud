@@ -30,3 +30,27 @@ export const useAgencyVehicles = (agencyId: string | undefined) => {
     enabled: !!agencyId,
   });
 };
+
+export interface VehicleWithAgency extends Vehicle {
+  agency_name: string;
+  agency_slug: string;
+}
+
+export const useAllVehicles = () => {
+  return useQuery({
+    queryKey: ['vehicles', 'all'],
+    queryFn: async (): Promise<VehicleWithAgency[]> => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .select('*, agencies!inner(name, slug)')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return (data ?? []).map((v: any) => ({
+        ...v,
+        agency_name: v.agencies?.name ?? '',
+        agency_slug: v.agencies?.slug ?? '',
+      })) as VehicleWithAgency[];
+    },
+  });
+};
