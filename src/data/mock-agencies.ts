@@ -8,7 +8,7 @@ export const mockAgencies: Agency[] = [
   },
   {
     id: '2', name: 'Mediterranean Stays', slug: 'medstays', domain: 'medstays.com', logo_url: null, status: 'active',
-    services: ['hotel', 'travel_package'], country: 'Spain', city: 'Barcelona', contact_email: 'hello@medstays.com',
+    services: ['apartment', 'limousine_services'], country: 'Spain', city: 'Barcelona', contact_email: 'hello@medstays.com',
     created_at: '2024-09-20', total_bookings: 876, revenue: 234100, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null,
   },
   {
