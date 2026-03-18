@@ -1,11 +1,12 @@
-import { Car, UserCheck, Hotel, Globe } from 'lucide-react';
+import { Car, UserCheck, Crown, Building, Truck } from 'lucide-react';
 import { ServiceType, SERVICE_LABELS } from '@/types/agency';
 
-const iconMap = {
+const iconMap: Record<ServiceType, any> = {
   car_rental: Car,
   private_driver: UserCheck,
-  hotel: Hotel,
-  travel_package: Globe,
+  limousine_services: Crown,
+  apartment: Building,
+  car_driver: Truck,
 };
 
 const ServiceBadge = ({ service }: { service: ServiceType }) => {
