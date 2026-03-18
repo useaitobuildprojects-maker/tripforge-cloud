@@ -41,10 +41,11 @@ export interface DashboardStats {
 }
 
 export const SERVICE_LABELS: Record<ServiceType, string> = {
-  car_rental: 'Car Rentals',
-  private_driver: 'Private Drivers',
-  hotel: 'Hotels',
-  travel_package: 'Travel Packages',
+  car_rental: 'Car Rental',
+  private_driver: 'Private Driver',
+  limousine_services: 'Limousine Services',
+  apartment: 'Apartment',
+  car_driver: 'Car Driver',
 };
 
 export const SERVICE_ICONS: Record<ServiceType, string> = {
