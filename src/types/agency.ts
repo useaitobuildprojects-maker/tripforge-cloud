@@ -31,6 +31,8 @@ export interface Agency {
   og_image: string | null;
   page_seo: PageSeo | null;
   storefront_template: StorefrontTemplate;
+  button_color: string | null;
+  background_color: string | null;
 }
 
 export interface DashboardStats {

@@ -1,4 +1,4 @@
-export type StorefrontTemplate = 'classic' | 'modern-dark' | 'elegant';
+export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant';
 
 export interface TemplateConfig {
   id: StorefrontTemplate;
@@ -29,22 +29,22 @@ export const STOREFRONT_TEMPLATES: TemplateConfig[] = [
     },
   },
   {
-    id: 'modern-dark',
-    name: 'Modern Dark',
-    description: 'Bold dark theme with neon accents and glass-morphism effects',
+    id: 'minimal',
+    name: 'Minimal',
+    description: 'Ultra-clean design with light grays and crisp typography',
     preview: {
-      headerBg: '#0f0f14',
-      heroBg: '#0f0f14',
-      heroText: '#ffffff',
-      cardBg: '#1a1a24',
-      accent: '#6366f1',
-      bodyBg: '#0f0f14',
+      headerBg: '#ffffff',
+      heroBg: '#f1f5f9',
+      heroText: '#1e293b',
+      cardBg: '#ffffff',
+      accent: '#3b82f6',
+      bodyBg: '#ffffff',
     },
   },
   {
     id: 'elegant',
     name: 'Elegant',
-    description: 'Warm tones with serif typography and luxury hospitality feel',
+    description: 'Warm tones with a luxury hospitality feel',
     preview: {
       headerBg: '#faf8f5',
       heroBg: '#2c1810',
