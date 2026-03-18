@@ -1,7 +1,7 @@
 export type ServiceType = 'car_rental' | 'private_driver' | 'limousine_services' | 'apartment' | 'car_driver';
 
 export type StorefrontPage = 'home' | 'fleet' | 'contact' | 'about';
-export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant';
+export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant' | 'corporate' | 'fresh' | 'coastal';
 export type StorefrontFont = 'sans' | 'serif' | 'modern' | 'rounded';
 
 export interface StorefrontConfig {
