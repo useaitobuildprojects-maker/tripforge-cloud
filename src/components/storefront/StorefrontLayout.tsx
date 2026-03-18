@@ -48,12 +48,15 @@ const StorefrontLayout = () => {
   const ts = getTemplateStyles(agency.storefront_template);
   const btnColor = agency.button_color ?? '#c8a951';
   const bgColor = agency.background_color ?? undefined;
+  const cfg = agency.storefront_config ?? {};
 
-  // Build inline custom style for the storefront
+  // Font class mapping
+  const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
+
   const customStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : {};
 
   return (
-    <div className={`min-h-screen ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
+    <div className={`min-h-screen ${fontClass} ${!bgColor ? ts.bodyClass : ''}`} style={customStyle}>
 
       {/* Navigation */}
       <header className={`sticky top-0 z-50 ${ts.headerClass}`}>
