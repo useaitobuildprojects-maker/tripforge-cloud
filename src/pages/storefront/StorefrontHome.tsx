@@ -84,7 +84,7 @@ const StorefrontHome = () => {
               </div>
             </div>
             <div>
-              <Button className={`w-full h-11 rounded-lg font-semibold gap-2 ${ts.primaryBtnClass}`}>
+              <Button className="w-full h-11 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
                 <Search className="h-4 w-4" /> Search
               </Button>
             </div>
