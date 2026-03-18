@@ -134,6 +134,75 @@ const Agencies = () => {
         )}
       </div>
 
+      {/* All Vehicles */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.55 }}
+        className="card-premium rounded-xl overflow-hidden"
+      >
+        <div className="px-7 py-6">
+          <h2 className="text-lg font-display font-bold text-foreground">All Vehicles</h2>
+          <p className="text-[13px] text-muted-foreground mt-0.5 font-light">Fleet overview across all agencies</p>
+        </div>
+
+        {vehiclesLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-7 pb-7">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-[220px] rounded-xl" />
+            ))}
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="px-7 pb-10 text-center text-sm text-muted-foreground">
+            No vehicles found across agencies.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 px-7 pb-7">
+            {vehicles.map((vehicle, i) => (
+              <motion.div
+                key={vehicle.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.04 }}
+                className="rounded-xl border border-border/60 bg-card overflow-hidden hover:shadow-md transition-shadow group"
+              >
+                {vehicle.photo_url ? (
+                  <div className="h-40 overflow-hidden bg-secondary/30">
+                    <img
+                      src={vehicle.photo_url}
+                      alt={`${vehicle.brand} ${vehicle.model}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-40 flex items-center justify-center bg-secondary/30">
+                    <Car className="h-12 w-12 text-muted-foreground/40" />
+                  </div>
+                )}
+                <div className="p-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[14px] font-semibold text-foreground">
+                      {vehicle.brand} {vehicle.model}
+                    </h3>
+                    <Badge
+                      variant={vehicle.status === 'available' ? 'default' : vehicle.status === 'rented' ? 'secondary' : 'outline'}
+                      className="text-[10px] capitalize"
+                    >
+                      <CircleDot className="h-2.5 w-2.5 mr-1" />
+                      {vehicle.status}
+                    </Badge>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground">{vehicle.year} · {vehicle.agency_name}</p>
+                  {vehicle.license_plate && (
+                    <p className="text-[11px] text-muted-foreground/70 font-mono">{vehicle.license_plate}</p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </motion.div>
+
       <AgencyFormDialog open={formOpen} onOpenChange={setFormOpen} agency={editingAgency} />
       <DeleteAgencyDialog open={deleteOpen} onOpenChange={setDeleteOpen} agency={deletingAgency} />
     </div>
