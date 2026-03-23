@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound, Pencil } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
 import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
+import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -21,6 +22,7 @@ const AgencyAdminVehicles = () => {
   const { data: vehicles = [], isLoading } = useAgencyVehicles(agency.id);
   const [search, setSearch] = useState('');
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [pricingVehicle, setPricingVehicle] = useState<Vehicle | null>(null);
 
   const filtered = vehicles.filter((v) =>
     `${v.brand} ${v.model}`.toLowerCase().includes(search.toLowerCase()) ||
@@ -94,6 +96,15 @@ const AgencyAdminVehicles = () => {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setPricingVehicle(vehicle)}
+                        title="Pricing & Availability"
+                      >
+                        <CalendarDays className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => setEditingVehicle(vehicle)}
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -130,6 +141,12 @@ const AgencyAdminVehicles = () => {
         vehicle={editingVehicle}
         open={!!editingVehicle}
         onOpenChange={(open) => !open && setEditingVehicle(null)}
+      />
+
+      <VehiclePricingDialog
+        vehicle={pricingVehicle}
+        open={!!pricingVehicle}
+        onOpenChange={(open) => !open && setPricingVehicle(null)}
       />
     </div>
   );
