@@ -96,6 +96,12 @@ const Vehicles = () => {
           ))}
         </div>
       )}
+
+      <VehiclePricingDialog
+        vehicle={pricingVehicle}
+        open={!!pricingVehicle}
+        onOpenChange={(open) => !open && setPricingVehicle(null)}
+      />
     </div>
   );
 };
