@@ -91,7 +91,7 @@ const StorefrontLayout = () => {
 
             <nav className="hidden md:flex items-center gap-8">
               <Link to={`/agency/${slug}`} className="text-sm font-medium hover:opacity-80 transition-opacity">Home</Link>
-              <Link to={`/agency/${slug}/fleet`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">Services</Link>
+              <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">Services</Link>
               <Link to={`/agency/${slug}/contact`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">Contact</Link>
               <Link to={`/agency/${slug}/about`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">About us</Link>
             </nav>

@@ -1,13 +1,32 @@
-import { useOutletContext } from 'react-router-dom';
-import { Agency, StorefrontConfig } from '@/types/agency';
+import { useOutletContext, Link, useParams } from 'react-router-dom';
+import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2 } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2, UserCheck, Crown, Building, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
+const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
+  car_rental: Car,
+  private_driver: UserCheck,
+  limousine_services: Crown,
+  apartment: Building,
+  car_driver: Truck,
+};
+
+const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
+  car_rental: 'Wide selection of quality vehicles for every need.',
+  private_driver: 'Professional drivers for transfers and tours.',
+  limousine_services: 'Premium limousines for special occasions.',
+  apartment: 'Furnished apartments for comfortable stays.',
+  car_driver: 'Personal car and driver packages.',
+};
+
 const StorefrontHome = () => {
+  const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
+
+  const enabledServices = agency.services ?? [];
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -31,12 +50,17 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero Section */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+      {/* Hero Section — Majestic style with background image overlay */}
+      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}), minHeight: '420px' }}>
+        {/* Background image placeholder */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
+        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
+            <p className={`text-xs uppercase tracking-[0.25em] font-semibold mb-4 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
+              {agency.city} - {agency.country}
+            </p>
+            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight uppercase ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
               {cfg.hero_title || <>Promote Mobility: Rent a Car<br />Tailored to Your Needs</>}
             </h1>
             <p className={`text-sm md:text-base max-w-xl mx-auto ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
@@ -46,7 +70,7 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Search Bar */}
+      {/* Search Bar — Majestic style with Pick-up / Drop-off tabs */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
@@ -113,8 +137,41 @@ const StorefrontHome = () => {
         </div>
       </section>
 
+      {/* Our Services — Dynamic based on agency's enabled services */}
+      {enabledServices.length > 0 && (
+        <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
+            <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">Explore the range of services we offer to make your experience exceptional.</p>
+            <div className={`grid grid-cols-1 ${enabledServices.length <= 2 ? 'md:grid-cols-2' : enabledServices.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'} gap-6`}>
+              {enabledServices.map((service, i) => {
+                const Icon = SERVICE_ICONS[service] ?? Car;
+                return (
+                  <motion.div key={service} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                    <Link
+                      to={`/agency/${slug}/services/${service}`}
+                      className={`block text-center p-8 rounded-2xl transition-all group ${ts.cardClass} ${ts.cardHoverClass}`}
+                      style={ts.cardStyle}
+                    >
+                      <div className={`inline-flex items-center justify-center h-16 w-16 rounded-full mb-5 ${ts.iconBgClass}`} style={ts.iconBgStyle}>
+                        <Icon className="h-7 w-7" />
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">{SERVICE_LABELS[service]}</h3>
+                      <p className="text-sm opacity-60 leading-relaxed mb-3">{SERVICE_SHORT_DESC[service]}</p>
+                      <span className="inline-flex items-center gap-1 text-sm font-medium group-hover:gap-2 transition-all" style={{ color: buttonColor }}>
+                        Learn More <ChevronRight className="h-4 w-4" />
+                      </span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Featured Car */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
           {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
           <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
@@ -177,9 +234,9 @@ const StorefrontHome = () => {
           ))}
         </div>
         <div className="text-center mt-8">
-          <button className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1 mx-auto">
-            View more cars <ChevronRight className="h-4 w-4" />
-          </button>
+          <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1 mx-auto justify-center">
+            View all services <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 

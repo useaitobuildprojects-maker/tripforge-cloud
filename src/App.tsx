@@ -10,7 +10,8 @@ import DomainRouter from "@/components/DomainRouter";
 import AdminLayout from "./components/admin/AdminLayout";
 import StorefrontLayout from "./components/storefront/StorefrontLayout";
 import StorefrontHome from "./pages/storefront/StorefrontHome";
-import StorefrontFleet from "./pages/storefront/StorefrontFleet";
+import StorefrontServices from "./pages/storefront/StorefrontServices";
+import StorefrontServiceDetail from "./pages/storefront/StorefrontServiceDetail";
 import StorefrontContact from "./pages/storefront/StorefrontContact";
 import StorefrontAbout from "./pages/storefront/StorefrontAbout";
 import AgencyAdminLayout from "./components/agency-admin/AgencyAdminLayout";
@@ -69,7 +70,10 @@ const App = () => (
                 {/* Agency public storefronts */}
                 <Route path="/agency/:slug" element={<StorefrontLayout />}>
                   <Route index element={<StorefrontHome />} />
-                  <Route path="fleet" element={<StorefrontFleet />} />
+                  <Route path="services" element={<StorefrontServices />} />
+                  <Route path="services/:serviceType" element={<StorefrontServiceDetail />} />
+                  {/* Keep fleet as redirect for backward compat */}
+                  <Route path="fleet" element={<StorefrontServices />} />
                   <Route path="contact" element={<StorefrontContact />} />
                   <Route path="about" element={<StorefrontAbout />} />
                 </Route>
