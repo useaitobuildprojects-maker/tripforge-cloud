@@ -9,6 +9,7 @@ import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog
 
 const Vehicles = () => {
   const { data: vehicles = [], isLoading } = useAllVehicles();
+  const [pricingVehicle, setPricingVehicle] = useState<Vehicle | null>(null);
 
   return (
     <div className="space-y-8 max-w-[1200px]">
