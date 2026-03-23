@@ -68,13 +68,24 @@ const Vehicles = () => {
                   <h3 className="text-[15px] font-bold text-foreground">
                     {vehicle.brand} {vehicle.model}
                   </h3>
-                  <Badge
-                    variant={vehicle.status === 'available' ? 'default' : vehicle.status === 'rented' ? 'secondary' : 'outline'}
-                    className="text-[10px] capitalize"
-                  >
-                    <CircleDot className="h-2.5 w-2.5 mr-1" />
-                    {vehicle.status}
-                  </Badge>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => setPricingVehicle(vehicle)}
+                      title="Pricing & Availability"
+                    >
+                      <CalendarDays className="h-3.5 w-3.5" />
+                    </Button>
+                    <Badge
+                      variant={vehicle.status === 'available' ? 'default' : vehicle.status === 'rented' ? 'secondary' : 'outline'}
+                      className="text-[10px] capitalize"
+                    >
+                      <CircleDot className="h-2.5 w-2.5 mr-1" />
+                      {vehicle.status}
+                    </Badge>
+                  </div>
                 </div>
                 <p className="text-[12px] text-muted-foreground">{vehicle.year} · {vehicle.agency_name}</p>
                 {vehicle.license_plate && (
