@@ -142,6 +142,12 @@ const AgencyAdminVehicles = () => {
         open={!!editingVehicle}
         onOpenChange={(open) => !open && setEditingVehicle(null)}
       />
+
+      <VehiclePricingDialog
+        vehicle={pricingVehicle}
+        open={!!pricingVehicle}
+        onOpenChange={(open) => !open && setPricingVehicle(null)}
+      />
     </div>
   );
 };
