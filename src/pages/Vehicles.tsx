@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Car, CircleDot } from 'lucide-react';
-import { useAllVehicles } from '@/hooks/use-vehicles';
+import { Car, CircleDot, CalendarDays } from 'lucide-react';
+import { useAllVehicles, Vehicle } from '@/hooks/use-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
 
 const Vehicles = () => {
   const { data: vehicles = [], isLoading } = useAllVehicles();
