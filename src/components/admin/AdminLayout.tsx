@@ -23,9 +23,6 @@ const AdminLayout = () => {
           <div className="flex items-center gap-5">
             <button className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background/80 text-muted-foreground hover:text-foreground hover:border-accent/25 hover:bg-card transition-all duration-200">
               <Bell className="h-[18px] w-[18px]" />
-              <span className="absolute -top-1 -right-1 flex h-[18px] w-[18px] items-center justify-center rounded-full gradient-accent text-[8px] font-bold text-accent-foreground shadow-sm">
-                3
-              </span>
             </button>
             <div className="h-8 w-px bg-border" />
             <button className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-secondary/60 transition-colors duration-200 -mr-2">
