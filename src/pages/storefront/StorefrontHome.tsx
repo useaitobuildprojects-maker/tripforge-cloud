@@ -120,44 +120,76 @@ const StorefrontHome = () => {
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
-          <div className="flex items-center gap-6 mb-4">
-            <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
-              <input type="radio" name="trip" defaultChecked className="accent-accent" /> Pick-up
-            </label>
-            <label className="flex items-center gap-2 text-sm font-medium opacity-60 cursor-pointer">
-              <input type="radio" name="trip" className="accent-accent" /> Drop-off
-            </label>
+          {/* Pick-up section */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-3 w-3 rounded-full bg-amber-500" />
+              <span className="text-sm font-semibold">Pick-up</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="text" placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-end">
-            <div className="md:col-span-2">
-              <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                <select className="w-full h-11 rounded-lg border border-current/10 bg-current/5 pl-10 pr-4 text-sm focus:outline-none appearance-none">
-                  <option>Select your city</option>
-                  <option>{agency.city}</option>
-                </select>
+
+          {/* Divider */}
+          <div className="border-t border-border my-4" />
+
+          {/* Drop-off section */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-3 w-3 rounded-full border-2 border-muted-foreground/40" />
+              <span className="text-sm font-semibold">Drop-off</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="text" placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
+                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
               </div>
             </div>
-            <div className="md:col-span-2">
-              <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                <input type="date" className="w-full h-11 rounded-lg border border-current/10 bg-current/5 pl-10 pr-4 text-sm focus:outline-none" />
-              </div>
-            </div>
-            <div className="md:col-span-2">
-              <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
-              <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                <input type="time" className="w-full h-11 rounded-lg border border-current/10 bg-current/5 pl-10 pr-4 text-sm focus:outline-none" />
-              </div>
-            </div>
-            <div>
-              <Button className="w-full h-11 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
-                <Search className="h-4 w-4" /> Search
-              </Button>
-            </div>
+          </div>
+
+          {/* Search Button */}
+          <div className="flex justify-end">
+            <Button className="h-11 px-8 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
+              <Search className="h-4 w-4" /> Search
+            </Button>
           </div>
         </motion.div>
       </section>
