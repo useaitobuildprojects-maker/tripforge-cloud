@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
