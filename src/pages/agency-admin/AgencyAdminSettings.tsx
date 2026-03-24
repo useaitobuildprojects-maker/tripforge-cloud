@@ -76,6 +76,7 @@ const AgencyAdminSettings = () => {
   const [buttonColor, setButtonColor] = useState(agency.button_color ?? '#c8a951');
   const [bgColor, setBgColor] = useState(agency.background_color ?? '#ffffff');
   const [storefrontConfig, setStorefrontConfig] = useState<StorefrontConfig>(agency.storefront_config ?? {});
+  const [locations, setLocations] = useState<{ name: string; type: 'station' | 'airport' | 'city'; address?: string }[]>(agency.storefront_config?.locations ?? []);
 
   const [form, setForm] = useState({
     name: agency.name,
