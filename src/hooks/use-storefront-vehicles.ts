@@ -9,16 +9,21 @@ export interface StorefrontVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
+  transmission: string | null;
+  seats: number | null;
+  fuel_type: string | null;
+  category: string | null;
+  air_conditioning: boolean | null;
+  mileage_policy: string | null;
 }
 
 export const useStorefrontVehicles = (agencyId: string | undefined) => {
   return useQuery({
     queryKey: ['storefront-vehicles', agencyId],
     queryFn: async (): Promise<StorefrontVehicle[]> => {
-      // Fetch available vehicles for this agency
       const { data: vehicles, error } = await supabase
         .from('vehicles')
-        .select('id, brand, model, year, status, photo_url')
+        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy')
         .eq('agency_id', agencyId!)
         .eq('status', 'available')
         .order('created_at', { ascending: false });
@@ -37,7 +42,6 @@ export const useStorefrontVehicles = (agencyId: string | undefined) => {
         .lte('start_date', today)
         .gte('end_date', today);
 
-      // Build a map of vehicle_id -> daily_rate (use first matching season)
       const priceMap: Record<string, number> = {};
       if (pricing) {
         for (const p of pricing as any[]) {
@@ -47,7 +51,6 @@ export const useStorefrontVehicles = (agencyId: string | undefined) => {
         }
       }
 
-      // If no seasonal pricing, try to get any pricing as fallback
       const missingIds = vehicleIds.filter((id: string) => !priceMap[id]);
       if (missingIds.length > 0) {
         const { data: fallback } = await supabase
