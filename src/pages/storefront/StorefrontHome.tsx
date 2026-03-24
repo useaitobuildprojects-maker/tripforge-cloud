@@ -9,6 +9,7 @@ import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
+import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
