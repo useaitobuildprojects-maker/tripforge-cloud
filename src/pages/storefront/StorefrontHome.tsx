@@ -46,9 +46,8 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero Section — Majestic style with background image overlay */}
+      {/* Hero Section */}
       <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}), minHeight: '420px' }}>
-        {/* Background image placeholder */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
@@ -66,7 +65,7 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Search Bar — Majestic style with Pick-up / Drop-off tabs */}
+      {/* Search Bar */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
@@ -133,7 +132,7 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Our Services — Dynamic based on agency's enabled services */}
+      {/* Our Services */}
       {enabledServices.length > 0 && (
         <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,7 +165,7 @@ const StorefrontHome = () => {
         </section>
       )}
 
-      {/* Featured Car — Show first vehicle if available */}
+      {/* Featured Vehicle — first from database */}
       {vehicles.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
@@ -250,65 +249,6 @@ const StorefrontHome = () => {
           </div>
         )}
 
-        <div className="text-center mt-8">
-          <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1 mx-auto justify-center">
-            View all services <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-              <div className="flex items-center gap-1 mt-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                ))}
-                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>(450 recommends)</span>
-              </div>
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
-                <Car className="h-24 w-24 opacity-20" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Car Listings */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Cars & Deals</h2>
-        <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">Find the perfect car for your journey with competitive prices and top-quality vehicles.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sampleCars.map((car, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
-              <div className="h-44 flex items-center justify-center opacity-30">
-                <Car className="h-16 w-16" />
-              </div>
-              <div className="p-4">
-                <h4 className="font-bold text-sm">{car.name} {car.year} {car.type}</h4>
-                <div className="flex items-center gap-3 mt-2 text-[11px] opacity-50">
-                  <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {car.fuel}</span>
-                  <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {car.transmission}</span>
-                  <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {car.seats} People</span>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className={`h-3 w-3 ${j < Math.floor(car.rating) ? 'fill-accent text-accent' : 'opacity-20'}`} />
-                  ))}
-                  <span className="text-[10px] opacity-50 ml-1">({car.reviews} recommends)</span>
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-current/10">
-                  <div>
-                    <span className="text-xs opacity-50 line-through">${(car.price * 1.2).toLocaleString()}</span>
-                    <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
-                  </div>
-                  <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
-                    {cfg.cta_text || 'Book now'}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
         <div className="text-center mt-8">
           <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1 mx-auto justify-center">
             View all services <ChevronRight className="h-4 w-4" />

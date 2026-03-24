@@ -1,10 +1,12 @@
 import { useOutletContext, useParams, Link } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Car, UserCheck, Crown, Building, Truck, Star, Users, Fuel, Settings2, ChevronLeft, Phone, CheckCircle2, Clock } from 'lucide-react';
+import { Car, UserCheck, Crown, Building, Truck, Star, ChevronLeft, Phone, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
+import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -30,34 +32,6 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   car_driver: ['Personal vehicle & driver', 'City tours', 'Intercity travel', 'Flexible scheduling', 'Local expertise'],
 };
 
-const sampleListings = {
-  car_rental: [
-    { name: 'Hyundai Tucson 2021 SUV', price: 150, rating: 4.5, reviews: 450, detail: '90L · Manual · 5 Seats' },
-    { name: 'BMW X5 2023 SUV', price: 220, rating: 4.8, reviews: 320, detail: '85L · Automatic · 5 Seats' },
-    { name: 'Mercedes C-Class 2022', price: 180, rating: 4.6, reviews: 280, detail: '66L · Automatic · 5 Seats' },
-  ],
-  private_driver: [
-    { name: 'Airport Transfer', price: 80, rating: 4.9, reviews: 210, detail: 'One-way · Sedan' },
-    { name: 'Half Day (4 hours)', price: 200, rating: 4.7, reviews: 165, detail: 'Flexible route · Sedan' },
-    { name: 'Full Day (8 hours)', price: 350, rating: 4.8, reviews: 98, detail: 'Flexible route · SUV or Sedan' },
-  ],
-  limousine_services: [
-    { name: 'Mercedes S-Class', price: 400, rating: 4.9, reviews: 120, detail: 'Luxury sedan · Chauffeur' },
-    { name: 'Stretch Limousine', price: 600, rating: 4.8, reviews: 85, detail: 'Up to 8 passengers' },
-    { name: 'Wedding Package', price: 800, rating: 5.0, reviews: 50, detail: 'Decorated · 6 hours' },
-  ],
-  apartment: [
-    { name: 'Studio City Center', price: 90, rating: 4.6, reviews: 180, detail: '1 Bed · WiFi · Kitchen' },
-    { name: '2-Bed Family Apartment', price: 140, rating: 4.7, reviews: 95, detail: '2 Bed · Parking · Balcony' },
-    { name: 'Luxury Penthouse', price: 280, rating: 4.9, reviews: 42, detail: '3 Bed · Terrace · Panoramic view' },
-  ],
-  car_driver: [
-    { name: 'City Tour (4 hours)', price: 180, rating: 4.7, reviews: 200, detail: 'Sedan · Local guide' },
-    { name: 'Intercity Transfer', price: 250, rating: 4.8, reviews: 130, detail: 'SUV · One-way' },
-    { name: 'Full Day Exploration', price: 400, rating: 4.9, reviews: 75, detail: 'SUV · Flexible itinerary' },
-  ],
-};
-
 const StorefrontServiceDetail = () => {
   const { slug, serviceType } = useParams<{ slug: string; serviceType: string }>();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
@@ -66,7 +40,8 @@ const StorefrontServiceDetail = () => {
   const Icon = SERVICE_ICONS[service] ?? Car;
   const heroText = SERVICE_HERO_TEXTS[service] ?? { title: SERVICE_LABELS[service] ?? service, subtitle: '' };
   const features = SERVICE_FEATURES[service] ?? [];
-  const listings = sampleListings[service] ?? [];
+
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
 
   // Check if service is enabled
   if (!agency.services?.includes(service)) {
@@ -127,36 +102,56 @@ const StorefrontServiceDetail = () => {
         </div>
       </section>
 
-      {/* Listings */}
+      {/* Listings from Database */}
       <section className={`py-16 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold mb-8" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
             {service === 'apartment' ? 'Available Apartments' : service === 'car_rental' ? 'Available Vehicles' : 'Available Packages'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {listings.map((item, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                className={`p-6 rounded-2xl transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
-                <div className="h-40 rounded-xl flex items-center justify-center opacity-10 bg-current mb-4">
-                  <Icon className="h-12 w-12" />
+
+          {vehiclesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={`p-6 rounded-2xl ${ts.cardClass}`} style={ts.cardStyle}>
+                  <Skeleton className="h-40 w-full rounded-xl mb-4" />
+                  <Skeleton className="h-5 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2 mb-4" />
+                  <Skeleton className="h-10 w-full" />
                 </div>
-                <h3 className="font-bold mb-1">{item.name}</h3>
-                <p className="text-xs opacity-50 mb-3">{item.detail}</p>
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className={`h-3 w-3 ${j < Math.floor(item.rating) ? 'fill-accent text-accent' : 'opacity-20'}`} />
-                  ))}
-                  <span className="text-[10px] opacity-50 ml-1">({item.reviews})</span>
-                </div>
-                <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                  <p className="text-lg font-bold">${item.price}<span className="text-xs font-normal opacity-50"> / {service === 'apartment' ? 'night' : 'day'}</span></p>
-                  <Button size="sm" className="rounded-lg text-xs text-white" style={{ backgroundColor: buttonColor }}>
-                    {cfg.cta_text || 'Book Now'}
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : vehicles.length === 0 ? (
+            <div className="text-center py-12 opacity-50">
+              <Icon className="h-12 w-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">No listings available at the moment. Check back soon!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {vehicles.map((vehicle, i) => (
+                <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+                  className={`p-6 rounded-2xl transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
+                  {vehicle.photo_url ? (
+                    <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-40 w-full rounded-xl object-cover mb-4" />
+                  ) : (
+                    <div className="h-40 rounded-xl flex items-center justify-center opacity-10 bg-current mb-4">
+                      <Icon className="h-12 w-12" />
+                    </div>
+                  )}
+                  <h3 className="font-bold mb-1">{vehicle.brand} {vehicle.model} {vehicle.year}</h3>
+                  <div className="flex items-center justify-between pt-3 border-t border-current/10 mt-3">
+                    {vehicle.daily_rate ? (
+                      <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / {service === 'apartment' ? 'night' : 'day'}</span></p>
+                    ) : (
+                      <p className="text-sm opacity-50">Contact for price</p>
+                    )}
+                    <Button size="sm" className="rounded-lg text-xs text-white" style={{ backgroundColor: buttonColor }}>
+                      {cfg.cta_text || 'Book Now'}
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
