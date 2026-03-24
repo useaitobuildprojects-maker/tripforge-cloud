@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateVehicle } from '@/hooks/use-vehicle-mutations';
 import { Vehicle } from '@/hooks/use-vehicles';
@@ -20,6 +21,12 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [licensePlate, setLicensePlate] = useState('');
   const [vin, setVin] = useState('');
   const [status, setStatus] = useState<'available' | 'rented' | 'maintenance'>('available');
+  const [transmission, setTransmission] = useState('manual');
+  const [seats, setSeats] = useState(5);
+  const [fuelType, setFuelType] = useState('gasoline');
+  const [category, setCategory] = useState('sedan');
+  const [airConditioning, setAirConditioning] = useState(true);
+  const [mileagePolicy, setMileagePolicy] = useState('unlimited');
 
   const updateVehicle = useUpdateVehicle();
 
@@ -31,6 +38,12 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setLicensePlate(vehicle.license_plate ?? '');
       setVin(vehicle.vin ?? '');
       setStatus(vehicle.status);
+      setTransmission((vehicle as any).transmission ?? 'manual');
+      setSeats((vehicle as any).seats ?? 5);
+      setFuelType((vehicle as any).fuel_type ?? 'gasoline');
+      setCategory((vehicle as any).category ?? 'sedan');
+      setAirConditioning((vehicle as any).air_conditioning ?? true);
+      setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
     }
   }, [vehicle]);
 
@@ -47,6 +60,12 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         license_plate: licensePlate || null,
         vin: vin || null,
         status,
+        transmission,
+        seats,
+        fuel_type: fuelType,
+        category,
+        air_conditioning: airConditioning,
+        mileage_policy: mileagePolicy,
       },
       { onSuccess: () => onOpenChange(false) }
     );
@@ -54,7 +73,7 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px]">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display">Edit Vehicle</DialogTitle>
         </DialogHeader>
@@ -76,10 +95,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as 'available' | 'rented' | 'maintenance')}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+              <Select value={status} onValueChange={(v) => setStatus(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="available">Available</SelectItem>
                   <SelectItem value="rented">Rented</SelectItem>
@@ -88,6 +105,75 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
               </Select>
             </div>
           </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sedan">Sedan</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                  <SelectItem value="hatchback">Hatchback</SelectItem>
+                  <SelectItem value="coupe">Coupe</SelectItem>
+                  <SelectItem value="convertible">Convertible</SelectItem>
+                  <SelectItem value="minivan">Minivan</SelectItem>
+                  <SelectItem value="pickup">Pickup Truck</SelectItem>
+                  <SelectItem value="luxury">Luxury</SelectItem>
+                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="electric">Electric</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Transmission</Label>
+              <Select value={transmission} onValueChange={setTransmission}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual</SelectItem>
+                  <SelectItem value="automatic">Automatic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Fuel Type</Label>
+              <Select value={fuelType} onValueChange={setFuelType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gasoline">Gasoline</SelectItem>
+                  <SelectItem value="diesel">Diesel</SelectItem>
+                  <SelectItem value="electric">Electric</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                  <SelectItem value="lpg">LPG</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editSeats">Seats</Label>
+              <Input id="editSeats" type="number" min={1} max={50} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Mileage Policy</Label>
+              <Select value={mileagePolicy} onValueChange={setMileagePolicy}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unlimited">Unlimited</SelectItem>
+                  <SelectItem value="limited">Limited</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-3 pt-7">
+              <Switch checked={airConditioning} onCheckedChange={setAirConditioning} />
+              <Label>Air Conditioning</Label>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="editPlate">License Plate</Label>
