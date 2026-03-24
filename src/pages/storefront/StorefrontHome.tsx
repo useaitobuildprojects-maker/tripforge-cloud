@@ -52,8 +52,10 @@ const StorefrontHome = () => {
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [dropoffTime, setDropoffTime] = useState('');
+  const [sameReturn, setSameReturn] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
+  const agencyLocations = useMemo(() => getAgencyLocations(agency.city, agency.country), [agency.city, agency.country]);
 
   // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
