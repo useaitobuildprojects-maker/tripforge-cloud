@@ -47,6 +47,12 @@ interface UpdateVehicleInput {
   license_plate: string | null;
   vin: string | null;
   status: string;
+  transmission?: string;
+  seats?: number;
+  fuel_type?: string;
+  category?: string;
+  air_conditioning?: boolean;
+  mileage_policy?: string;
 }
 
 export const useUpdateVehicle = () => {
