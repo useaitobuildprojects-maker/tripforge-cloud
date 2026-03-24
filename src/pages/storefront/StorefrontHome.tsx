@@ -150,13 +150,11 @@ const StorefrontHome = () => {
             </label>
           </div>
 
-          {/* Main search grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-            {/* Location */}
-            <div className={sameReturn ? 'md:col-span-4' : 'md:col-span-3'}>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">
-                {sameReturn ? 'Pickup and return location' : 'Pickup location'}
-              </label>
+          {/* Main search grid - single row layout */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_auto] gap-3 items-end">
+            {/* Pickup location */}
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
               <LocationAutocomplete
                 value={pickupLocation}
                 onChange={setPickupLocation}
@@ -167,53 +165,51 @@ const StorefrontHome = () => {
             </div>
 
             {/* Pickup date & time */}
-            <div className={sameReturn ? 'md:col-span-3' : 'md:col-span-2'}>
+            <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date and time</label>
-              <div className="flex gap-1.5">
-                <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+              <div className="flex gap-1">
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[140px] h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
-                <div className="relative w-24">
-                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <div className="relative">
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[90px] h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
 
-            {/* Return location (only if different) */}
-            {!sameReturn && (
-              <div className="md:col-span-2">
-                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
-                <LocationAutocomplete
-                  value={dropoffLocation}
-                  onChange={setDropoffLocation}
-                  placeholder="Return city or airport"
-                  locations={agencyLocations}
-                  agencyCity={agency.city}
-                />
-              </div>
-            )}
+            {/* Return location */}
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
+              <LocationAutocomplete
+                value={sameReturn ? pickupLocation : dropoffLocation}
+                onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }}
+                placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'}
+                locations={agencyLocations}
+                agencyCity={agency.city}
+              />
+            </div>
 
             {/* Return date & time */}
-            <div className={sameReturn ? 'md:col-span-3' : 'md:col-span-2'}>
+            <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date and time</label>
-              <div className="flex gap-1.5">
-                <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+              <div className="flex gap-1">
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-[140px] h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
-                <div className="relative w-24">
-                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <div className="relative">
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-[90px] h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
 
             {/* Search button */}
-            <div className="md:col-span-2">
+            <div className="flex items-end">
               <Button
-                className="w-full h-11 rounded-lg font-bold gap-2 text-white text-sm"
+                className="h-11 px-6 rounded-lg font-bold gap-2 text-white text-sm"
                 style={{ backgroundColor: buttonColor }}
                 onClick={() => {
                   setSearchActive(true);
