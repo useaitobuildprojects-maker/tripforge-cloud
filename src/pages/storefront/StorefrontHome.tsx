@@ -255,9 +255,9 @@ const StorefrontHome = () => {
             ) : filteredVehicles.length === 0 ? (
               <div className="text-center py-16 opacity-50">
                 <Car className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">{hasActiveFilters ? 'No vehicles match your filters.' : 'No vehicles available at the moment.'}</p>
-                {hasActiveFilters && (
-                  <button onClick={clearAllFilters} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>Clear all filters</button>
+                <p className="text-sm">{hasAnyFilter(filters) ? 'No vehicles match your filters.' : 'No vehicles available at the moment.'}</p>
+                {hasAnyFilter(filters) && (
+                  <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>Clear all filters</button>
                 )}
               </div>
             ) : (
