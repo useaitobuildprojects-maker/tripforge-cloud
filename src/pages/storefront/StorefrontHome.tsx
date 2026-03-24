@@ -33,6 +33,95 @@ const StorefrontHome = () => {
   const enabledServices = agency.services ?? [];
   const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
 
+  // Filter state
+  const PRICE_RANGES = [
+    { label: '$0 - $50', min: 0, max: 50 },
+    { label: '$50 - $100', min: 50, max: 100 },
+    { label: '$100 - $150', min: 100, max: 150 },
+    { label: '$150 - $200', min: 150, max: 200 },
+    { label: '$200+', min: 200, max: Infinity },
+  ];
+
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<number[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const availableBrands = useMemo(() => [...new Set(vehicles.map(v => v.brand))].sort(), [vehicles]);
+  const availableYears = useMemo(() => [...new Set(vehicles.map(v => v.year))].sort((a, b) => b - a), [vehicles]);
+
+  const filteredVehicles = useMemo(() => {
+    return vehicles.filter(v => {
+      if (selectedBrands.length > 0 && !selectedBrands.includes(v.brand)) return false;
+      if (selectedYears.length > 0 && !selectedYears.includes(v.year)) return false;
+      if (selectedPriceRanges.length > 0) {
+        const price = v.daily_rate ?? 0;
+        const inRange = selectedPriceRanges.some(idx => {
+          const range = PRICE_RANGES[idx];
+          return price >= range.min && price < range.max;
+        });
+        if (!inRange) return false;
+      }
+      return true;
+    });
+  }, [vehicles, selectedBrands, selectedYears, selectedPriceRanges]);
+
+  const hasActiveFilters = selectedPriceRanges.length > 0 || selectedBrands.length > 0 || selectedYears.length > 0;
+  const clearAllFilters = () => { setSelectedPriceRanges([]); setSelectedBrands([]); setSelectedYears([]); };
+  const togglePriceRange = (idx: number) => setSelectedPriceRanges(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  const toggleBrand = (brand: string) => setSelectedBrands(prev => prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]);
+  const toggleYear = (year: number) => setSelectedYears(prev => prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]);
+
+  const FilterSidebar = ({ className = '' }: { className?: string }) => (
+    <div className={className}>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-bold">Filter</h3>
+        {hasActiveFilters && (
+          <button onClick={clearAllFilters} className="text-sm font-medium hover:underline" style={{ color: buttonColor }}>Clear all</button>
+        )}
+      </div>
+      <div className="mb-6">
+        <h4 className="font-semibold text-sm mb-3">Price per day</h4>
+        <div className="space-y-2.5">
+          {PRICE_RANGES.map((range, idx) => (
+            <label key={idx} className="flex items-center gap-2.5 cursor-pointer text-sm">
+              <Checkbox checked={selectedPriceRanges.includes(idx)} onCheckedChange={() => togglePriceRange(idx)} />
+              {range.label}
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="border-t border-current/10 my-4" />
+      {availableBrands.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-semibold text-sm mb-3">Brand</h4>
+          <div className="space-y-2.5">
+            {availableBrands.map(brand => (
+              <label key={brand} className="flex items-center gap-2.5 cursor-pointer text-sm">
+                <Checkbox checked={selectedBrands.includes(brand)} onCheckedChange={() => toggleBrand(brand)} />
+                {brand}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+      {availableBrands.length > 0 && <div className="border-t border-current/10 my-4" />}
+      {availableYears.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-semibold text-sm mb-3">Year</h4>
+          <div className="space-y-2.5">
+            {availableYears.map(year => (
+              <label key={year} className="flex items-center gap-2.5 cursor-pointer text-sm">
+                <Checkbox checked={selectedYears.includes(year)} onCheckedChange={() => toggleYear(year)} />
+                {year}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const testimonials = [
     { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles. The staff was incredibly helpful throughout the entire rental process.', rating: 5 },
     { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had. Will definitely be coming back for our next trip!', rating: 5 },
