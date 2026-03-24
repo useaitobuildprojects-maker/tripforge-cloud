@@ -141,21 +141,21 @@ const StorefrontHome = () => {
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="text" value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
@@ -175,21 +175,21 @@ const StorefrontHome = () => {
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="text" value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)} placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
@@ -197,7 +197,14 @@ const StorefrontHome = () => {
 
           {/* Search Button */}
           <div className="flex justify-end">
-            <Button className="h-11 px-8 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
+            <Button
+              className="h-11 px-8 rounded-lg font-semibold gap-2 text-white"
+              style={{ backgroundColor: buttonColor }}
+              onClick={() => {
+                setSearchActive(true);
+                vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
               <Search className="h-4 w-4" /> Search
             </Button>
           </div>
