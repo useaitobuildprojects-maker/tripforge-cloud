@@ -1,7 +1,7 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, UserCheck, Crown, Building, Truck, SlidersHorizontal, X, Users, Briefcase, Plane } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, UserCheck, Crown, Building, Truck, SlidersHorizontal, X, Users, Briefcase, Plane, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -9,6 +9,7 @@ import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
+import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -51,8 +52,10 @@ const StorefrontHome = () => {
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [dropoffTime, setDropoffTime] = useState('');
+  const [sameReturn, setSameReturn] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
+  const agencyLocations = useMemo(() => getAgencyLocations(agency.city, agency.country), [agency.city, agency.country]);
 
   // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
@@ -126,87 +129,100 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Search Bar */}
+      {/* Europcar-style Search Bar */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
-          {/* Pick-up section */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-3 w-3 rounded-full bg-amber-500" />
-              <span className="text-sm font-semibold">Pick-up</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                </div>
-              </div>
-            </div>
+
+          {/* Header row with same-return toggle */}
+          <div className="flex flex-col md:flex-row md:items-center gap-3 mb-5">
+            <h3 className="text-base font-bold">Pickup and return location</h3>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <button
+                type="button"
+                onClick={() => setSameReturn(!sameReturn)}
+                className="h-5 w-5 rounded border-2 flex items-center justify-center transition-colors"
+                style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: 'hsl(var(--border))' }}
+              >
+                {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
+              </button>
+              <span className="text-sm text-muted-foreground">Same return location</span>
+            </label>
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-border my-4" />
-
-          {/* Drop-off section */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="h-3 w-3 rounded-full border-2 border-muted-foreground/40" />
-              <span className="text-sm font-semibold">Drop-off</span>
+          {/* Main search grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+            {/* Location */}
+            <div className={sameReturn ? 'md:col-span-4' : 'md:col-span-3'}>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">
+                {sameReturn ? 'Pickup and return location' : 'Pickup location'}
+              </label>
+              <LocationAutocomplete
+                value={pickupLocation}
+                onChange={setPickupLocation}
+                placeholder="City, airport, or address"
+                locations={agencyLocations}
+                agencyCity={agency.city}
+              />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)} placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+
+            {/* Pickup date & time */}
+            <div className={sameReturn ? 'md:col-span-3' : 'md:col-span-2'}>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date and time</label>
+              <div className="flex gap-1.5">
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                <div className="relative w-24">
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Search Button */}
-          <div className="flex justify-end">
-            <Button
-              className="h-11 px-8 rounded-lg font-semibold gap-2 text-white"
-              style={{ backgroundColor: buttonColor }}
-              onClick={() => {
-                setSearchActive(true);
-                vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-            >
-              <Search className="h-4 w-4" /> Search
-            </Button>
+            {/* Return location (only if different) */}
+            {!sameReturn && (
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
+                <LocationAutocomplete
+                  value={dropoffLocation}
+                  onChange={setDropoffLocation}
+                  placeholder="Return city or airport"
+                  locations={agencyLocations}
+                  agencyCity={agency.city}
+                />
+              </div>
+            )}
+
+            {/* Return date & time */}
+            <div className={sameReturn ? 'md:col-span-3' : 'md:col-span-2'}>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date and time</label>
+              <div className="flex gap-1.5">
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+                <div className="relative w-24">
+                  <Clock className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-9 pr-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                </div>
+              </div>
+            </div>
+
+            {/* Search button */}
+            <div className="md:col-span-2">
+              <Button
+                className="w-full h-11 rounded-lg font-bold gap-2 text-white text-sm"
+                style={{ backgroundColor: buttonColor }}
+                onClick={() => {
+                  setSearchActive(true);
+                  vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+              >
+                <Search className="h-4 w-4" /> Search
+              </Button>
+            </div>
           </div>
         </motion.div>
       </section>
