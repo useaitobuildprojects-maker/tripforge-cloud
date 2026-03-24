@@ -44,6 +44,16 @@ const StorefrontHome = () => {
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>('all');
 
+  // Search state
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [pickupTime, setPickupTime] = useState('');
+  const [dropoffLocation, setDropoffLocation] = useState('');
+  const [dropoffDate, setDropoffDate] = useState('');
+  const [dropoffTime, setDropoffTime] = useState('');
+  const [searchActive, setSearchActive] = useState(false);
+  const vehiclesRef = useRef<HTMLDivElement>(null);
+
   // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
