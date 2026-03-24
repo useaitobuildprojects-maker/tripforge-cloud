@@ -1,8 +1,7 @@
-import { useState, useRef } from 'react';
-import { Plus, X, MapPin, Plane, Building2, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Plus, X, MapPin, Plane, Building2, Search, Loader2, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LocationEntry {
   name: string;
@@ -15,6 +14,22 @@ interface LocationsEditorProps {
   onChange: (locations: LocationEntry[]) => void;
 }
 
+interface PhotonFeature {
+  properties: {
+    name?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    osm_value?: string;
+    osm_key?: string;
+    type?: string;
+    street?: string;
+    housenumber?: string;
+    postcode?: string;
+  };
+  geometry: { coordinates: [number, number] };
+}
+
 const TYPE_LABELS: Record<string, string> = { station: 'Station', airport: 'Airport', city: 'City' };
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2 };
 const TYPE_COLORS: Record<string, string> = {
@@ -23,43 +38,90 @@ const TYPE_COLORS: Record<string, string> = {
   city: 'bg-emerald-500/10 text-emerald-700 border-emerald-200',
 };
 
-const AIRPORT_KEYWORDS = ['airport', 'aéroport', 'aeropuerto', 'flughafen', 'aeroporto', 'cdg', 'ory', 'jfk', 'lhr', 'bcn', 'fco', 'terminal'];
-const STATION_KEYWORDS = ['station', 'gare', 'train', 'railway', 'bus', 'port', 'harbor', 'harbour', 'terminal', 'downtown', 'north', 'south', 'east', 'west', 'central', 'office', 'desk', 'counter', 'branch'];
+function detectTypeFromPhoton(feat: PhotonFeature): LocationEntry['type'] {
+  const { osm_value, osm_key, name } = feat.properties;
+  const lower = (name || '').toLowerCase();
+  if (osm_value === 'aerodrome' || osm_key === 'aeroway' || lower.includes('airport') || lower.includes('aéroport')) return 'airport';
+  if (osm_value === 'city' || osm_value === 'town' || osm_value === 'village' || osm_value === 'hamlet' || osm_key === 'place') return 'city';
+  return 'station';
+}
 
-function detectType(name: string): 'station' | 'airport' | 'city' {
-  const lower = name.toLowerCase();
-  if (AIRPORT_KEYWORDS.some((kw) => lower.includes(kw))) return 'airport';
-  if (STATION_KEYWORDS.some((kw) => lower.includes(kw))) return 'station';
-  return 'city';
+function buildAddress(feat: PhotonFeature): string {
+  const p = feat.properties;
+  const parts: string[] = [];
+  if (p.city && p.city !== p.name) parts.push(p.city);
+  if (p.state) parts.push(p.state);
+  if (p.country) parts.push(p.country);
+  return parts.join(', ');
+}
+
+function buildDisplayName(feat: PhotonFeature): string {
+  return feat.properties.name || 'Unknown location';
 }
 
 const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
-  const [input, setInput] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<PhotonFeature[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const addLocation = (raw: string) => {
-    const name = raw.trim();
-    if (!name) return;
-    // Avoid duplicates
-    if (locations.some((l) => l.name.toLowerCase() === name.toLowerCase())) return;
-    const type = detectType(name);
-    onChange([...locations, { name, type }]);
-    setInput('');
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setShowDropdown(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const searchLocations = useCallback(async (q: string) => {
+    if (q.length < 2) { setResults([]); return; }
+    setLoading(true);
+    try {
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lang=en`);
+      const data = await res.json();
+      setResults(data.features || []);
+      setShowDropdown(true);
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleInputChange = (val: string) => {
+    setQuery(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => searchLocations(val), 300);
   };
 
-  const addMultiple = (text: string) => {
-    // Support comma or newline separated bulk paste
-    const names = text.split(/[,\n]/).map((s) => s.trim()).filter(Boolean);
-    if (names.length <= 1) {
-      addLocation(text);
+  const addFromResult = (feat: PhotonFeature) => {
+    const name = buildDisplayName(feat);
+    if (locations.some((l) => l.name.toLowerCase() === name.toLowerCase())) {
+      setShowDropdown(false);
+      setQuery('');
       return;
     }
-    const existing = new Set(locations.map((l) => l.name.toLowerCase()));
-    const newLocs = names
-      .filter((n) => !existing.has(n.toLowerCase()))
-      .map((n) => ({ name: n, type: detectType(n) }));
-    if (newLocs.length > 0) onChange([...locations, ...newLocs]);
-    setInput('');
+    const type = detectTypeFromPhoton(feat);
+    const address = buildAddress(feat);
+    onChange([...locations, { name, type, address: address || undefined }]);
+    setQuery('');
+    setShowDropdown(false);
+    setResults([]);
+  };
+
+  const addManual = () => {
+    const name = query.trim();
+    if (!name) return;
+    if (locations.some((l) => l.name.toLowerCase() === name.toLowerCase())) return;
+    const AIRPORT_KW = ['airport', 'aéroport', 'aeropuerto', 'flughafen', 'aeroporto', 'cdg', 'ory', 'jfk', 'lhr'];
+    const lower = name.toLowerCase();
+    const type = AIRPORT_KW.some((kw) => lower.includes(kw)) ? 'airport' : 'city';
+    onChange([...locations, { name, type }]);
+    setQuery('');
+    setShowDropdown(false);
   };
 
   const removeLocation = (index: number) => {
@@ -75,58 +137,76 @@ const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
     onChange(updated);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addMultiple(input);
-    }
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') { e.preventDefault(); addManual(); }
   };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    const pasted = e.clipboardData.getData('text');
-    if (pasted.includes(',') || pasted.includes('\n')) {
-      e.preventDefault();
-      addMultiple(pasted);
-    }
-  };
-
-  const detectedType = input.trim() ? detectType(input) : null;
 
   return (
     <div className="space-y-4">
-      {/* Quick-add input */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            placeholder="Type a location name and press Enter  (e.g. Paris CDG Airport)"
-            className="pl-10 pr-24"
-          />
-          {detectedType && (
-            <span className={`absolute right-12 top-1/2 -translate-y-1/2 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${TYPE_COLORS[detectedType]}`}>
-              {TYPE_LABELS[detectedType]}
-            </span>
+      {/* Search input */}
+      <div ref={wrapperRef} className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />}
+        <Input
+          value={query}
+          onChange={(e) => handleInputChange(e.target.value)}
+          onFocus={() => { if (results.length > 0) setShowDropdown(true); }}
+          onKeyDown={handleKeyDown}
+          placeholder="Search for a city, airport, or station..."
+          className="pl-10 pr-10"
+        />
+
+        <AnimatePresence>
+          {showDropdown && results.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.15 }}
+              className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 bg-popover border border-border rounded-xl shadow-lg max-h-72 overflow-y-auto"
+            >
+              {results.map((feat, i) => {
+                const type = detectTypeFromPhoton(feat);
+                const Icon = TYPE_ICONS[type];
+                const name = buildDisplayName(feat);
+                const addr = buildAddress(feat);
+                const alreadyAdded = locations.some((l) => l.name.toLowerCase() === name.toLowerCase());
+                return (
+                  <button
+                    key={i}
+                    onClick={() => addFromResult(feat)}
+                    disabled={alreadyAdded}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">{name}</div>
+                      {addr && <div className="text-xs text-muted-foreground truncate">{addr}</div>}
+                    </div>
+                    <span className={`text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border ${TYPE_COLORS[type]}`}>
+                      {TYPE_LABELS[type]}
+                    </span>
+                    {alreadyAdded && <span className="text-[10px] text-muted-foreground">Added</span>}
+                  </button>
+                );
+              })}
+              {query.trim() && (
+                <button
+                  onClick={addManual}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left border-t border-border"
+                >
+                  <Plus className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm text-muted-foreground">Add "<span className="font-medium text-foreground">{query.trim()}</span>" manually</span>
+                </button>
+              )}
+            </motion.div>
           )}
-        </div>
-        <Button
-          type="button"
-          onClick={() => addMultiple(input)}
-          disabled={!input.trim()}
-          size="sm"
-          className="h-10 px-4"
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        </AnimatePresence>
       </div>
 
       <p className="text-[10px] text-muted-foreground flex items-center gap-1.5">
         <Sparkles className="h-3 w-3" />
-        Auto-detects type from name. Click the type badge to change it. Paste a comma-separated list to bulk-add.
+        Search real places worldwide. Type detects automatically. Click the badge to change type.
       </p>
 
       {/* Location chips */}
@@ -141,6 +221,7 @@ const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
               >
                 <Icon className="h-3.5 w-3.5 shrink-0" />
                 <span className="font-medium">{loc.name}</span>
+                {loc.address && <span className="text-[10px] opacity-60 hidden sm:inline">— {loc.address}</span>}
                 <button
                   onClick={() => cycleType(i)}
                   className="text-[9px] uppercase tracking-wider font-bold opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
@@ -162,9 +243,7 @@ const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
         <div className="text-center py-8 rounded-lg border border-dashed border-border">
           <MapPin className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">No pickup/drop-off locations yet</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Add locations like "Paris CDG Airport", "Nice Train Station", "Marseille"
-          </p>
+          <p className="text-xs text-muted-foreground mt-1">Search and add real locations above</p>
         </div>
       )}
 
