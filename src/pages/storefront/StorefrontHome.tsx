@@ -1,12 +1,14 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2, UserCheck, Crown, Building, Truck } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Users, Fuel, Settings2, UserCheck, Crown, Building, Truck, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useMemo } from 'react';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
