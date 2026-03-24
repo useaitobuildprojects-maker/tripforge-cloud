@@ -5,6 +5,8 @@ import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
+import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -27,13 +29,7 @@ const StorefrontHome = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const enabledServices = agency.services ?? [];
-
-  const sampleCars = [
-    { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
-    { name: 'BMW X5', year: 2023, type: 'SUV', price: 220, rating: 4.8, reviews: 320, seats: 5, transmission: 'Automatic', fuel: '85L' },
-    { name: 'Mercedes C-Class', year: 2022, type: 'Sedan', price: 180, rating: 4.6, reviews: 280, seats: 5, transmission: 'Automatic', fuel: '66L' },
-    { name: 'Audi Q7', year: 2023, type: 'SUV', price: 250, rating: 4.7, reviews: 195, seats: 7, transmission: 'Automatic', fuel: '85L' },
-  ];
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
 
   const testimonials = [
     { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles. The staff was incredibly helpful throughout the entire rental process.', rating: 5 },
@@ -50,9 +46,8 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero Section — Majestic style with background image overlay */}
+      {/* Hero Section */}
       <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}), minHeight: '420px' }}>
-        {/* Background image placeholder */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
         {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
@@ -70,7 +65,7 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Search Bar — Majestic style with Pick-up / Drop-off tabs */}
+      {/* Search Bar */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-5 md:p-6 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
@@ -137,7 +132,7 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Our Services — Dynamic based on agency's enabled services */}
+      {/* Our Services */}
       {enabledServices.length > 0 && (
         <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,69 +165,90 @@ const StorefrontHome = () => {
         </section>
       )}
 
-      {/* Featured Car */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
-          {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
-          <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-            <div className="flex-1">
-              <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>Best Offer</span>
-              <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>Hyundai Tucson 2021 SUV</h3>
-              <p className={`text-sm line-through mb-0.5 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>$200,000 / day</p>
-              <p className="text-2xl font-bold text-accent">$150,000 / day</p>
-              <div className="flex items-center gap-1 mt-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-accent text-accent" />
-                ))}
-                <span className={`text-xs ml-1 ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>(450 recommends)</span>
+      {/* Featured Vehicle — first from database */}
+      {vehicles.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
+            {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
+            <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1">
+                <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>Best Offer</span>
+                <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
+                  {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
+                </h3>
+                {vehicles[0].daily_rate && (
+                  <p className="text-2xl font-bold text-accent">${vehicles[0].daily_rate.toLocaleString()} / day</p>
+                )}
               </div>
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
-                <Car className="h-24 w-24 opacity-20" />
+              <div className="flex-1 flex items-center justify-center">
+                {vehicles[0].photo_url ? (
+                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-80 h-48 rounded-xl object-cover" />
+                ) : (
+                  <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
+                    <Car className="h-24 w-24 opacity-20" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Car Listings */}
+      {/* Vehicle Listings from Database */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Cars & Deals</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Vehicles</h2>
         <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">Find the perfect car for your journey with competitive prices and top-quality vehicles.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sampleCars.map((car, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}
-              className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
-              <div className="h-44 flex items-center justify-center opacity-30">
-                <Car className="h-16 w-16" />
+
+        {vehiclesLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className={`overflow-hidden ${ts.cardClass}`} style={ts.cardStyle}>
+                <Skeleton className="h-44 w-full" />
+                <div className="p-4 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-8 w-full mt-4" />
+                </div>
               </div>
-              <div className="p-4">
-                <h4 className="font-bold text-sm">{car.name} {car.year} {car.type}</h4>
-                <div className="flex items-center gap-3 mt-2 text-[11px] opacity-50">
-                  <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {car.fuel}</span>
-                  <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {car.transmission}</span>
-                  <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {car.seats} People</span>
-                </div>
-                <div className="flex items-center gap-1 mt-2">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className={`h-3 w-3 ${j < Math.floor(car.rating) ? 'fill-accent text-accent' : 'opacity-20'}`} />
-                  ))}
-                  <span className="text-[10px] opacity-50 ml-1">({car.reviews} recommends)</span>
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-current/10">
-                  <div>
-                    <span className="text-xs opacity-50 line-through">${(car.price * 1.2).toLocaleString()}</span>
-                    <p className="text-base font-bold">${car.price.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
+            ))}
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="text-center py-12 opacity-50">
+            <Car className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm">No vehicles available at the moment. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {vehicles.slice(0, 8).map((vehicle, i) => (
+              <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}
+                className={`overflow-hidden transition-all group ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
+                {vehicle.photo_url ? (
+                  <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
+                ) : (
+                  <div className="h-44 flex items-center justify-center opacity-30">
+                    <Car className="h-16 w-16" />
                   </div>
-                  <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
-                    {cfg.cta_text || 'Book now'}
-                  </Button>
+                )}
+                <div className="p-4">
+                  <h4 className="font-bold text-sm">{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-current/10">
+                    <div>
+                      {vehicle.daily_rate ? (
+                        <p className="text-base font-bold">${vehicle.daily_rate.toLocaleString()} <span className="text-xs font-normal opacity-50">/ day</span></p>
+                      ) : (
+                        <p className="text-sm opacity-50">Contact for price</p>
+                      )}
+                    </div>
+                    <Button size="sm" className="rounded-lg text-xs h-9 px-4 text-white" style={{ backgroundColor: buttonColor }}>
+                      {cfg.cta_text || 'Book now'}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         <div className="text-center mt-8">
           <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity flex items-center gap-1 mx-auto justify-center">
             View all services <ChevronRight className="h-4 w-4" />
