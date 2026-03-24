@@ -211,9 +211,9 @@ const StorefrontHome = () => {
           </div>
           <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
             <SlidersHorizontal className="h-4 w-4" /> Filter
-            {hasActiveFilters && (
+            {activeFilterCount > 0 && (
               <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
-                {selectedPriceRanges.length + selectedBrands.length + selectedYears.length}
+                {activeFilterCount}
               </span>
             )}
           </Button>
@@ -221,7 +221,7 @@ const StorefrontHome = () => {
 
         <div className="flex gap-8">
           {/* Desktop filter sidebar */}
-          <FilterSidebar className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
+          <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
 
           {/* Mobile filter drawer */}
           {mobileFiltersOpen && (
@@ -232,7 +232,7 @@ const StorefrontHome = () => {
                   <span className="font-bold text-lg">Filters</span>
                   <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
                 </div>
-                <FilterSidebar />
+                <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
               </div>
             </div>
           )}
