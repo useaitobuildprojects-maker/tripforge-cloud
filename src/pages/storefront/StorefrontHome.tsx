@@ -359,7 +359,16 @@ const StorefrontHome = () => {
 
       {/* Full Vehicle Listings */}
       {showVehicles && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <section ref={vehiclesRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 scroll-mt-8">
+          {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl border border-border bg-muted/30 flex flex-wrap items-center gap-4 text-sm">
+              <MapPin className="h-4 w-4 opacity-50" />
+              <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
+              <span className="opacity-30">→</span>
+              <span><strong>Drop-off:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
+              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium underline opacity-60 hover:opacity-100">Clear</button>
+            </motion.div>
+          )}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Choose Your Vehicle</h2>
