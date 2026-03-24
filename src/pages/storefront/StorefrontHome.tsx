@@ -7,7 +7,7 @@ import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
@@ -43,6 +43,16 @@ const StorefrontHome = () => {
 
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>('all');
+
+  // Search state
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [pickupTime, setPickupTime] = useState('');
+  const [dropoffLocation, setDropoffLocation] = useState('');
+  const [dropoffDate, setDropoffDate] = useState('');
+  const [dropoffTime, setDropoffTime] = useState('');
+  const [searchActive, setSearchActive] = useState(false);
+  const vehiclesRef = useRef<HTMLDivElement>(null);
 
   // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
@@ -131,21 +141,21 @@ const StorefrontHome = () => {
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="text" value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} placeholder="Enter pickup location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
@@ -165,21 +175,21 @@ const StorefrontHome = () => {
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="text" placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="text" value={dropoffLocation} onChange={(e) => setDropoffLocation(e.target.value)} placeholder="Enter drop-off location" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Date</label>
                 <div className="relative">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="date" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-semibold opacity-50 uppercase tracking-wider block mb-1.5">Time</label>
                 <div className="relative">
                   <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50" />
-                  <input type="time" className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+                  <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
               </div>
             </div>
@@ -187,7 +197,14 @@ const StorefrontHome = () => {
 
           {/* Search Button */}
           <div className="flex justify-end">
-            <Button className="h-11 px-8 rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
+            <Button
+              className="h-11 px-8 rounded-lg font-semibold gap-2 text-white"
+              style={{ backgroundColor: buttonColor }}
+              onClick={() => {
+                setSearchActive(true);
+                vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+            >
               <Search className="h-4 w-4" /> Search
             </Button>
           </div>
@@ -342,7 +359,16 @@ const StorefrontHome = () => {
 
       {/* Full Vehicle Listings */}
       {showVehicles && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <section ref={vehiclesRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 scroll-mt-8">
+          {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl border border-border bg-muted/30 flex flex-wrap items-center gap-4 text-sm">
+              <MapPin className="h-4 w-4 opacity-50" />
+              <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
+              <span className="opacity-30">→</span>
+              <span><strong>Drop-off:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
+              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium underline opacity-60 hover:opacity-100">Clear</button>
+            </motion.div>
+          )}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Choose Your Vehicle</h2>
