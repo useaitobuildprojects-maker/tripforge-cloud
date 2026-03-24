@@ -12,6 +12,7 @@ import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
+import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
@@ -75,6 +76,7 @@ const AgencyAdminSettings = () => {
   const [buttonColor, setButtonColor] = useState(agency.button_color ?? '#c8a951');
   const [bgColor, setBgColor] = useState(agency.background_color ?? '#ffffff');
   const [storefrontConfig, setStorefrontConfig] = useState<StorefrontConfig>(agency.storefront_config ?? {});
+  const [locations, setLocations] = useState<{ name: string; type: 'station' | 'airport' | 'city'; address?: string }[]>(agency.storefront_config?.locations ?? []);
 
   const [form, setForm] = useState({
     name: agency.name,
@@ -140,7 +142,7 @@ const AgencyAdminSettings = () => {
       storefront_template: selectedTemplate,
       button_color: buttonColor,
       background_color: bgColor,
-      storefront_config: storefrontConfig,
+      storefront_config: { ...storefrontConfig, locations: locations.length > 0 ? locations : undefined },
     });
   };
 
@@ -399,7 +401,19 @@ const AgencyAdminSettings = () => {
         </Tabs>
       </motion.div>
 
-
+      {/* Locations */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="card-premium rounded-xl p-7 space-y-4"
+      >
+        <div>
+          <h2 className="text-lg font-display font-bold text-foreground">Pickup & Drop-off Locations</h2>
+          <p className="text-sm text-muted-foreground mt-1">Add the locations customers can choose from when booking. These appear in the search bar on your storefront.</p>
+        </div>
+        <LocationsEditor locations={locations} onChange={setLocations} />
+      </motion.div>
 
       <div className="flex justify-end">
         <Button

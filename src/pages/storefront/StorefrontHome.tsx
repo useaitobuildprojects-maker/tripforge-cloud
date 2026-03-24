@@ -55,7 +55,13 @@ const StorefrontHome = () => {
   const [sameReturn, setSameReturn] = useState(true);
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
-  const agencyLocations = useMemo(() => getAgencyLocations(agency.city, agency.country), [agency.city, agency.country]);
+  const agencyLocations = useMemo(() => {
+    const configLocs = cfg?.locations;
+    if (configLocs && configLocs.length > 0) {
+      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address }));
+    }
+    return getAgencyLocations(agency.city, agency.country);
+  }, [cfg?.locations, agency.city, agency.country]);
 
   // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);

@@ -29,6 +29,8 @@ export interface StorefrontConfig {
   phone?: string;
   working_hours?: string;
   working_hours_weekend?: string;
+  // Locations (pickup/drop-off points)
+  locations?: { name: string; type: 'station' | 'airport' | 'city'; address?: string }[];
 }
 
 export interface PageSeoEntry {
