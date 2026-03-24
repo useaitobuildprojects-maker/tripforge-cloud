@@ -3,6 +3,7 @@ import { Plus, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter,
@@ -22,6 +23,12 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [vin, setVin] = useState('');
   const [status, setStatus] = useState<string>('available');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [transmission, setTransmission] = useState('manual');
+  const [seats, setSeats] = useState('5');
+  const [fuelType, setFuelType] = useState('gasoline');
+  const [category, setCategory] = useState('sedan');
+  const [airConditioning, setAirConditioning] = useState(true);
+  const [mileagePolicy, setMileagePolicy] = useState('unlimited');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -29,6 +36,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const reset = () => {
     setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
+    setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
+    setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
   };
 
   const handleSubmit = async () => {
@@ -48,6 +57,12 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       vin: vin.trim() || undefined,
       status,
       photo_url,
+      transmission,
+      seats: parseInt(seats),
+      fuel_type: fuelType,
+      category,
+      air_conditioning: airConditioning,
+      mileage_policy: mileagePolicy,
     });
 
     reset();
@@ -63,7 +78,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
           <Plus className="h-4 w-4" /> Add Vehicle
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Vehicle</DialogTitle>
           <DialogDescription>Add a vehicle to your fleet.</DialogDescription>
@@ -89,15 +104,81 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
             <div className="space-y-1.5">
               <Label htmlFor="status">Status</Label>
               <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="available">Available</SelectItem>
                   <SelectItem value="rented">Rented</SelectItem>
                   <SelectItem value="maintenance">Maintenance</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Category</Label>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sedan">Sedan</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                  <SelectItem value="hatchback">Hatchback</SelectItem>
+                  <SelectItem value="coupe">Coupe</SelectItem>
+                  <SelectItem value="convertible">Convertible</SelectItem>
+                  <SelectItem value="minivan">Minivan</SelectItem>
+                  <SelectItem value="pickup">Pickup Truck</SelectItem>
+                  <SelectItem value="luxury">Luxury</SelectItem>
+                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="electric">Electric</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Transmission</Label>
+              <Select value={transmission} onValueChange={setTransmission}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual</SelectItem>
+                  <SelectItem value="automatic">Automatic</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Fuel Type</Label>
+              <Select value={fuelType} onValueChange={setFuelType}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gasoline">Gasoline</SelectItem>
+                  <SelectItem value="diesel">Diesel</SelectItem>
+                  <SelectItem value="electric">Electric</SelectItem>
+                  <SelectItem value="hybrid">Hybrid</SelectItem>
+                  <SelectItem value="lpg">LPG</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="seats">Seats</Label>
+              <Input id="seats" type="number" min={1} max={50} value={seats} onChange={(e) => setSeats(e.target.value)} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Mileage Policy</Label>
+              <Select value={mileagePolicy} onValueChange={setMileagePolicy}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unlimited">Unlimited</SelectItem>
+                  <SelectItem value="limited">Limited</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-3 pt-6">
+              <Switch checked={airConditioning} onCheckedChange={setAirConditioning} />
+              <Label>Air Conditioning</Label>
             </div>
           </div>
 
