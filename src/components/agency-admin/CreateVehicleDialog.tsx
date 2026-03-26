@@ -41,6 +41,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
+    setDefaultPrice('');
   };
 
   const handleSubmit = async () => {
