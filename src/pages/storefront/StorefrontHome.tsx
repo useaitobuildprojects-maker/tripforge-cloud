@@ -40,7 +40,7 @@ const StorefrontHome = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const enabledServices = agency.services ?? [];
-  const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
 
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>('all');
