@@ -66,20 +66,32 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       {
         id: vehicle.id,
         agency_id: vehicle.agency_id,
-        brand,
-        model,
-        year,
+        brand, model, year,
         license_plate: licensePlate || null,
         vin: vin || null,
-        status,
-        transmission,
-        seats,
-        fuel_type: fuelType,
-        category,
+        status, transmission, seats,
+        fuel_type: fuelType, category,
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
       },
-      { onSuccess: () => onOpenChange(false) }
+      {
+        onSuccess: async () => {
+          // Create/update default pricing
+          const priceNum = parseFloat(defaultPrice);
+          if (priceNum > 0 && (!existingPricing?.length)) {
+            await addPricing.mutateAsync({
+              vehicle_id: vehicle.id,
+              season_name: 'Default',
+              start_date: '2020-01-01',
+              end_date: '2099-12-31',
+              daily_rate: priceNum,
+              weekly_rate: null,
+              monthly_rate: null,
+            });
+          }
+          onOpenChange(false);
+        },
+      }
     );
   };
 
