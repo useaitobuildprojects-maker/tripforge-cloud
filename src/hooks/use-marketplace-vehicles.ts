@@ -9,6 +9,8 @@ export interface MarketplaceVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
+  price_per_km: number | null;
+  display_price_per_km: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
