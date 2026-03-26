@@ -51,6 +51,14 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
     }
   }, [vehicle]);
 
+  useEffect(() => {
+    if (existingPricing?.length) {
+      setDefaultPrice(String(existingPricing[0].daily_rate));
+    } else {
+      setDefaultPrice('');
+    }
+  }, [existingPricing]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehicle) return;
