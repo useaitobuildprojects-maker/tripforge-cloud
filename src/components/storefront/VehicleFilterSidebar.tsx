@@ -98,7 +98,7 @@ export const applyFilters = (vehicles: MarketplaceVehicle[], f: VehicleFilters) 
 };
 
 interface Props {
-  vehicles: StorefrontVehicle[];
+  vehicles: MarketplaceVehicle[];
   filters: VehicleFilters;
   onChange: (filters: VehicleFilters) => void;
   buttonColor: string;
