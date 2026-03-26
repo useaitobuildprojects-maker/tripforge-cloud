@@ -25,6 +25,7 @@ const mapAgency = (a: any): Agency => ({
   button_color: a.button_color ?? null,
   background_color: a.background_color ?? null,
   storefront_config: a.storefront_config ?? null,
+  commission_rate: Number(a.commission_rate) || 10,
 });
 
 export const useAgencies = () => {
