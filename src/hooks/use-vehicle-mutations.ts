@@ -17,6 +17,7 @@ interface CreateVehicleInput {
   category?: string;
   air_conditioning?: boolean;
   mileage_policy?: string;
+  price_per_km?: number | null;
 }
 
 export const useCreateVehicle = () => {
@@ -53,6 +54,7 @@ interface UpdateVehicleInput {
   category?: string;
   air_conditioning?: boolean;
   mileage_policy?: string;
+  price_per_km?: number | null;
 }
 
 export const useUpdateVehicle = () => {

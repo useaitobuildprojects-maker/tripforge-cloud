@@ -11,6 +11,7 @@ export interface Vehicle {
   vin: string | null;
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
+  price_per_km: number | null;
   created_at: string;
 }
 

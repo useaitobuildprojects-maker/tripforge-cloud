@@ -9,6 +9,8 @@ export interface MarketplaceVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
+  price_per_km: number | null;
+  display_price_per_km: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -34,7 +36,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
       // Fetch ALL available vehicles with agency info
       const { data: vehicles, error } = await supabase
         .from('vehicles')
-        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
+        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
@@ -86,6 +88,10 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
         const displayRate = originalRate && !isOwn
           ? Math.round(originalRate * (1 + agencyCommission / 100))
           : originalRate;
+        const originalPricePerKm = v.price_per_km ?? null;
+        const displayPricePerKm = originalPricePerKm && !isOwn
+          ? +(originalPricePerKm * (1 + agencyCommission / 100)).toFixed(2)
+          : originalPricePerKm;
 
         return {
           id: v.id,
@@ -100,6 +106,8 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           category: v.category,
           air_conditioning: v.air_conditioning,
           mileage_policy: v.mileage_policy,
+          price_per_km: originalPricePerKm,
+          display_price_per_km: displayPricePerKm,
           agency_id: v.agency_id,
           agency_name: v.agencies?.name ?? '',
           agency_slug: v.agencies?.slug ?? '',

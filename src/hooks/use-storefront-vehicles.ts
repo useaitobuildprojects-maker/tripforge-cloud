@@ -9,6 +9,7 @@ export interface StorefrontVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
+  price_per_km: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -23,7 +24,7 @@ export const useStorefrontVehicles = (agencyId: string | undefined) => {
     queryFn: async (): Promise<StorefrontVehicle[]> => {
       const { data: vehicles, error } = await supabase
         .from('vehicles')
-        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy')
+        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km')
         .eq('agency_id', agencyId!)
         .eq('status', 'available')
         .order('created_at', { ascending: false });

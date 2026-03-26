@@ -323,9 +323,11 @@ const StorefrontHome = () => {
                               <h4 className="font-bold text-sm">{vehicle.brand} {vehicle.model}</h4>
                               <div className="flex items-center justify-between mt-1">
                                 <span className="text-xs opacity-50">{vehicle.year}</span>
-                                {vehicle.daily_rate && (
-                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>${vehicle.daily_rate}/day</span>
-                                )}
+                                {vehicle.display_price_per_km ? (
+                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.display_price_per_km} €/km</span>
+                                ) : vehicle.daily_rate ? (
+                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.daily_rate} €/day</span>
+                                ) : null}
                               </div>
                             </div>
                           </div>
@@ -357,9 +359,11 @@ const StorefrontHome = () => {
                 <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
                   {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
                 </h3>
-                {vehicles[0].daily_rate && (
-                  <p className="text-2xl font-bold text-accent">${vehicles[0].daily_rate.toLocaleString()} / day</p>
-                )}
+                {vehicles[0].display_price_per_km ? (
+                  <p className="text-2xl font-bold text-accent">{vehicles[0].display_price_per_km} €/km</p>
+                ) : vehicles[0].daily_rate ? (
+                  <p className="text-2xl font-bold text-accent">{vehicles[0].daily_rate.toLocaleString()} €/day</p>
+                ) : null}
               </div>
               <div className="flex-1 flex items-center justify-center">
                 {vehicles[0].photo_url ? (
@@ -471,8 +475,10 @@ const StorefrontHome = () => {
                           <h4 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h4>
                           <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
                           <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                            {vehicle.daily_rate ? (
-                              <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / day</span></p>
+                            {vehicle.display_price_per_km ? (
+                              <p className="text-lg font-bold">{vehicle.display_price_per_km} €<span className="text-xs font-normal opacity-50"> / km</span></p>
+                            ) : vehicle.daily_rate ? (
+                              <p className="text-lg font-bold">{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal opacity-50"> / day</span></p>
                             ) : (
                               <p className="text-sm opacity-50">Contact for price</p>
                             )}

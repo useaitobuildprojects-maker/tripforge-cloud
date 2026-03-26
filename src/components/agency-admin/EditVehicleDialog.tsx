@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateVehicle } from '@/hooks/use-vehicle-mutations';
-import { useVehiclePricing, useAddPricing } from '@/hooks/use-vehicle-pricing';
 import { Vehicle } from '@/hooks/use-vehicles';
 
 interface EditVehicleDialogProps {
@@ -28,11 +27,9 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [category, setCategory] = useState('sedan');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
-  const [defaultPrice, setDefaultPrice] = useState('');
+  const [pricePerKm, setPricePerKm] = useState('');
 
   const updateVehicle = useUpdateVehicle();
-  const addPricing = useAddPricing();
-  const { data: existingPricing } = useVehiclePricing(vehicle?.id);
 
   useEffect(() => {
     if (vehicle) {
@@ -48,20 +45,14 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setCategory((vehicle as any).category ?? 'sedan');
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
+      setPricePerKm(vehicle.price_per_km != null ? String(vehicle.price_per_km) : '');
     }
   }, [vehicle]);
-
-  useEffect(() => {
-    if (existingPricing?.length) {
-      setDefaultPrice(String(existingPricing[0].daily_rate));
-    } else {
-      setDefaultPrice('');
-    }
-  }, [existingPricing]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehicle) return;
+    const kmPrice = parseFloat(pricePerKm);
     updateVehicle.mutate(
       {
         id: vehicle.id,
@@ -73,25 +64,9 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         fuel_type: fuelType, category,
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
+        price_per_km: kmPrice > 0 ? kmPrice : null,
       },
-      {
-        onSuccess: async () => {
-          // Create/update default pricing
-          const priceNum = parseFloat(defaultPrice);
-          if (priceNum > 0 && (!existingPricing?.length)) {
-            await addPricing.mutateAsync({
-              vehicle_id: vehicle.id,
-              season_name: 'Default',
-              start_date: '2020-01-01',
-              end_date: '2099-12-31',
-              daily_rate: priceNum,
-              weekly_rate: null,
-              monthly_rate: null,
-            });
-          }
-          onOpenChange(false);
-        },
-      }
+      { onSuccess: () => onOpenChange(false) }
     );
   };
 
@@ -204,8 +179,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
               <Input id="editPlate" value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="editPrice">Default Daily Price (€)</Label>
-              <Input id="editPrice" type="number" min={0} step="0.01" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} placeholder="50" />
+              <Label htmlFor="editPriceKm">Price per KM (€)</Label>
+              <Input id="editPriceKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
           <div className="space-y-2">
