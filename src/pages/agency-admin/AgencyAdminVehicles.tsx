@@ -24,8 +24,6 @@ const AgencyAdminVehicles = () => {
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [pricingVehicle, setPricingVehicle] = useState<Vehicle | null>(null);
 
-  const vehicleIds = useMemo(() => vehicles.map(v => v.id), [vehicles]);
-  const { data: priceMap = {} } = useBulkVehiclePricing(vehicleIds);
 
   const filtered = vehicles.filter((v) =>
     `${v.brand} ${v.model}`.toLowerCase().includes(search.toLowerCase()) ||
