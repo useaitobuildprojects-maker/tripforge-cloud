@@ -36,7 +36,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
       // Fetch ALL available vehicles with agency info
       const { data: vehicles, error } = await supabase
         .from('vehicles')
-        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
+        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
