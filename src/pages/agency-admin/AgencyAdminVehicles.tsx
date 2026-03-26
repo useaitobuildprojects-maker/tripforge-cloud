@@ -137,8 +137,8 @@ const AgencyAdminVehicles = () => {
                     <div>
                       <h3 className="text-sm font-semibold text-foreground">{vehicle.brand} {vehicle.model}</h3>
                       <p className="text-xs text-muted-foreground">{vehicle.year}</p>
-                      {priceMap[vehicle.id] ? (
-                        <p className="text-sm font-bold text-accent mt-0.5">{priceMap[vehicle.id]} €/day</p>
+                      {vehicle.price_per_km ? (
+                        <p className="text-sm font-bold text-accent mt-0.5">{vehicle.price_per_km} €/km</p>
                       ) : (
                         <p className="text-xs text-muted-foreground/50 mt-0.5 italic">No price set</p>
                       )}
