@@ -88,6 +88,10 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
         const displayRate = originalRate && !isOwn
           ? Math.round(originalRate * (1 + agencyCommission / 100))
           : originalRate;
+        const originalPricePerKm = v.price_per_km ?? null;
+        const displayPricePerKm = originalPricePerKm && !isOwn
+          ? +(originalPricePerKm * (1 + agencyCommission / 100)).toFixed(2)
+          : originalPricePerKm;
 
         return {
           id: v.id,
@@ -102,6 +106,8 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           category: v.category,
           air_conditioning: v.air_conditioning,
           mileage_policy: v.mileage_policy,
+          price_per_km: originalPricePerKm,
+          display_price_per_km: displayPricePerKm,
           agency_id: v.agency_id,
           agency_name: v.agencies?.name ?? '',
           agency_slug: v.agencies?.slug ?? '',
