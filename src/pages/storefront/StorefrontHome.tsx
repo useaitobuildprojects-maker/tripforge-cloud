@@ -359,9 +359,11 @@ const StorefrontHome = () => {
                 <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
                   {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
                 </h3>
-                {vehicles[0].daily_rate && (
-                  <p className="text-2xl font-bold text-accent">${vehicles[0].daily_rate.toLocaleString()} / day</p>
-                )}
+                {vehicles[0].display_price_per_km ? (
+                  <p className="text-2xl font-bold text-accent">{vehicles[0].display_price_per_km} €/km</p>
+                ) : vehicles[0].daily_rate ? (
+                  <p className="text-2xl font-bold text-accent">{vehicles[0].daily_rate.toLocaleString()} €/day</p>
+                ) : null}
               </div>
               <div className="flex-1 flex items-center justify-center">
                 {vehicles[0].photo_url ? (
