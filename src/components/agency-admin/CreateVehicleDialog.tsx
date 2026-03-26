@@ -34,6 +34,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
+  const addPricing = useAddPricing();
 
   const reset = () => {
     setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
