@@ -192,8 +192,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
               <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="defaultPrice">Default Daily Price (€)</Label>
-              <Input id="defaultPrice" type="number" min={0} step="0.01" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} placeholder="50" />
+              <Label htmlFor="pricePerKm">Price per KM (€)</Label>
+              <Input id="pricePerKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
 
