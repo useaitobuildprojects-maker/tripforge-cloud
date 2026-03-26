@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUpdateVehicle } from '@/hooks/use-vehicle-mutations';
-import { useVehiclePricing, useAddPricing } from '@/hooks/use-vehicle-pricing';
 import { Vehicle } from '@/hooks/use-vehicles';
 
 interface EditVehicleDialogProps {
