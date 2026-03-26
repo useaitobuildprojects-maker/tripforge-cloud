@@ -323,9 +323,11 @@ const StorefrontHome = () => {
                               <h4 className="font-bold text-sm">{vehicle.brand} {vehicle.model}</h4>
                               <div className="flex items-center justify-between mt-1">
                                 <span className="text-xs opacity-50">{vehicle.year}</span>
-                                {vehicle.daily_rate && (
-                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>${vehicle.daily_rate}/day</span>
-                                )}
+                                {vehicle.display_price_per_km ? (
+                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.display_price_per_km} €/km</span>
+                                ) : vehicle.daily_rate ? (
+                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.daily_rate} €/day</span>
+                                ) : null}
                               </div>
                             </div>
                           </div>
