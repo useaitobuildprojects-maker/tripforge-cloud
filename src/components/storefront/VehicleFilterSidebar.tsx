@@ -98,7 +98,7 @@ export const applyFilters = <T extends StorefrontVehicle>(vehicles: T[], f: Vehi
 };
 
 interface Props {
-  vehicles: MarketplaceVehicle[];
+  vehicles: StorefrontVehicle[];
   filters: VehicleFilters;
   onChange: (filters: VehicleFilters) => void;
   buttonColor: string;
