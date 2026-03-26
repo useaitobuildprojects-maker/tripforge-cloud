@@ -28,8 +28,11 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [category, setCategory] = useState('sedan');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
+  const [defaultPrice, setDefaultPrice] = useState('');
 
   const updateVehicle = useUpdateVehicle();
+  const addPricing = useAddPricing();
+  const { data: existingPricing } = useVehiclePricing(vehicle?.id);
 
   useEffect(() => {
     if (vehicle) {
