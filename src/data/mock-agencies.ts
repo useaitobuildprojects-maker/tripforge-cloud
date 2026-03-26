@@ -9,7 +9,7 @@ export const mockAgencies: Agency[] = [
   {
     id: '2', name: 'Mediterranean Stays', slug: 'medstays', domain: 'medstays.com', logo_url: null, status: 'active',
     services: ['apartment', 'limousine_services'], country: 'Spain', city: 'Barcelona', contact_email: 'hello@medstays.com',
-    created_at: '2024-09-20', total_bookings: 876, revenue: 234100, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'minimal', button_color: null, background_color: null, storefront_config: null,
+    created_at: '2024-09-20', total_bookings: 876, revenue: 234100, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'minimal', button_color: null, background_color: null, storefront_config: null, commission_rate: 10,
   },
   {
     id: '3', name: 'Alpine Adventures', slug: 'alpine', domain: 'alpine-adventures.eu', logo_url: null, status: 'active',
