@@ -52,6 +52,7 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehicle) return;
+    const kmPrice = parseFloat(pricePerKm);
     updateVehicle.mutate(
       {
         id: vehicle.id,
@@ -63,25 +64,9 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         fuel_type: fuelType, category,
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
+        price_per_km: kmPrice > 0 ? kmPrice : null,
       },
-      {
-        onSuccess: async () => {
-          // Create/update default pricing
-          const priceNum = parseFloat(defaultPrice);
-          if (priceNum > 0 && (!existingPricing?.length)) {
-            await addPricing.mutateAsync({
-              vehicle_id: vehicle.id,
-              season_name: 'Default',
-              start_date: '2020-01-01',
-              end_date: '2099-12-31',
-              daily_rate: priceNum,
-              weekly_rate: null,
-              monthly_rate: null,
-            });
-          }
-          onOpenChange(false);
-        },
-      }
+      { onSuccess: () => onOpenChange(false) }
     );
   };
 
