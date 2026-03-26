@@ -9,6 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import { useCreateVehicle, useUploadVehiclePhoto } from '@/hooks/use-vehicle-mutations';
+import { useAddPricing } from '@/hooks/use-vehicle-pricing';
 
 interface Props {
   agencyId: string;
@@ -29,15 +30,18 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [category, setCategory] = useState('sedan');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
+  const [defaultPrice, setDefaultPrice] = useState('');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
+  const addPricing = useAddPricing();
 
   const reset = () => {
     setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
+    setDefaultPrice('');
   };
 
   const handleSubmit = async () => {
@@ -48,7 +52,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       photo_url = await uploadPhoto.mutateAsync({ file: photoFile, agencyId });
     }
 
-    await createVehicle.mutateAsync({
+    const vehicle = await createVehicle.mutateAsync({
       agency_id: agencyId,
       brand: brand.trim(),
       model: model.trim(),
@@ -64,6 +68,20 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
     });
+
+    // Auto-create default pricing if a price was set
+    const priceNum = parseFloat(defaultPrice);
+    if (priceNum > 0 && vehicle?.id) {
+      await addPricing.mutateAsync({
+        vehicle_id: vehicle.id,
+        season_name: 'Default',
+        start_date: '2020-01-01',
+        end_date: '2099-12-31',
+        daily_rate: priceNum,
+        weekly_rate: null,
+        monthly_rate: null,
+      });
+    }
 
     reset();
     setOpen(false);
@@ -182,9 +200,15 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="plate">License Plate</Label>
-            <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="plate">License Plate</Label>
+              <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="defaultPrice">Default Daily Price (€)</Label>
+              <Input id="defaultPrice" type="number" min={0} step="0.01" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} placeholder="50" />
+            </div>
           </div>
 
           <div className="space-y-1.5">
