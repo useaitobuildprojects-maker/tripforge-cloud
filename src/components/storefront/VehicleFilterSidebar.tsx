@@ -1,5 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import { MarketplaceVehicle } from '@/hooks/use-marketplace-vehicles';
+import { StorefrontVehicle } from '@/hooks/use-storefront-vehicles';
 import { useMemo } from 'react';
 
 export const PRICE_RANGES = [
