@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
+import { useVehiclePricing } from '@/hooks/use-vehicle-pricing';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
 import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
 import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
