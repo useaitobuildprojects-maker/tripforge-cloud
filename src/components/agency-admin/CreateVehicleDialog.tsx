@@ -9,6 +9,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
 import { useCreateVehicle, useUploadVehiclePhoto } from '@/hooks/use-vehicle-mutations';
+import { useAddPricing } from '@/hooks/use-vehicle-pricing';
 
 interface Props {
   agencyId: string;
