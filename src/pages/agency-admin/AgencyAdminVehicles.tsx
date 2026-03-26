@@ -1,16 +1,59 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays, DollarSign } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
-import { useVehiclePricing } from '@/hooks/use-vehicle-pricing';
+import { supabase } from '@/integrations/supabase/client';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
 import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
 import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
+
+const useBulkVehiclePricing = (vehicleIds: string[]) => {
+  return useQuery({
+    queryKey: ['bulk-vehicle-pricing', vehicleIds],
+    queryFn: async (): Promise<Record<string, number>> => {
+      if (!vehicleIds.length) return {};
+      const today = new Date().toISOString().split('T')[0];
+
+      // Current season pricing
+      const { data: pricing } = await supabase
+        .from('vehicle_pricing')
+        .select('vehicle_id, daily_rate')
+        .in('vehicle_id', vehicleIds)
+        .lte('start_date', today)
+        .gte('end_date', today);
+
+      const priceMap: Record<string, number> = {};
+      if (pricing) {
+        for (const p of pricing as any[]) {
+          if (!priceMap[p.vehicle_id]) priceMap[p.vehicle_id] = p.daily_rate;
+        }
+      }
+
+      // Fallback for vehicles without current season
+      const missing = vehicleIds.filter(id => !priceMap[id]);
+      if (missing.length > 0) {
+        const { data: fallback } = await supabase
+          .from('vehicle_pricing')
+          .select('vehicle_id, daily_rate')
+          .in('vehicle_id', missing)
+          .order('start_date', { ascending: true });
+        if (fallback) {
+          for (const p of fallback as any[]) {
+            if (!priceMap[p.vehicle_id]) priceMap[p.vehicle_id] = p.daily_rate;
+          }
+        }
+      }
+      return priceMap;
+    },
+    enabled: vehicleIds.length > 0,
+  });
+};
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
