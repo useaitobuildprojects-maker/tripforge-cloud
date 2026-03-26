@@ -144,8 +144,8 @@ const AgencyAdminSettings = () => {
       button_color: buttonColor,
       background_color: bgColor,
       storefront_config: { ...storefrontConfig, locations: locations.length > 0 ? locations : undefined },
+      commission_rate: commissionRate,
     });
-  };
 
   return (
     <div className="space-y-8 max-w-[800px]">
