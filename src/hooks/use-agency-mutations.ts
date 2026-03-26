@@ -22,6 +22,7 @@ interface CreateAgencyInput {
   button_color?: string;
   background_color?: string;
   storefront_config?: StorefrontConfig;
+  commission_rate?: number;
 }
 
 export const useCreateAgency = () => {

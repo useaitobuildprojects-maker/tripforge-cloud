@@ -5,7 +5,7 @@ import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
-import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
+import { useMarketplaceVehicles, MarketplaceVehicle } from '@/hooks/use-marketplace-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
@@ -40,7 +40,7 @@ const StorefrontHome = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const enabledServices = agency.services ?? [];
-  const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
+  const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
 
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>('all');
@@ -444,9 +444,22 @@ const StorefrontHome = () => {
                 <>
                   <p className="text-sm opacity-50 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredVehicles.map((vehicle, i) => (
+                    {filteredVehicles.map((vehicle, i) => {
+                      const mv = vehicle as MarketplaceVehicle;
+                      return (
                       <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
-                        className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg" style={ts.cardStyle}>
+                        className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg relative" style={ts.cardStyle}>
+                        {/* Partner badge */}
+                        {mv.agency_name && !mv.is_own && (
+                          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
+                            {mv.agency_logo_url ? (
+                              <img src={mv.agency_logo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
+                            ) : (
+                              <Briefcase className="h-3 w-3" />
+                            )}
+                            via {mv.agency_name}
+                          </div>
+                        )}
                         {vehicle.photo_url ? (
                           <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
                         ) : (
@@ -472,7 +485,8 @@ const StorefrontHome = () => {
                           </div>
                         </div>
                       </motion.div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </>
               )}

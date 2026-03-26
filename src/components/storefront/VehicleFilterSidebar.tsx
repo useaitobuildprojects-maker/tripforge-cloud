@@ -75,7 +75,7 @@ export const countActiveFilters = (f: VehicleFilters) =>
   f.categories.length + f.transmissions.length + f.fuelTypes.length +
   f.seatCounts.length + (f.airConditioning !== null ? 1 : 0) + f.mileagePolicies.length;
 
-export const applyFilters = (vehicles: StorefrontVehicle[], f: VehicleFilters) => {
+export const applyFilters = <T extends StorefrontVehicle>(vehicles: T[], f: VehicleFilters): T[] => {
   return vehicles.filter(v => {
     if (f.brands.length > 0 && !f.brands.includes(v.brand)) return false;
     if (f.years.length > 0 && !f.years.includes(v.year)) return false;
