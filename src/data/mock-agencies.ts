@@ -4,7 +4,7 @@ export const mockAgencies: Agency[] = [
   {
     id: '1', name: 'EuroRide Express', slug: 'euroride', domain: 'euroride.travel', logo_url: null, status: 'active',
     services: ['car_rental', 'private_driver'], country: 'France', city: 'Paris', contact_email: 'admin@euroride.travel',
-    created_at: '2024-11-15', total_bookings: 1243, revenue: 187500, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'classic', button_color: null, background_color: null, storefront_config: null,
+    created_at: '2024-11-15', total_bookings: 1243, revenue: 187500, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'classic', button_color: null, background_color: null, storefront_config: null, commission_rate: 10,
   },
   {
     id: '2', name: 'Mediterranean Stays', slug: 'medstays', domain: 'medstays.com', logo_url: null, status: 'active',
