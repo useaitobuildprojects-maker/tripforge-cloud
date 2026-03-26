@@ -50,7 +50,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       photo_url = await uploadPhoto.mutateAsync({ file: photoFile, agencyId });
     }
 
-    const vehicle = await createVehicle.mutateAsync({
+    const kmPrice = parseFloat(pricePerKm);
+    await createVehicle.mutateAsync({
       agency_id: agencyId,
       brand: brand.trim(),
       model: model.trim(),
@@ -65,21 +66,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       category,
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
+      price_per_km: kmPrice > 0 ? kmPrice : null,
     });
-
-    // Auto-create default pricing if a price was set
-    const priceNum = parseFloat(defaultPrice);
-    if (priceNum > 0 && vehicle?.id) {
-      await addPricing.mutateAsync({
-        vehicle_id: vehicle.id,
-        season_name: 'Default',
-        start_date: '2020-01-01',
-        end_date: '2099-12-31',
-        daily_rate: priceNum,
-        weekly_rate: null,
-        monthly_rate: null,
-      });
-    }
 
     reset();
     setOpen(false);
