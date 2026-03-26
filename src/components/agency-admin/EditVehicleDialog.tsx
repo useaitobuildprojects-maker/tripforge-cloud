@@ -179,8 +179,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
               <Input id="editPlate" value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="editPrice">Default Daily Price (€)</Label>
-              <Input id="editPrice" type="number" min={0} step="0.01" value={defaultPrice} onChange={(e) => setDefaultPrice(e.target.value)} placeholder="50" />
+              <Label htmlFor="editPriceKm">Price per KM (€)</Label>
+              <Input id="editPriceKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
           <div className="space-y-2">
