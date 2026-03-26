@@ -475,8 +475,10 @@ const StorefrontHome = () => {
                           <h4 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h4>
                           <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
                           <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                            {vehicle.daily_rate ? (
-                              <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / day</span></p>
+                            {vehicle.display_price_per_km ? (
+                              <p className="text-lg font-bold">{vehicle.display_price_per_km} €<span className="text-xs font-normal opacity-50"> / km</span></p>
+                            ) : vehicle.daily_rate ? (
+                              <p className="text-lg font-bold">{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal opacity-50"> / day</span></p>
                             ) : (
                               <p className="text-sm opacity-50">Contact for price</p>
                             )}
