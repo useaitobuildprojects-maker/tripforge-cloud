@@ -45,16 +45,9 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setCategory((vehicle as any).category ?? 'sedan');
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
+      setPricePerKm(vehicle.price_per_km != null ? String(vehicle.price_per_km) : '');
     }
   }, [vehicle]);
-
-  useEffect(() => {
-    if (existingPricing?.length) {
-      setDefaultPrice(String(existingPricing[0].daily_rate));
-    } else {
-      setDefaultPrice('');
-    }
-  }, [existingPricing]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
