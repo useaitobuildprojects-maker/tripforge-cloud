@@ -29,11 +29,10 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [category, setCategory] = useState('sedan');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
-  const [defaultPrice, setDefaultPrice] = useState('');
+  const [pricePerKm, setPricePerKm] = useState('');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
-  const addPricing = useAddPricing();
 
   const reset = () => {
     setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
