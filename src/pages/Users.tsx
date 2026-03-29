@@ -111,7 +111,7 @@ const Users = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (deleteTarget) {
-                  deleteUser.mutate(deleteTarget.id);
+                  deleteUser.mutate(deleteTarget);
                   setDeleteTarget(null);
                 }
               }}
