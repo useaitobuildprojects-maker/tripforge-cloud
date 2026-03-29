@@ -9,11 +9,15 @@ import { TemplateStyles } from '@/lib/template-styles';
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
+  private_driver: UserCheck,
+  limousine_services: Crown,
 };
 
 const SERVICE_DESCRIPTIONS: Record<ServiceType, string> = {
   car_rental: 'Browse our curated fleet of vehicles — from economy to luxury SUVs — ready for your next adventure.',
   apartment: 'Comfortable furnished apartments for short and long-term stays, conveniently located near key destinations.',
+  private_driver: 'Professional chauffeurs for airport transfers, city tours, business meetings, and more.',
+  limousine_services: 'Luxury chauffeured vehicles for weddings, VIP events, corporate travel, and special occasions.',
 };
 
 const StorefrontServices = () => {
