@@ -192,20 +192,30 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="plate">License Plate</Label>
               <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="pricePerKm">Price per KM (€)</Label>
+              <Label htmlFor="dailyRate">Daily Rate (€)</Label>
+              <Input id="dailyRate" type="number" min={0} step="1" value={dailyRateBase} onChange={(e) => setDailyRateBase(e.target.value)} placeholder="45" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pricePerKm">Price/KM (€)</Label>
               <Input id="pricePerKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="vin">VIN</Label>
-            <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="freeKm">Free KM / Day</Label>
+              <Input id="freeKm" type="number" min={0} value={freeKmPerDay} onChange={(e) => setFreeKmPerDay(e.target.value)} placeholder="200" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="vin">VIN</Label>
+              <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
+            </div>
           </div>
 
           <div className="space-y-1.5">
