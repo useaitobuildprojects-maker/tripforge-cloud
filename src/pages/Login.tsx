@@ -77,7 +77,7 @@ const Login = () => {
           </div>
           <h1 className="text-[28px] font-display font-bold text-foreground">TravelHub</h1>
           <p className="text-sm text-muted-foreground mt-1.5 font-light">
-            Super Admin Panel
+            Admin Panel
           </p>
         </div>
 
