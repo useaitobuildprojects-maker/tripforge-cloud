@@ -450,6 +450,24 @@ const AgencyAdminSettings = () => {
             Example: A partner vehicle at $100/day shows as <strong>${Math.round(100 * (1 + commissionRate / 100))}/day</strong> on your storefront.
           </p>
         </div>
+        <div className="space-y-3">
+          <Label>One-Way Drop-off Fee (€)</Label>
+          <div className="flex items-center gap-4">
+            <Input
+              type="number"
+              min={0}
+              max={500}
+              step={5}
+              value={oneWayFee}
+              onChange={(e) => setOneWayFee(Number(e.target.value))}
+              className="w-28 font-mono"
+            />
+            <span className="text-sm text-muted-foreground">€</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Charged when customers return the vehicle to a different location.
+          </p>
+        </div>
       </motion.div>
 
       <div className="flex justify-end">
