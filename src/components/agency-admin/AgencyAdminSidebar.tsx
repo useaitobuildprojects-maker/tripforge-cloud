@@ -8,6 +8,7 @@ import {
   ChevronRight,
   BarChart3,
   Users,
+  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,29 +35,31 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[270px] flex-col gradient-sidebar sidebar-glow">
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col bg-card border-r border-border">
       {/* Agency Branding */}
-      <div className="flex h-[76px] items-center gap-3.5 px-7">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-accent gold-glow">
-          <span className="text-accent-foreground font-bold text-lg">
+      <div className="flex h-[68px] items-center gap-3 px-6">
+        {agency?.logo_url ? (
+          <img src={agency.logo_url} alt={agency.name} className="h-9 w-9 rounded-lg object-cover" />
+        ) : (
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
             {agency?.name?.charAt(0) ?? 'A'}
-          </span>
-        </div>
+          </div>
+        )}
         <div className="min-w-0">
-          <h1 className="text-base font-display font-bold text-sidebar-accent-foreground tracking-wide leading-none truncate">
+          <h1 className="text-sm font-semibold text-foreground leading-none truncate">
             {agency?.name ?? 'Agency'}
           </h1>
-          <p className="text-[9px] font-semibold text-sidebar-primary uppercase tracking-[0.25em] mt-1">
-            Agency Admin
+          <p className="text-[10px] text-muted-foreground mt-1">
+            Admin Panel
           </p>
         </div>
       </div>
 
-      <div className="mx-6 gold-line opacity-40" />
+      <div className="mx-5 h-px bg-border" />
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-7 space-y-0.5">
-        <p className="text-[9px] font-bold text-sidebar-foreground/70 uppercase tracking-[0.25em] px-3 mb-4">
+      <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-3">
           Management
         </p>
         {navItems.map((item) => {
@@ -69,57 +72,50 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
               key={item.to}
               to={item.to}
               className={cn(
-                'group flex items-center gap-3 rounded-xl px-3.5 py-[11px] text-[13px] font-medium transition-all duration-250 relative',
+                'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors',
                 isActive
-                  ? 'bg-sidebar-accent text-sidebar-primary shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04)]'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               )}
             >
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-sidebar-primary" />
-              )}
-              <item.icon
-                className={cn(
-                  'h-[18px] w-[18px] shrink-0 transition-colors duration-200',
-                  isActive ? 'text-sidebar-primary' : 'group-hover:text-sidebar-accent-foreground'
-                )}
-              />
+              <item.icon className="h-[17px] w-[17px] shrink-0" />
               <span className="flex-1">{item.label}</span>
-              {isActive && <ChevronRight className="h-3.5 w-3.5 text-sidebar-primary/50" />}
+              {isActive && <ChevronRight className="h-3.5 w-3.5 opacity-50" />}
             </NavLink>
           );
         })}
       </nav>
 
       {/* Storefront Link */}
-      <div className="px-4 pb-2">
+      <div className="px-3 pb-2">
         <NavLink
           to={`/agency/${slug}`}
-          className="flex items-center gap-3 rounded-xl px-3.5 py-[11px] text-[13px] font-medium text-sidebar-foreground hover:bg-sidebar-accent/40 hover:text-sidebar-accent-foreground transition-all duration-250"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
         >
-          <Car className="h-[18px] w-[18px] shrink-0" />
+          <ExternalLink className="h-[17px] w-[17px] shrink-0" />
           <span className="flex-1">View Storefront</span>
         </NavLink>
       </div>
 
       {/* Footer */}
-      <div className="mx-6 gold-line opacity-20" />
-      <div className="p-5 px-6">
+      <div className="mx-5 h-px bg-border" />
+      <div className="p-4 px-5">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-accent text-[11px] font-bold text-accent-foreground shadow-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground text-[11px] font-bold">
             {user?.email?.charAt(0).toUpperCase() ?? 'A'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-sidebar-accent-foreground truncate leading-none">
-              Agency Admin
+            <p className="text-[12px] font-medium text-foreground truncate leading-none">
+              {user?.user_metadata?.full_name || 'Admin'}
             </p>
-            <p className="text-[10px] text-sidebar-foreground truncate mt-1">
+            <p className="text-[10px] text-muted-foreground truncate mt-1">
               {user?.email ?? ''}
             </p>
           </div>
           <button
             onClick={signOut}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-sidebar-foreground hover:text-sidebar-accent-foreground hover:bg-sidebar-accent/50 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            title="Sign out"
           >
             <LogOut className="h-4 w-4" />
           </button>
