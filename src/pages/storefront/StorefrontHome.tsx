@@ -61,7 +61,7 @@ const StorefrontHome = () => {
   const activeFilterCount = countActiveFilters(filters);
 
   // Show vehicles section only for car-related services
-  const vehicleServices: ServiceType[] = ['car_rental', 'car_driver', 'limousine_services'];
+  const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
 
   const testimonials = [
