@@ -11,6 +11,8 @@ export interface MarketplaceVehicle {
   daily_rate: number | null;
   price_per_km: number | null;
   display_price_per_km: number | null;
+  daily_rate_base: number | null;
+  free_km_per_day: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -22,6 +24,7 @@ export interface MarketplaceVehicle {
   agency_name: string;
   agency_slug: string;
   agency_logo_url: string | null;
+  agency_one_way_fee: number;
   is_own: boolean;
   // Commission
   commission_rate: number;
@@ -36,7 +39,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
       // Fetch ALL available vehicles with agency info
       const { data: vehicles, error } = await supabase
         .from('vehicles')
-        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
+        .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, daily_rate_base, free_km_per_day, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee)')
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
@@ -108,10 +111,13 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           mileage_policy: v.mileage_policy,
           price_per_km: originalPricePerKm,
           display_price_per_km: displayPricePerKm,
+          daily_rate_base: v.daily_rate_base ?? null,
+          free_km_per_day: v.free_km_per_day ?? 200,
           agency_id: v.agency_id,
           agency_name: v.agencies?.name ?? '',
           agency_slug: v.agencies?.slug ?? '',
           agency_logo_url: v.agencies?.logo_url ?? null,
+          agency_one_way_fee: v.agencies?.one_way_fee ?? 0,
           is_own: isOwn,
           commission_rate: agencyCommission,
           original_rate: originalRate,

@@ -78,6 +78,7 @@ const AgencyAdminSettings = () => {
   const [storefrontConfig, setStorefrontConfig] = useState<StorefrontConfig>(agency.storefront_config ?? {});
   const [locations, setLocations] = useState<{ name: string; type: 'station' | 'airport' | 'city'; address?: string }[]>(agency.storefront_config?.locations ?? []);
   const [commissionRate, setCommissionRate] = useState(agency.commission_rate ?? 10);
+  const [oneWayFee, setOneWayFee] = useState(agency.one_way_fee ?? 0);
 
   const [form, setForm] = useState({
     name: agency.name,
@@ -145,6 +146,7 @@ const AgencyAdminSettings = () => {
       background_color: bgColor,
       storefront_config: { ...storefrontConfig, locations: locations.length > 0 ? locations : undefined },
       commission_rate: commissionRate,
+      one_way_fee: oneWayFee,
     });
   };
 
@@ -446,6 +448,24 @@ const AgencyAdminSettings = () => {
           </div>
           <p className="text-[11px] text-muted-foreground">
             Example: A partner vehicle at $100/day shows as <strong>${Math.round(100 * (1 + commissionRate / 100))}/day</strong> on your storefront.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <Label>One-Way Drop-off Fee (€)</Label>
+          <div className="flex items-center gap-4">
+            <Input
+              type="number"
+              min={0}
+              max={500}
+              step={5}
+              value={oneWayFee}
+              onChange={(e) => setOneWayFee(Number(e.target.value))}
+              className="w-28 font-mono"
+            />
+            <span className="text-sm text-muted-foreground">€</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Charged when customers return the vehicle to a different location.
           </p>
         </div>
       </motion.div>

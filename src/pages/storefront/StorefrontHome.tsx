@@ -1,7 +1,7 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, UserCheck, Crown, Building, Truck, SlidersHorizontal, X, Users, Briefcase, Plane, Check } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
+import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -59,6 +60,17 @@ const StorefrontHome = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const filteredVehicles = useMemo(() => applyFilters(vehicles, filters), [vehicles, filters]);
   const activeFilterCount = countActiveFilters(filters);
+
+  // Booking dialog
+  const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
+  const isOneWay = !sameReturn && pickupLocation !== dropoffLocation && !!dropoffLocation;
+  const numDays = useMemo(() => {
+    if (pickupDate && dropoffDate) {
+      const diff = Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / 86400000);
+      return diff > 0 ? diff : 1;
+    }
+    return 1;
+  }, [pickupDate, dropoffDate]);
 
   // Show vehicles section only for car-related services
   const vehicleServices: ServiceType[] = ['car_rental'];
@@ -531,7 +543,8 @@ const StorefrontHome = () => {
                             <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2 hover:text-white"
                               style={{ borderColor: buttonColor, color: buttonColor }}
                               onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = buttonColor; }}
-                              onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; }}>
+                              onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; }}
+                              onClick={() => setBookingVehicle(mv)}>
                               {cfg.cta_text || 'Book Now'}
                             </Button>
                           </div>
@@ -606,6 +619,19 @@ const StorefrontHome = () => {
           ))}
         </div>
       </section>
+
+      {/* Booking Quote Dialog */}
+      {bookingVehicle && (
+        <BookingQuoteDialog
+          vehicle={bookingVehicle}
+          open={!!bookingVehicle}
+          onOpenChange={(open) => { if (!open) setBookingVehicle(null); }}
+          buttonColor={buttonColor}
+          numDays={numDays}
+          isOneWay={isOneWay}
+          oneWayFee={agency.one_way_fee}
+        />
+      )}
     </div>
   );
 };

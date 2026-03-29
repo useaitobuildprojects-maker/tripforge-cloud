@@ -26,6 +26,7 @@ const mapAgency = (a: any): Agency => ({
   background_color: a.background_color ?? null,
   storefront_config: a.storefront_config ?? null,
   commission_rate: Number(a.commission_rate) || 10,
+  one_way_fee: Number(a.one_way_fee) || 0,
 });
 
 /** Known platform hostnames that should NOT trigger domain-based routing */

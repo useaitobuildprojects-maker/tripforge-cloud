@@ -30,6 +30,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [pricePerKm, setPricePerKm] = useState('');
+  const [dailyRateBase, setDailyRateBase] = useState('');
+  const [freeKmPerDay, setFreeKmPerDay] = useState('200');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -39,7 +41,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
-    setPricePerKm('');
+    setPricePerKm(''); setDailyRateBase(''); setFreeKmPerDay('200');
   };
 
   const handleSubmit = async () => {
@@ -51,6 +53,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     }
 
     const kmPrice = parseFloat(pricePerKm);
+    const baseRate = parseFloat(dailyRateBase);
+    const freeKm = parseInt(freeKmPerDay);
     await createVehicle.mutateAsync({
       agency_id: agencyId,
       brand: brand.trim(),
@@ -67,6 +71,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
       price_per_km: kmPrice > 0 ? kmPrice : null,
+      daily_rate_base: baseRate > 0 ? baseRate : null,
+      free_km_per_day: freeKm > 0 ? freeKm : null,
     });
 
     reset();
@@ -186,20 +192,30 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="plate">License Plate</Label>
               <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="pricePerKm">Price per KM (€)</Label>
+              <Label htmlFor="dailyRate">Daily Rate (€)</Label>
+              <Input id="dailyRate" type="number" min={0} step="1" value={dailyRateBase} onChange={(e) => setDailyRateBase(e.target.value)} placeholder="45" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pricePerKm">Price/KM (€)</Label>
               <Input id="pricePerKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="vin">VIN</Label>
-            <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="freeKm">Free KM / Day</Label>
+              <Input id="freeKm" type="number" min={0} value={freeKmPerDay} onChange={(e) => setFreeKmPerDay(e.target.value)} placeholder="200" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="vin">VIN</Label>
+              <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
+            </div>
           </div>
 
           <div className="space-y-1.5">
