@@ -99,13 +99,6 @@ const StorefrontHome = () => {
             {enabledServices.length > 1 && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                 className="inline-flex items-center gap-1 p-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
-                <button
-                  onClick={() => setActiveService('all')}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeService === 'all' ? 'text-white shadow-lg' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
-                  style={activeService === 'all' ? { backgroundColor: buttonColor } : undefined}
-                >
-                  All Services
-                </button>
                 {enabledServices.map((service) => {
                   const Icon = SERVICE_ICONS[service] ?? Car;
                   return (
