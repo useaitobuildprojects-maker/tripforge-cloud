@@ -19,7 +19,7 @@ export const mockAgencies: Agency[] = [
   {
     id: '4', name: 'Adriatic Transfers', slug: 'adriatic', domain: null, logo_url: null, status: 'pending',
     services: ['car_rental'], country: 'Croatia', city: 'Split', contact_email: 'contact@adriatic-transfers.hr',
-    created_at: '2025-03-01', total_bookings: 0, revenue: 0, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'classic', button_color: null, background_color: null, storefront_config: null, commission_rate: 10,
+    created_at: '2025-03-01', total_bookings: 0, revenue: 0, meta_title: null, meta_description: null, og_image: null, favicon_url: null, page_seo: null, storefront_template: 'classic', button_color: null, background_color: null, storefront_config: null, commission_rate: 10, one_way_fee: 20,
   },
   {
     id: '5', name: 'Nordic Wheels', slug: 'nordicwheels', domain: 'nordicwheels.no', logo_url: null, status: 'inactive',
