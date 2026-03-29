@@ -18,7 +18,7 @@ const Users = () => {
   const { data: users = [], isLoading } = useUsers();
   const deleteUser = useDeleteUser();
   const { user: currentUser } = useAuth();
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; role: string | null } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   return (
     <div className="space-y-8 max-w-[1200px]">
@@ -82,7 +82,7 @@ const Users = () => {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => setDeleteTarget({ id: user.id, role: user.role })}
+                            onClick={() => setDeleteTarget(user.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -102,7 +102,7 @@ const Users = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-display">Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the user's role and agency membership. This action cannot be undone.
+              This will permanently remove this user from both platform access and authentication. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -111,7 +111,7 @@ const Users = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               onClick={() => {
                 if (deleteTarget) {
-                  deleteUser.mutate(deleteTarget.id);
+                  deleteUser.mutate(deleteTarget);
                   setDeleteTarget(null);
                 }
               }}

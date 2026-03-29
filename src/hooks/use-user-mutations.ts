@@ -63,30 +63,26 @@ export const useDeleteUser = () => {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      const { error: memberError } = await supabase
-        .from('agency_members')
-        .delete()
-        .eq('user_id', userId);
+      const { data, error } = await supabase.rpc('delete_user_account', {
+        target_user_id: userId,
+      });
 
-      if (memberError) throw memberError;
+      if (error) {
+        if (error.code === '42883') {
+          throw new Error('Delete function is missing. Please run the SQL setup for delete_user_account first.');
+        }
+        throw error;
+      }
 
-      const { data: deletedRoles, error: roleError } = await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId)
-        .select('id');
-
-      if (roleError) throw roleError;
-
-      if (!deletedRoles || deletedRoles.length === 0) {
-        throw new Error('Delete blocked by permissions (RLS). Please allow super_admin to delete user_roles.');
+      if (!data) {
+        throw new Error('User was not deleted from authentication.');
       }
 
       return userId;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('User removed successfully');
+      toast.success('User deleted from platform and authentication');
     },
     onError: (error: Error) => {
       toast.error(`Failed to delete user: ${error.message}`);
