@@ -13,22 +13,25 @@ import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, count
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
-  private_driver: UserCheck,
-  limousine_services: Crown,
+  transfer: UserCheck,
+  limo_tour: Crown,
+  city_tour: Car,
 };
 
 const SERVICE_HERO_TEXTS: Record<ServiceType, { title: string; subtitle: string }> = {
   car_rental: { title: 'Car Rental', subtitle: 'Find the perfect car for your journey with competitive prices and top-quality vehicles.' },
   apartment: { title: 'Apartments', subtitle: 'Comfortable furnished apartments for short and long-term stays.' },
-  private_driver: { title: 'Private Driver', subtitle: 'Professional chauffeurs for airport transfers, city tours, and business travel.' },
-  limousine_services: { title: 'Limousine Services', subtitle: 'Luxury chauffeured vehicles for VIP events, weddings, and corporate needs.' },
+  transfer: { title: 'Transfer', subtitle: 'Reliable airport transfers and point-to-point rides with professional drivers.' },
+  limo_tour: { title: 'Limo Tour', subtitle: 'Multi-day luxury chauffeured tours — explore cities and countries in style.' },
+  city_tour: { title: 'City Tour', subtitle: 'Guided city tours covering top landmarks with knowledgeable local drivers.' },
 };
 
 const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   car_rental: ['Wide selection of vehicles', 'Flexible pick-up & drop-off', 'Full insurance included', '24/7 roadside assistance', 'No hidden fees'],
   apartment: ['Fully furnished', 'Central locations', 'Short & long term stays', 'All utilities included', 'Cleaning service available'],
-  private_driver: ['Vetted professional drivers', 'Airport transfers', 'Hourly & daily bookings', 'Multilingual drivers', 'Meet & greet service'],
-  limousine_services: ['Premium luxury fleet', 'Corporate accounts', 'Wedding & event transport', 'VIP meet & greet', 'Red carpet service'],
+  transfer: ['Professional drivers', 'Airport pickup & drop-off', 'Flight tracking', 'Meet & greet service', 'Fixed prices'],
+  limo_tour: ['Multi-day itineraries', 'Luxury vehicles', 'Experienced chauffeurs', 'Custom routes', 'Hotel coordination'],
+  city_tour: ['Half-day & full-day options', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules', 'Private tours available'],
 };
 
 const StorefrontServiceDetail = () => {

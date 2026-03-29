@@ -17,11 +17,11 @@ export async function seedAtlasTravelBookings() {
 
   const bookings = [
     { agency_id: agencyId, customer_name: 'Ahmed Ben Ali', service_type: 'car_rental', status: 'confirmed', amount: 450, booking_date: '2026-03-15' },
-    { agency_id: agencyId, customer_name: 'Sophie Martin', service_type: 'private_driver', status: 'completed', amount: 1200, booking_date: '2026-03-10' },
+    { agency_id: agencyId, customer_name: 'Sophie Martin', service_type: 'transfer', status: 'completed', amount: 1200, booking_date: '2026-03-10' },
     { agency_id: agencyId, customer_name: 'Marco Rossi', service_type: 'travel_package', status: 'pending', amount: 3500, booking_date: '2026-03-18' },
     { agency_id: agencyId, customer_name: 'Fatima Zahra', service_type: 'hotel', status: 'confirmed', amount: 890, booking_date: '2026-03-12' },
     { agency_id: agencyId, customer_name: 'Jean Dupont', service_type: 'car_rental', status: 'in_progress', amount: 275, booking_date: '2026-03-16' },
-    { agency_id: agencyId, customer_name: 'Lina Kaddouri', service_type: 'private_driver', status: 'completed', amount: 600, booking_date: '2026-03-08' },
+    { agency_id: agencyId, customer_name: 'Lina Kaddouri', service_type: 'transfer', status: 'completed', amount: 600, booking_date: '2026-03-08' },
     { agency_id: agencyId, customer_name: 'Thomas Weber', service_type: 'travel_package', status: 'cancelled', amount: 2100, booking_date: '2026-03-05' },
     { agency_id: agencyId, customer_name: 'Yasmine Belkacem', service_type: 'hotel', status: 'confirmed', amount: 1450, booking_date: '2026-03-14' },
   ];
