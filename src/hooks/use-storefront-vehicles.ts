@@ -24,14 +24,24 @@ export const useStorefrontVehicles = (agencyId: string | undefined) => {
   return useQuery({
     queryKey: ['storefront-vehicles', agencyId],
     queryFn: async (): Promise<StorefrontVehicle[]> => {
-      const { data: vehicles, error } = await supabase
+      let res: any = await supabase
         .from('vehicles')
         .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, daily_rate_base, free_km_per_day')
         .eq('agency_id', agencyId!)
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (res.error?.code === '42703') {
+        res = await supabase
+          .from('vehicles')
+          .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km')
+          .eq('agency_id', agencyId!)
+          .eq('status', 'available')
+          .order('created_at', { ascending: false });
+      }
+
+      const vehicles = res.data;
+      if (res.error) throw res.error;
       if (!vehicles?.length) return [];
 
       // Fetch current pricing for these vehicles

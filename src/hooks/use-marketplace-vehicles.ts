@@ -37,13 +37,23 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
     queryKey: ['marketplace-vehicles', currentAgencyId],
     queryFn: async (): Promise<MarketplaceVehicle[]> => {
       // Fetch ALL available vehicles with agency info
-      const { data: vehicles, error } = await supabase
+      let res: any = await supabase
         .from('vehicles')
         .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, daily_rate_base, free_km_per_day, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee)')
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      // Fallback if new columns don't exist yet
+      if (res.error?.code === '42703') {
+        res = await supabase
+          .from('vehicles')
+          .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false });
+      }
+
+      const vehicles = res.data;
+      if (res.error) throw res.error;
       if (!vehicles?.length) return [];
 
       // Fetch pricing for all vehicles
