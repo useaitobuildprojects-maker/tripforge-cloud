@@ -146,6 +146,7 @@ const AgencyAdminSettings = () => {
       background_color: bgColor,
       storefront_config: { ...storefrontConfig, locations: locations.length > 0 ? locations : undefined },
       commission_rate: commissionRate,
+      one_way_fee: oneWayFee,
     });
   };
 
