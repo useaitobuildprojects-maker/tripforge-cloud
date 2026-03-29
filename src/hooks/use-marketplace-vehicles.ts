@@ -37,25 +37,22 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
     queryKey: ['marketplace-vehicles', currentAgencyId],
     queryFn: async (): Promise<MarketplaceVehicle[]> => {
       // Fetch ALL available vehicles with agency info
-      const { data: vehicles, error } = await supabase
+      let result = await supabase
         .from('vehicles')
         .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, daily_rate_base, free_km_per_day, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee)')
         .eq('status', 'available')
-        .order('created_at', { ascending: false })
-        .then(res => {
-          // If columns don't exist yet, retry without them
-          if (res.error?.code === '42703') {
-            return supabase
-              .from('vehicles')
-              .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
-              .eq('status', 'available')
-              .order('created_at', { ascending: false });
-          }
-          return res;
-        });
-        .eq('status', 'available')
         .order('created_at', { ascending: false });
 
+      // Fallback if new columns don't exist yet
+      if (result.error?.code === '42703') {
+        result = await supabase
+          .from('vehicles')
+          .select('id, brand, model, year, status, photo_url, transmission, seats, fuel_type, category, air_conditioning, mileage_policy, price_per_km, agency_id, agencies!inner(name, slug, logo_url, commission_rate)')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false });
+      }
+
+      const { data: vehicles, error } = result;
       if (error) throw error;
       if (!vehicles?.length) return [];
 
