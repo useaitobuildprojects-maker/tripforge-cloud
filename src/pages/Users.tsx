@@ -82,7 +82,7 @@ const Users = () => {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            onClick={() => setDeleteTarget({ id: user.id, role: user.role })}
+                            onClick={() => setDeleteTarget(user.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
