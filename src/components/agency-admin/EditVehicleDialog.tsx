@@ -57,6 +57,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
     e.preventDefault();
     if (!vehicle) return;
     const kmPrice = parseFloat(pricePerKm);
+    const baseRate = parseFloat(dailyRateBase);
+    const freeKm = parseInt(freeKmPerDay);
     updateVehicle.mutate(
       {
         id: vehicle.id,
@@ -69,6 +71,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
         price_per_km: kmPrice > 0 ? kmPrice : null,
+        daily_rate_base: baseRate > 0 ? baseRate : null,
+        free_km_per_day: freeKm > 0 ? freeKm : null,
       },
       { onSuccess: () => onOpenChange(false) }
     );
