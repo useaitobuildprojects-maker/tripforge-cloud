@@ -18,7 +18,7 @@ const Users = () => {
   const { data: users = [], isLoading } = useUsers();
   const deleteUser = useDeleteUser();
   const { user: currentUser } = useAuth();
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; role: string | null } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   return (
     <div className="space-y-8 max-w-[1200px]">
