@@ -15,22 +15,25 @@ import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
-  private_driver: Users,
-  limousine_services: Briefcase,
+  transfer: Users,
+  limo_tour: Briefcase,
+  city_tour: Star,
 };
 
 const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
   car_rental: 'Wide selection of quality vehicles for every need.',
   apartment: 'Furnished apartments for comfortable stays.',
-  private_driver: 'Professional drivers at your service, anywhere.',
-  limousine_services: 'Luxury chauffeured rides for every occasion.',
+  transfer: 'Airport transfers & point-to-point rides with professional drivers.',
+  limo_tour: 'Multi-day luxury chauffeured tours across cities and countries.',
+  city_tour: 'Guided city tours with local expert drivers.',
 };
 
 const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: string[] }> = {
   car_rental: { icon: Car, items: ['Free cancellation up to 24h', 'Unlimited mileage options', 'Full insurance included', 'Airport pickup available'] },
   apartment: { icon: Building, items: ['Fully furnished', 'Weekly & monthly rates', 'Central locations', 'Self check-in'] },
-  private_driver: { icon: Users, items: ['Vetted professional drivers', 'Airport transfers', 'Hourly & daily bookings', 'Multilingual drivers'] },
-  limousine_services: { icon: Briefcase, items: ['Luxury fleet', 'Corporate accounts', 'Event transportation', 'VIP meet & greet'] },
+  transfer: { icon: Users, items: ['Professional drivers', 'Airport pickup & drop-off', 'Flight tracking', 'Meet & greet service'] },
+  limo_tour: { icon: Briefcase, items: ['Multi-day itineraries', 'Luxury vehicles', 'Experienced chauffeurs', 'Custom routes available'] },
+  city_tour: { icon: Star, items: ['Half-day & full-day tours', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules'] },
 };
 
 const StorefrontHome = () => {

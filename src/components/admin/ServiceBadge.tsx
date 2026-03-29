@@ -1,9 +1,12 @@
-import { Car, Building, HelpCircle } from 'lucide-react';
+import { Car, Building, HelpCircle, Navigation, Globe, Map } from 'lucide-react';
 import { ServiceType, SERVICE_LABELS } from '@/types/agency';
 
 const iconMap: Record<string, any> = {
   car_rental: Car,
   apartment: Building,
+  transfer: Navigation,
+  limo_tour: Globe,
+  city_tour: Map,
 };
 
 const ServiceBadge = ({ service }: { service: ServiceType }) => {
