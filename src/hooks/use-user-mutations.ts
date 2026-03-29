@@ -30,14 +30,30 @@ export const useCreateUser = () => {
 
       const userId = authData.user.id;
 
-      // 2. Assign role
+      // 2. Auto-confirm email so admin-created users can sign in immediately
+      const { data: confirmed, error: confirmError } = await supabase.rpc('confirm_user_email', {
+        target_user_id: userId,
+      });
+
+      if (confirmError) {
+        if (confirmError.code === '42883') {
+          throw new Error('Missing confirm_user_email function. Please run SQL setup in Supabase first.');
+        }
+        throw confirmError;
+      }
+
+      if (!confirmed) {
+        throw new Error('User created, but email confirmation failed.');
+      }
+
+      // 3. Assign role
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: input.role });
 
       if (roleError) throw roleError;
 
-      // 3. Link to agency if agency_admin
+      // 4. Link to agency if agency_admin
       if (input.role === 'agency_admin' && input.agencyId) {
         const { error: memberError } = await supabase
           .from('agency_members')
