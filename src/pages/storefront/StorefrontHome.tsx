@@ -1,7 +1,7 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, UserCheck, Crown, Building, Truck, SlidersHorizontal, X, Users, Briefcase, Plane, Check } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
