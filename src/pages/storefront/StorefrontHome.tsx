@@ -180,7 +180,7 @@ const StorefrontHome = () => {
                   <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date</label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[160px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                    <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                   </div>
                 </div>
                 <div>
