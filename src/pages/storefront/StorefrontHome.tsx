@@ -135,111 +135,246 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Europcar-style Search Bar */}
+      {/* Contextual Search Bar */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
           className={`p-6 md:p-8 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
 
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold">Book your ride</h3>
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <button
-                type="button"
-                onClick={() => setSameReturn(!sameReturn)}
-                className="h-5 w-5 rounded border-2 flex items-center justify-center transition-all duration-200"
-                style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: 'hsl(var(--border))' }}
-              >
-                {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
-              </button>
-              <span className="text-sm text-muted-foreground">Return to same location</span>
-            </label>
-          </div>
+          <AnimatePresence mode="wait">
+            {/* ---- CAR RENTAL / CAR DRIVER / LIMOUSINE / ALL ---- */}
+            {(activeService === 'all' || activeService === 'car_rental' || activeService === 'car_driver' || activeService === 'limousine_services') && (
+              <motion.div key="vehicle-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold">
+                    {activeService === 'limousine_services' ? 'Book your limousine' : activeService === 'car_driver' ? 'Book car & driver' : 'Book your ride'}
+                  </h3>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <button
+                      type="button"
+                      onClick={() => setSameReturn(!sameReturn)}
+                      className="h-5 w-5 rounded border-2 flex items-center justify-center transition-all duration-200"
+                      style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: 'hsl(var(--border))' }}
+                    >
+                      {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
+                    </button>
+                    <span className="text-sm text-muted-foreground">Return to same location</span>
+                  </label>
+                </div>
 
-          <div className="space-y-5">
-            {/* Pickup row */}
-            <div className="relative pl-8">
-              <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
-                <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                  <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
-                </div>
-                <div className="w-0.5 flex-1 bg-border my-1" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
-                  <LocationAutocomplete
-                    value={pickupLocation}
-                    onChange={setPickupLocation}
-                    placeholder="City, airport, or address"
-                    locations={agencyLocations}
-                    agencyCity={agency.city}
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                <div className="space-y-5">
+                  {/* Pickup row */}
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
+                      </div>
+                      <div className="w-0.5 flex-1 bg-border my-1" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
+                        <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="City, airport, or address" locations={agencyLocations} agencyCity={agency.city} />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date</label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup time</label>
+                        <div className="relative">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup time</label>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Return row */}
-            <div className="relative pl-8">
-              <div className="absolute left-0 top-0 flex flex-col items-center">
-                <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
-                  <MapPin className="h-3 w-3 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                <div className={sameReturn ? 'opacity-50 pointer-events-none' : ''}>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
-                  <LocationAutocomplete
-                    value={sameReturn ? pickupLocation : dropoffLocation}
-                    onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }}
-                    placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'}
-                    locations={agencyLocations}
-                    agencyCity={agency.city}
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date</label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                  {/* Return row */}
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
+                      <div className={sameReturn ? 'opacity-50 pointer-events-none' : ''}>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
+                        <LocationAutocomplete value={sameReturn ? pickupLocation : dropoffLocation} onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }} placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'} locations={agencyLocations} agencyCity={agency.city} />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date</label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return time</label>
+                        <div className="relative">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return time</label>
-                  <div className="relative">
-                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                    <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Search button - full width */}
-          <Button
-            className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200"
-            style={{ backgroundColor: buttonColor }}
-            onClick={() => {
-              setSearchActive(true);
-              vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }}
-          >
-            <Search className="h-4 w-4" /> Search available vehicles
-          </Button>
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                  <Search className="h-4 w-4" /> Search available vehicles
+                </Button>
+              </motion.div>
+            )}
+
+            {/* ---- PRIVATE DRIVER ---- */}
+            {activeService === 'private_driver' && (
+              <motion.div key="driver-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold">Book a private driver</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Professional chauffeur at your service</p>
+                </div>
+
+                <div className="space-y-5">
+                  {/* Pickup */}
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
+                      </div>
+                      <div className="w-0.5 flex-1 bg-border my-1" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
+                        <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Hotel, airport, or address" locations={agencyLocations} agencyCity={agency.city} />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
+                        <div className="relative">
+                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Time</label>
+                        <div className="relative">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                          <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Destination */}
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Destination</label>
+                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Where are you going?" locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+
+                  {/* Passengers & duration */}
+                  <div className="grid grid-cols-2 gap-3 pl-8">
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                          {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Trip type</label>
+                      <div className="relative">
+                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                          <option value="transfer">Airport transfer</option>
+                          <option value="hourly">Hourly booking</option>
+                          <option value="daily">Full day</option>
+                          <option value="tour">City tour</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                  <Search className="h-4 w-4" /> Find a driver
+                </Button>
+              </motion.div>
+            )}
+
+            {/* ---- APARTMENT ---- */}
+            {activeService === 'apartment' && (
+              <motion.div key="apartment-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold">Find an apartment</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Furnished apartments for short & long stays</p>
+                </div>
+
+                <div className="space-y-5">
+                  {/* Location */}
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <Building className="h-3 w-3" style={{ color: buttonColor }} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Location</label>
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Neighborhood or area" locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+
+                  {/* Check-in / Check-out */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-8">
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-in</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-out</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Guests */}
+                  <div className="pl-8">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Guests</label>
+                    <div className="relative w-48">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                  <Search className="h-4 w-4" /> Search apartments
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         </motion.div>
       </section>
 
