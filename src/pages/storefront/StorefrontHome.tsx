@@ -156,9 +156,8 @@ const StorefrontHome = () => {
             </label>
           </div>
 
-          {/* Main search grid - single row layout */}
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr_auto_auto] gap-3 items-end">
-            {/* Pickup location */}
+          {/* Pickup row */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-end">
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
               <LocationAutocomplete
@@ -169,8 +168,6 @@ const StorefrontHome = () => {
                 agencyCity={agency.city}
               />
             </div>
-
-            {/* Pickup date & time */}
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date and time</label>
               <div className="flex gap-1">
@@ -184,8 +181,10 @@ const StorefrontHome = () => {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Return location */}
+          {/* Return row */}
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-end mt-4">
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
               <LocationAutocomplete
@@ -196,8 +195,6 @@ const StorefrontHome = () => {
                 agencyCity={agency.city}
               />
             </div>
-
-            {/* Return date & time */}
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date and time</label>
               <div className="flex gap-1">
@@ -211,11 +208,9 @@ const StorefrontHome = () => {
                 </div>
               </div>
             </div>
-
-            {/* Search button */}
             <div className="flex items-end">
               <Button
-                className="h-11 px-6 rounded-lg font-bold gap-2 text-white text-sm"
+                className="h-11 px-8 rounded-lg font-bold gap-2 text-white text-sm"
                 style={{ backgroundColor: buttonColor }}
                 onClick={() => {
                   setSearchActive(true);
