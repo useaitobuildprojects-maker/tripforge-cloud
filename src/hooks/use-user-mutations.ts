@@ -63,11 +63,25 @@ export const useDeleteUser = () => {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      // Delete from agency_members first
-      await supabase.from('agency_members').delete().eq('user_id', userId);
-      // Delete from user_roles
-      const { error } = await supabase.from('user_roles').delete().eq('user_id', userId);
-      if (error) throw error;
+      const { error: memberError } = await supabase
+        .from('agency_members')
+        .delete()
+        .eq('user_id', userId);
+
+      if (memberError) throw memberError;
+
+      const { data: deletedRoles, error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId)
+        .select('id');
+
+      if (roleError) throw roleError;
+
+      if (!deletedRoles || deletedRoles.length === 0) {
+        throw new Error('Delete blocked by permissions (RLS). Please allow super_admin to delete user_roles.');
+      }
+
       return userId;
     },
     onSuccess: () => {
