@@ -102,7 +102,7 @@ const Users = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="font-display">Delete User</AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove the user's role and agency membership. This action cannot be undone.
+              This will permanently remove this user from both platform access and authentication. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
