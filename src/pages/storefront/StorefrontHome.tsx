@@ -201,7 +201,7 @@ const StorefrontHome = () => {
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                <div>
+                <div className={sameReturn ? 'opacity-50 pointer-events-none' : ''}>
                   <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
                   <LocationAutocomplete
                     value={sameReturn ? pickupLocation : dropoffLocation}
