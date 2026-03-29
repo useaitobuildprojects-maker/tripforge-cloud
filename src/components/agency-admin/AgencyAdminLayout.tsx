@@ -1,5 +1,5 @@
 import { Outlet, useParams, Navigate } from 'react-router-dom';
-import { Bell, Search, ChevronDown } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgencyAdmin } from '@/hooks/use-agency-admin';
 import { useFavicon } from '@/hooks/use-favicon';
