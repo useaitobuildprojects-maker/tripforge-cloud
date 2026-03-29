@@ -136,34 +136,6 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
             </Select>
           </div>
 
-          <div className="space-y-3">
-            <Label>Services</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {serviceOptions.map((service) => (
-                <label key={service} className="flex items-center gap-2.5 cursor-pointer rounded-lg border border-border p-3 hover:bg-secondary/40 transition-colors">
-                  <Checkbox checked={form.services.includes(service)} onCheckedChange={() => toggleService(service)} />
-                  <span className="text-sm text-foreground">{SERVICE_LABELS[service]}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* SEO Settings */}
-          <div className="space-y-3 pt-2 border-t border-border">
-            <Label className="text-xs uppercase tracking-wider text-muted-foreground">SEO & Meta Tags</Label>
-            <div className="space-y-2">
-              <Label htmlFor="meta_title">Meta Title <span className="text-muted-foreground font-normal">(max 60 chars)</span></Label>
-              <Input id="meta_title" value={form.meta_title} onChange={(e) => setForm((f) => ({ ...f, meta_title: e.target.value }))} placeholder="e.g. Majestic Car Rental | Salzburg" maxLength={60} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="meta_desc">Meta Description <span className="text-muted-foreground font-normal">(max 160 chars)</span></Label>
-              <textarea id="meta_desc" value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))} placeholder="Rent premium cars in Salzburg..." maxLength={160} rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="og_image">OG Image URL</Label>
-              <Input id="og_image" value={form.og_image} onChange={(e) => setForm((f) => ({ ...f, og_image: e.target.value }))} placeholder="https://..." />
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl">Cancel</Button>
