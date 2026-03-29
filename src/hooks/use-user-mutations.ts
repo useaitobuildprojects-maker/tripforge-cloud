@@ -15,45 +15,24 @@ export const useCreateUser = () => {
 
   return useMutation({
     mutationFn: async (input: CreateUserInput) => {
-      // 1. Create the user via signUp
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: input.email,
-        password: input.password,
-        options: {
-          data: { full_name: input.fullName },
-          emailRedirectTo: window.location.origin,
-        },
+      // 1. Create user via admin RPC (bypasses disabled signups)
+      const { data: userId, error: createError } = await supabase.rpc('create_user_admin', {
+        p_email: input.email,
+        p_password: input.password,
+        p_full_name: input.fullName,
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('User creation failed');
+      if (createError) throw createError;
+      if (!userId) throw new Error('User creation failed');
 
-      const userId = authData.user.id;
-
-      // 2. Auto-confirm email so admin-created users can sign in immediately
-      const { data: confirmed, error: confirmError } = await supabase.rpc('confirm_user_email', {
-        target_user_id: userId,
-      });
-
-      if (confirmError) {
-        if (confirmError.code === '42883') {
-          throw new Error('Missing confirm_user_email function. Please run SQL setup in Supabase first.');
-        }
-        throw confirmError;
-      }
-
-      if (!confirmed) {
-        throw new Error('User created, but email confirmation failed.');
-      }
-
-      // 3. Assign role
+      // 2. Assign role
       const { error: roleError } = await supabase
         .from('user_roles')
         .insert({ user_id: userId, role: input.role });
 
       if (roleError) throw roleError;
 
-      // 4. Link to agency if agency_admin
+      // 3. Link to agency if agency_admin
       if (input.role === 'agency_admin' && input.agencyId) {
         const { error: memberError } = await supabase
           .from('agency_members')
