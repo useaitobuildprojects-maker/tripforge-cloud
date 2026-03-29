@@ -15,16 +15,22 @@ import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
+  private_driver: Users,
+  limousine_services: Briefcase,
 };
 
 const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
   car_rental: 'Wide selection of quality vehicles for every need.',
   apartment: 'Furnished apartments for comfortable stays.',
+  private_driver: 'Professional drivers at your service, anywhere.',
+  limousine_services: 'Luxury chauffeured rides for every occasion.',
 };
 
 const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: string[] }> = {
   car_rental: { icon: Car, items: ['Free cancellation up to 24h', 'Unlimited mileage options', 'Full insurance included', 'Airport pickup available'] },
   apartment: { icon: Building, items: ['Fully furnished', 'Weekly & monthly rates', 'Central locations', 'Self check-in'] },
+  private_driver: { icon: Users, items: ['Vetted professional drivers', 'Airport transfers', 'Hourly & daily bookings', 'Multilingual drivers'] },
+  limousine_services: { icon: Briefcase, items: ['Luxury fleet', 'Corporate accounts', 'Event transportation', 'VIP meet & greet'] },
 };
 
 const StorefrontHome = () => {
