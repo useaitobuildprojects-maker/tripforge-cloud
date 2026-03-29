@@ -65,6 +65,7 @@ export interface Agency {
   background_color: string | null;
   storefront_config: StorefrontConfig | null;
   commission_rate: number;
+  one_way_fee: number;
 }
 
 export const FONT_OPTIONS: { id: StorefrontFont; name: string; preview: string }[] = [
