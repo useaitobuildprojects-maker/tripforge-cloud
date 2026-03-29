@@ -83,7 +83,7 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px] bg-card border-border">
+      <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">
             {isEditing ? 'Edit Agency' : 'Add New Agency'}
