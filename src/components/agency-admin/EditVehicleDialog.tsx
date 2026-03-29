@@ -28,6 +28,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [pricePerKm, setPricePerKm] = useState('');
+  const [dailyRateBase, setDailyRateBase] = useState('');
+  const [freeKmPerDay, setFreeKmPerDay] = useState('200');
 
   const updateVehicle = useUpdateVehicle();
 
