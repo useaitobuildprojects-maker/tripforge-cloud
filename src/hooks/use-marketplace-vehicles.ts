@@ -11,6 +11,8 @@ export interface MarketplaceVehicle {
   daily_rate: number | null;
   price_per_km: number | null;
   display_price_per_km: number | null;
+  daily_rate_base: number | null;
+  free_km_per_day: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -22,6 +24,7 @@ export interface MarketplaceVehicle {
   agency_name: string;
   agency_slug: string;
   agency_logo_url: string | null;
+  agency_one_way_fee: number;
   is_own: boolean;
   // Commission
   commission_rate: number;
