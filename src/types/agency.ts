@@ -85,18 +85,12 @@ export interface DashboardStats {
 
 export const SERVICE_LABELS: Record<ServiceType, string> = {
   car_rental: 'Car Rental',
-  private_driver: 'Private Driver',
-  limousine_services: 'Limousine Services',
   apartment: 'Apartment',
-  car_driver: 'Car Driver',
 };
 
 export const SERVICE_ICONS: Record<ServiceType, string> = {
   car_rental: 'Car',
-  private_driver: 'UserCheck',
-  limousine_services: 'Crown',
   apartment: 'Building',
-  car_driver: 'Truck',
 };
 
 export const PAGE_LABELS: Record<StorefrontPage, string> = {

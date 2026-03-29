@@ -13,26 +13,17 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
-  private_driver: UserCheck,
-  limousine_services: Crown,
   apartment: Building,
-  car_driver: Truck,
 };
 
 const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
   car_rental: 'Wide selection of quality vehicles for every need.',
-  private_driver: 'Professional drivers for transfers and tours.',
-  limousine_services: 'Premium limousines for special occasions.',
   apartment: 'Furnished apartments for comfortable stays.',
-  car_driver: 'Personal car and driver packages.',
 };
 
 const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: string[] }> = {
   car_rental: { icon: Car, items: ['Free cancellation up to 24h', 'Unlimited mileage options', 'Full insurance included', 'Airport pickup available'] },
-  private_driver: { icon: UserCheck, items: ['Vetted professional chauffeurs', 'Airport & hotel transfers', 'Hourly & daily booking', 'Multi-language drivers'] },
-  limousine_services: { icon: Crown, items: ['Luxury fleet selection', 'Red carpet service', 'Events & weddings', 'Corporate accounts'] },
   apartment: { icon: Building, items: ['Fully furnished', 'Weekly & monthly rates', 'Central locations', 'Self check-in'] },
-  car_driver: { icon: Truck, items: ['Car + driver combos', 'City tours', 'Flexible schedules', 'Local expertise'] },
 };
 
 const StorefrontHome = () => {

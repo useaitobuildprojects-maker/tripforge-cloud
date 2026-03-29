@@ -8,18 +8,12 @@ import { TemplateStyles } from '@/lib/template-styles';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
-  private_driver: UserCheck,
-  limousine_services: Crown,
   apartment: Building,
-  car_driver: Truck,
 };
 
 const SERVICE_DESCRIPTIONS: Record<ServiceType, string> = {
   car_rental: 'Browse our curated fleet of vehicles — from economy to luxury SUVs — ready for your next adventure.',
-  private_driver: 'Professional and experienced private drivers available for airport transfers, business trips, and city tours.',
-  limousine_services: 'Travel in style with our premium limousine fleet, perfect for special occasions and VIP transport.',
   apartment: 'Comfortable furnished apartments for short and long-term stays, conveniently located near key destinations.',
-  car_driver: 'Reliable car and driver packages combining the freedom of a personal vehicle with expert local drivers.',
 };
 
 const StorefrontServices = () => {
