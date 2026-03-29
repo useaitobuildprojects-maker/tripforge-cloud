@@ -165,7 +165,7 @@ const StorefrontHome = () => {
                 </div>
                 <div className="w-0.5 flex-1 bg-border my-1" />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-start">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
                 <div>
                   <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
                   <LocationAutocomplete
