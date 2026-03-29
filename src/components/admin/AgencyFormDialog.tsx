@@ -124,16 +124,29 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as any }))}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as any }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Services</Label>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {serviceOptions.map((service) => (
+                  <label key={service} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox checked={form.services.includes(service)} onCheckedChange={() => toggleService(service)} />
+                    <span className="text-xs text-foreground">{SERVICE_LABELS[service]}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
 
 
