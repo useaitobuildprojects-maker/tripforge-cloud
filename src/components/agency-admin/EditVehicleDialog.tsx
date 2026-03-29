@@ -181,19 +181,29 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label htmlFor="editPlate">License Plate</Label>
               <Input id="editPlate" value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="editPriceKm">Price per KM (€)</Label>
+              <Label htmlFor="editDailyRate">Daily Rate (€)</Label>
+              <Input id="editDailyRate" type="number" min={0} step="1" value={dailyRateBase} onChange={(e) => setDailyRateBase(e.target.value)} placeholder="45" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editPriceKm">Price/KM (€)</Label>
               <Input id="editPriceKm" type="number" min={0} step="0.01" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} placeholder="0.35" />
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="editVin">VIN</Label>
-            <Input id="editVin" value={vin} onChange={(e) => setVin(e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="editFreeKm">Free KM / Day</Label>
+              <Input id="editFreeKm" type="number" min={0} value={freeKmPerDay} onChange={(e) => setFreeKmPerDay(e.target.value)} placeholder="200" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editVin">VIN</Label>
+              <Input id="editVin" value={vin} onChange={(e) => setVin(e.target.value)} />
+            </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
