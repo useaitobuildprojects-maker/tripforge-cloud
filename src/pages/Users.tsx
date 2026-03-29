@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import CreateUserDialog from '@/components/admin/CreateUserDialog';
 import { useAuth } from '@/contexts/AuthContext';
+import { format } from 'date-fns';
 
 const roleConfig: Record<string, { label: string; icon: typeof Shield; color: string }> = {
   super_admin: { label: 'Super Admin', icon: ShieldCheck, color: 'text-accent' },
@@ -41,8 +42,9 @@ const Users = () => {
           <table className="w-full">
             <thead>
               <tr className="border-t border-border/70">
-                <th className="px-7 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">User ID</th>
+                <th className="px-7 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">User</th>
                 <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Role</th>
+                <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Joined</th>
                 <th className="px-6 py-3.5 text-right text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Actions</th>
               </tr>
             </thead>
@@ -50,12 +52,12 @@ const Users = () => {
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <tr key={i} className="border-t border-border/40">
-                    <td className="px-7 py-4" colSpan={3}><Skeleton className="h-10 w-full" /></td>
+                    <td className="px-7 py-4" colSpan={4}><Skeleton className="h-10 w-full" /></td>
                   </tr>
                 ))
               ) : users.length === 0 ? (
                 <tr className="border-t border-border/40">
-                  <td colSpan={3} className="px-7 py-12 text-center text-sm text-muted-foreground">
+                  <td colSpan={4} className="px-7 py-12 text-center text-sm text-muted-foreground">
                     <UsersIcon className="h-8 w-8 mx-auto mb-3 text-muted-foreground/40" />
                     No users found with assigned roles.
                   </td>
@@ -68,13 +70,21 @@ const Users = () => {
                   return (
                     <motion.tr key={user.id + (user.role ?? '')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 + i * 0.05 }} className="border-t border-border/40 hover:bg-accent/3 transition-colors">
                       <td className="px-7 py-4">
-                        <p className="text-[13px] font-mono text-foreground">{user.id}</p>
+                        <div>
+                          <p className="text-[13px] font-semibold text-foreground">{user.full_name || '—'}</p>
+                          <p className="text-[12px] text-muted-foreground">{user.email}</p>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <RoleIcon className={`h-4 w-4 ${config.color}`} />
                           <span className={`text-[13px] font-semibold ${config.color}`}>{config.label}</span>
                         </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-[13px] text-muted-foreground">
+                          {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : '—'}
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-right">
                         {!isSelf && (
