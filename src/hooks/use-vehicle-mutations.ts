@@ -18,6 +18,8 @@ interface CreateVehicleInput {
   air_conditioning?: boolean;
   mileage_policy?: string;
   price_per_km?: number | null;
+  daily_rate_base?: number | null;
+  free_km_per_day?: number | null;
 }
 
 export const useCreateVehicle = () => {
