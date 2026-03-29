@@ -546,10 +546,10 @@ const StorefrontHome = () => {
                             ) : (
                               <p className="text-sm opacity-50">Contact for price</p>
                             )}
-                            <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2 hover:text-white"
+                            <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2"
                               style={{ borderColor: buttonColor, color: buttonColor }}
-                              onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = buttonColor; }}
-                              onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; }}
+                              onMouseEnter={e => { const el = e.target as HTMLElement; el.style.backgroundColor = buttonColor; el.style.color = '#fff'; }}
+                              onMouseLeave={e => { const el = e.target as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = buttonColor; }}
                               onClick={() => setBookingVehicle(mv)}>
                               {cfg.cta_text || 'Book Now'}
                             </Button>
