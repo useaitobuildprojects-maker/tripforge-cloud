@@ -30,6 +30,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [pricePerKm, setPricePerKm] = useState('');
+  const [dailyRateBase, setDailyRateBase] = useState('');
+  const [freeKmPerDay, setFreeKmPerDay] = useState('200');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -39,7 +41,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
-    setPricePerKm('');
+    setPricePerKm(''); setDailyRateBase(''); setFreeKmPerDay('200');
   };
 
   const handleSubmit = async () => {
