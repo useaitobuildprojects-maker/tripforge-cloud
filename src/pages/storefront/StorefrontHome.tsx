@@ -543,7 +543,8 @@ const StorefrontHome = () => {
                             <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2 hover:text-white"
                               style={{ borderColor: buttonColor, color: buttonColor }}
                               onMouseEnter={e => { (e.target as HTMLElement).style.backgroundColor = buttonColor; }}
-                              onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; }}>
+                              onMouseLeave={e => { (e.target as HTMLElement).style.backgroundColor = 'transparent'; }}
+                              onClick={() => setBookingVehicle(mv)}>
                               {cfg.cta_text || 'Book Now'}
                             </Button>
                           </div>
