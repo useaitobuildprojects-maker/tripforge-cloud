@@ -48,6 +48,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
       setPricePerKm(vehicle.price_per_km != null ? String(vehicle.price_per_km) : '');
+      setDailyRateBase(vehicle.daily_rate_base != null ? String(vehicle.daily_rate_base) : '');
+      setFreeKmPerDay(vehicle.free_km_per_day != null ? String(vehicle.free_km_per_day) : '200');
     }
   }, [vehicle]);
 
