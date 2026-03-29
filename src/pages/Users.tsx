@@ -83,7 +83,14 @@ const Users = () => {
                       </td>
                       <td className="px-6 py-4">
                         <p className="text-[13px] text-muted-foreground">
-                          {user.created_at ? format(new Date(user.created_at), 'MMM d, yyyy') : '—'}
+                          {(() => {
+                            try {
+                              const d = new Date(user.created_at);
+                              return isNaN(d.getTime()) ? '—' : format(d, 'MMM d, yyyy');
+                            } catch {
+                              return '—';
+                            }
+                          })()}
                         </p>
                       </td>
                       <td className="px-6 py-4 text-right">
