@@ -12,26 +12,17 @@ import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, count
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
-  private_driver: UserCheck,
-  limousine_services: Crown,
   apartment: Building,
-  car_driver: Truck,
 };
 
 const SERVICE_HERO_TEXTS: Record<ServiceType, { title: string; subtitle: string }> = {
   car_rental: { title: 'Car Rental', subtitle: 'Find the perfect car for your journey with competitive prices and top-quality vehicles.' },
-  private_driver: { title: 'Private Driver', subtitle: 'Professional chauffeurs for airport transfers, business trips, and city tours.' },
-  limousine_services: { title: 'Limousine Services', subtitle: 'Travel in luxury with our premium limousine fleet for any occasion.' },
   apartment: { title: 'Apartments', subtitle: 'Comfortable furnished apartments for short and long-term stays.' },
-  car_driver: { title: 'Car & Driver', subtitle: 'Enjoy the freedom of a personal vehicle with an expert local driver.' },
 };
 
 const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   car_rental: ['Wide selection of vehicles', 'Flexible pick-up & drop-off', 'Full insurance included', '24/7 roadside assistance', 'No hidden fees'],
-  private_driver: ['Professional licensed drivers', 'Punctual & reliable', 'Airport transfers', 'Hourly or daily booking', 'Multilingual drivers available'],
-  limousine_services: ['Luxury fleet', 'Red carpet service', 'Wedding & event transport', 'VIP airport transfers', 'Corporate accounts'],
   apartment: ['Fully furnished', 'Central locations', 'Short & long term stays', 'All utilities included', 'Cleaning service available'],
-  car_driver: ['Personal vehicle & driver', 'City tours', 'Intercity travel', 'Flexible scheduling', 'Local expertise'],
 };
 
 const StorefrontServiceDetail = () => {

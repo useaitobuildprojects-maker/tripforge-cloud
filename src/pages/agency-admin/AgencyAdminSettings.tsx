@@ -14,7 +14,7 @@ import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 
-const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
+const serviceOptions: ServiceType[] = ['car_rental', 'apartment'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });

@@ -14,7 +14,7 @@ interface AgencyFormDialogProps {
   agency?: Agency | null;
 }
 
-const serviceOptions: ServiceType[] = ['car_rental', 'private_driver', 'limousine_services', 'apartment', 'car_driver'];
+const serviceOptions: ServiceType[] = ['car_rental', 'apartment'];
 
 const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps) => {
   const createAgency = useCreateAgency();

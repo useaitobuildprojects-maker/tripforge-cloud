@@ -13,26 +13,17 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
-  private_driver: UserCheck,
-  limousine_services: Crown,
   apartment: Building,
-  car_driver: Truck,
 };
 
 const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
   car_rental: 'Wide selection of quality vehicles for every need.',
-  private_driver: 'Professional drivers for transfers and tours.',
-  limousine_services: 'Premium limousines for special occasions.',
   apartment: 'Furnished apartments for comfortable stays.',
-  car_driver: 'Personal car and driver packages.',
 };
 
 const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: string[] }> = {
   car_rental: { icon: Car, items: ['Free cancellation up to 24h', 'Unlimited mileage options', 'Full insurance included', 'Airport pickup available'] },
-  private_driver: { icon: UserCheck, items: ['Vetted professional chauffeurs', 'Airport & hotel transfers', 'Hourly & daily booking', 'Multi-language drivers'] },
-  limousine_services: { icon: Crown, items: ['Luxury fleet selection', 'Red carpet service', 'Events & weddings', 'Corporate accounts'] },
   apartment: { icon: Building, items: ['Fully furnished', 'Weekly & monthly rates', 'Central locations', 'Self check-in'] },
-  car_driver: { icon: Truck, items: ['Car + driver combos', 'City tours', 'Flexible schedules', 'Local expertise'] },
 };
 
 const StorefrontHome = () => {
@@ -70,7 +61,7 @@ const StorefrontHome = () => {
   const activeFilterCount = countActiveFilters(filters);
 
   // Show vehicles section only for car-related services
-  const vehicleServices: ServiceType[] = ['car_rental', 'car_driver', 'limousine_services'];
+  const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
 
   const testimonials = [
@@ -141,14 +132,12 @@ const StorefrontHome = () => {
           className={`p-6 md:p-8 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
 
           <AnimatePresence mode="wait">
-            {/* ---- CAR RENTAL / CAR DRIVER / LIMOUSINE / ALL ---- */}
-            {(activeService === 'all' || activeService === 'car_rental' || activeService === 'car_driver' || activeService === 'limousine_services') && (
+            {/* ---- CAR RENTAL / ALL ---- */}
+            {(activeService === 'all' || activeService === 'car_rental') && (
               <motion.div key="vehicle-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">
-                    {activeService === 'limousine_services' ? 'Book your limousine' : activeService === 'car_driver' ? 'Book car & driver' : 'Book your ride'}
-                  </h3>
+                  <h3 className="text-lg font-bold">Book your ride</h3>
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <button
                       type="button"
@@ -226,91 +215,6 @@ const StorefrontHome = () => {
                 <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
                   onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
                   <Search className="h-4 w-4" /> Search available vehicles
-                </Button>
-              </motion.div>
-            )}
-
-            {/* ---- PRIVATE DRIVER ---- */}
-            {activeService === 'private_driver' && (
-              <motion.div key="driver-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold">Book a private driver</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Professional chauffeur at your service</p>
-                </div>
-
-                <div className="space-y-5">
-                  {/* Pickup */}
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
-                      </div>
-                      <div className="w-0.5 flex-1 bg-border my-1" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
-                        <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Hotel, airport, or address" locations={agencyLocations} agencyCity={agency.city} />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Time</label>
-                        <div className="relative">
-                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Destination */}
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Destination</label>
-                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Where are you going?" locations={agencyLocations} agencyCity={agency.city} />
-                    </div>
-                  </div>
-
-                  {/* Passengers & duration */}
-                  <div className="grid grid-cols-2 gap-3 pl-8">
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                          {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Trip type</label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                          <option value="transfer">Airport transfer</option>
-                          <option value="hourly">Hourly booking</option>
-                          <option value="daily">Full day</option>
-                          <option value="tour">City tour</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                  <Search className="h-4 w-4" /> Find a driver
                 </Button>
               </motion.div>
             )}

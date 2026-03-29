@@ -1,12 +1,9 @@
-import { Car, UserCheck, Crown, Building, Truck, HelpCircle } from 'lucide-react';
+import { Car, Building, HelpCircle } from 'lucide-react';
 import { ServiceType, SERVICE_LABELS } from '@/types/agency';
 
 const iconMap: Record<string, any> = {
   car_rental: Car,
-  private_driver: UserCheck,
-  limousine_services: Crown,
   apartment: Building,
-  car_driver: Truck,
 };
 
 const ServiceBadge = ({ service }: { service: ServiceType }) => {
