@@ -61,6 +61,17 @@ const StorefrontHome = () => {
   const filteredVehicles = useMemo(() => applyFilters(vehicles, filters), [vehicles, filters]);
   const activeFilterCount = countActiveFilters(filters);
 
+  // Booking dialog
+  const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
+  const isOneWay = !sameReturn && pickupLocation !== dropoffLocation && !!dropoffLocation;
+  const numDays = useMemo(() => {
+    if (pickupDate && dropoffDate) {
+      const diff = Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / 86400000);
+      return diff > 0 ? diff : 1;
+    }
+    return 1;
+  }, [pickupDate, dropoffDate]);
+
   // Show vehicles section only for car-related services
   const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
