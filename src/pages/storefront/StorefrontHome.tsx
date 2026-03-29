@@ -619,6 +619,19 @@ const StorefrontHome = () => {
           ))}
         </div>
       </section>
+
+      {/* Booking Quote Dialog */}
+      {bookingVehicle && (
+        <BookingQuoteDialog
+          vehicle={bookingVehicle}
+          open={!!bookingVehicle}
+          onOpenChange={(open) => { if (!open) setBookingVehicle(null); }}
+          buttonColor={buttonColor}
+          numDays={numDays}
+          isOneWay={isOneWay}
+          oneWayFee={agency.one_way_fee}
+        />
+      )}
     </div>
   );
 };
