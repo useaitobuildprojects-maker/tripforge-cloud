@@ -132,14 +132,12 @@ const StorefrontHome = () => {
           className={`p-6 md:p-8 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
 
           <AnimatePresence mode="wait">
-            {/* ---- CAR RENTAL / CAR DRIVER / LIMOUSINE / ALL ---- */}
-            {(activeService === 'all' || activeService === 'car_rental' || activeService === 'car_driver' || activeService === 'limousine_services') && (
+            {/* ---- CAR RENTAL / ALL ---- */}
+            {(activeService === 'all' || activeService === 'car_rental') && (
               <motion.div key="vehicle-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">
-                    {activeService === 'limousine_services' ? 'Book your limousine' : activeService === 'car_driver' ? 'Book car & driver' : 'Book your ride'}
-                  </h3>
+                  <h3 className="text-lg font-bold">Book your ride</h3>
                   <label className="flex items-center gap-2 cursor-pointer select-none">
                     <button
                       type="button"
