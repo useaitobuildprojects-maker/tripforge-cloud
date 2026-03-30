@@ -35,6 +35,18 @@ export interface CityTourPrice {
   created_at: string;
 }
 
+export interface CarRentalPrice {
+  id: string;
+  agency_id: string;
+  vehicle_class: string;
+  daily_rate: number;
+  weekly_rate: number | null;
+  monthly_rate: number | null;
+  drop_off_fee: number;
+  description: string | null;
+  created_at: string;
+}
+
 // ── Transfer Routes ──
 export const useTransferRoutes = (agencyId: string | undefined) =>
   useQuery({
