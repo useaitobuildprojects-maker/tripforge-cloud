@@ -12,6 +12,7 @@ import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
+import ServicePricingEditor from '@/components/agency-admin/ServicePricingEditor';
 
 
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
