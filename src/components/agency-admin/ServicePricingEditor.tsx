@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import { toast } from 'sonner';
 import {
   useTransferRoutes, useAddTransferRoute, useDeleteTransferRoute,
   useLimoTourPricing, useAddLimoTourPrice, useDeleteLimoTourPrice,
@@ -70,11 +72,13 @@ const TransferPricingTab = ({ agencyId }: { agencyId: string }) => {
   const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
   const addRoute = useAddTransferRoute();
   const deleteRoute = useDeleteTransferRoute();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [price, setPrice] = useState('');
   const [distanceKm, setDistanceKm] = useState('');
   const [maxPass, setMaxPass] = useState('4');
+  const [uploading, setUploading] = useState(false);
 
   const handleAdd = () => {
     if (!origin || !destination || !price) return;
@@ -82,8 +86,74 @@ const TransferPricingTab = ({ agencyId }: { agencyId: string }) => {
     setOrigin(''); setDestination(''); setPrice(''); setDistanceKm('');
   };
 
+  const downloadTemplate = () => {
+    const data = [
+      { Origin: 'Airport', Destination: 'City Center', 'Price (€)': 45, 'Distance (km)': 25, 'Max Passengers': 4 },
+      { Origin: 'Airport', Destination: 'Hotel Zone', 'Price (€)': 55, 'Distance (km)': 30, 'Max Passengers': 4 },
+    ];
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
+    XLSX.writeFile(wb, 'transfer_routes_template.xlsx');
+  };
+
+  const downloadCurrent = () => {
+    if (!routes.length) { toast.info('No routes to export'); return; }
+    const data = routes.map(r => ({
+      Origin: r.origin, Destination: r.destination, 'Price (€)': r.price,
+      'Distance (km)': r.distance_km ?? '', 'Max Passengers': r.max_passengers ?? 4,
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
+    XLSX.writeFile(wb, 'transfer_routes_export.xlsx');
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows: any[] = XLSX.utils.sheet_to_json(ws);
+      let added = 0;
+      for (const row of rows) {
+        const o = row['Origin'] || row['origin'] || '';
+        const d = row['Destination'] || row['destination'] || '';
+        const p = Number(row['Price (€)'] || row['price'] || row['Price'] || 0);
+        if (!o || !d || !p) continue;
+        const dist = Number(row['Distance (km)'] || row['distance_km'] || row['Distance'] || 0) || null;
+        const pax = Number(row['Max Passengers'] || row['max_passengers'] || 4);
+        await addRoute.mutateAsync({ agency_id: agencyId, origin: o, destination: d, price: p, distance_km: dist, max_passengers: pax, notes: null });
+        added++;
+      }
+      toast.success(`Imported ${added} routes`);
+    } catch (err: any) {
+      toast.error('Failed to parse file: ' + err.message);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex gap-2 flex-wrap">
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
+          <Download className="h-3.5 w-3.5 mr-1" /> Download Template
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!routes.length}>
+          <Download className="h-3.5 w-3.5 mr-1" /> Export Current
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
+          <Upload className="h-3.5 w-3.5 mr-1" /> {uploading ? 'Importing...' : 'Import Excel'}
+        </Button>
+        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
+      </div>
       <div className="grid grid-cols-5 gap-2">
         <div className="space-y-1"><Label className="text-[11px]">Origin</Label><Input placeholder="Airport" value={origin} onChange={(e) => setOrigin(e.target.value)} className="text-xs" /></div>
         <div className="space-y-1"><Label className="text-[11px]">Destination</Label><Input placeholder="City center" value={destination} onChange={(e) => setDestination(e.target.value)} className="text-xs" /></div>
@@ -91,7 +161,7 @@ const TransferPricingTab = ({ agencyId }: { agencyId: string }) => {
         <div className="space-y-1"><Label className="text-[11px]">Distance (km)</Label><Input type="number" min={0} placeholder="25" value={distanceKm} onChange={(e) => setDistanceKm(e.target.value)} className="text-xs font-mono" /></div>
         <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addRoute.isPending || !origin || !destination || !price} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
       </div>
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : routes.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No transfer routes configured yet</p> : (
+      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : routes.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No transfer routes configured yet. Download the template, fill it in, and import!</p> : (
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-xs">
             <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Origin</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Destination</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Price</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Dist.</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Pax</th><th className="px-3 py-2 w-10" /></tr></thead>
