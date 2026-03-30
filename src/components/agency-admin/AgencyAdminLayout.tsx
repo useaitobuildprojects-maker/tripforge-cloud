@@ -1,5 +1,5 @@
 import { Outlet, useParams, Navigate } from 'react-router-dom';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAgencyAdmin } from '@/hooks/use-agency-admin';
 import { useFavicon } from '@/hooks/use-favicon';
@@ -11,7 +11,6 @@ const AgencyAdminLayout = () => {
   const { user, loading: authLoading } = useAuth();
   const { data: agency, isLoading } = useAgencyAdmin(slug ?? '');
 
-  // Hooks must be called before any early returns
   useFavicon(agency?.favicon_url);
 
   if (authLoading || isLoading) {
@@ -41,18 +40,18 @@ const AgencyAdminLayout = () => {
     <div className="min-h-screen bg-background">
       <AgencyAdminSidebar agency={agency} />
       <main className="ml-[260px] min-h-screen">
-        <header className="sticky top-0 z-30 flex h-[60px] items-center justify-between border-b border-border bg-card px-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b border-border bg-card/95 backdrop-blur-lg px-8">
+          <div className="relative group">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-accent" />
             <input
               type="text"
               placeholder="Search..."
-              className="h-9 w-64 rounded-lg border border-border bg-background pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/20 transition-all"
+              className="h-10 w-72 rounded-xl border border-border bg-background/80 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent/40 transition-all duration-200"
             />
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-              <Bell className="h-4 w-4" />
+            <button className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background/80 text-muted-foreground hover:text-foreground hover:border-accent/25 transition-all duration-200">
+              <Bell className="h-[18px] w-[18px]" />
             </button>
             <div className="text-right hidden sm:block">
               <p className="text-[13px] font-medium text-foreground leading-none">{agency.name}</p>
