@@ -233,6 +233,9 @@ const AgencyAdminSettings = () => {
         agencyName={agency.name}
       />
 
+      {/* Service Pricing */}
+      <ServicePricingEditor agencyId={agency.id} enabledServices={form.services} />
+
       {/* Branding — Logo & Favicon */}
       <motion.div
         initial={{ opacity: 0, y: 14 }}
