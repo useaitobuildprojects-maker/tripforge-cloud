@@ -405,19 +405,6 @@ const AgencyAdminSettings = () => {
         </Tabs>
       </motion.div>
 
-      {/* Locations */}
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="card-premium rounded-xl p-7 space-y-4"
-      >
-        <div>
-          <h2 className="text-lg font-display font-bold text-foreground">Pickup & Drop-off Locations</h2>
-          <p className="text-sm text-muted-foreground mt-1">Add the locations customers can choose from when booking. These appear in the search bar on your storefront.</p>
-        </div>
-        <LocationsEditor locations={locations} onChange={setLocations} />
-      </motion.div>
 
       {/* Marketplace Commission */}
       <motion.div
