@@ -12,7 +12,7 @@ import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
-import LocationsEditor from '@/components/agency-admin/LocationsEditor';
+
 
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
