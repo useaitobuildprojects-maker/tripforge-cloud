@@ -72,7 +72,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 };
 
 // ── Transfer Tab ──
-const TransferPricingTab = ({ agencyId }: { agencyId: string }) => {
+const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
   const addRoute = useAddTransferRoute();
   const deleteRoute = useDeleteTransferRoute();
