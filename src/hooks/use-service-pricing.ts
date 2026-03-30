@@ -35,6 +35,18 @@ export interface CityTourPrice {
   created_at: string;
 }
 
+export interface CarRentalPrice {
+  id: string;
+  agency_id: string;
+  vehicle_class: string;
+  daily_rate: number;
+  weekly_rate: number | null;
+  monthly_rate: number | null;
+  drop_off_fee: number;
+  description: string | null;
+  created_at: string;
+}
+
 // ── Transfer Routes ──
 export const useTransferRoutes = (agencyId: string | undefined) =>
   useQuery({
@@ -152,5 +164,45 @@ export const useDeleteCityTourPrice = () => {
       if (error) throw error;
     },
     onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['city-tour-pricing', v.agencyId] }); },
+  });
+};
+
+// ── Car Rental Pricing ──
+export const useCarRentalPricing = (agencyId: string | undefined) =>
+  useQuery({
+    queryKey: ['car-rental-pricing', agencyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('car_rental_pricing')
+        .select('*')
+        .eq('agency_id', agencyId!)
+        .order('vehicle_class');
+      if (error) throw error;
+      return (data ?? []) as CarRentalPrice[];
+    },
+    enabled: !!agencyId,
+  });
+
+export const useAddCarRentalPrice = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: Omit<CarRentalPrice, 'id' | 'created_at'>) => {
+      const { data, error } = await supabase.from('car_rental_pricing').insert(input).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['car-rental-pricing', v.agency_id] }); toast.success('Car rental pricing added'); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useDeleteCarRentalPrice = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, agencyId }: { id: string; agencyId: string }) => {
+      const { error } = await supabase.from('car_rental_pricing').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['car-rental-pricing', v.agencyId] }); },
   });
 };
