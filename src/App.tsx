@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
@@ -7,28 +8,37 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import DomainRouter from "@/components/DomainRouter";
-import AdminLayout from "./components/admin/AdminLayout";
-import StorefrontLayout from "./components/storefront/StorefrontLayout";
-import StorefrontHome from "./pages/storefront/StorefrontHome";
-import StorefrontServices from "./pages/storefront/StorefrontServices";
-import StorefrontServiceDetail from "./pages/storefront/StorefrontServiceDetail";
-import StorefrontContact from "./pages/storefront/StorefrontContact";
-import StorefrontAbout from "./pages/storefront/StorefrontAbout";
-import AgencyAdminLayout from "./components/agency-admin/AgencyAdminLayout";
-import AgencyAdminDashboard from "./pages/agency-admin/AgencyAdminDashboard";
-import AgencyAdminBookings from "./pages/agency-admin/AgencyAdminBookings";
-import AgencyAdminSettings from "./pages/agency-admin/AgencyAdminSettings";
-import AgencyAdminDrivers from "./pages/agency-admin/AgencyAdminDrivers";
-import AgencyAdminVehicles from "./pages/agency-admin/AgencyAdminVehicles";
-import Dashboard from "./pages/Dashboard";
-import Agencies from "./pages/Agencies";
-import Bookings from "./pages/Bookings";
-import Vehicles from "./pages/Vehicles";
-import Users from "./pages/Users";
-import Analytics from "./pages/Analytics";
-import ComingSoon from "./pages/ComingSoon";
-import Login from "./pages/Login";
-import NotFound from "./pages/NotFound";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy-loaded pages
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const StorefrontLayout = lazy(() => import("./components/storefront/StorefrontLayout"));
+const StorefrontHome = lazy(() => import("./pages/storefront/StorefrontHome"));
+const StorefrontServices = lazy(() => import("./pages/storefront/StorefrontServices"));
+const StorefrontServiceDetail = lazy(() => import("./pages/storefront/StorefrontServiceDetail"));
+const StorefrontContact = lazy(() => import("./pages/storefront/StorefrontContact"));
+const StorefrontAbout = lazy(() => import("./pages/storefront/StorefrontAbout"));
+const AgencyAdminLayout = lazy(() => import("./components/agency-admin/AgencyAdminLayout"));
+const AgencyAdminDashboard = lazy(() => import("./pages/agency-admin/AgencyAdminDashboard"));
+const AgencyAdminBookings = lazy(() => import("./pages/agency-admin/AgencyAdminBookings"));
+const AgencyAdminSettings = lazy(() => import("./pages/agency-admin/AgencyAdminSettings"));
+const AgencyAdminDrivers = lazy(() => import("./pages/agency-admin/AgencyAdminDrivers"));
+const AgencyAdminVehicles = lazy(() => import("./pages/agency-admin/AgencyAdminVehicles"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Agencies = lazy(() => import("./pages/Agencies"));
+const Bookings = lazy(() => import("./pages/Bookings"));
+const Vehicles = lazy(() => import("./pages/Vehicles"));
+const Users = lazy(() => import("./pages/Users"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+const Login = lazy(() => import("./pages/Login"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Skeleton className="h-12 w-48" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
