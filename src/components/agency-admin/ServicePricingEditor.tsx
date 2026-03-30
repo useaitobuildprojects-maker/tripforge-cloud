@@ -14,9 +14,13 @@ import {
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
 } from '@/hooks/use-service-pricing';
 
+import { StorefrontConfig } from '@/types/agency';
+
 interface Props {
   agencyId: string;
   enabledServices: string[];
+  storefrontConfig: StorefrontConfig;
+  onConfigChange: (config: StorefrontConfig) => void;
 }
 
 const ServicePricingEditor = ({ agencyId, enabledServices }: Props) => {
