@@ -23,7 +23,7 @@ interface Props {
   onConfigChange: (config: StorefrontConfig) => void;
 }
 
-const ServicePricingEditor = ({ agencyId, enabledServices }: Props) => {
+const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange }: Props) => {
   const hasTransfer = enabledServices.includes('transfer');
   const hasLimo = enabledServices.includes('limo_tour');
   const hasCityTour = enabledServices.includes('city_tour');
