@@ -27,39 +27,61 @@ const Login = () => {
       return;
     }
 
-    // Check user role and redirect accordingly
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
+    if (!user) {
+      setError('Could not verify your account. Please try again.');
+      setLoading(false);
+      return;
+    }
+
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (roleError || !roleData?.role) {
+      setError('Your account role could not be verified. Please contact support.');
+      setLoading(false);
+      return;
+    }
+
+    if (roleData.role === 'super_admin') {
+      navigate('/');
+      return;
+    }
+
+    if (roleData.role === 'agency_admin') {
+      const { data: memberData, error: memberError } = await supabase
+        .from('agency_members')
+        .select('agency_id')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (roleData?.role === 'agency_admin') {
-        // Find the agency this user belongs to
-        const { data: memberData } = await supabase
-          .from('agency_members')
-          .select('agency_id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (memberData?.agency_id) {
-          const { data: agencyData } = await supabase
-            .from('agencies')
-            .select('slug')
-            .eq('id', memberData.agency_id)
-            .maybeSingle();
-
-          if (agencyData?.slug) {
-            navigate(`/agency/${agencyData.slug}/admin`);
-            return;
-          }
-        }
+      if (memberError || !memberData?.agency_id) {
+        setError('No agency is assigned to your account.');
+        setLoading(false);
+        return;
       }
+
+      const { data: agencyData, error: agencyError } = await supabase
+        .from('agencies')
+        .select('slug')
+        .eq('id', memberData.agency_id)
+        .maybeSingle();
+
+      if (agencyError || !agencyData?.slug) {
+        setError('Your agency dashboard is not configured yet.');
+        setLoading(false);
+        return;
+      }
+
+      navigate(`/agency/${agencyData.slug}/admin`);
+      return;
     }
 
-    navigate('/');
+    setError('Your account role is not allowed to access this panel.');
+    setLoading(false);
   };
 
   return (
