@@ -145,7 +145,40 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Auto-pricing formula */}
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
+        <h4 className="text-xs font-semibold text-foreground">Auto-Pricing Formula (Sixt-style)</h4>
+        <p className="text-[11px] text-muted-foreground">When no fixed route exists, price = Base Fee + (Distance × Per-KM Rate)</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Base Fee (€)</Label>
+            <Input
+              type="number" min={0} step={0.5}
+              placeholder="15"
+              value={storefrontConfig.transfer_base_fee ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_base_fee: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Per-KM Rate (€)</Label>
+            <Input
+              type="number" min={0} step={0.1}
+              placeholder="1.20"
+              value={storefrontConfig.transfer_per_km_rate ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono"
+            />
+          </div>
+        </div>
+        {(storefrontConfig.transfer_base_fee || storefrontConfig.transfer_per_km_rate) && (
+          <p className="text-[11px] text-accent font-medium">
+            Example: 30 km trip = €{((storefrontConfig.transfer_base_fee ?? 0) + 30 * (storefrontConfig.transfer_per_km_rate ?? 0)).toFixed(2)}
+          </p>
+        )}
+      </div>
+
       <div className="flex gap-2 flex-wrap">
         <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
           <Download className="h-3.5 w-3.5 mr-1" /> Download Template
@@ -158,6 +191,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
         </Button>
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
       </div>
+      <p className="text-[11px] text-muted-foreground -mt-2">Fixed routes below override the auto-pricing formula</p>
       <div className="grid grid-cols-5 gap-2">
         <div className="space-y-1"><Label className="text-[11px]">Origin</Label><Input placeholder="Airport" value={origin} onChange={(e) => setOrigin(e.target.value)} className="text-xs" /></div>
         <div className="space-y-1"><Label className="text-[11px]">Destination</Label><Input placeholder="City center" value={destination} onChange={(e) => setDestination(e.target.value)} className="text-xs" /></div>
