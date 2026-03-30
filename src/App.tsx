@@ -51,44 +51,43 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <DomainRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  element={
-                    <ProtectedRoute>
-                      <AdminLayout />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/agencies" element={<Agencies />} />
-                  <Route path="/vehicles" element={<Vehicles />} />
-                  <Route path="/bookings" element={<Bookings />} />
-                  <Route path="/users" element={<Users />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/settings" element={<ComingSoon title="Settings" />} />
-                </Route>
-                {/* Agency Admin Dashboard — isolated per agency */}
-                <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
-                  <Route index element={<AgencyAdminDashboard />} />
-                  <Route path="bookings" element={<AgencyAdminBookings />} />
-                  <Route path="drivers" element={<AgencyAdminDrivers />} />
-                  <Route path="vehicles" element={<AgencyAdminVehicles />} />
-                  <Route path="analytics" element={<ComingSoon title="Analytics" />} />
-                  <Route path="settings" element={<AgencyAdminSettings />} />
-                </Route>
-                {/* Agency public storefronts */}
-                <Route path="/agency/:slug" element={<StorefrontLayout />}>
-                  <Route index element={<StorefrontHome />} />
-                  <Route path="services" element={<StorefrontServices />} />
-                  <Route path="services/:serviceType" element={<StorefrontServiceDetail />} />
-                  {/* Keep fleet as redirect for backward compat */}
-                  <Route path="fleet" element={<StorefrontServices />} />
-                  <Route path="contact" element={<StorefrontContact />} />
-                  <Route path="about" element={<StorefrontAbout />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    element={
+                      <ProtectedRoute>
+                        <AdminLayout />
+                      </ProtectedRoute>
+                    }
+                  >
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/agencies" element={<Agencies />} />
+                    <Route path="/vehicles" element={<Vehicles />} />
+                    <Route path="/bookings" element={<Bookings />} />
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<ComingSoon title="Settings" />} />
+                  </Route>
+                  <Route path="/agency/:slug/admin" element={<AgencyAdminLayout />}>
+                    <Route index element={<AgencyAdminDashboard />} />
+                    <Route path="bookings" element={<AgencyAdminBookings />} />
+                    <Route path="drivers" element={<AgencyAdminDrivers />} />
+                    <Route path="vehicles" element={<AgencyAdminVehicles />} />
+                    <Route path="analytics" element={<ComingSoon title="Analytics" />} />
+                    <Route path="settings" element={<AgencyAdminSettings />} />
+                  </Route>
+                  <Route path="/agency/:slug" element={<StorefrontLayout />}>
+                    <Route index element={<StorefrontHome />} />
+                    <Route path="services" element={<StorefrontServices />} />
+                    <Route path="services/:serviceType" element={<StorefrontServiceDetail />} />
+                    <Route path="fleet" element={<StorefrontServices />} />
+                    <Route path="contact" element={<StorefrontContact />} />
+                    <Route path="about" element={<StorefrontAbout />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </DomainRouter>
           </AuthProvider>
         </BrowserRouter>
