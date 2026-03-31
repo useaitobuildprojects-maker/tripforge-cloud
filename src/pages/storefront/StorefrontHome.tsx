@@ -73,6 +73,35 @@ const StorefrontHome = () => {
   // Booking dialog
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
   const isOneWay = !sameReturn && pickupLocation !== dropoffLocation && !!dropoffLocation;
+  // Today's date as minimum for pickup
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  // Minimum next-day date for return/checkout
+  const minReturnDate = useMemo(() => {
+    if (!pickupDate) return todayStr;
+    const d = new Date(pickupDate);
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  }, [pickupDate, todayStr]);
+
+  // Auto-correct dropoff date if it's before the minimum
+  const handlePickupDateChange = (val: string) => {
+    setPickupDate(val);
+    if (val) {
+      const min = new Date(val);
+      min.setDate(min.getDate() + 1);
+      const minStr = min.toISOString().split('T')[0];
+      if (!dropoffDate || dropoffDate < minStr) {
+        setDropoffDate(minStr);
+      }
+    }
+  };
+
+  const handleDropoffDateChange = (val: string) => {
+    if (pickupDate && val <= pickupDate) return; // prevent same-day or earlier
+    setDropoffDate(val);
+  };
+
   const numDays = useMemo(() => {
     if (pickupDate && dropoffDate) {
       const diff = Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / 86400000);
@@ -183,7 +212,7 @@ const StorefrontHome = () => {
                         <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date</label>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                          <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                         </div>
                       </div>
                       <div>
@@ -212,7 +241,7 @@ const StorefrontHome = () => {
                         <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date</label>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                          <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                         </div>
                       </div>
                       <div>
@@ -269,7 +298,7 @@ const StorefrontHome = () => {
                       <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                       </div>
                     </div>
                     <div>
@@ -321,7 +350,7 @@ const StorefrontHome = () => {
                       <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Start date</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                       </div>
                     </div>
                     <div>
@@ -375,7 +404,7 @@ const StorefrontHome = () => {
                       <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                       </div>
                     </div>
                     <div>
@@ -434,14 +463,14 @@ const StorefrontHome = () => {
                       <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-in</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                       </div>
                     </div>
                     <div>
                       <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-out</label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={dropoffDate} onChange={(e) => setDropoffDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                        <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
                       </div>
                     </div>
                   </div>
