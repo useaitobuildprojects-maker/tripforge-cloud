@@ -65,7 +65,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
         {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoTourPricingTab agencyId={agencyId} /></TabsContent>}
         {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} /></TabsContent>}
-        {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} /></TabsContent>}
+        {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
     </motion.div>
   );
@@ -286,15 +286,18 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
 };
 
 // ── Car Rental Tab ──
-const CarRentalPricingTab = ({ agencyId }: { agencyId: string }) => {
+const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: prices = [], isLoading } = useCarRentalPricing(agencyId);
   const addPrice = useAddCarRentalPrice();
   const deletePrice = useDeleteCarRentalPrice();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [vehicleClass, setVehicleClass] = useState('');
   const [dailyRate, setDailyRate] = useState('');
   const [weeklyRate, setWeeklyRate] = useState('');
+  const [monthlyRate, setMonthlyRate] = useState('');
   const [dropOff, setDropOff] = useState('');
   const [desc, setDesc] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const handleAdd = () => {
     if (!vehicleClass || !dailyRate) return;
@@ -303,28 +306,136 @@ const CarRentalPricingTab = ({ agencyId }: { agencyId: string }) => {
       vehicle_class: vehicleClass,
       daily_rate: Number(dailyRate),
       weekly_rate: weeklyRate ? Number(weeklyRate) : null,
-      monthly_rate: null,
+      monthly_rate: monthlyRate ? Number(monthlyRate) : null,
       drop_off_fee: Number(dropOff) || 0,
       description: desc || null,
     });
-    setVehicleClass(''); setDailyRate(''); setWeeklyRate(''); setDropOff(''); setDesc('');
+    setVehicleClass(''); setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
+  };
+
+  const downloadTemplate = () => {
+    const data = [
+      { 'Vehicle Class': 'Economy', 'Daily Rate (€)': 35, 'Weekly Rate (€)': 210, 'Monthly Rate (€)': 750, 'Drop-off Fee (€)': 25, Notes: 'A/C, Manual' },
+      { 'Vehicle Class': 'Compact', 'Daily Rate (€)': 45, 'Weekly Rate (€)': 280, 'Monthly Rate (€)': 950, 'Drop-off Fee (€)': 25, Notes: 'A/C, Automatic' },
+      { 'Vehicle Class': 'SUV', 'Daily Rate (€)': 85, 'Weekly Rate (€)': 520, 'Monthly Rate (€)': 1800, 'Drop-off Fee (€)': 40, Notes: '4WD, 7 seats' },
+    ];
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [{ wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 24 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Car Rental Pricing');
+    XLSX.writeFile(wb, 'car_rental_pricing_template.xlsx');
+  };
+
+  const downloadCurrent = () => {
+    if (!prices.length) { toast.info('No pricing to export'); return; }
+    const data = prices.map(p => ({
+      'Vehicle Class': p.vehicle_class, 'Daily Rate (€)': p.daily_rate,
+      'Weekly Rate (€)': p.weekly_rate ?? '', 'Monthly Rate (€)': p.monthly_rate ?? '',
+      'Drop-off Fee (€)': p.drop_off_fee, Notes: p.description ?? '',
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    ws['!cols'] = [{ wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 24 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Car Rental Pricing');
+    XLSX.writeFile(wb, 'car_rental_pricing_export.xlsx');
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows: any[] = XLSX.utils.sheet_to_json(ws);
+      let added = 0;
+      for (const row of rows) {
+        const vc = row['Vehicle Class'] || row['vehicle_class'] || '';
+        const dr = Number(row['Daily Rate (€)'] || row['daily_rate'] || 0);
+        if (!vc || !dr) continue;
+        const wr = Number(row['Weekly Rate (€)'] || row['weekly_rate'] || 0) || null;
+        const mr = Number(row['Monthly Rate (€)'] || row['monthly_rate'] || 0) || null;
+        const df = Number(row['Drop-off Fee (€)'] || row['drop_off_fee'] || 0);
+        const notes = row['Notes'] || row['description'] || null;
+        await addPrice.mutateAsync({ agency_id: agencyId, vehicle_class: vc, daily_rate: dr, weekly_rate: wr, monthly_rate: mr, drop_off_fee: df, description: notes });
+        added++;
+      }
+      toast.success(`Imported ${added} pricing entries`);
+    } catch (err: any) {
+      toast.error('Failed to parse file: ' + err.message);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-5 gap-2">
+    <div className="space-y-5">
+      {/* Mileage config */}
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
+        <h4 className="text-xs font-semibold text-foreground">Mileage Settings (Sixt-style)</h4>
+        <p className="text-[11px] text-muted-foreground">Set included free km/day and extra km rate for all car rentals</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Free KM / Day</Label>
+            <Input
+              type="number" min={0} step={10}
+              placeholder="200"
+              value={storefrontConfig.car_rental_free_km ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_free_km: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Extra KM Rate (€)</Label>
+            <Input
+              type="number" min={0} step={0.05}
+              placeholder="0.25"
+              value={storefrontConfig.car_rental_extra_km_rate ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_extra_km_rate: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono"
+            />
+          </div>
+        </div>
+        {(storefrontConfig.car_rental_free_km || storefrontConfig.car_rental_extra_km_rate) && (
+          <p className="text-[11px] text-accent font-medium">
+            {storefrontConfig.car_rental_free_km ?? 0} km/day free • Extra at €{storefrontConfig.car_rental_extra_km_rate ?? 0}/km
+          </p>
+        )}
+      </div>
+
+      {/* Excel import/export */}
+      <div className="flex gap-2 flex-wrap">
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
+          <Download className="h-3.5 w-3.5 mr-1" /> Download Template
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!prices.length}>
+          <Download className="h-3.5 w-3.5 mr-1" /> Export Current
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
+          <Upload className="h-3.5 w-3.5 mr-1" /> {uploading ? 'Importing...' : 'Import Excel'}
+        </Button>
+        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
+      </div>
+
+      {/* Add form */}
+      <div className="grid grid-cols-6 gap-2">
         <div className="space-y-1"><Label className="text-[11px]">Vehicle Class</Label><Input placeholder="Economy" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value)} className="text-xs" /></div>
         <div className="space-y-1"><Label className="text-[11px]">Per Night (€)</Label><Input type="number" min={0} placeholder="45" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="text-xs font-mono" /></div>
         <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" min={0} placeholder="250" value={weeklyRate} onChange={(e) => setWeeklyRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Drop-off Fee (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+        <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" min={0} placeholder="850" value={monthlyRate} onChange={(e) => setMonthlyRate(e.target.value)} className="text-xs font-mono" /></div>
+        <div className="space-y-1"><Label className="text-[11px]">Drop-off (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
         <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
       </div>
-      <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes insurance, GPS, etc." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet</p> : (
+      <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Automatic, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
+
+      {/* Table */}
+      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-xs">
-            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Class</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Notes</th><th className="px-3 py-2 w-10" /></tr></thead>
-            <tbody>{prices.map((p) => (<tr key={p.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground font-medium">{p.vehicle_class}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td><td className="px-3 py-2 text-muted-foreground max-w-[150px] truncate">{p.description || '—'}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
+            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Class</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Month</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Notes</th><th className="px-3 py-2 w-10" /></tr></thead>
+            <tbody>{prices.map((p) => (<tr key={p.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground font-medium">{p.vehicle_class}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.monthly_rate ? `€${p.monthly_rate}` : '—'}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td><td className="px-3 py-2 text-muted-foreground max-w-[120px] truncate">{p.description || '—'}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
           </table>
         </div>
       )}
