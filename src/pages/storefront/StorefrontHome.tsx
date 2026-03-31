@@ -73,6 +73,32 @@ const StorefrontHome = () => {
   // Booking dialog
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
   const isOneWay = !sameReturn && pickupLocation !== dropoffLocation && !!dropoffLocation;
+  // Minimum next-day date for return/checkout
+  const minReturnDate = useMemo(() => {
+    if (!pickupDate) return '';
+    const d = new Date(pickupDate);
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  }, [pickupDate]);
+
+  // Auto-correct dropoff date if it's before the minimum
+  const handlePickupDateChange = (val: string) => {
+    setPickupDate(val);
+    if (val) {
+      const min = new Date(val);
+      min.setDate(min.getDate() + 1);
+      const minStr = min.toISOString().split('T')[0];
+      if (!dropoffDate || dropoffDate < minStr) {
+        setDropoffDate(minStr);
+      }
+    }
+  };
+
+  const handleDropoffDateChange = (val: string) => {
+    if (pickupDate && val <= pickupDate) return; // prevent same-day or earlier
+    setDropoffDate(val);
+  };
+
   const numDays = useMemo(() => {
     if (pickupDate && dropoffDate) {
       const diff = Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / 86400000);
