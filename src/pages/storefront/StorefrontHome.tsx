@@ -233,6 +233,179 @@ const StorefrontHome = () => {
               </motion.div>
             )}
 
+            {/* ---- TRANSFER ---- */}
+            {activeService === 'transfer' && (
+              <motion.div key="transfer-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold">Book a Transfer</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Airport transfers & point-to-point rides with professional drivers</p>
+                </div>
+                <div className="space-y-5">
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
+                      </div>
+                      <div className="w-0.5 flex-1 bg-border my-1" />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Airport, hotel, or address" locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
+                        <MapPin className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Drop-off location</label>
+                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Destination address" locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 pl-8">
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Time</label>
+                      <div className="relative">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pl-8">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
+                    <div className="relative w-48">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); }}>
+                  <Search className="h-4 w-4" /> Get a quote
+                </Button>
+              </motion.div>
+            )}
+
+            {/* ---- LIMO TOUR ---- */}
+            {activeService === 'limo_tour' && (
+              <motion.div key="limo-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold">Plan a Limo Tour</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Multi-day luxury chauffeured tours across cities & countries</p>
+                </div>
+                <div className="space-y-5">
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <MapPin className="h-3 w-3" style={{ color: buttonColor }} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Starting city</label>
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="e.g. Paris, Rome, Barcelona" locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 pl-8">
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Start date</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Number of days</label>
+                      <div className="relative w-full">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                          {[1, 2, 3, 5, 7, 10, 14].map(n => <option key={n} value={n}>{n} {n === 1 ? 'day' : 'days'}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pl-8">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
+                    <div className="relative w-48">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); }}>
+                  <Search className="h-4 w-4" /> Get a quote
+                </Button>
+              </motion.div>
+            )}
+
+            {/* ---- CITY TOUR ---- */}
+            {activeService === 'city_tour' && (
+              <motion.div key="city-tour-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+                <div className="mb-6">
+                  <h3 className="text-lg font-bold">Book a City Tour</h3>
+                  <p className="text-sm text-muted-foreground mt-1">Guided tours with local expert drivers</p>
+                </div>
+                <div className="space-y-5">
+                  <div className="relative pl-8">
+                    <div className="absolute left-0 top-0 flex flex-col items-center">
+                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
+                        <Star className="h-3 w-3" style={{ color: buttonColor }} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">City</label>
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={`e.g. ${agency.city}`} locations={agencyLocations} agencyCity={agency.city} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 pl-8">
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <input type="date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Duration</label>
+                      <div className="relative w-full">
+                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                          <option value="4">Half day (4 hours)</option>
+                          <option value="8">Full day (8 hours)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pl-8">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
+                    <div className="relative w-48">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
+                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                  onClick={() => { setSearchActive(true); }}>
+                  <Search className="h-4 w-4" /> Find tours
+                </Button>
+              </motion.div>
+            )}
+
             {/* ---- APARTMENT ---- */}
             {activeService === 'apartment' && (
               <motion.div key="apartment-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
