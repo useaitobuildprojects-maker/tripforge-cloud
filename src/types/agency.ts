@@ -34,6 +34,9 @@ export interface StorefrontConfig {
   // Transfer auto-pricing (Sixt-style: base fee + per-km rate)
   transfer_base_fee?: number;
   transfer_per_km_rate?: number;
+  // Car rental mileage settings
+  car_rental_free_km?: number;
+  car_rental_extra_km_rate?: number;
 }
 
 export interface PageSeoEntry {
