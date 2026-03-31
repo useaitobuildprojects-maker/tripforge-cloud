@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import {
@@ -292,6 +293,12 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const deletePrice = useDeleteCarRentalPrice();
   const fileRef = useRef<HTMLInputElement>(null);
   const [vehicleClass, setVehicleClass] = useState('');
+  const [brand, setBrand] = useState('');
+  const [model, setModel] = useState('');
+  const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [transmission, setTransmission] = useState('automatic');
+  const [fuelType, setFuelType] = useState('gasoline');
+  const [seats, setSeats] = useState('5');
   const [dailyRate, setDailyRate] = useState('');
   const [weeklyRate, setWeeklyRate] = useState('');
   const [monthlyRate, setMonthlyRate] = useState('');
@@ -304,23 +311,30 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     addPrice.mutate({
       agency_id: agencyId,
       vehicle_class: vehicleClass,
+      brand: brand || null,
+      model: model || null,
+      year: year ? Number(year) : null,
+      transmission,
+      fuel_type: fuelType,
+      seats: Number(seats) || 5,
+      image_url: null,
       daily_rate: Number(dailyRate),
       weekly_rate: weeklyRate ? Number(weeklyRate) : null,
       monthly_rate: monthlyRate ? Number(monthlyRate) : null,
       drop_off_fee: Number(dropOff) || 0,
       description: desc || null,
     });
-    setVehicleClass(''); setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
+    setVehicleClass(''); setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
+    setTransmission('automatic'); setFuelType('gasoline'); setSeats('5');
+    setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
   };
 
   const downloadTemplate = () => {
     const data = [
-      { 'Vehicle Class': 'Economy', 'Daily Rate (€)': 35, 'Weekly Rate (€)': 210, 'Monthly Rate (€)': 750, 'Drop-off Fee (€)': 25, Notes: 'A/C, Manual' },
-      { 'Vehicle Class': 'Compact', 'Daily Rate (€)': 45, 'Weekly Rate (€)': 280, 'Monthly Rate (€)': 950, 'Drop-off Fee (€)': 25, Notes: 'A/C, Automatic' },
-      { 'Vehicle Class': 'SUV', 'Daily Rate (€)': 85, 'Weekly Rate (€)': 520, 'Monthly Rate (€)': 1800, 'Drop-off Fee (€)': 40, Notes: '4WD, 7 seats' },
+      { 'Vehicle Class': 'Economy', Brand: 'Toyota', Model: 'Yaris', Year: 2024, Transmission: 'automatic', 'Fuel Type': 'gasoline', Seats: 5, 'Daily Rate (€)': 35, 'Weekly Rate (€)': 210, 'Monthly Rate (€)': 750, 'Drop-off Fee (€)': 25, Notes: 'A/C included' },
+      { 'Vehicle Class': 'SUV', Brand: 'BMW', Model: 'X5', Year: 2024, Transmission: 'automatic', 'Fuel Type': 'diesel', Seats: 7, 'Daily Rate (€)': 85, 'Weekly Rate (€)': 520, 'Monthly Rate (€)': 1800, 'Drop-off Fee (€)': 40, Notes: '4WD' },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 24 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Car Rental Pricing');
     XLSX.writeFile(wb, 'car_rental_pricing_template.xlsx');
@@ -329,12 +343,12 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const downloadCurrent = () => {
     if (!prices.length) { toast.info('No pricing to export'); return; }
     const data = prices.map(p => ({
-      'Vehicle Class': p.vehicle_class, 'Daily Rate (€)': p.daily_rate,
-      'Weekly Rate (€)': p.weekly_rate ?? '', 'Monthly Rate (€)': p.monthly_rate ?? '',
+      'Vehicle Class': p.vehicle_class, Brand: p.brand ?? '', Model: p.model ?? '', Year: p.year ?? '',
+      Transmission: p.transmission ?? '', 'Fuel Type': p.fuel_type ?? '', Seats: p.seats ?? '',
+      'Daily Rate (€)': p.daily_rate, 'Weekly Rate (€)': p.weekly_rate ?? '', 'Monthly Rate (€)': p.monthly_rate ?? '',
       'Drop-off Fee (€)': p.drop_off_fee, Notes: p.description ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 24 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Car Rental Pricing');
     XLSX.writeFile(wb, 'car_rental_pricing_export.xlsx');
@@ -354,11 +368,22 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         const vc = row['Vehicle Class'] || row['vehicle_class'] || '';
         const dr = Number(row['Daily Rate (€)'] || row['daily_rate'] || 0);
         if (!vc || !dr) continue;
-        const wr = Number(row['Weekly Rate (€)'] || row['weekly_rate'] || 0) || null;
-        const mr = Number(row['Monthly Rate (€)'] || row['monthly_rate'] || 0) || null;
-        const df = Number(row['Drop-off Fee (€)'] || row['drop_off_fee'] || 0);
-        const notes = row['Notes'] || row['description'] || null;
-        await addPrice.mutateAsync({ agency_id: agencyId, vehicle_class: vc, daily_rate: dr, weekly_rate: wr, monthly_rate: mr, drop_off_fee: df, description: notes });
+        await addPrice.mutateAsync({
+          agency_id: agencyId,
+          vehicle_class: vc,
+          brand: row['Brand'] || row['brand'] || null,
+          model: row['Model'] || row['model'] || null,
+          year: Number(row['Year'] || row['year'] || 0) || null,
+          transmission: row['Transmission'] || row['transmission'] || 'automatic',
+          fuel_type: row['Fuel Type'] || row['fuel_type'] || 'gasoline',
+          seats: Number(row['Seats'] || row['seats'] || 5),
+          image_url: null,
+          daily_rate: dr,
+          weekly_rate: Number(row['Weekly Rate (€)'] || row['weekly_rate'] || 0) || null,
+          monthly_rate: Number(row['Monthly Rate (€)'] || row['monthly_rate'] || 0) || null,
+          drop_off_fee: Number(row['Drop-off Fee (€)'] || row['drop_off_fee'] || 0),
+          description: row['Notes'] || row['description'] || null,
+        });
         added++;
       }
       toast.success(`Imported ${added} pricing entries`);
@@ -374,35 +399,23 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     <div className="space-y-5">
       {/* Mileage config */}
       <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Mileage Settings (Sixt-style)</h4>
-        <p className="text-[11px] text-muted-foreground">Set included free km/day and extra km rate for all car rentals</p>
+        <h4 className="text-xs font-semibold text-foreground">Mileage Settings</h4>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Free KM / Day</Label>
-            <Input
-              type="number" min={0} step={10}
-              placeholder="200"
+            <Input type="number" min={0} step={10} placeholder="200"
               value={storefrontConfig.car_rental_free_km ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_free_km: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono"
-            />
+              className="text-xs font-mono" />
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">Extra KM Rate (€)</Label>
-            <Input
-              type="number" min={0} step={0.05}
-              placeholder="0.25"
+            <Input type="number" min={0} step={0.05} placeholder="0.25"
               value={storefrontConfig.car_rental_extra_km_rate ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_extra_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono"
-            />
+              className="text-xs font-mono" />
           </div>
         </div>
-        {(storefrontConfig.car_rental_free_km || storefrontConfig.car_rental_extra_km_rate) && (
-          <p className="text-[11px] text-accent font-medium">
-            {storefrontConfig.car_rental_free_km ?? 0} km/day free • Extra at €{storefrontConfig.car_rental_extra_km_rate ?? 0}/km
-          </p>
-        )}
       </div>
 
       {/* Excel import/export */}
@@ -419,23 +432,85 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
       </div>
 
-      {/* Add form */}
-      <div className="grid grid-cols-6 gap-2">
-        <div className="space-y-1"><Label className="text-[11px]">Vehicle Class</Label><Input placeholder="Economy" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value)} className="text-xs" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Per Night (€)</Label><Input type="number" min={0} placeholder="45" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" min={0} placeholder="250" value={weeklyRate} onChange={(e) => setWeeklyRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" min={0} placeholder="850" value={monthlyRate} onChange={(e) => setMonthlyRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Drop-off (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
+      {/* Add form - Vehicle info */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <h4 className="text-xs font-semibold text-foreground">Add Vehicle Pricing</h4>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-1"><Label className="text-[11px]">Vehicle Class *</Label><Input placeholder="Economy" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Brand</Label><Input placeholder="Toyota" value={brand} onChange={(e) => setBrand(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Model</Label><Input placeholder="Corolla" value={model} onChange={(e) => setModel(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Year</Label><Input type="number" value={year} onChange={(e) => setYear(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Transmission</Label>
+            <Select value={transmission} onValueChange={setTransmission}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="automatic">Automatic</SelectItem>
+                <SelectItem value="manual">Manual</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Fuel Type</Label>
+            <Select value={fuelType} onValueChange={setFuelType}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gasoline">Gasoline</SelectItem>
+                <SelectItem value="diesel">Diesel</SelectItem>
+                <SelectItem value="electric">Electric</SelectItem>
+                <SelectItem value="hybrid">Hybrid</SelectItem>
+                <SelectItem value="lpg">LPG</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1"><Label className="text-[11px]">Seats</Label><Input type="number" min={1} max={50} value={seats} onChange={(e) => setSeats(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        {/* Pricing row */}
+        <div className="grid grid-cols-5 gap-2">
+          <div className="space-y-1"><Label className="text-[11px]">Per Night (€) *</Label><Input type="number" min={0} placeholder="45" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" min={0} placeholder="250" value={weeklyRate} onChange={(e) => setWeeklyRate(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" min={0} placeholder="850" value={monthlyRate} onChange={(e) => setMonthlyRate(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Drop-off (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
+        </div>
+        <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
       </div>
-      <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Automatic, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
 
       {/* Table */}
       {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Class</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Month</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Notes</th><th className="px-3 py-2 w-10" /></tr></thead>
-            <tbody>{prices.map((p) => (<tr key={p.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground font-medium">{p.vehicle_class}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.monthly_rate ? `€${p.monthly_rate}` : '—'}</td><td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td><td className="px-3 py-2 text-muted-foreground max-w-[120px] truncate">{p.description || '—'}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
+            <thead className="bg-secondary/50">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Vehicle</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Details</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Month</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
+                <th className="px-3 py-2 w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {prices.map((p) => (
+                <tr key={p.id} className="border-t border-border hover:bg-secondary/20">
+                  <td className="px-3 py-2">
+                    <div className="font-medium text-foreground">{p.brand && p.model ? `${p.brand} ${p.model}` : p.vehicle_class}</div>
+                    <div className="text-muted-foreground">{p.vehicle_class}{p.year ? ` • ${p.year}` : ''}</div>
+                  </td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {[p.transmission, p.fuel_type, p.seats ? `${p.seats} seats` : null].filter(Boolean).join(' • ')}
+                  </td>
+                  <td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.monthly_rate ? `€${p.monthly_rate}` : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td>
+                  <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       )}

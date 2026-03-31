@@ -44,6 +44,13 @@ export interface CarRentalPrice {
   monthly_rate: number | null;
   drop_off_fee: number;
   description: string | null;
+  brand: string | null;
+  model: string | null;
+  year: number | null;
+  transmission: string | null;
+  fuel_type: string | null;
+  seats: number | null;
+  image_url: string | null;
   created_at: string;
 }
 
