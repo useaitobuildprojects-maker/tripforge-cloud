@@ -412,8 +412,8 @@ const StorefrontHome = () => {
                       <div className="relative w-full">
                         <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                         <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                          <option value="4">Half day (4 hours)</option>
                           <option value="8">Full day (8 hours)</option>
+                          <option value="12">Extended day (12 hours)</option>
                         </select>
                       </div>
                     </div>
