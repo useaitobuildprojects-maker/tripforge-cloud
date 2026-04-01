@@ -2,14 +2,12 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, ArrowRight, Users, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TransferRoute, TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
-import { getMatrixPrice, getFormulaPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { getMatrixPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
@@ -26,19 +24,22 @@ interface Props {
 }
 
 const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => {
-  const locations = config.locations ?? [];
+  const agencyLocations = useMemo(() => {
+    const configLocs = config.locations;
+    if (configLocs && configLocs.length > 0) {
+      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address }));
+    }
+    return getAgencyLocations(agency.city, agency.country);
+  }, [config.locations, agency.city, agency.country]);
+
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [customOrigin, setCustomOrigin] = useState('');
-  const [customDestination, setCustomDestination] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const useCustomOrigin = origin === '__custom__';
-  const useCustomDest = destination === '__custom__';
-  const effectiveOrigin = useCustomOrigin ? customOrigin : origin;
-  const effectiveDest = useCustomDest ? customDestination : destination;
+  const effectiveOrigin = origin;
+  const effectiveDest = destination;
 
   // Quick matrix prices for all categories (instant, no API call)
   const matrixPrices = useMemo(() => {
