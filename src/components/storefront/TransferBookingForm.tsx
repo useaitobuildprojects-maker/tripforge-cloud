@@ -56,13 +56,23 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
     return hasAny ? prices : null;
   }, [routes, effectiveOrigin, effectiveDest]);
 
+  // Resolve a location name to a geocoding-friendly string by appending its address if configured
+  const resolveLocationQuery = (name: string): string => {
+    const loc = agencyLocations.find((l) => l.name === name);
+    if (loc?.address) return `${name}, ${loc.address}`;
+    return name;
+  };
+
   const handleGetQuote = async () => {
     if (!effectiveOrigin || !effectiveDest) return;
     setLoading(true);
     try {
       const result = await calculateTransferPrice(
-        routes, config, effectiveOrigin, effectiveDest, selectedCategory, agency.country
+        routes, config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country
       );
+      // Keep original names in the quote for display
+      result.origin = effectiveOrigin;
+      result.destination = effectiveDest;
       setQuote(result);
     } catch {
       setQuote(null);
