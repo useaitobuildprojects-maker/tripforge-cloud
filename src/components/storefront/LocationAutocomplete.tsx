@@ -20,43 +20,29 @@ interface LocationAutocompleteProps {
   agencyCountry?: string;
 }
 
-interface NominatimResult {
-  display_name: string;
-  name?: string;
-  type?: string;
-  class?: string;
-  address?: {
-    city?: string;
-    town?: string;
-    state?: string;
-    country?: string;
-    aerodrome?: string;
-  };
+interface MapboxFeature {
+  id: string;
+  place_name: string;
+  text: string;
+  place_type: string[];
+  properties: { category?: string; maki?: string };
+  context?: Array<{ id: string; text: string }>;
 }
 
-function detectTypeFromNominatim(result: NominatimResult): LocationOption['type'] {
-  const cls = result.class || '';
-  const type = result.type || '';
-  const name = (result.name || result.display_name).toLowerCase();
-  if (cls === 'aeroway' || type === 'aerodrome' || name.includes('airport') || name.includes('aéroport')) return 'airport';
-  if (type === 'city' || type === 'town' || type === 'village' || cls === 'place') return 'city';
+function detectTypeFromMapbox(feature: MapboxFeature): LocationOption['type'] {
+  const types = feature.place_type || [];
+  const text = feature.text.toLowerCase();
+  const placeName = feature.place_name.toLowerCase();
+  const category = (feature.properties?.category || '').toLowerCase();
+  if (types.includes('poi') && (text.includes('airport') || placeName.includes('airport') || category.includes('airport') || feature.properties?.maki === 'airport')) return 'airport';
+  if (types.includes('place') || types.includes('locality')) return 'city';
   return 'station';
 }
 
-function buildNominatimAddress(result: NominatimResult): string {
-  const addr = result.address;
-  if (!addr) {
-    // Extract last 2-3 parts from display_name
-    const parts = result.display_name.split(',').map(s => s.trim());
-    return parts.slice(1, 4).join(', ');
-  }
-  const parts: string[] = [];
-  const city = addr.city || addr.town;
-  const name = result.name || '';
-  if (city && city !== name) parts.push(city);
-  if (addr.state) parts.push(addr.state);
-  if (addr.country) parts.push(addr.country);
-  return parts.join(', ');
+function buildMapboxAddress(feature: MapboxFeature): string {
+  const ctx = feature.context || [];
+  const parts = ctx.map(c => c.text).filter(Boolean);
+  return parts.join(', ') || feature.place_name.split(',').slice(1).map(s => s.trim()).join(', ');
 }
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
