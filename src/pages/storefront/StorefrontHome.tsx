@@ -55,6 +55,7 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [dropoffTime, setDropoffTime] = useState('');
   const [sameReturn, setSameReturn] = useState(true);
+  const [transferCategory, setTransferCategory] = useState<TransferCategory>('economy');
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
   const agencyLocations = useMemo(() => {
