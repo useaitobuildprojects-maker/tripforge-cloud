@@ -278,13 +278,35 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
               </div>
             )}
 
-            {/* Search results from web */}
-            {dedupedSearch.length > 0 && (
+            {/* POI database results (instant, local) */}
+            {grouped.poi.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-t border-border">
+                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${grouped.configured.length > 0 ? 'border-t border-border' : ''}`}>
+                  Popular locations
+                </div>
+                {grouped.poi.map((loc) => {
+                  const Icon = TYPE_ICONS[loc.type] || MapPin;
+                  return (
+                    <button key={loc.id} onClick={() => handleSelect(loc)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left">
+                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{loc.name}</div>
+                        {loc.address && <div className="text-xs text-muted-foreground truncate">{loc.address}</div>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Search results from web (Photon fallback) */}
+            {grouped.searchResults.length > 0 && (
+              <div>
+                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${(grouped.configured.length > 0 || grouped.poi.length > 0) ? 'border-t border-border' : ''}`}>
                   Other places
                 </div>
-                {dedupedSearch.map((loc) => {
+                {grouped.searchResults.map((loc) => {
                   const Icon = TYPE_ICONS[loc.type] || MapPin;
                   return (
                     <button key={loc.id} onClick={() => handleSelect(loc)}
