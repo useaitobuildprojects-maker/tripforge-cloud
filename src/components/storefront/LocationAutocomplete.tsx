@@ -16,6 +16,7 @@ interface LocationAutocompleteProps {
   placeholder?: string;
   locations: LocationOption[];
   agencyCity: string;
+  agencyCountry?: string;
 }
 
 interface PhotonFeature {
@@ -48,7 +49,7 @@ function buildAddress(feat: PhotonFeature): string {
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2 };
 
-const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations }: LocationAutocompleteProps) => {
+const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry }: LocationAutocompleteProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const [searchResults, setSearchResults] = useState<LocationOption[]>([]);
@@ -57,11 +58,22 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const countryHints = useMemo(() => {
+    const fromAgency = (agencyCountry || '')
+      .split(',')
+      .map((c) => c.trim())
+      .filter(Boolean);
+
     const fromAddresses = locations
       .map((l) => l.address?.split(',').pop()?.trim())
       .filter((c): c is string => !!c);
-    return Array.from(new Set(fromAddresses)).slice(0, 3);
-  }, [locations]);
+
+    return Array.from(new Set([...fromAgency, ...fromAddresses])).slice(0, 6);
+  }, [agencyCountry, locations]);
+
+  const countryHintsLower = useMemo(
+    () => new Set(countryHints.map((c) => c.toLowerCase())),
+    [countryHints]
+  );
 
   useEffect(() => { setQuery(value); }, [value]);
 
@@ -79,9 +91,16 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
     setLoading(true);
     try {
+      const normalizedLower = normalized.toLowerCase();
+      const queryAlreadyScopedToCountry = countryHints.some((country) =>
+        normalizedLower.includes(country.toLowerCase())
+      );
+
       const queries = Array.from(new Set([
+        ...(queryAlreadyScopedToCountry || countryHints.length === 0
+          ? [normalized]
+          : countryHints.map((country) => `${normalized}, ${country}`)),
         normalized,
-        ...countryHints.map((country) => `${normalized}, ${country}`),
       ]));
 
       const responses = await Promise.all(
@@ -104,6 +123,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         const name = feat.properties.name || 'Unknown';
         const address = buildAddress(feat);
         const type = detectTypeFromPhoton(feat);
+        const featureCountry = (feat.properties.country || '').toLowerCase();
         const haystack = `${name} ${address}`.toLowerCase();
         const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
         if (seen.has(key)) return;
@@ -119,6 +139,12 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
           if (token.includes('city') && type === 'city') score += 10;
         }
         if (name.toLowerCase().startsWith(tokens[0] || '')) score += 8;
+        if (agencyCity && haystack.includes(agencyCity.toLowerCase())) score += 10;
+
+        if (countryHintsLower.size > 0 && featureCountry) {
+          if (countryHintsLower.has(featureCountry)) score += 28;
+          else score -= 24;
+        }
 
         seen.add(key);
         rankedResults.push({
@@ -132,13 +158,22 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
       });
 
       rankedResults.sort((a, b) => b.score - a.score);
-      setSearchResults(rankedResults.slice(0, 12).map(({ score: _score, ...rest }) => rest));
+
+      const cleanedResults = rankedResults.map(({ score: _score, ...rest }) => rest);
+      const countryScopedResults = countryHintsLower.size > 0
+        ? cleanedResults.filter((loc) => {
+            const haystack = `${loc.name} ${loc.address || ''}`.toLowerCase();
+            return Array.from(countryHintsLower).some((country) => haystack.includes(country));
+          })
+        : cleanedResults;
+
+      setSearchResults((countryScopedResults.length > 0 ? countryScopedResults : cleanedResults).slice(0, 12));
     } catch {
       setSearchResults([]);
     } finally {
       setLoading(false);
     }
-  }, [countryHints]);
+  }, [agencyCity, countryHints, countryHintsLower]);
 
   // Filter configured locations
   const filteredConfigured = locations.filter((loc) =>
