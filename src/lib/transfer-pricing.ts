@@ -8,6 +8,7 @@ export interface TransferQuote {
   price: number;
   source: 'matrix' | 'formula';
   distance_km: number | null;
+  error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
 }
 
 const CATEGORY_PRICE_KEY: Record<TransferCategory, keyof TransferRoute> = {
