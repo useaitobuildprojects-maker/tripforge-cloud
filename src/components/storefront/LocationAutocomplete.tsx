@@ -48,7 +48,7 @@ function buildAddress(feat: PhotonFeature): string {
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2 };
 
-const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity }: LocationAutocompleteProps) => {
+const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations }: LocationAutocompleteProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const [searchResults, setSearchResults] = useState<LocationOption[]>([]);
