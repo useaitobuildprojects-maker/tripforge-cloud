@@ -2,6 +2,7 @@ import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
+import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -54,6 +55,7 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [dropoffTime, setDropoffTime] = useState('');
   const [sameReturn, setSameReturn] = useState(true);
+  const [transferCategory, setTransferCategory] = useState<TransferCategory>('economy');
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
   const agencyLocations = useMemo(() => {
@@ -316,6 +318,30 @@ const StorefrontHome = () => {
                       <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
                       </select>
+                    </div>
+                  </div>
+                  {/* Vehicle Category Selector */}
+                  <div className="pl-8">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-2.5">Vehicle Category</label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {TRANSFER_CATEGORIES.map(cat => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setTransferCategory(cat.id)}
+                          className={`p-3 rounded-xl border-2 text-left transition-all ${
+                            transferCategory === cat.id ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
+                          }`}
+                          style={transferCategory === cat.id ? { borderColor: buttonColor } : undefined}
+                        >
+                          {transferCategory === cat.id && (
+                            <div className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
+                              <Check className="h-2.5 w-2.5" />
+                            </div>
+                          )}
+                          <p className="text-xs font-bold">{cat.label}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{cat.description}</p>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
