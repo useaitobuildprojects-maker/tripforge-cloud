@@ -26,7 +26,7 @@ interface Props {
   country?: string;
 }
 
-const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange }: Props) => {
+const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange, country }: Props) => {
   const hasTransfer = enabledServices.includes('transfer');
   const hasLimo = enabledServices.includes('limo_tour');
   const hasCityTour = enabledServices.includes('city_tour');
