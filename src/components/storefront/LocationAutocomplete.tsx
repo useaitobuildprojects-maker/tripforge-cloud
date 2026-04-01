@@ -86,32 +86,53 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
       const responses = await Promise.all(
         queries.map(async (singleQuery) => {
-          const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(singleQuery)}&limit=6&lang=en`);
+          const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(singleQuery)}&limit=8&lang=en`);
           if (!res.ok) return [];
           const data = await res.json();
           return (data.features || []) as PhotonFeature[];
         })
       );
 
+      const tokens = normalized.toLowerCase().split(/\s+/).filter(Boolean);
+      const genericTokens = new Set(['airport', 'airports', 'station', 'stations', 'city', 'hotel', 'port', 'terminal']);
+      const significantTokens = tokens.filter((t) => !genericTokens.has(t));
+
       const seen = new Set<string>();
-      const mergedResults: LocationOption[] = [];
+      const rankedResults: Array<LocationOption & { score: number }> = [];
 
       responses.flat().forEach((feat) => {
         const name = feat.properties.name || 'Unknown';
         const address = buildAddress(feat);
+        const type = detectTypeFromPhoton(feat);
+        const haystack = `${name} ${address}`.toLowerCase();
         const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
         if (seen.has(key)) return;
+
+        const hasAllSignificantTokens = significantTokens.every((t) => haystack.includes(t));
+        if (significantTokens.length > 0 && !hasAllSignificantTokens) return;
+
+        let score = 0;
+        if (haystack.includes(normalized.toLowerCase())) score += 100;
+        for (const token of tokens) {
+          if (haystack.includes(token)) score += 20;
+          if (token.includes('airport') && type === 'airport') score += 15;
+          if (token.includes('city') && type === 'city') score += 10;
+        }
+        if (name.toLowerCase().startsWith(tokens[0] || '')) score += 8;
+
         seen.add(key);
-        mergedResults.push({
-          id: `search-${mergedResults.length}`,
+        rankedResults.push({
+          id: `search-${rankedResults.length}`,
           name,
-          type: detectTypeFromPhoton(feat),
+          type,
           address,
           source: 'search',
+          score,
         });
       });
 
-      setSearchResults(mergedResults.slice(0, 12));
+      rankedResults.sort((a, b) => b.score - a.score);
+      setSearchResults(rankedResults.slice(0, 12).map(({ score: _score, ...rest }) => rest));
     } catch {
       setSearchResults([]);
     } finally {
