@@ -68,10 +68,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     return Array.from(new Set([...fromAgency, ...fromAddresses])).slice(0, 6);
   }, [agencyCountry, locations]);
 
-  const countryHintsLower = useMemo(
-    () => new Set(countryHints.map((c) => c.toLowerCase())),
-    [countryHints]
-  );
 
   useEffect(() => { setQuery(value); }, [value]);
 
