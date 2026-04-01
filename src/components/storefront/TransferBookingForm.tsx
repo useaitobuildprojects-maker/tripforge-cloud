@@ -2,14 +2,12 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, ArrowRight, Users, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TransferRoute, TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
-import { getMatrixPrice, getFormulaPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { getMatrixPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
@@ -26,19 +24,22 @@ interface Props {
 }
 
 const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => {
-  const locations = config.locations ?? [];
+  const agencyLocations = useMemo(() => {
+    const configLocs = config.locations;
+    if (configLocs && configLocs.length > 0) {
+      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address }));
+    }
+    return getAgencyLocations(agency.city, agency.country);
+  }, [config.locations, agency.city, agency.country]);
+
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [customOrigin, setCustomOrigin] = useState('');
-  const [customDestination, setCustomDestination] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const useCustomOrigin = origin === '__custom__';
-  const useCustomDest = destination === '__custom__';
-  const effectiveOrigin = useCustomOrigin ? customOrigin : origin;
-  const effectiveDest = useCustomDest ? customDestination : destination;
+  const effectiveOrigin = origin;
+  const effectiveDest = destination;
 
   // Quick matrix prices for all categories (instant, no API call)
   const matrixPrices = useMemo(() => {
@@ -77,10 +78,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
     window.open(url, '_blank');
   };
 
-  const availableDestinations = useMemo(() => {
-    return locations.filter(l => l.name !== origin);
-  }, [locations, origin]);
-
   return (
     <div className="max-w-2xl mx-auto">
       <motion.div
@@ -99,28 +96,13 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
             <Label className="text-xs font-medium flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup
             </Label>
-            <Select value={origin} onValueChange={(v) => { setOrigin(v); setQuote(null); }}>
-              <SelectTrigger className="text-sm"><SelectValue placeholder="Select pickup..." /></SelectTrigger>
-              <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.name} value={loc.name}>
-                    <span className="flex items-center gap-2">
-                      {loc.name}
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{loc.type}</Badge>
-                    </span>
-                  </SelectItem>
-                ))}
-                <SelectItem value="__custom__">✏️ Enter custom address</SelectItem>
-              </SelectContent>
-            </Select>
-            {useCustomOrigin && (
-              <Input
-                placeholder="Enter address..."
-                value={customOrigin}
-                onChange={(e) => { setCustomOrigin(e.target.value); setQuote(null); }}
-                className="text-sm mt-1"
-              />
-            )}
+            <LocationAutocomplete
+              value={origin}
+              onChange={(v) => { setOrigin(v); setQuote(null); }}
+              placeholder="Airport, hotel, or address"
+              locations={agencyLocations}
+              agencyCity={agency.city}
+            />
           </div>
 
           <div className="hidden md:flex items-center justify-center pb-1">
@@ -131,28 +113,13 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
             <Label className="text-xs font-medium flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off
             </Label>
-            <Select value={destination} onValueChange={(v) => { setDestination(v); setQuote(null); }}>
-              <SelectTrigger className="text-sm"><SelectValue placeholder="Select drop-off..." /></SelectTrigger>
-              <SelectContent>
-                {availableDestinations.map((loc) => (
-                  <SelectItem key={loc.name} value={loc.name}>
-                    <span className="flex items-center gap-2">
-                      {loc.name}
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{loc.type}</Badge>
-                    </span>
-                  </SelectItem>
-                ))}
-                <SelectItem value="__custom__">✏️ Enter custom address</SelectItem>
-              </SelectContent>
-            </Select>
-            {useCustomDest && (
-              <Input
-                placeholder="Enter address..."
-                value={customDestination}
-                onChange={(e) => { setCustomDestination(e.target.value); setQuote(null); }}
-                className="text-sm mt-1"
-              />
-            )}
+            <LocationAutocomplete
+              value={destination}
+              onChange={(v) => { setDestination(v); setQuote(null); }}
+              placeholder="Destination address"
+              locations={agencyLocations}
+              agencyCity={agency.city}
+            />
           </div>
         </div>
 
