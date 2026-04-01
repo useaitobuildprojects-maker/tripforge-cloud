@@ -97,9 +97,9 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const searchPhoton = useCallback(async (q: string) => {
+  const searchLocation = useCallback(async (q: string) => {
     const normalized = q.trim();
-    if (normalized.length < 1) { setSearchResults([]); return; }
+    if (normalized.length < 2) { setSearchResults([]); return; }
 
     setLoading(true);
     try {
@@ -117,10 +117,12 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
       const responses = await Promise.all(
         queries.map(async (singleQuery) => {
-          const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(singleQuery)}&limit=8&lang=en`);
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(singleQuery)}&format=json&addressdetails=1&limit=8&accept-language=en`,
+            { headers: { 'User-Agent': 'LovableTransferApp/1.0' } }
+          );
           if (!res.ok) return [];
-          const data = await res.json();
-          return (data.features || []) as PhotonFeature[];
+          return (await res.json()) as NominatimResult[];
         })
       );
 
@@ -131,11 +133,11 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
       const seen = new Set<string>();
       const rankedResults: Array<LocationOption & { score: number }> = [];
 
-      responses.flat().forEach((feat) => {
-        const name = feat.properties.name || 'Unknown';
-        const address = buildAddress(feat);
-        const type = detectTypeFromPhoton(feat);
-        const featureCountry = (feat.properties.country || '').toLowerCase();
+      responses.flat().forEach((result) => {
+        const name = result.name || result.display_name.split(',')[0];
+        const address = buildNominatimAddress(result);
+        const type = detectTypeFromNominatim(result);
+        const featureCountry = (result.address?.country || '').toLowerCase();
         const haystack = `${name} ${address}`.toLowerCase();
         const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
         if (seen.has(key)) return;
@@ -144,7 +146,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         if (significantTokens.length > 0 && !hasAllSignificantTokens) return;
 
         let score = 0;
-        if (haystack.includes(normalized.toLowerCase())) score += 100;
+        if (haystack.includes(normalizedLower)) score += 100;
         for (const token of tokens) {
           if (haystack.includes(token)) score += 20;
           if (token.includes('airport') && type === 'airport') score += 15;
@@ -159,23 +161,15 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         }
 
         seen.add(key);
-        rankedResults.push({
-          id: `search-${rankedResults.length}`,
-          name,
-          type,
-          address,
-          source: 'search',
-          score,
-        });
+        rankedResults.push({ id: `search-${rankedResults.length}`, name, type, address, source: 'search', score });
       });
 
       rankedResults.sort((a, b) => b.score - a.score);
-
       const cleanedResults = rankedResults.map(({ score: _score, ...rest }) => rest);
       const countryScopedResults = countryHintsLower.size > 0
         ? cleanedResults.filter((loc) => {
-            const haystack = `${loc.name} ${loc.address || ''}`.toLowerCase();
-            return Array.from(countryHintsLower).some((country) => haystack.includes(country));
+            const h = `${loc.name} ${loc.address || ''}`.toLowerCase();
+            return Array.from(countryHintsLower).some((country) => h.includes(country));
           })
         : cleanedResults;
 
