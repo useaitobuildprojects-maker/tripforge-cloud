@@ -20,31 +20,42 @@ interface LocationAutocompleteProps {
   agencyCountry?: string;
 }
 
-interface PhotonFeature {
-  properties: {
-    name?: string;
+interface NominatimResult {
+  display_name: string;
+  name?: string;
+  type?: string;
+  class?: string;
+  address?: {
     city?: string;
+    town?: string;
     state?: string;
     country?: string;
-    osm_value?: string;
-    osm_key?: string;
+    aerodrome?: string;
   };
 }
 
-function detectTypeFromPhoton(feat: PhotonFeature): LocationOption['type'] {
-  const { osm_value, osm_key, name } = feat.properties;
-  const lower = (name || '').toLowerCase();
-  if (osm_value === 'aerodrome' || osm_key === 'aeroway' || lower.includes('airport') || lower.includes('aéroport')) return 'airport';
-  if (osm_value === 'city' || osm_value === 'town' || osm_value === 'village' || osm_key === 'place') return 'city';
+function detectTypeFromNominatim(result: NominatimResult): LocationOption['type'] {
+  const cls = result.class || '';
+  const type = result.type || '';
+  const name = (result.name || result.display_name).toLowerCase();
+  if (cls === 'aeroway' || type === 'aerodrome' || name.includes('airport') || name.includes('aéroport')) return 'airport';
+  if (type === 'city' || type === 'town' || type === 'village' || cls === 'place') return 'city';
   return 'station';
 }
 
-function buildAddress(feat: PhotonFeature): string {
-  const p = feat.properties;
+function buildNominatimAddress(result: NominatimResult): string {
+  const addr = result.address;
+  if (!addr) {
+    // Extract last 2-3 parts from display_name
+    const parts = result.display_name.split(',').map(s => s.trim());
+    return parts.slice(1, 4).join(', ');
+  }
   const parts: string[] = [];
-  if (p.city && p.city !== p.name) parts.push(p.city);
-  if (p.state) parts.push(p.state);
-  if (p.country) parts.push(p.country);
+  const city = addr.city || addr.town;
+  const name = result.name || '';
+  if (city && city !== name) parts.push(city);
+  if (addr.state) parts.push(addr.state);
+  if (addr.country) parts.push(addr.country);
   return parts.join(', ');
 }
 
