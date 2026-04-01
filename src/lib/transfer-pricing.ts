@@ -73,18 +73,19 @@ export async function getOsrmDistance(
   }
 }
 
-/** Geocode a place name using Photon (free) and return [lng, lat] */
+/** Geocode a place name using Nominatim (OSM) and return [lng, lat] */
 export async function geocodePlace(name: string, country?: string): Promise<[number, number] | null> {
   try {
     const query = country ? `${name}, ${country}` : name;
-    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
     console.log('[Transfer] Geocoding:', query);
-    const res = await fetch(url);
-    if (!res.ok) { console.warn('[Transfer] Photon HTTP error:', res.status); return null; }
+    const res = await fetch(url, { headers: { 'User-Agent': 'LovableTransferApp/1.0' } });
+    if (!res.ok) { console.warn('[Transfer] Nominatim HTTP error:', res.status); return null; }
     const data = await res.json();
-    const feature = data.features?.[0];
-    if (!feature) { console.warn('[Transfer] No geocode result for:', query); return null; }
-    const [lng, lat] = feature.geometry.coordinates;
+    const result = data?.[0];
+    if (!result) { console.warn('[Transfer] No geocode result for:', query); return null; }
+    const lng = parseFloat(result.lon);
+    const lat = parseFloat(result.lat);
     console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
     return [lng, lat];
   } catch (e) {
