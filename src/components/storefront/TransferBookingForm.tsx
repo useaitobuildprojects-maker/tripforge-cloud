@@ -259,9 +259,17 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
                 {quote && quote.price === 0 && (
                   <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
                     <AlertCircle className="h-5 w-5 mx-auto mb-2 text-destructive" />
-                    <p className="text-sm font-medium">Price unavailable for this route</p>
+                    <p className="text-sm font-medium">
+                      {quote.error === 'no_formula' && 'Pricing formula not configured'}
+                      {quote.error === 'geocode_origin' && `Could not locate "${effectiveOrigin}"`}
+                      {quote.error === 'geocode_destination' && `Could not locate "${effectiveDest}"`}
+                      {quote.error === 'osrm_failed' && 'Could not calculate route distance'}
+                      {!quote.error && 'Price unavailable for this route'}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Please contact us directly for a custom quote.
+                      {quote.error === 'no_formula'
+                        ? 'The agency has not set up distance-based pricing yet.'
+                        : 'Please contact us directly for a custom quote.'}
                     </p>
                     {config.whatsapp_number && (
                       <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={() => {

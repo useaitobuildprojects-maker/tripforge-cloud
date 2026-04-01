@@ -8,6 +8,7 @@ export interface TransferQuote {
   price: number;
   source: 'matrix' | 'formula';
   distance_km: number | null;
+  error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
 }
 
 const CATEGORY_PRICE_KEY: Record<TransferCategory, keyof TransferRoute> = {
@@ -75,19 +76,19 @@ export async function getOsrmDistance(
 /** Geocode a place name using Photon (free) and return [lng, lat] */
 export async function geocodePlace(name: string, country?: string): Promise<[number, number] | null> {
   try {
-    let url = `https://photon.komoot.io/api/?q=${encodeURIComponent(name)}&limit=1`;
-    if (country) {
-      // Photon uses ISO country codes — attempt a simple mapping isn't reliable
-      // but the name itself usually disambiguates
-    }
+    const query = country ? `${name}, ${country}` : name;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`;
+    console.log('[Transfer] Geocoding:', query);
     const res = await fetch(url);
-    if (!res.ok) return null;
+    if (!res.ok) { console.warn('[Transfer] Photon HTTP error:', res.status); return null; }
     const data = await res.json();
     const feature = data.features?.[0];
-    if (!feature) return null;
+    if (!feature) { console.warn('[Transfer] No geocode result for:', query); return null; }
     const [lng, lat] = feature.geometry.coordinates;
+    console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
     return [lng, lat];
-  } catch {
+  } catch (e) {
+    console.error('[Transfer] Geocode error:', e);
     return null;
   }
 }
@@ -101,9 +102,13 @@ export async function calculateTransferPrice(
   category: TransferCategory,
   country?: string
 ): Promise<TransferQuote> {
+  console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
+  console.log('[Transfer] Config:', { base: config.transfer_base_fee, perKm: config.transfer_per_km_rate });
+
   // 1. Check matrix
   const matrixPrice = getMatrixPrice(routes, origin, destination, category);
   if (matrixPrice !== null) {
+    console.log('[Transfer] Matrix hit:', matrixPrice);
     return { origin, destination, category, price: matrixPrice, source: 'matrix', distance_km: null };
   }
 
@@ -111,8 +116,8 @@ export async function calculateTransferPrice(
   const baseFee = config.transfer_base_fee ?? 0;
   const perKmRate = config.transfer_per_km_rate ?? 0;
   if (baseFee === 0 && perKmRate === 0) {
-    // No formula configured — return 0
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+    console.warn('[Transfer] No formula configured (base=0, perKm=0)');
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'no_formula' };
   }
 
   const [originCoords, destCoords] = await Promise.all([
@@ -120,15 +125,20 @@ export async function calculateTransferPrice(
     geocodePlace(destination, country),
   ]);
 
-  if (!originCoords || !destCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+  if (!originCoords) {
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_origin' };
+  }
+  if (!destCoords) {
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_destination' };
   }
 
   const distanceKm = await getOsrmDistance(originCoords, destCoords);
   if (!distanceKm) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+    console.warn('[Transfer] OSRM returned no distance');
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'osrm_failed' };
   }
 
   const price = getFormulaPrice(config, distanceKm, category);
+  console.log('[Transfer] Formula result:', { distanceKm, price });
   return { origin, destination, category, price, source: 'formula', distance_km: distanceKm };
 }
