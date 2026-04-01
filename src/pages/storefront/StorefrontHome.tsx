@@ -2,7 +2,7 @@ import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
-import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
+import { useTransferRoutes } from '@/hooks/use-service-pricing';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -12,6 +12,7 @@ import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
+import TransferBookingForm from '@/components/storefront/TransferBookingForm';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -43,6 +44,7 @@ const StorefrontHome = () => {
 
   const enabledServices = agency.services ?? [];
   const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
+  const { data: transferRoutes = [] } = useTransferRoutes(agency.id);
 
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>(enabledServices[0] ?? 'car_rental');
@@ -55,7 +57,6 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [dropoffTime, setDropoffTime] = useState('');
   const [sameReturn, setSameReturn] = useState(true);
-  const [transferCategory, setTransferCategory] = useState<TransferCategory>('economy');
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
   const agencyLocations = useMemo(() => {
