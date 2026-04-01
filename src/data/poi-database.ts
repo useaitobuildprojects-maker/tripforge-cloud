@@ -370,15 +370,19 @@ export function searchPOIs(query: string, countries: string): POI[] {
       const haystack = `${poi.name} ${poi.address} ${poi.iata || ''}`.toLowerCase();
       let score = 0;
 
-      // All tokens must match
-      const allMatch = tokens.every((t) => haystack.includes(t));
-      if (!allMatch) return null;
+      // Count matching tokens — require at least half to match
+      const matchCount = tokens.filter((t) => haystack.includes(t)).length;
+      if (matchCount === 0) return null;
+      if (tokens.length > 1 && matchCount < Math.ceil(tokens.length * 0.5)) return null;
 
-      // Exact IATA match
-      if (poi.iata && tokens.some((t) => t === poi.iata!.toLowerCase())) score += 200;
+      // Bonus for all tokens matching
+      if (matchCount === tokens.length) score += 100;
+
+      // Partial match bonus
+      score += matchCount * 15;
 
       // Full query match
-      if (haystack.includes(query.toLowerCase())) score += 100;
+      if (haystack.includes(query.toLowerCase())) score += 80;
 
       // Name starts with first token
       if (poi.name.toLowerCase().startsWith(tokens[0])) score += 50;
