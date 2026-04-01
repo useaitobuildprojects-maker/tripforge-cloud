@@ -225,12 +225,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     setOpen(false);
   };
 
-  const grouped = {
-    configured: filteredConfigured,
-    searchAirport: dedupedSearch.filter((l) => l.type === 'airport'),
-    searchCity: dedupedSearch.filter((l) => l.type === 'city'),
-    searchStation: dedupedSearch.filter((l) => l.type === 'station'),
-  };
+
+
 
   return (
     <div ref={wrapperRef} className="relative">
