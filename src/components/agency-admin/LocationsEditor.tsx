@@ -81,10 +81,32 @@ const LocationsEditor = ({ locations, onChange, country }: LocationsEditorProps)
     if (q.length < 2) { setResults([]); return; }
     setLoading(true);
     try {
-      const searchQuery = country ? `${q}, ${country}` : q;
-      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=8&lang=en`);
-      const data = await res.json();
-      setResults(data.features || []);
+      // Support multiple comma-separated countries
+      const countries = country ? country.split(',').map(c => c.trim()).filter(Boolean) : [];
+      let allResults: PhotonFeature[] = [];
+      if (countries.length > 1) {
+        // Search in parallel across all countries
+        const fetches = countries.map(c =>
+          fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(`${q}, ${c}`)}&limit=5&lang=en`)
+            .then(r => r.json()).then(d => (d.features || []) as PhotonFeature[]).catch(() => [] as PhotonFeature[])
+        );
+        const results = await Promise.all(fetches);
+        // Deduplicate by name
+        const seen = new Set<string>();
+        for (const group of results) {
+          for (const f of group) {
+            const key = (f.properties.name || '').toLowerCase();
+            if (!seen.has(key)) { seen.add(key); allResults.push(f); }
+          }
+        }
+        allResults = allResults.slice(0, 10);
+      } else {
+        const searchQuery = countries[0] ? `${q}, ${countries[0]}` : q;
+        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=8&lang=en`);
+        const data = await res.json();
+        allResults = data.features || [];
+      }
+      setResults(allResults);
       setShowDropdown(true);
     } catch {
       setResults([]);
