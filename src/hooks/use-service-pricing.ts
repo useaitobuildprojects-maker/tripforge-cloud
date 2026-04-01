@@ -85,7 +85,7 @@ export const useAddTransferRoute = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: Omit<TransferRoute, 'id' | 'created_at'>) => {
-      const { data, error } = await supabase.from('transfer_routes').insert(input).select().single();
+      const { data, error } = await supabase.from('transfer_routes').insert(input as any).select().single();
       if (error) throw error;
       return data;
     },
