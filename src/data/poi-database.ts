@@ -191,7 +191,7 @@ const DB: POI[] = [
   { name: 'Amsterdam Centraal Station', type: 'station', address: 'Amsterdam, Netherlands', country: 'Netherlands' },
 
   // ─── Austria ───────────────────────────────────────────────
-  { name: 'Vienna International Airport', type: 'airport', address: 'Vienna, Austria', country: 'Austria', iata: 'VIE' },
+  { name: 'Vienna-Schwechat International Airport', type: 'airport', address: 'Vienna, Austria', country: 'Austria', iata: 'VIE' },
   { name: 'Salzburg Airport', type: 'airport', address: 'Salzburg, Austria', country: 'Austria', iata: 'SZG' },
   { name: 'Innsbruck Airport', type: 'airport', address: 'Innsbruck, Austria', country: 'Austria', iata: 'INN' },
   { name: 'Vienna', type: 'city', address: 'Austria', country: 'Austria' },
