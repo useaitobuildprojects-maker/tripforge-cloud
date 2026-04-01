@@ -108,104 +108,116 @@ const StorefrontServiceDetail = () => {
         </div>
       </section>
 
-      {/* Listings with Filter Sidebar */}
-      <section className={`py-16 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-              {service === 'apartment' ? 'Available Apartments' : service === 'car_rental' ? 'Choose Your Vehicle' : 'Available Packages'}
-            </h2>
-            <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
-              <SlidersHorizontal className="h-4 w-4" /> Filter
-              {activeFilterCount > 0 && (
-                <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
-                  {activeFilterCount}
-                </span>
-              )}
-            </Button>
-          </div>
+      {isTransfer ? (
+        /* Transfer Booking Form */
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <TransferBookingForm
+            agency={agency}
+            config={cfg}
+            routes={transferRoutes}
+            buttonColor={buttonColor}
+          />
+        </section>
+      ) : (
+        /* Vehicle/Package Listings with Filter Sidebar */
+        <section className={`py-16 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+                {service === 'apartment' ? 'Available Apartments' : service === 'car_rental' ? 'Choose Your Vehicle' : 'Available Packages'}
+              </h2>
+              <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
+                <SlidersHorizontal className="h-4 w-4" /> Filter
+                {activeFilterCount > 0 && (
+                  <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            </div>
 
-          <div className="flex gap-8">
-            <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
+            <div className="flex gap-8">
+              <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
 
-            {mobileFiltersOpen && (
-              <div className="fixed inset-0 z-50 lg:hidden">
-                <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
-                <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background p-6 overflow-y-auto shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-bold text-lg">Filters</span>
-                    <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
-                  </div>
-                  <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
-                </div>
-              </div>
-            )}
-
-            <div className="flex-1 min-w-0">
-              {vehiclesLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="rounded-xl border border-current/10 overflow-hidden" style={ts.cardStyle}>
-                      <Skeleton className="h-44 w-full" />
-                      <div className="p-5">
-                        <Skeleton className="h-5 w-3/4 mb-2" />
-                        <Skeleton className="h-4 w-1/2 mb-4" />
-                        <Skeleton className="h-10 w-full" />
-                      </div>
+              {mobileFiltersOpen && (
+                <div className="fixed inset-0 z-50 lg:hidden">
+                  <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
+                  <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background p-6 overflow-y-auto shadow-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-bold text-lg">Filters</span>
+                      <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
                     </div>
-                  ))}
+                    <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
+                  </div>
                 </div>
-              ) : filteredVehicles.length === 0 ? (
-                <div className="text-center py-16 opacity-50">
-                  <Icon className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">
-                    {hasAnyFilter(filters) ? 'No vehicles match your filters. Try adjusting your criteria.' : 'No listings available at the moment. Check back soon!'}
-                  </p>
-                  {hasAnyFilter(filters) && (
-                    <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>
-                      Clear all filters
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm opacity-50 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
+              )}
+
+              <div className="flex-1 min-w-0">
+                {vehiclesLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredVehicles.map((vehicle, i) => (
-                      <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                        className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg" style={ts.cardStyle}>
-                        {vehicle.photo_url ? (
-                          <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
-                        ) : (
-                          <div className="h-44 flex items-center justify-center opacity-10 bg-current">
-                            <Icon className="h-14 w-14" />
-                          </div>
-                        )}
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="rounded-xl border border-current/10 overflow-hidden" style={ts.cardStyle}>
+                        <Skeleton className="h-44 w-full" />
                         <div className="p-5">
-                          <h3 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h3>
-                          <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
-                          <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                            {vehicle.daily_rate ? (
-                              <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / {service === 'apartment' ? 'night' : 'day'}</span></p>
-                            ) : (
-                              <p className="text-sm opacity-50">Contact for price</p>
-                            )}
-                            <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2" style={{ borderColor: buttonColor, color: buttonColor }}
-                              onMouseEnter={e => { const el = e.target as HTMLElement; el.style.backgroundColor = buttonColor; el.style.color = '#fff'; }}
-                              onMouseLeave={e => { const el = e.target as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = buttonColor; }}>
-                              {cfg.cta_text || 'Book Now'}
-                            </Button>
-                          </div>
+                          <Skeleton className="h-5 w-3/4 mb-2" />
+                          <Skeleton className="h-4 w-1/2 mb-4" />
+                          <Skeleton className="h-10 w-full" />
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
-                </>
-              )}
+                ) : filteredVehicles.length === 0 ? (
+                  <div className="text-center py-16 opacity-50">
+                    <Icon className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">
+                      {hasAnyFilter(filters) ? 'No vehicles match your filters. Try adjusting your criteria.' : 'No listings available at the moment. Check back soon!'}
+                    </p>
+                    {hasAnyFilter(filters) && (
+                      <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>
+                        Clear all filters
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm opacity-50 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                      {filteredVehicles.map((vehicle, i) => (
+                        <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                          className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg" style={ts.cardStyle}>
+                          {vehicle.photo_url ? (
+                            <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
+                          ) : (
+                            <div className="h-44 flex items-center justify-center opacity-10 bg-current">
+                              <Icon className="h-14 w-14" />
+                            </div>
+                          )}
+                          <div className="p-5">
+                            <h3 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h3>
+                            <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
+                            <div className="flex items-center justify-between pt-3 border-t border-current/10">
+                              {vehicle.daily_rate ? (
+                                <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / {service === 'apartment' ? 'night' : 'day'}</span></p>
+                              ) : (
+                                <p className="text-sm opacity-50">Contact for price</p>
+                              )}
+                              <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2" style={{ borderColor: buttonColor, color: buttonColor }}
+                                onMouseEnter={e => { const el = e.target as HTMLElement; el.style.backgroundColor = buttonColor; el.style.color = '#fff'; }}
+                                onMouseLeave={e => { const el = e.target as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = buttonColor; }}>
+                                {cfg.cta_text || 'Book Now'}
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
