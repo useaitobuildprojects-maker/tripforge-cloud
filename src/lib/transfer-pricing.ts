@@ -76,19 +76,19 @@ export async function getOsrmDistance(
 /** Geocode a place name using Photon (free) and return [lng, lat] */
 export async function geocodePlace(name: string, country?: string): Promise<[number, number] | null> {
   try {
-    let url = `https://photon.komoot.io/api/?q=${encodeURIComponent(name)}&limit=1`;
-    if (country) {
-      // Photon uses ISO country codes — attempt a simple mapping isn't reliable
-      // but the name itself usually disambiguates
-    }
+    const query = country ? `${name}, ${country}` : name;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=1`;
+    console.log('[Transfer] Geocoding:', query);
     const res = await fetch(url);
-    if (!res.ok) return null;
+    if (!res.ok) { console.warn('[Transfer] Photon HTTP error:', res.status); return null; }
     const data = await res.json();
     const feature = data.features?.[0];
-    if (!feature) return null;
+    if (!feature) { console.warn('[Transfer] No geocode result for:', query); return null; }
     const [lng, lat] = feature.geometry.coordinates;
+    console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
     return [lng, lat];
-  } catch {
+  } catch (e) {
+    console.error('[Transfer] Geocode error:', e);
     return null;
   }
 }
