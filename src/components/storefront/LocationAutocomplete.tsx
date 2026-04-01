@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Plane, X, Search, Loader2, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { searchPOIs } from '@/data/poi-database';
 
 interface LocationOption {
   id: string;
   name: string;
-  type: 'station' | 'airport' | 'city';
+  type: 'station' | 'airport' | 'city' | 'hotel_zone';
   address?: string;
-  source?: 'configured' | 'search';
+  source?: 'configured' | 'search' | 'poi';
 }
 
 interface LocationAutocompleteProps {
