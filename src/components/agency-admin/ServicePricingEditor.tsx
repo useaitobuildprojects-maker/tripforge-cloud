@@ -75,7 +75,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 };
 
 // ── Transfer Tab with Zone Matrix ──
-const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
   const addRoute = useAddTransferRoute();
   const deleteRoute = useDeleteTransferRoute();
