@@ -23,6 +23,7 @@ interface Props {
   enabledServices: string[];
   storefrontConfig: StorefrontConfig;
   onConfigChange: (config: StorefrontConfig) => void;
+  country?: string;
 }
 
 const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange }: Props) => {
