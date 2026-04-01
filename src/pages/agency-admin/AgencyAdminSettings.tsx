@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry, StorefrontTemplate, StorefrontConfig } from '@/types/agency';
@@ -14,11 +14,29 @@ import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
 import ServicePricingEditor from '@/components/agency-admin/ServicePricingEditor';
 
-
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
+
+const COUNTRY_LIST = [
+  'Afghanistan','Albania','Algeria','Andorra','Angola','Argentina','Armenia','Australia','Austria','Azerbaijan',
+  'Bahrain','Bangladesh','Belarus','Belgium','Benin','Bolivia','Bosnia and Herzegovina','Brazil','Brunei','Bulgaria',
+  'Burkina Faso','Cambodia','Cameroon','Canada','Chad','Chile','China','Colombia','Comoros','Congo','Costa Rica',
+  'Croatia','Cuba','Cyprus','Czech Republic','Denmark','Djibouti','Dominican Republic','DR Congo','Ecuador','Egypt',
+  'El Salvador','Equatorial Guinea','Eritrea','Estonia','Eswatini','Ethiopia','Fiji','Finland','France','Gabon',
+  'Gambia','Georgia','Germany','Ghana','Greece','Guatemala','Guinea','Haiti','Honduras','Hungary','Iceland','India',
+  'Indonesia','Iran','Iraq','Ireland','Israel','Italy','Ivory Coast','Jamaica','Japan','Jordan','Kazakhstan','Kenya',
+  'Kosovo','Kuwait','Kyrgyzstan','Laos','Latvia','Lebanon','Lesotho','Liberia','Libya','Liechtenstein','Lithuania',
+  'Luxembourg','Madagascar','Malawi','Malaysia','Maldives','Mali','Malta','Mauritania','Mauritius','Mexico','Moldova',
+  'Monaco','Mongolia','Montenegro','Morocco','Mozambique','Myanmar','Namibia','Nepal','Netherlands','New Zealand',
+  'Nicaragua','Niger','Nigeria','North Korea','North Macedonia','Norway','Oman','Pakistan','Palestine','Panama',
+  'Paraguay','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Rwanda','Saudi Arabia','Senegal',
+  'Serbia','Sierra Leone','Singapore','Slovakia','Slovenia','Somalia','South Africa','South Korea','South Sudan',
+  'Spain','Sri Lanka','Sudan','Suriname','Sweden','Switzerland','Syria','Taiwan','Tajikistan','Tanzania','Thailand',
+  'Togo','Trinidad and Tobago','Tunisia','Turkey','Turkmenistan','UAE','Uganda','Ukraine','United Kingdom',
+  'United States','Uruguay','Uzbekistan','Vatican City','Venezuela','Vietnam','Yemen','Zambia','Zimbabwe',
+];
 
 const OgImageUpload = ({ currentUrl, agencyId, agencySlug, onUploaded }: { currentUrl: string; agencyId: string; agencySlug: string; onUploaded: (url: string) => void }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +108,36 @@ const AgencyAdminSettings = () => {
     services: agency.services as string[],
   });
 
+  // Country autocomplete
+  const [countryQuery, setCountryQuery] = useState('');
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const countryWrapperRef = useRef<HTMLDivElement>(null);
+  const countryInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedCountries = useMemo(() => form.country.split(',').filter(Boolean).map(s => s.trim().toLowerCase()), [form.country]);
+
+  const filteredCountries = useMemo(() => {
+    if (!countryQuery.trim()) return COUNTRY_LIST.filter(c => !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
+    const q = countryQuery.toLowerCase();
+    return COUNTRY_LIST.filter(c => c.toLowerCase().includes(q) && !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
+  }, [countryQuery, selectedCountries]);
+
+  const addCountry = (val: string) => {
+    if (selectedCountries.includes(val.toLowerCase())) return;
+    const newCountry = form.country ? `${form.country}, ${val}` : val;
+    setForm(f => ({ ...f, country: newCountry }));
+    setCountryQuery('');
+    setShowCountryDropdown(false);
+  };
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (countryWrapperRef.current && !countryWrapperRef.current.contains(e.target as Node)) setShowCountryDropdown(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const [pageSeo, setPageSeo] = useState<Record<StorefrontPage, PageSeoEntry>>(() => {
     const existing = agency.page_seo ?? {};
     return {
@@ -114,7 +162,6 @@ const AgencyAdminSettings = () => {
   };
 
   const handleSave = async () => {
-    // Clean page_seo: only include entries with at least one value
     const cleanedPageSeo: PageSeo = {};
     for (const page of seoPages) {
       const entry = pageSeo[page];
@@ -137,7 +184,6 @@ const AgencyAdminSettings = () => {
       country: form.country,
       services: form.services,
       domain: form.domain || undefined,
-      // Keep legacy fields from home page SEO
       meta_title: pageSeo.home.meta_title || undefined,
       meta_description: pageSeo.home.meta_description || undefined,
       og_image: pageSeo.home.og_image || undefined,
@@ -321,7 +367,7 @@ const AgencyAdminSettings = () => {
             <Label htmlFor="city">City</Label>
             <Input id="city" value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 relative" ref={countryWrapperRef}>
             <Label>Countries</Label>
             <div className="flex flex-wrap gap-1.5 p-2 min-h-[40px] rounded-md border border-input bg-background">
               {form.country.split(',').filter(Boolean).map((c, i) => (
@@ -341,23 +387,37 @@ const AgencyAdminSettings = () => {
                 </span>
               ))}
               <input
+                ref={countryInputRef}
+                value={countryQuery}
+                onChange={(e) => setCountryQuery(e.target.value)}
                 className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                placeholder="Type country & press Enter..."
+                placeholder="Type to search countries..."
+                onFocus={() => setShowCountryDropdown(true)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const val = (e.target as HTMLInputElement).value.trim();
+                    const val = countryQuery.trim();
                     if (!val) return;
-                    const existing = form.country.split(',').filter(Boolean).map(s => s.trim().toLowerCase());
-                    if (existing.includes(val.toLowerCase())) return;
-                    const newCountry = form.country ? `${form.country}, ${val}` : val;
-                    setForm(f => ({ ...f, country: newCountry }));
-                    (e.target as HTMLInputElement).value = '';
+                    addCountry(filteredCountries[0] || val);
                   }
                 }}
               />
             </div>
-            <p className="text-[10px] text-muted-foreground">Add multiple countries where this agency operates. Location search will cover all of them.</p>
+            {showCountryDropdown && filteredCountries.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-popover border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                {filteredCountries.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => addCountry(c)}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-accent/50 transition-colors"
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
+            <p className="text-[10px] text-muted-foreground">Add multiple countries where this agency operates.</p>
           </div>
         </div>
         <div className="space-y-2">
@@ -412,22 +472,20 @@ const AgencyAdminSettings = () => {
                   maxLength={60}
                   placeholder={`e.g. ${PAGE_LABELS[page]} | ${agency.name}`}
                 />
-                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_title ?? '').length}/60 characters</p>
+                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_title ?? '').length}/60</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`${page}-desc`}>
                   Meta Description <span className="text-muted-foreground font-normal">(max 160 chars)</span>
                 </Label>
-                <textarea
+                <Input
                   id={`${page}-desc`}
                   value={pageSeo[page].meta_description ?? ''}
                   onChange={(e) => updatePageSeo(page, 'meta_description', e.target.value)}
                   maxLength={160}
-                  rows={2}
-                  placeholder={`Describe the ${PAGE_LABELS[page].toLowerCase()} page...`}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder={`Describe the ${PAGE_LABELS[page].toLowerCase()} page for search engines...`}
                 />
-                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_description ?? '').length}/160 characters</p>
+                <p className="text-[10px] text-muted-foreground">{(pageSeo[page].meta_description ?? '').length}/160</p>
               </div>
               <div className="space-y-2">
                 <Label>OG Image</Label>
@@ -442,7 +500,6 @@ const AgencyAdminSettings = () => {
           ))}
         </Tabs>
       </motion.div>
-
 
       {/* Marketplace Commission */}
       <motion.div
