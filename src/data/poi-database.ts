@@ -359,10 +359,13 @@ export function getPOIsForCountries(countries: string): POI[] {
 export function searchPOIs(query: string, countries: string): POI[] {
   if (!query || query.trim().length < 1) return [];
 
-  const pool = getPOIsForCountries(countries);
+  // Search ALL POIs, but boost agency countries
+  const countryList = new Set(
+    countries.split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
+  );
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
-  const scored = pool
+  const scored = DB
     .map((poi) => {
       const haystack = `${poi.name} ${poi.address} ${poi.iata || ''}`.toLowerCase();
       let score = 0;
@@ -389,11 +392,14 @@ export function searchPOIs(query: string, countries: string): POI[] {
       // Type bonus for airports (most common transfer)
       if (poi.type === 'airport') score += 5;
 
+      // Boost agency's own countries
+      if (countryList.size > 0 && countryList.has(poi.country.toLowerCase())) score += 30;
+
       return { ...poi, score };
     })
     .filter((r): r is POI & { score: number } => r !== null)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
+    .slice(0, 15);
 
   return scored.map(({ score: _, ...rest }) => rest);
 }
