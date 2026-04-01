@@ -89,11 +89,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
     setLoading(true);
     try {
-      const normalizedLower = normalized.toLowerCase();
-      const queryAlreadyScopedToCountry = countryHints.some((country) =>
-        normalizedLower.includes(country.toLowerCase())
-      );
-
       const token = import.meta.env.VITE_MAPBOX_TOKEN;
       if (!token) { setSearchResults([]); setLoading(false); return; }
 
