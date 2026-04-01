@@ -182,11 +182,35 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     (loc.address && loc.address.toLowerCase().includes(query.toLowerCase()))
   );
 
-  // Merge: configured first, then search results (deduplicated)
-  const configuredNames = new Set(filteredConfigured.map((l) => l.name.toLowerCase()));
-  const dedupedSearch = searchResults.filter((r) => !configuredNames.has(r.name.toLowerCase()));
-  const allResults = [...filteredConfigured, ...dedupedSearch];
+  // POI results (instant, from local database)
+  const poiResults = useMemo(() => {
+    if (!query || query.length < 1) return [];
+    const pois = searchPOIs(query, agencyCountry || '');
+    const configuredNames = new Set(locations.map((l) => l.name.toLowerCase()));
+    return pois
+      .filter((p) => !configuredNames.has(p.name.toLowerCase()))
+      .map((p, i) => ({
+        id: `poi-${i}`,
+        name: p.name,
+        type: p.type,
+        address: p.address,
+        source: 'poi' as const,
+      }));
+  }, [query, agencyCountry, locations]);
 
+  // Merge: configured first, then POI, then search results (deduplicated)
+  const allNames = new Set([
+    ...filteredConfigured.map((l) => l.name.toLowerCase()),
+    ...poiResults.map((l) => l.name.toLowerCase()),
+  ]);
+  const dedupedSearch = searchResults.filter((r) => !allNames.has(r.name.toLowerCase()));
+  const allResults = [...filteredConfigured, ...poiResults, ...dedupedSearch];
+
+  const grouped = {
+    configured: filteredConfigured,
+    poi: poiResults,
+    searchResults: dedupedSearch,
+  };
   const handleInputChange = (val: string) => {
     setQuery(val);
     onChange(val);
