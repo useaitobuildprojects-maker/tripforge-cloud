@@ -12,6 +12,7 @@ interface LocationEntry {
 interface LocationsEditorProps {
   locations: LocationEntry[];
   onChange: (locations: LocationEntry[]) => void;
+  country?: string;
 }
 
 interface PhotonFeature {
