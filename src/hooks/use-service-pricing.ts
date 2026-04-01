@@ -3,14 +3,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 // ── Types ──
+export type TransferCategory = 'economy' | 'business' | 'first_class' | 'van';
+
+export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string }[] = [
+  { id: 'economy', label: 'Economy', description: 'Sedan (1-3 pax)' },
+  { id: 'business', label: 'Business', description: 'Premium sedan (1-3 pax)' },
+  { id: 'first_class', label: 'First Class', description: 'Luxury (1-3 pax)' },
+  { id: 'van', label: 'VAN', description: 'Minivan (4-7 pax)' },
+];
+
 export interface TransferRoute {
   id: string;
   agency_id: string;
   origin: string;
   destination: string;
   distance_km: number | null;
-  price: number;
-  max_passengers: number | null;
+  price_economy: number;
+  price_business: number;
+  price_first_class: number;
+  price_van: number;
   notes: string | null;
   created_at: string;
 }
