@@ -60,7 +60,7 @@ function buildDisplayName(feat: PhotonFeature): string {
   return feat.properties.name || 'Unknown location';
 }
 
-const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
+const LocationsEditor = ({ locations, onChange, country }: LocationsEditorProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PhotonFeature[]>([]);
   const [loading, setLoading] = useState(false);
