@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Plane, X, Search, Loader2, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { searchPOIs } from '@/data/poi-database';
 
 interface LocationOption {
   id: string;
   name: string;
-  type: 'station' | 'airport' | 'city';
+  type: 'station' | 'airport' | 'city' | 'hotel_zone';
   address?: string;
-  source?: 'configured' | 'search';
+  source?: 'configured' | 'search' | 'poi';
 }
 
 interface LocationAutocompleteProps {
@@ -47,7 +48,7 @@ function buildAddress(feat: PhotonFeature): string {
   return parts.join(', ');
 }
 
-const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2 };
+const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
 
 const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry }: LocationAutocompleteProps) => {
   const [open, setOpen] = useState(false);
@@ -181,11 +182,35 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     (loc.address && loc.address.toLowerCase().includes(query.toLowerCase()))
   );
 
-  // Merge: configured first, then search results (deduplicated)
-  const configuredNames = new Set(filteredConfigured.map((l) => l.name.toLowerCase()));
-  const dedupedSearch = searchResults.filter((r) => !configuredNames.has(r.name.toLowerCase()));
-  const allResults = [...filteredConfigured, ...dedupedSearch];
+  // POI results (instant, from local database)
+  const poiResults = useMemo(() => {
+    if (!query || query.length < 1) return [];
+    const pois = searchPOIs(query, agencyCountry || '');
+    const configuredNames = new Set(locations.map((l) => l.name.toLowerCase()));
+    return pois
+      .filter((p) => !configuredNames.has(p.name.toLowerCase()))
+      .map((p, i) => ({
+        id: `poi-${i}`,
+        name: p.name,
+        type: p.type,
+        address: p.address,
+        source: 'poi' as const,
+      }));
+  }, [query, agencyCountry, locations]);
 
+  // Merge: configured first, then POI, then search results (deduplicated)
+  const allNames = new Set([
+    ...filteredConfigured.map((l) => l.name.toLowerCase()),
+    ...poiResults.map((l) => l.name.toLowerCase()),
+  ]);
+  const dedupedSearch = searchResults.filter((r) => !allNames.has(r.name.toLowerCase()));
+  const allResults = [...filteredConfigured, ...poiResults, ...dedupedSearch];
+
+  const grouped = {
+    configured: filteredConfigured,
+    poi: poiResults,
+    searchResults: dedupedSearch,
+  };
   const handleInputChange = (val: string) => {
     setQuery(val);
     onChange(val);
@@ -200,12 +225,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     setOpen(false);
   };
 
-  const grouped = {
-    configured: filteredConfigured,
-    searchAirport: dedupedSearch.filter((l) => l.type === 'airport'),
-    searchCity: dedupedSearch.filter((l) => l.type === 'city'),
-    searchStation: dedupedSearch.filter((l) => l.type === 'station'),
-  };
+
+
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -257,13 +278,35 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
               </div>
             )}
 
-            {/* Search results from web */}
-            {dedupedSearch.length > 0 && (
+            {/* POI database results (instant, local) */}
+            {grouped.poi.length > 0 && (
               <div>
-                <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-t border-border">
+                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${grouped.configured.length > 0 ? 'border-t border-border' : ''}`}>
+                  Popular locations
+                </div>
+                {grouped.poi.map((loc) => {
+                  const Icon = TYPE_ICONS[loc.type] || MapPin;
+                  return (
+                    <button key={loc.id} onClick={() => handleSelect(loc)}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left">
+                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{loc.name}</div>
+                        {loc.address && <div className="text-xs text-muted-foreground truncate">{loc.address}</div>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Search results from web (Photon fallback) */}
+            {grouped.searchResults.length > 0 && (
+              <div>
+                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${(grouped.configured.length > 0 || grouped.poi.length > 0) ? 'border-t border-border' : ''}`}>
                   Other places
                 </div>
-                {dedupedSearch.map((loc) => {
+                {grouped.searchResults.map((loc) => {
                   const Icon = TYPE_ICONS[loc.type] || MapPin;
                   return (
                     <button key={loc.id} onClick={() => handleSelect(loc)}
