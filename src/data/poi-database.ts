@@ -384,6 +384,9 @@ export function searchPOIs(query: string, countries: string): POI[] {
       // Full query match
       if (haystack.includes(query.toLowerCase())) score += 80;
 
+      // Exact IATA match
+      if (poi.iata && tokens.some((t) => t === poi.iata!.toLowerCase())) score += 200;
+
       // Name starts with first token
       if (poi.name.toLowerCase().startsWith(tokens[0])) score += 50;
 
