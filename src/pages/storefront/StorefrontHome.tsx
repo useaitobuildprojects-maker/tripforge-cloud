@@ -2,6 +2,7 @@ import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
+import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
