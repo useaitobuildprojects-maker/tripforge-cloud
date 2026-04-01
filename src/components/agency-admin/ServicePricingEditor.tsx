@@ -80,24 +80,34 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   const fileRef = useRef<HTMLInputElement>(null);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [price, setPrice] = useState('');
+  const [priceEconomy, setPriceEconomy] = useState('');
+  const [priceBusiness, setPriceBusiness] = useState('');
+  const [priceFirstClass, setPriceFirstClass] = useState('');
+  const [priceVan, setPriceVan] = useState('');
   const [distanceKm, setDistanceKm] = useState('');
-  const [maxPass, setMaxPass] = useState('4');
   const [uploading, setUploading] = useState(false);
 
   const handleAdd = () => {
-    if (!origin || !destination || !price) return;
-    addRoute.mutate({ agency_id: agencyId, origin, destination, price: Number(price), distance_km: distanceKm ? Number(distanceKm) : null, max_passengers: Number(maxPass) || 4, notes: null });
-    setOrigin(''); setDestination(''); setPrice(''); setDistanceKm('');
+    if (!origin || !destination || !priceEconomy) return;
+    addRoute.mutate({
+      agency_id: agencyId, origin, destination,
+      price_economy: Number(priceEconomy),
+      price_business: Number(priceBusiness) || 0,
+      price_first_class: Number(priceFirstClass) || 0,
+      price_van: Number(priceVan) || 0,
+      distance_km: distanceKm ? Number(distanceKm) : null,
+      notes: null,
+    });
+    setOrigin(''); setDestination(''); setPriceEconomy(''); setPriceBusiness(''); setPriceFirstClass(''); setPriceVan(''); setDistanceKm('');
   };
 
   const downloadTemplate = () => {
     const data = [
-      { Origin: 'Airport', Destination: 'City Center', 'Price (€)': 45, 'Distance (km)': 25, 'Max Passengers': 4 },
-      { Origin: 'Airport', Destination: 'Hotel Zone', 'Price (€)': 55, 'Distance (km)': 30, 'Max Passengers': 4 },
+      { Origin: 'Airport', Destination: 'City Center', 'Economy (€)': 35, 'Business (€)': 55, 'First Class (€)': 85, 'VAN (€)': 65, 'Distance (km)': 25 },
+      { Origin: 'Airport', Destination: 'Hotel Zone', 'Economy (€)': 45, 'Business (€)': 70, 'First Class (€)': 110, 'VAN (€)': 80, 'Distance (km)': 30 },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 14 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
     XLSX.writeFile(wb, 'transfer_routes_template.xlsx');
@@ -106,11 +116,13 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   const downloadCurrent = () => {
     if (!routes.length) { toast.info('No routes to export'); return; }
     const data = routes.map(r => ({
-      Origin: r.origin, Destination: r.destination, 'Price (€)': r.price,
-      'Distance (km)': r.distance_km ?? '', 'Max Passengers': r.max_passengers ?? 4,
+      Origin: r.origin, Destination: r.destination,
+      'Economy (€)': r.price_economy, 'Business (€)': r.price_business,
+      'First Class (€)': r.price_first_class, 'VAN (€)': r.price_van,
+      'Distance (km)': r.distance_km ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 16 }];
+    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 14 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
     XLSX.writeFile(wb, 'transfer_routes_export.xlsx');
@@ -129,11 +141,17 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
       for (const row of rows) {
         const o = row['Origin'] || row['origin'] || '';
         const d = row['Destination'] || row['destination'] || '';
-        const p = Number(row['Price (€)'] || row['price'] || row['Price'] || 0);
-        if (!o || !d || !p) continue;
-        const dist = Number(row['Distance (km)'] || row['distance_km'] || row['Distance'] || 0) || null;
-        const pax = Number(row['Max Passengers'] || row['max_passengers'] || 4);
-        await addRoute.mutateAsync({ agency_id: agencyId, origin: o, destination: d, price: p, distance_km: dist, max_passengers: pax, notes: null });
+        const pe = Number(row['Economy (€)'] || row['price_economy'] || 0);
+        if (!o || !d || !pe) continue;
+        await addRoute.mutateAsync({
+          agency_id: agencyId, origin: o, destination: d,
+          price_economy: pe,
+          price_business: Number(row['Business (€)'] || row['price_business'] || 0),
+          price_first_class: Number(row['First Class (€)'] || row['price_first_class'] || 0),
+          price_van: Number(row['VAN (€)'] || row['price_van'] || 0),
+          distance_km: Number(row['Distance (km)'] || row['distance_km'] || 0) || null,
+          notes: null,
+        });
         added++;
       }
       toast.success(`Imported ${added} routes`);
@@ -149,35 +167,24 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
     <div className="space-y-5">
       {/* Auto-pricing formula */}
       <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Auto-Pricing Formula (Sixt-style)</h4>
-        <p className="text-[11px] text-muted-foreground">When no fixed route exists, price = Base Fee + (Distance × Per-KM Rate)</p>
+        <h4 className="text-xs font-semibold text-foreground">Auto-Pricing Formula (fallback)</h4>
+        <p className="text-[11px] text-muted-foreground">When no fixed route exists, Economy price = Base Fee + (Distance × Per-KM Rate). Other categories use multipliers.</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
-            <Input
-              type="number" min={0} step={0.5}
-              placeholder="15"
+            <Input type="number" min={0} step={0.5} placeholder="15"
               value={storefrontConfig.transfer_base_fee ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_base_fee: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono"
-            />
+              className="text-xs font-mono" />
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">Per-KM Rate (€)</Label>
-            <Input
-              type="number" min={0} step={0.1}
-              placeholder="1.20"
+            <Input type="number" min={0} step={0.1} placeholder="1.20"
               value={storefrontConfig.transfer_per_km_rate ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono"
-            />
+              className="text-xs font-mono" />
           </div>
         </div>
-        {(storefrontConfig.transfer_base_fee || storefrontConfig.transfer_per_km_rate) && (
-          <p className="text-[11px] text-accent font-medium">
-            Example: 30 km trip = €{((storefrontConfig.transfer_base_fee ?? 0) + 30 * (storefrontConfig.transfer_per_km_rate ?? 0)).toFixed(2)}
-          </p>
-        )}
       </div>
 
       <div className="flex gap-2 flex-wrap">
@@ -192,19 +199,56 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
         </Button>
         <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
       </div>
-      <p className="text-[11px] text-muted-foreground -mt-2">Fixed routes below override the auto-pricing formula</p>
-      <div className="grid grid-cols-5 gap-2">
-        <div className="space-y-1"><Label className="text-[11px]">Origin</Label><Input placeholder="Airport" value={origin} onChange={(e) => setOrigin(e.target.value)} className="text-xs" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Destination</Label><Input placeholder="City center" value={destination} onChange={(e) => setDestination(e.target.value)} className="text-xs" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Price (€)</Label><Input type="number" min={0} placeholder="50" value={price} onChange={(e) => setPrice(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Distance (km)</Label><Input type="number" min={0} placeholder="25" value={distanceKm} onChange={(e) => setDistanceKm(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addRoute.isPending || !origin || !destination || !price} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
+
+      <p className="text-[11px] text-muted-foreground -mt-2">Fixed routes below override the auto-pricing formula. Price per route + vehicle category (like Blacklane).</p>
+
+      {/* Add form */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <h4 className="text-xs font-semibold text-foreground">Add Route</h4>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="space-y-1"><Label className="text-[11px]">Origin *</Label><Input placeholder="Airport" value={origin} onChange={(e) => setOrigin(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Destination *</Label><Input placeholder="City center" value={destination} onChange={(e) => setDestination(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Distance (km)</Label><Input type="number" min={0} placeholder="25" value={distanceKm} onChange={(e) => setDistanceKm(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-1"><Label className="text-[11px]">Economy (€) *</Label><Input type="number" min={0} placeholder="35" value={priceEconomy} onChange={(e) => setPriceEconomy(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Business (€)</Label><Input type="number" min={0} placeholder="55" value={priceBusiness} onChange={(e) => setPriceBusiness(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">First Class (€)</Label><Input type="number" min={0} placeholder="85" value={priceFirstClass} onChange={(e) => setPriceFirstClass(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">VAN (€)</Label><Input type="number" min={0} placeholder="65" value={priceVan} onChange={(e) => setPriceVan(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        <Button size="sm" onClick={handleAdd} disabled={addRoute.isPending || !origin || !destination || !priceEconomy} className="gradient-accent text-accent-foreground"><Plus className="h-3.5 w-3.5 mr-1" /> Add Route</Button>
       </div>
+
+      {/* Table */}
       {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : routes.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No transfer routes configured yet. Download the template, fill it in, and import!</p> : (
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Origin</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Destination</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Price</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Dist.</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Pax</th><th className="px-3 py-2 w-10" /></tr></thead>
-            <tbody>{routes.map((r) => (<tr key={r.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground">{r.origin}</td><td className="px-3 py-2 text-foreground">{r.destination}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{r.price}</td><td className="px-3 py-2 text-right text-muted-foreground">{r.distance_km ? `${r.distance_km} km` : '—'}</td><td className="px-3 py-2 text-right text-muted-foreground">{r.max_passengers ?? 4}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteRoute.mutate({ id: r.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
+            <thead className="bg-secondary/50">
+              <tr>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Origin</th>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Destination</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Economy</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Business</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">1st Class</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">VAN</th>
+                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Dist.</th>
+                <th className="px-3 py-2 w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {routes.map((r) => (
+                <tr key={r.id} className="border-t border-border hover:bg-secondary/20">
+                  <td className="px-3 py-2 text-foreground">{r.origin}</td>
+                  <td className="px-3 py-2 text-foreground">{r.destination}</td>
+                  <td className="px-3 py-2 text-right font-mono text-foreground">€{r.price_economy}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_business ? `€${r.price_business}` : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_first_class ? `€${r.price_first_class}` : '—'}</td>
+                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_van ? `€${r.price_van}` : '—'}</td>
+                  <td className="px-3 py-2 text-right text-muted-foreground">{r.distance_km ? `${r.distance_km} km` : '—'}</td>
+                  <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteRoute.mutate({ id: r.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       )}
