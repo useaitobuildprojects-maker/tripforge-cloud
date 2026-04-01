@@ -221,7 +221,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     onChange(val);
     setOpen(true);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => searchPhoton(val), 350);
+    debounceRef.current = setTimeout(() => searchLocation(val), 400);
   };
 
   const handleSelect = (loc: LocationOption) => {
