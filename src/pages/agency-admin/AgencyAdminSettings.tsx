@@ -321,7 +321,7 @@ const AgencyAdminSettings = () => {
             <Label htmlFor="city">City</Label>
             <Input id="city" value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 relative" ref={countryWrapperRef}>
             <Label>Countries</Label>
             <div className="flex flex-wrap gap-1.5 p-2 min-h-[40px] rounded-md border border-input bg-background">
               {form.country.split(',').filter(Boolean).map((c, i) => (
@@ -341,22 +341,36 @@ const AgencyAdminSettings = () => {
                 </span>
               ))}
               <input
+                ref={countryInputRef}
+                value={countryQuery}
+                onChange={(e) => setCountryQuery(e.target.value)}
                 className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                 placeholder="Type country & press Enter..."
+                onFocus={() => setShowCountryDropdown(true)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const val = (e.target as HTMLInputElement).value.trim();
+                    const val = countryQuery.trim();
                     if (!val) return;
-                    const existing = form.country.split(',').filter(Boolean).map(s => s.trim().toLowerCase());
-                    if (existing.includes(val.toLowerCase())) return;
-                    const newCountry = form.country ? `${form.country}, ${val}` : val;
-                    setForm(f => ({ ...f, country: newCountry }));
-                    (e.target as HTMLInputElement).value = '';
+                    addCountry(val);
                   }
                 }}
               />
             </div>
+            {showCountryDropdown && filteredCountries.length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-popover border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                {filteredCountries.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => addCountry(c)}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-accent/50 transition-colors"
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            )}
             <p className="text-[10px] text-muted-foreground">Add multiple countries where this agency operates. Location search will cover all of them.</p>
           </div>
         </div>
