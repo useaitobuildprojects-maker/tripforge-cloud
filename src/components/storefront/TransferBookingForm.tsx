@@ -102,6 +102,7 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
               placeholder="Airport, hotel, or address"
               locations={agencyLocations}
               agencyCity={agency.city}
+              agencyCountry={agency.country}
             />
           </div>
 
@@ -119,6 +120,7 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
               placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
+              agencyCountry={agency.country}
             />
           </div>
         </div>
