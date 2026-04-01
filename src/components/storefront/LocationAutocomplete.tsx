@@ -20,43 +20,29 @@ interface LocationAutocompleteProps {
   agencyCountry?: string;
 }
 
-interface NominatimResult {
-  display_name: string;
-  name?: string;
-  type?: string;
-  class?: string;
-  address?: {
-    city?: string;
-    town?: string;
-    state?: string;
-    country?: string;
-    aerodrome?: string;
-  };
+interface MapboxFeature {
+  id: string;
+  place_name: string;
+  text: string;
+  place_type: string[];
+  properties: { category?: string; maki?: string };
+  context?: Array<{ id: string; text: string }>;
 }
 
-function detectTypeFromNominatim(result: NominatimResult): LocationOption['type'] {
-  const cls = result.class || '';
-  const type = result.type || '';
-  const name = (result.name || result.display_name).toLowerCase();
-  if (cls === 'aeroway' || type === 'aerodrome' || name.includes('airport') || name.includes('aéroport')) return 'airport';
-  if (type === 'city' || type === 'town' || type === 'village' || cls === 'place') return 'city';
+function detectTypeFromMapbox(feature: MapboxFeature): LocationOption['type'] {
+  const types = feature.place_type || [];
+  const text = feature.text.toLowerCase();
+  const placeName = feature.place_name.toLowerCase();
+  const category = (feature.properties?.category || '').toLowerCase();
+  if (types.includes('poi') && (text.includes('airport') || placeName.includes('airport') || category.includes('airport') || feature.properties?.maki === 'airport')) return 'airport';
+  if (types.includes('place') || types.includes('locality')) return 'city';
   return 'station';
 }
 
-function buildNominatimAddress(result: NominatimResult): string {
-  const addr = result.address;
-  if (!addr) {
-    // Extract last 2-3 parts from display_name
-    const parts = result.display_name.split(',').map(s => s.trim());
-    return parts.slice(1, 4).join(', ');
-  }
-  const parts: string[] = [];
-  const city = addr.city || addr.town;
-  const name = result.name || '';
-  if (city && city !== name) parts.push(city);
-  if (addr.state) parts.push(addr.state);
-  if (addr.country) parts.push(addr.country);
-  return parts.join(', ');
+function buildMapboxAddress(feature: MapboxFeature): string {
+  const ctx = feature.context || [];
+  const parts = ctx.map(c => c.text).filter(Boolean);
+  return parts.join(', ') || feature.place_name.split(',').slice(1).map(s => s.trim()).join(', ');
 }
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
@@ -82,10 +68,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     return Array.from(new Set([...fromAgency, ...fromAddresses])).slice(0, 6);
   }, [agencyCountry, locations]);
 
-  const countryHintsLower = useMemo(
-    () => new Set(countryHints.map((c) => c.toLowerCase())),
-    [countryHints]
-  );
 
   useEffect(() => { setQuery(value); }, [value]);
 
@@ -103,83 +85,34 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
     setLoading(true);
     try {
-      const normalizedLower = normalized.toLowerCase();
-      const queryAlreadyScopedToCountry = countryHints.some((country) =>
-        normalizedLower.includes(country.toLowerCase())
-      );
+      const token = import.meta.env.VITE_MAPBOX_TOKEN;
+      if (!token) { setSearchResults([]); setLoading(false); return; }
 
-      const queries = Array.from(new Set([
-        ...(queryAlreadyScopedToCountry || countryHints.length === 0
-          ? [normalized]
-          : countryHints.map((country) => `${normalized}, ${country}`)),
-        normalized,
-      ]));
+      const country = countryHints[0] || '';
+      const proximity = agencyCity ? `&proximity=${encodeURIComponent(agencyCity)}` : '';
+      const types = 'place,poi,address,locality';
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10${proximity}&language=en${country ? `&country=${encodeURIComponent(country.slice(0, 2))}` : ''}`;
 
-      const responses = await Promise.all(
-        queries.map(async (singleQuery) => {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(singleQuery)}&format=json&addressdetails=1&limit=8&accept-language=en`,
-            { headers: { 'User-Agent': 'LovableTransferApp/1.0' } }
-          );
-          if (!res.ok) return [];
-          return (await res.json()) as NominatimResult[];
-        })
-      );
+      const res = await fetch(url);
+      if (!res.ok) { setSearchResults([]); setLoading(false); return; }
+      const data = await res.json();
+      const features = (data.features || []) as MapboxFeature[];
 
-      const tokens = normalized.toLowerCase().split(/\s+/).filter(Boolean);
-      const genericTokens = new Set(['airport', 'airports', 'station', 'stations', 'city', 'hotel', 'port', 'terminal']);
-      const significantTokens = tokens.filter((t) => !genericTokens.has(t));
+      const results: LocationOption[] = features.map((f, i) => ({
+        id: `search-${i}`,
+        name: f.text,
+        type: detectTypeFromMapbox(f),
+        address: buildMapboxAddress(f),
+        source: 'search' as const,
+      }));
 
-      const seen = new Set<string>();
-      const rankedResults: Array<LocationOption & { score: number }> = [];
-
-      responses.flat().forEach((result) => {
-        const name = result.name || result.display_name.split(',')[0];
-        const address = buildNominatimAddress(result);
-        const type = detectTypeFromNominatim(result);
-        const featureCountry = (result.address?.country || '').toLowerCase();
-        const haystack = `${name} ${address}`.toLowerCase();
-        const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
-        if (seen.has(key)) return;
-
-        const hasAllSignificantTokens = significantTokens.every((t) => haystack.includes(t));
-        if (significantTokens.length > 0 && !hasAllSignificantTokens) return;
-
-        let score = 0;
-        if (haystack.includes(normalizedLower)) score += 100;
-        for (const token of tokens) {
-          if (haystack.includes(token)) score += 20;
-          if (token.includes('airport') && type === 'airport') score += 15;
-          if (token.includes('city') && type === 'city') score += 10;
-        }
-        if (name.toLowerCase().startsWith(tokens[0] || '')) score += 8;
-        if (agencyCity && haystack.includes(agencyCity.toLowerCase())) score += 10;
-
-        if (countryHintsLower.size > 0 && featureCountry) {
-          if (countryHintsLower.has(featureCountry)) score += 28;
-          else score -= 24;
-        }
-
-        seen.add(key);
-        rankedResults.push({ id: `search-${rankedResults.length}`, name, type, address, source: 'search', score });
-      });
-
-      rankedResults.sort((a, b) => b.score - a.score);
-      const cleanedResults = rankedResults.map(({ score: _score, ...rest }) => rest);
-      const countryScopedResults = countryHintsLower.size > 0
-        ? cleanedResults.filter((loc) => {
-            const h = `${loc.name} ${loc.address || ''}`.toLowerCase();
-            return Array.from(countryHintsLower).some((country) => h.includes(country));
-          })
-        : cleanedResults;
-
-      setSearchResults((countryScopedResults.length > 0 ? countryScopedResults : cleanedResults).slice(0, 12));
+      setSearchResults(results.slice(0, 12));
     } catch {
       setSearchResults([]);
     } finally {
       setLoading(false);
     }
-  }, [agencyCity, countryHints, countryHintsLower]);
+  }, [agencyCity, countryHints]);
 
   // Filter configured locations
   const filteredConfigured = locations.filter((loc) =>

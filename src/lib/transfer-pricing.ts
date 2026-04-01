@@ -73,19 +73,20 @@ export async function getOsrmDistance(
   }
 }
 
-/** Geocode a place name using Nominatim (OSM) and return [lng, lat] */
+/** Geocode a place name using Mapbox and return [lng, lat] */
 export async function geocodePlace(name: string, country?: string): Promise<[number, number] | null> {
   try {
+    const token = import.meta.env.VITE_MAPBOX_TOKEN;
+    if (!token) { console.warn('[Transfer] No Mapbox token configured'); return null; }
     const query = country ? `${name}, ${country}` : name;
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&limit=1`;
     console.log('[Transfer] Geocoding:', query);
-    const res = await fetch(url, { headers: { 'User-Agent': 'LovableTransferApp/1.0' } });
-    if (!res.ok) { console.warn('[Transfer] Nominatim HTTP error:', res.status); return null; }
+    const res = await fetch(url);
+    if (!res.ok) { console.warn('[Transfer] Mapbox HTTP error:', res.status); return null; }
     const data = await res.json();
-    const result = data?.[0];
-    if (!result) { console.warn('[Transfer] No geocode result for:', query); return null; }
-    const lng = parseFloat(result.lon);
-    const lat = parseFloat(result.lat);
+    const feature = data?.features?.[0];
+    if (!feature) { console.warn('[Transfer] No geocode result for:', query); return null; }
+    const [lng, lat] = feature.center;
     console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
     return [lng, lat];
   } catch (e) {
