@@ -94,72 +94,28 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         normalizedLower.includes(country.toLowerCase())
       );
 
-      const queries = Array.from(new Set([
-        ...(queryAlreadyScopedToCountry || countryHints.length === 0
-          ? [normalized]
-          : countryHints.map((country) => `${normalized}, ${country}`)),
-        normalized,
-      ]));
+      const token = import.meta.env.VITE_MAPBOX_TOKEN;
+      if (!token) { setSearchResults([]); setLoading(false); return; }
 
-      const responses = await Promise.all(
-        queries.map(async (singleQuery) => {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(singleQuery)}&format=json&addressdetails=1&limit=8&accept-language=en`,
-            { headers: { 'User-Agent': 'LovableTransferApp/1.0' } }
-          );
-          if (!res.ok) return [];
-          return (await res.json()) as NominatimResult[];
-        })
-      );
+      const country = countryHints[0] || '';
+      const proximity = agencyCity ? `&proximity=${encodeURIComponent(agencyCity)}` : '';
+      const types = 'place,poi,address,locality';
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10${proximity}&language=en${country ? `&country=${encodeURIComponent(country.slice(0, 2))}` : ''}`;
 
-      const tokens = normalized.toLowerCase().split(/\s+/).filter(Boolean);
-      const genericTokens = new Set(['airport', 'airports', 'station', 'stations', 'city', 'hotel', 'port', 'terminal']);
-      const significantTokens = tokens.filter((t) => !genericTokens.has(t));
+      const res = await fetch(url);
+      if (!res.ok) { setSearchResults([]); setLoading(false); return; }
+      const data = await res.json();
+      const features = (data.features || []) as MapboxFeature[];
 
-      const seen = new Set<string>();
-      const rankedResults: Array<LocationOption & { score: number }> = [];
+      const results: LocationOption[] = features.map((f, i) => ({
+        id: `search-${i}`,
+        name: f.text,
+        type: detectTypeFromMapbox(f),
+        address: buildMapboxAddress(f),
+        source: 'search' as const,
+      }));
 
-      responses.flat().forEach((result) => {
-        const name = result.name || result.display_name.split(',')[0];
-        const address = buildNominatimAddress(result);
-        const type = detectTypeFromNominatim(result);
-        const featureCountry = (result.address?.country || '').toLowerCase();
-        const haystack = `${name} ${address}`.toLowerCase();
-        const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
-        if (seen.has(key)) return;
-
-        const hasAllSignificantTokens = significantTokens.every((t) => haystack.includes(t));
-        if (significantTokens.length > 0 && !hasAllSignificantTokens) return;
-
-        let score = 0;
-        if (haystack.includes(normalizedLower)) score += 100;
-        for (const token of tokens) {
-          if (haystack.includes(token)) score += 20;
-          if (token.includes('airport') && type === 'airport') score += 15;
-          if (token.includes('city') && type === 'city') score += 10;
-        }
-        if (name.toLowerCase().startsWith(tokens[0] || '')) score += 8;
-        if (agencyCity && haystack.includes(agencyCity.toLowerCase())) score += 10;
-
-        if (countryHintsLower.size > 0 && featureCountry) {
-          if (countryHintsLower.has(featureCountry)) score += 28;
-          else score -= 24;
-        }
-
-        seen.add(key);
-        rankedResults.push({ id: `search-${rankedResults.length}`, name, type, address, source: 'search', score });
-      });
-
-      rankedResults.sort((a, b) => b.score - a.score);
-      const cleanedResults = rankedResults.map(({ score: _score, ...rest }) => rest);
-      const countryScopedResults = countryHintsLower.size > 0
-        ? cleanedResults.filter((loc) => {
-            const h = `${loc.name} ${loc.address || ''}`.toLowerCase();
-            return Array.from(countryHintsLower).some((country) => h.includes(country));
-          })
-        : cleanedResults;
-
-      setSearchResults((countryScopedResults.length > 0 ? countryScopedResults : cleanedResults).slice(0, 12));
+      setSearchResults(results.slice(0, 12));
     } catch {
       setSearchResults([]);
     } finally {
