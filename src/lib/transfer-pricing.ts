@@ -102,9 +102,13 @@ export async function calculateTransferPrice(
   category: TransferCategory,
   country?: string
 ): Promise<TransferQuote> {
+  console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
+  console.log('[Transfer] Config:', { base: config.transfer_base_fee, perKm: config.transfer_per_km_rate });
+
   // 1. Check matrix
   const matrixPrice = getMatrixPrice(routes, origin, destination, category);
   if (matrixPrice !== null) {
+    console.log('[Transfer] Matrix hit:', matrixPrice);
     return { origin, destination, category, price: matrixPrice, source: 'matrix', distance_km: null };
   }
 
@@ -112,8 +116,8 @@ export async function calculateTransferPrice(
   const baseFee = config.transfer_base_fee ?? 0;
   const perKmRate = config.transfer_per_km_rate ?? 0;
   if (baseFee === 0 && perKmRate === 0) {
-    // No formula configured — return 0
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+    console.warn('[Transfer] No formula configured (base=0, perKm=0)');
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'no_formula' };
   }
 
   const [originCoords, destCoords] = await Promise.all([
@@ -121,15 +125,20 @@ export async function calculateTransferPrice(
     geocodePlace(destination, country),
   ]);
 
-  if (!originCoords || !destCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+  if (!originCoords) {
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_origin' };
+  }
+  if (!destCoords) {
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_destination' };
   }
 
   const distanceKm = await getOsrmDistance(originCoords, destCoords);
   if (!distanceKm) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null };
+    console.warn('[Transfer] OSRM returned no distance');
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'osrm_failed' };
   }
 
   const price = getFormulaPrice(config, distanceKm, category);
+  console.log('[Transfer] Formula result:', { distanceKm, price });
   return { origin, destination, category, price, source: 'formula', distance_km: distanceKm };
 }
