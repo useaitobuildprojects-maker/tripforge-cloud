@@ -48,7 +48,7 @@ function buildAddress(feat: PhotonFeature): string {
   return parts.join(', ');
 }
 
-const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2 };
+const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
 
 const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry }: LocationAutocompleteProps) => {
   const [open, setOpen] = useState(false);
