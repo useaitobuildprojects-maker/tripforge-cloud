@@ -280,7 +280,7 @@ const AgencyAdminSettings = () => {
       />
 
       {/* Service Pricing */}
-      <ServicePricingEditor agencyId={agency.id} enabledServices={form.services} storefrontConfig={storefrontConfig} onConfigChange={setStorefrontConfig} country={agency.country} />
+      <ServicePricingEditor agencyId={agency.id} enabledServices={form.services} storefrontConfig={storefrontConfig} onConfigChange={setStorefrontConfig} country={form.country} />
 
       {/* Branding — Logo & Favicon */}
       <motion.div
