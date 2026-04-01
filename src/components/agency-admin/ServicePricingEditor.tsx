@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload, Settings2 } from 'lucide-react';
+import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
