@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Download, Upload, Settings2 } from 'lucide-react';
+import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
@@ -72,42 +73,100 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
   );
 };
 
-// ── Transfer Tab ──
+// ── Transfer Tab with Zone Matrix ──
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
   const addRoute = useAddTransferRoute();
   const deleteRoute = useDeleteTransferRoute();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
-  const [priceEconomy, setPriceEconomy] = useState('');
-  const [priceBusiness, setPriceBusiness] = useState('');
-  const [priceFirstClass, setPriceFirstClass] = useState('');
-  const [priceVan, setPriceVan] = useState('');
-  const [distanceKm, setDistanceKm] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
-  const handleAdd = () => {
-    if (!origin || !destination || !priceEconomy) return;
-    addRoute.mutate({
-      agency_id: agencyId, origin, destination,
-      price_economy: Number(priceEconomy),
-      price_business: Number(priceBusiness) || 0,
-      price_first_class: Number(priceFirstClass) || 0,
-      price_van: Number(priceVan) || 0,
-      distance_km: distanceKm ? Number(distanceKm) : null,
-      notes: null,
+  const locations = storefrontConfig.locations ?? [];
+  const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
+  const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
+  const multVan = storefrontConfig.transfer_multiplier_van ?? 1.8;
+
+  // Build a lookup map: "origin|destination" -> route
+  const routeMap = useMemo(() => {
+    const map: Record<string, typeof routes[0]> = {};
+    routes.forEach(r => {
+      map[`${r.origin}|${r.destination}`] = r;
     });
-    setOrigin(''); setDestination(''); setPriceEconomy(''); setPriceBusiness(''); setPriceFirstClass(''); setPriceVan(''); setDistanceKm('');
+    return map;
+  }, [routes]);
+
+  // Generate all unique pairs from locations
+  const pairs = useMemo(() => {
+    const result: { origin: string; destination: string }[] = [];
+    for (let i = 0; i < locations.length; i++) {
+      for (let j = i + 1; j < locations.length; j++) {
+        result.push({ origin: locations[i].name, destination: locations[j].name });
+      }
+    }
+    return result;
+  }, [locations]);
+
+  // Save/update a route price
+  const handlePriceChange = async (origin: string, destination: string, economyPrice: number) => {
+    // Check if route exists (either direction)
+    const existingKey1 = `${origin}|${destination}`;
+    const existingKey2 = `${destination}|${origin}`;
+    const existing = routeMap[existingKey1] || routeMap[existingKey2];
+
+    if (existing) {
+      // Delete old and re-add with new price
+      await deleteRoute.mutateAsync({ id: existing.id, agencyId });
+    }
+
+    if (economyPrice > 0) {
+      await addRoute.mutateAsync({
+        agency_id: agencyId,
+        origin,
+        destination,
+        price_economy: economyPrice,
+        price_business: Math.round(economyPrice * multBusiness),
+        price_first_class: Math.round(economyPrice * multFirstClass),
+        price_van: Math.round(economyPrice * multVan),
+        distance_km: null,
+        notes: null,
+      });
+    }
   };
 
+  // Recalculate all category prices when multipliers change
+  const recalculateAllPrices = async () => {
+    for (const route of routes) {
+      if (route.price_economy > 0) {
+        await deleteRoute.mutateAsync({ id: route.id, agencyId });
+        await addRoute.mutateAsync({
+          agency_id: agencyId,
+          origin: route.origin,
+          destination: route.destination,
+          price_economy: route.price_economy,
+          price_business: Math.round(route.price_economy * multBusiness),
+          price_first_class: Math.round(route.price_economy * multFirstClass),
+          price_van: Math.round(route.price_economy * multVan),
+          distance_km: route.distance_km,
+          notes: route.notes,
+        });
+      }
+    }
+    toast.success('All category prices recalculated');
+  };
+
+  const getEconomyPrice = (origin: string, destination: string): string => {
+    const route = routeMap[`${origin}|${destination}`] || routeMap[`${destination}|${origin}`];
+    return route ? String(route.price_economy) : '';
+  };
+
+  // Excel import/export
   const downloadTemplate = () => {
-    const data = [
-      { Origin: 'Airport', Destination: 'City Center', 'Economy (€)': 35, 'Business (€)': 55, 'First Class (€)': 85, 'VAN (€)': 65, 'Distance (km)': 25 },
-      { Origin: 'Airport', Destination: 'Hotel Zone', 'Economy (€)': 45, 'Business (€)': 70, 'First Class (€)': 110, 'VAN (€)': 80, 'Distance (km)': 30 },
-    ];
+    const data = pairs.length > 0
+      ? pairs.map(p => ({ Origin: p.origin, Destination: p.destination, 'Economy Price (€)': '' }))
+      : [{ Origin: 'Airport', Destination: 'City Center', 'Economy Price (€)': 35 }];
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 14 }];
+    ws['!cols'] = [{ wch: 25 }, { wch: 25 }, { wch: 18 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
     XLSX.writeFile(wb, 'transfer_routes_template.xlsx');
@@ -119,10 +178,8 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
       Origin: r.origin, Destination: r.destination,
       'Economy (€)': r.price_economy, 'Business (€)': r.price_business,
       'First Class (€)': r.price_first_class, 'VAN (€)': r.price_van,
-      'Distance (km)': r.distance_km ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 20 }, { wch: 20 }, { wch: 14 }, { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 14 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
     XLSX.writeFile(wb, 'transfer_routes_export.xlsx');
@@ -141,16 +198,20 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
       for (const row of rows) {
         const o = row['Origin'] || row['origin'] || '';
         const d = row['Destination'] || row['destination'] || '';
-        const pe = Number(row['Economy (€)'] || row['price_economy'] || 0);
+        const pe = Number(row['Economy Price (€)'] || row['Economy (€)'] || row['price_economy'] || row['Price'] || 0);
         if (!o || !d || !pe) continue;
+        // Delete existing route for this pair
+        const existingKey1 = `${o}|${d}`;
+        const existingKey2 = `${d}|${o}`;
+        const existing = routeMap[existingKey1] || routeMap[existingKey2];
+        if (existing) await deleteRoute.mutateAsync({ id: existing.id, agencyId });
         await addRoute.mutateAsync({
           agency_id: agencyId, origin: o, destination: d,
           price_economy: pe,
-          price_business: Number(row['Business (€)'] || row['price_business'] || 0),
-          price_first_class: Number(row['First Class (€)'] || row['price_first_class'] || 0),
-          price_van: Number(row['VAN (€)'] || row['price_van'] || 0),
-          distance_km: Number(row['Distance (km)'] || row['distance_km'] || 0) || null,
-          notes: null,
+          price_business: Math.round(pe * multBusiness),
+          price_first_class: Math.round(pe * multFirstClass),
+          price_van: Math.round(pe * multVan),
+          distance_km: null, notes: null,
         });
         added++;
       }
@@ -165,10 +226,167 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
 
   return (
     <div className="space-y-5">
-      {/* Auto-pricing formula */}
+      {/* Step 1: Locations */}
       <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Auto-Pricing Formula (fallback)</h4>
-        <p className="text-[11px] text-muted-foreground">When no fixed route exists, Economy price = Base Fee + (Distance × Per-KM Rate). Other categories use multipliers.</p>
+        <h4 className="text-xs font-semibold text-foreground">Step 1 — Define Locations</h4>
+        <p className="text-[11px] text-muted-foreground">Add airports, hotels, cities, and stations. The system auto-generates price pairs between all locations.</p>
+        <LocationsEditor
+          locations={locations}
+          onChange={(locs) => onConfigChange({ ...storefrontConfig, locations: locs })}
+        />
+      </div>
+
+      {/* Step 2: Category Multipliers */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">Step 2 — Category Multipliers</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Set the economy base price per route. Other categories are auto-calculated.</p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSettings(!showSettings)}>
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSettings ? 'Hide' : 'Edit'} Multipliers
+          </Button>
+        </div>
+        {showSettings && (
+          <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Business (×)</Label>
+              <Input type="number" min={1} step={0.1} value={multBusiness}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_business: Number(e.target.value) || 1.6 })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">First Class (×)</Label>
+              <Input type="number" min={1} step={0.1} value={multFirstClass}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_first_class: Number(e.target.value) || 2.4 })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">VAN (×)</Label>
+              <Input type="number" min={1} step={0.1} value={multVan}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_van: Number(e.target.value) || 1.8 })}
+                className="text-xs font-mono" />
+            </div>
+          </div>
+        )}
+        {!showSettings && (
+          <div className="flex gap-4 text-[11px] text-muted-foreground">
+            <span>Economy: <strong className="text-foreground">1.0×</strong></span>
+            <span>Business: <strong className="text-foreground">{multBusiness}×</strong></span>
+            <span>First Class: <strong className="text-foreground">{multFirstClass}×</strong></span>
+            <span>VAN: <strong className="text-foreground">{multVan}×</strong></span>
+          </div>
+        )}
+        {showSettings && routes.length > 0 && (
+          <Button variant="outline" size="sm" className="text-xs" onClick={recalculateAllPrices}>
+            Recalculate all {routes.length} routes with new multipliers
+          </Button>
+        )}
+      </div>
+
+      {/* Excel import/export */}
+      <div className="flex gap-2 flex-wrap">
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
+          <Download className="h-3.5 w-3.5 mr-1" /> {pairs.length > 0 ? `Download Template (${pairs.length} pairs)` : 'Download Template'}
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!routes.length}>
+          <Download className="h-3.5 w-3.5 mr-1" /> Export Current
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
+          <Upload className="h-3.5 w-3.5 mr-1" /> {uploading ? 'Importing...' : 'Import Excel'}
+        </Button>
+        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
+      </div>
+
+      {/* Step 3: Price Matrix */}
+      {locations.length < 2 ? (
+        <p className="text-xs text-muted-foreground py-8 text-center">Add at least 2 locations above to see the price matrix</p>
+      ) : isLoading ? (
+        <p className="text-xs text-muted-foreground">Loading routes...</p>
+      ) : (
+        <div className="space-y-2">
+          <h4 className="text-xs font-semibold text-foreground">Step 3 — Price Matrix (Economy base price in €)</h4>
+          <p className="text-[11px] text-muted-foreground">Enter the economy price for each route. Business, First Class, and VAN are calculated automatically.</p>
+          <div className="border border-border rounded-lg overflow-x-auto">
+            <table className="text-xs">
+              <thead className="bg-secondary/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground sticky left-0 bg-secondary/50 z-10 min-w-[140px]">From ↓ / To →</th>
+                  {locations.map((loc, i) => (
+                    <th key={i} className="px-2 py-2 text-center font-medium text-muted-foreground min-w-[90px] whitespace-nowrap">
+                      {loc.name.length > 15 ? loc.name.substring(0, 13) + '…' : loc.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {locations.map((rowLoc, ri) => (
+                  <tr key={ri} className="border-t border-border">
+                    <td className="px-3 py-2 font-medium text-foreground sticky left-0 bg-background z-10 whitespace-nowrap">
+                      {rowLoc.name.length > 18 ? rowLoc.name.substring(0, 16) + '…' : rowLoc.name}
+                    </td>
+                    {locations.map((colLoc, ci) => {
+                      if (ri === ci) {
+                        return <td key={ci} className="px-2 py-1 text-center bg-muted/30">—</td>;
+                      }
+                      // Only show editable cells for upper triangle (ri < ci), mirror for lower
+                      const isUpper = ri < ci;
+                      const origin = isUpper ? rowLoc.name : colLoc.name;
+                      const destination = isUpper ? colLoc.name : rowLoc.name;
+                      const currentPrice = getEconomyPrice(origin, destination);
+                      
+                      if (!isUpper) {
+                        // Lower triangle: show read-only mirror
+                        return (
+                          <td key={ci} className="px-2 py-1 text-center text-muted-foreground bg-muted/10 font-mono">
+                            {currentPrice ? `€${currentPrice}` : ''}
+                          </td>
+                        );
+                      }
+
+                      return (
+                        <td key={ci} className="px-1 py-1">
+                          <Input
+                            type="number"
+                            min={0}
+                            placeholder="—"
+                            defaultValue={currentPrice}
+                            onBlur={(e) => {
+                              const val = Number(e.target.value) || 0;
+                              const prev = Number(currentPrice) || 0;
+                              if (val !== prev) {
+                                handlePriceChange(origin, destination, val);
+                              }
+                            }}
+                            className="text-xs font-mono h-7 w-[80px] text-center px-1"
+                          />
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary with calculated prices */}
+          {routes.length > 0 && (
+            <div className="text-[11px] text-muted-foreground pt-2">
+              {routes.length} route{routes.length !== 1 ? 's' : ''} configured. 
+              Example: {routes[0].origin} → {routes[0].destination}: 
+              Economy €{routes[0].price_economy} · 
+              Business €{routes[0].price_business} · 
+              First Class €{routes[0].price_first_class} · 
+              VAN €{routes[0].price_van}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fallback formula */}
+      <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
+        <h4 className="text-xs font-semibold text-foreground">Fallback Formula (optional)</h4>
+        <p className="text-[11px] text-muted-foreground">For custom addresses not in your locations list: Price = Base Fee + (Distance × Per-KM Rate)</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
@@ -186,77 +404,9 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
           </div>
         </div>
       </div>
-
-      <div className="flex gap-2 flex-wrap">
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
-          <Download className="h-3.5 w-3.5 mr-1" /> Download Template
-        </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!routes.length}>
-          <Download className="h-3.5 w-3.5 mr-1" /> Export Current
-        </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
-          <Upload className="h-3.5 w-3.5 mr-1" /> {uploading ? 'Importing...' : 'Import Excel'}
-        </Button>
-        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
-      </div>
-
-      <p className="text-[11px] text-muted-foreground -mt-2">Fixed routes below override the auto-pricing formula. Price per route + vehicle category (like Blacklane).</p>
-
-      {/* Add form */}
-      <div className="rounded-lg border border-border p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Add Route</h4>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="space-y-1"><Label className="text-[11px]">Origin *</Label><Input placeholder="Airport" value={origin} onChange={(e) => setOrigin(e.target.value)} className="text-xs" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">Destination *</Label><Input placeholder="City center" value={destination} onChange={(e) => setDestination(e.target.value)} className="text-xs" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">Distance (km)</Label><Input type="number" min={0} placeholder="25" value={distanceKm} onChange={(e) => setDistanceKm(e.target.value)} className="text-xs font-mono" /></div>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          <div className="space-y-1"><Label className="text-[11px]">Economy (€) *</Label><Input type="number" min={0} placeholder="35" value={priceEconomy} onChange={(e) => setPriceEconomy(e.target.value)} className="text-xs font-mono" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">Business (€)</Label><Input type="number" min={0} placeholder="55" value={priceBusiness} onChange={(e) => setPriceBusiness(e.target.value)} className="text-xs font-mono" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">First Class (€)</Label><Input type="number" min={0} placeholder="85" value={priceFirstClass} onChange={(e) => setPriceFirstClass(e.target.value)} className="text-xs font-mono" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">VAN (€)</Label><Input type="number" min={0} placeholder="65" value={priceVan} onChange={(e) => setPriceVan(e.target.value)} className="text-xs font-mono" /></div>
-        </div>
-        <Button size="sm" onClick={handleAdd} disabled={addRoute.isPending || !origin || !destination || !priceEconomy} className="gradient-accent text-accent-foreground"><Plus className="h-3.5 w-3.5 mr-1" /> Add Route</Button>
-      </div>
-
-      {/* Table */}
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : routes.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No transfer routes configured yet. Download the template, fill it in, and import!</p> : (
-        <div className="border border-border rounded-lg overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-secondary/50">
-              <tr>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Origin</th>
-                <th className="px-3 py-2 text-left font-medium text-muted-foreground">Destination</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Economy</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Business</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">1st Class</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">VAN</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Dist.</th>
-                <th className="px-3 py-2 w-10" />
-              </tr>
-            </thead>
-            <tbody>
-              {routes.map((r) => (
-                <tr key={r.id} className="border-t border-border hover:bg-secondary/20">
-                  <td className="px-3 py-2 text-foreground">{r.origin}</td>
-                  <td className="px-3 py-2 text-foreground">{r.destination}</td>
-                  <td className="px-3 py-2 text-right font-mono text-foreground">€{r.price_economy}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_business ? `€${r.price_business}` : '—'}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_first_class ? `€${r.price_first_class}` : '—'}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{r.price_van ? `€${r.price_van}` : '—'}</td>
-                  <td className="px-3 py-2 text-right text-muted-foreground">{r.distance_km ? `${r.distance_km} km` : '—'}</td>
-                  <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteRoute.mutate({ id: r.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 };
-
-// ── Limo Tour Tab ──
 const LimoTourPricingTab = ({ agencyId }: { agencyId: string }) => {
   const { data: prices = [], isLoading } = useLimoTourPricing(agencyId);
   const addPrice = useAddLimoTourPrice();
