@@ -12,6 +12,7 @@ interface LocationEntry {
 interface LocationsEditorProps {
   locations: LocationEntry[];
   onChange: (locations: LocationEntry[]) => void;
+  country?: string;
 }
 
 interface PhotonFeature {
@@ -59,7 +60,7 @@ function buildDisplayName(feat: PhotonFeature): string {
   return feat.properties.name || 'Unknown location';
 }
 
-const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
+const LocationsEditor = ({ locations, onChange, country }: LocationsEditorProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PhotonFeature[]>([]);
   const [loading, setLoading] = useState(false);
@@ -80,7 +81,8 @@ const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
     if (q.length < 2) { setResults([]); return; }
     setLoading(true);
     try {
-      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lang=en`);
+      const searchQuery = country ? `${q}, ${country}` : q;
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=8&lang=en`);
       const data = await res.json();
       setResults(data.features || []);
       setShowDropdown(true);
@@ -89,7 +91,7 @@ const LocationsEditor = ({ locations, onChange }: LocationsEditorProps) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [country]);
 
   const handleInputChange = (val: string) => {
     setQuery(val);

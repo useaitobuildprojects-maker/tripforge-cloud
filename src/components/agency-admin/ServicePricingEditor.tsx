@@ -23,9 +23,10 @@ interface Props {
   enabledServices: string[];
   storefrontConfig: StorefrontConfig;
   onConfigChange: (config: StorefrontConfig) => void;
+  country?: string;
 }
 
-const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange }: Props) => {
+const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onConfigChange, country }: Props) => {
   const hasTransfer = enabledServices.includes('transfer');
   const hasLimo = enabledServices.includes('limo_tour');
   const hasCityTour = enabledServices.includes('city_tour');
@@ -64,7 +65,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
           ))}
         </TabsList>
 
-        {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
+        {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} country={country} /></TabsContent>}
         {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoTourPricingTab agencyId={agencyId} /></TabsContent>}
         {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} /></TabsContent>}
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
@@ -74,7 +75,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 };
 
 // ── Transfer Tab with Zone Matrix ──
-const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
   const addRoute = useAddTransferRoute();
   const deleteRoute = useDeleteTransferRoute();
@@ -233,6 +234,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
         <LocationsEditor
           locations={locations}
           onChange={(locs) => onConfigChange({ ...storefrontConfig, locations: locs })}
+          country={country}
         />
       </div>
 
