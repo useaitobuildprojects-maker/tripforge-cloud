@@ -81,7 +81,8 @@ const LocationsEditor = ({ locations, onChange, country }: LocationsEditorProps)
     if (q.length < 2) { setResults([]); return; }
     setLoading(true);
     try {
-      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=8&lang=en`);
+      const searchQuery = country ? `${q}, ${country}` : q;
+      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(searchQuery)}&limit=8&lang=en`);
       const data = await res.json();
       setResults(data.features || []);
       setShowDropdown(true);
@@ -90,7 +91,7 @@ const LocationsEditor = ({ locations, onChange, country }: LocationsEditorProps)
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [country]);
 
   const handleInputChange = (val: string) => {
     setQuery(val);

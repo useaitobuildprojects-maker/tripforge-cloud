@@ -234,6 +234,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
         <LocationsEditor
           locations={locations}
           onChange={(locs) => onConfigChange({ ...storefrontConfig, locations: locs })}
+          country={country}
         />
       </div>
 
