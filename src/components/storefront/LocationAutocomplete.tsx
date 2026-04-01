@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Plane, X, Search, Loader2, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -56,6 +56,13 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
+  const countryHints = useMemo(() => {
+    const fromAddresses = locations
+      .map((l) => l.address?.split(',').pop()?.trim())
+      .filter((c): c is string => !!c);
+    return Array.from(new Set(fromAddresses)).slice(0, 3);
+  }, [locations]);
+
   useEffect(() => { setQuery(value); }, [value]);
 
   useEffect(() => {
@@ -67,25 +74,50 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   }, []);
 
   const searchPhoton = useCallback(async (q: string) => {
-    if (q.length < 2) { setSearchResults([]); return; }
+    const normalized = q.trim();
+    if (normalized.length < 1) { setSearchResults([]); return; }
+
     setLoading(true);
     try {
-      const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5&lang=en`);
-      const data = await res.json();
-      const results: LocationOption[] = (data.features || []).map((feat: PhotonFeature, i: number) => ({
-        id: `search-${i}`,
-        name: feat.properties.name || 'Unknown',
-        type: detectTypeFromPhoton(feat),
-        address: buildAddress(feat),
-        source: 'search' as const,
-      }));
-      setSearchResults(results);
+      const queries = Array.from(new Set([
+        normalized,
+        ...countryHints.map((country) => `${normalized}, ${country}`),
+      ]));
+
+      const responses = await Promise.all(
+        queries.map(async (singleQuery) => {
+          const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(singleQuery)}&limit=6&lang=en`);
+          if (!res.ok) return [];
+          const data = await res.json();
+          return (data.features || []) as PhotonFeature[];
+        })
+      );
+
+      const seen = new Set<string>();
+      const mergedResults: LocationOption[] = [];
+
+      responses.flat().forEach((feat) => {
+        const name = feat.properties.name || 'Unknown';
+        const address = buildAddress(feat);
+        const key = `${name.toLowerCase()}|${address.toLowerCase()}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        mergedResults.push({
+          id: `search-${mergedResults.length}`,
+          name,
+          type: detectTypeFromPhoton(feat),
+          address,
+          source: 'search',
+        });
+      });
+
+      setSearchResults(mergedResults.slice(0, 12));
     } catch {
       setSearchResults([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [countryHints]);
 
   // Filter configured locations
   const filteredConfigured = locations.filter((loc) =>
