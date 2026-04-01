@@ -78,10 +78,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
     window.open(url, '_blank');
   };
 
-  const availableDestinations = useMemo(() => {
-    return locations.filter(l => l.name !== origin);
-  }, [locations, origin]);
-
   return (
     <div className="max-w-2xl mx-auto">
       <motion.div
@@ -100,28 +96,13 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
             <Label className="text-xs font-medium flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup
             </Label>
-            <Select value={origin} onValueChange={(v) => { setOrigin(v); setQuote(null); }}>
-              <SelectTrigger className="text-sm"><SelectValue placeholder="Select pickup..." /></SelectTrigger>
-              <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc.name} value={loc.name}>
-                    <span className="flex items-center gap-2">
-                      {loc.name}
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{loc.type}</Badge>
-                    </span>
-                  </SelectItem>
-                ))}
-                <SelectItem value="__custom__">✏️ Enter custom address</SelectItem>
-              </SelectContent>
-            </Select>
-            {useCustomOrigin && (
-              <Input
-                placeholder="Enter address..."
-                value={customOrigin}
-                onChange={(e) => { setCustomOrigin(e.target.value); setQuote(null); }}
-                className="text-sm mt-1"
-              />
-            )}
+            <LocationAutocomplete
+              value={origin}
+              onChange={(v) => { setOrigin(v); setQuote(null); }}
+              placeholder="Airport, hotel, or address"
+              locations={agencyLocations}
+              agencyCity={agency.city}
+            />
           </div>
 
           <div className="hidden md:flex items-center justify-center pb-1">
@@ -132,28 +113,13 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
             <Label className="text-xs font-medium flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off
             </Label>
-            <Select value={destination} onValueChange={(v) => { setDestination(v); setQuote(null); }}>
-              <SelectTrigger className="text-sm"><SelectValue placeholder="Select drop-off..." /></SelectTrigger>
-              <SelectContent>
-                {availableDestinations.map((loc) => (
-                  <SelectItem key={loc.name} value={loc.name}>
-                    <span className="flex items-center gap-2">
-                      {loc.name}
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{loc.type}</Badge>
-                    </span>
-                  </SelectItem>
-                ))}
-                <SelectItem value="__custom__">✏️ Enter custom address</SelectItem>
-              </SelectContent>
-            </Select>
-            {useCustomDest && (
-              <Input
-                placeholder="Enter address..."
-                value={customDestination}
-                onChange={(e) => { setCustomDestination(e.target.value); setQuote(null); }}
-                className="text-sm mt-1"
-              />
-            )}
+            <LocationAutocomplete
+              value={destination}
+              onChange={(v) => { setDestination(v); setQuote(null); }}
+              placeholder="Destination address"
+              locations={agencyLocations}
+              agencyCity={agency.city}
+            />
           </div>
         </div>
 
