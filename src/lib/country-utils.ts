@@ -1,45 +1,51 @@
-/** Country name → ISO 3166-1 alpha-2 mapping for Mapbox country filtering */
-const COUNTRY_TO_ISO: Record<string, string> = {
-  'afghanistan': 'af', 'albania': 'al', 'algeria': 'dz', 'andorra': 'ad', 'angola': 'ao',
-  'argentina': 'ar', 'armenia': 'am', 'australia': 'au', 'austria': 'at', 'azerbaijan': 'az',
-  'bahrain': 'bh', 'bangladesh': 'bd', 'belarus': 'by', 'belgium': 'be', 'benin': 'bj',
-  'bolivia': 'bo', 'bosnia and herzegovina': 'ba', 'brazil': 'br', 'brunei': 'bn', 'bulgaria': 'bg',
-  'burkina faso': 'bf', 'cambodia': 'kh', 'cameroon': 'cm', 'canada': 'ca', 'chad': 'td',
-  'chile': 'cl', 'china': 'cn', 'colombia': 'co', 'comoros': 'km', 'congo': 'cg',
-  'costa rica': 'cr', 'croatia': 'hr', 'cuba': 'cu', 'cyprus': 'cy', 'czech republic': 'cz',
-  'denmark': 'dk', 'djibouti': 'dj', 'dominican republic': 'do', 'dr congo': 'cd',
-  'ecuador': 'ec', 'egypt': 'eg', 'el salvador': 'sv', 'equatorial guinea': 'gq',
-  'eritrea': 'er', 'estonia': 'ee', 'eswatini': 'sz', 'ethiopia': 'et', 'fiji': 'fj',
-  'finland': 'fi', 'france': 'fr', 'gabon': 'ga', 'gambia': 'gm', 'georgia': 'ge',
-  'germany': 'de', 'ghana': 'gh', 'greece': 'gr', 'guatemala': 'gt', 'guinea': 'gn',
-  'haiti': 'ht', 'honduras': 'hn', 'hungary': 'hu', 'iceland': 'is', 'india': 'in',
-  'indonesia': 'id', 'iran': 'ir', 'iraq': 'iq', 'ireland': 'ie', 'israel': 'il',
-  'italy': 'it', 'ivory coast': 'ci', 'jamaica': 'jm', 'japan': 'jp', 'jordan': 'jo',
-  'kazakhstan': 'kz', 'kenya': 'ke', 'kosovo': 'xk', 'kuwait': 'kw', 'kyrgyzstan': 'kg',
-  'laos': 'la', 'latvia': 'lv', 'lebanon': 'lb', 'lesotho': 'ls', 'liberia': 'lr',
-  'libya': 'ly', 'liechtenstein': 'li', 'lithuania': 'lt', 'luxembourg': 'lu',
-  'madagascar': 'mg', 'malawi': 'mw', 'malaysia': 'my', 'maldives': 'mv', 'mali': 'ml',
-  'malta': 'mt', 'mauritania': 'mr', 'mauritius': 'mu', 'mexico': 'mx', 'moldova': 'md',
-  'monaco': 'mc', 'mongolia': 'mn', 'montenegro': 'me', 'morocco': 'ma', 'mozambique': 'mz',
-  'myanmar': 'mm', 'namibia': 'na', 'nepal': 'np', 'netherlands': 'nl', 'new zealand': 'nz',
-  'nicaragua': 'ni', 'niger': 'ne', 'nigeria': 'ng', 'north korea': 'kp',
-  'north macedonia': 'mk', 'norway': 'no', 'oman': 'om', 'pakistan': 'pk', 'palestine': 'ps',
-  'panama': 'pa', 'paraguay': 'py', 'peru': 'pe', 'philippines': 'ph', 'poland': 'pl',
-  'portugal': 'pt', 'qatar': 'qa', 'romania': 'ro', 'russia': 'ru', 'rwanda': 'rw',
-  'saudi arabia': 'sa', 'senegal': 'sn', 'serbia': 'rs', 'sierra leone': 'sl',
-  'singapore': 'sg', 'slovakia': 'sk', 'slovenia': 'si', 'somalia': 'so', 'south africa': 'za',
-  'south korea': 'kr', 'south sudan': 'ss', 'spain': 'es', 'sri lanka': 'lk', 'sudan': 'sd',
-  'suriname': 'sr', 'sweden': 'se', 'switzerland': 'ch', 'syria': 'sy', 'taiwan': 'tw',
-  'tajikistan': 'tj', 'tanzania': 'tz', 'thailand': 'th', 'togo': 'tg',
-  'trinidad and tobago': 'tt', 'tunisia': 'tn', 'turkey': 'tr', 'turkmenistan': 'tm',
-  'uae': 'ae', 'uganda': 'ug', 'ukraine': 'ua', 'united kingdom': 'gb',
-  'united states': 'us', 'uruguay': 'uy', 'uzbekistan': 'uz', 'vatican city': 'va',
-  'venezuela': 've', 'vietnam': 'vn', 'yemen': 'ye', 'zambia': 'zm', 'zimbabwe': 'zw',
+/** Country display name → ISO 3166-1 alpha-2 code */
+const COUNTRY_MAP: Record<string, string> = {
+  'Afghanistan': 'af', 'Albania': 'al', 'Algeria': 'dz', 'Andorra': 'ad', 'Angola': 'ao',
+  'Argentina': 'ar', 'Armenia': 'am', 'Australia': 'au', 'Austria': 'at', 'Azerbaijan': 'az',
+  'Bahrain': 'bh', 'Bangladesh': 'bd', 'Belarus': 'by', 'Belgium': 'be', 'Benin': 'bj',
+  'Bolivia': 'bo', 'Bosnia and Herzegovina': 'ba', 'Brazil': 'br', 'Brunei': 'bn', 'Bulgaria': 'bg',
+  'Burkina Faso': 'bf', 'Cambodia': 'kh', 'Cameroon': 'cm', 'Canada': 'ca', 'Chad': 'td',
+  'Chile': 'cl', 'China': 'cn', 'Colombia': 'co', 'Comoros': 'km', 'Congo': 'cg',
+  'Costa Rica': 'cr', 'Croatia': 'hr', 'Cuba': 'cu', 'Cyprus': 'cy', 'Czech Republic': 'cz',
+  'Denmark': 'dk', 'Djibouti': 'dj', 'Dominican Republic': 'do', 'DR Congo': 'cd',
+  'Ecuador': 'ec', 'Egypt': 'eg', 'El Salvador': 'sv', 'Equatorial Guinea': 'gq',
+  'Eritrea': 'er', 'Estonia': 'ee', 'Eswatini': 'sz', 'Ethiopia': 'et', 'Fiji': 'fj',
+  'Finland': 'fi', 'France': 'fr', 'Gabon': 'ga', 'Gambia': 'gm', 'Georgia': 'ge',
+  'Germany': 'de', 'Ghana': 'gh', 'Greece': 'gr', 'Guatemala': 'gt', 'Guinea': 'gn',
+  'Haiti': 'ht', 'Honduras': 'hn', 'Hungary': 'hu', 'Iceland': 'is', 'India': 'in',
+  'Indonesia': 'id', 'Iran': 'ir', 'Iraq': 'iq', 'Ireland': 'ie', 'Israel': 'il',
+  'Italy': 'it', 'Ivory Coast': 'ci', 'Jamaica': 'jm', 'Japan': 'jp', 'Jordan': 'jo',
+  'Kazakhstan': 'kz', 'Kenya': 'ke', 'Kosovo': 'xk', 'Kuwait': 'kw', 'Kyrgyzstan': 'kg',
+  'Laos': 'la', 'Latvia': 'lv', 'Lebanon': 'lb', 'Lesotho': 'ls', 'Liberia': 'lr',
+  'Libya': 'ly', 'Liechtenstein': 'li', 'Lithuania': 'lt', 'Luxembourg': 'lu',
+  'Madagascar': 'mg', 'Malawi': 'mw', 'Malaysia': 'my', 'Maldives': 'mv', 'Mali': 'ml',
+  'Malta': 'mt', 'Mauritania': 'mr', 'Mauritius': 'mu', 'Mexico': 'mx', 'Moldova': 'md',
+  'Monaco': 'mc', 'Mongolia': 'mn', 'Montenegro': 'me', 'Morocco': 'ma', 'Mozambique': 'mz',
+  'Myanmar': 'mm', 'Namibia': 'na', 'Nepal': 'np', 'Netherlands': 'nl', 'New Zealand': 'nz',
+  'Nicaragua': 'ni', 'Niger': 'ne', 'Nigeria': 'ng', 'North Korea': 'kp',
+  'North Macedonia': 'mk', 'Norway': 'no', 'Oman': 'om', 'Pakistan': 'pk', 'Palestine': 'ps',
+  'Panama': 'pa', 'Paraguay': 'py', 'Peru': 'pe', 'Philippines': 'ph', 'Poland': 'pl',
+  'Portugal': 'pt', 'Qatar': 'qa', 'Romania': 'ro', 'Russia': 'ru', 'Rwanda': 'rw',
+  'Saudi Arabia': 'sa', 'Senegal': 'sn', 'Serbia': 'rs', 'Sierra Leone': 'sl',
+  'Singapore': 'sg', 'Slovakia': 'sk', 'Slovenia': 'si', 'Somalia': 'so', 'South Africa': 'za',
+  'South Korea': 'kr', 'South Sudan': 'ss', 'Spain': 'es', 'Sri Lanka': 'lk', 'Sudan': 'sd',
+  'Suriname': 'sr', 'Sweden': 'se', 'Switzerland': 'ch', 'Syria': 'sy', 'Taiwan': 'tw',
+  'Tajikistan': 'tj', 'Tanzania': 'tz', 'Thailand': 'th', 'Togo': 'tg',
+  'Trinidad and Tobago': 'tt', 'Tunisia': 'tn', 'Turkey': 'tr', 'Turkmenistan': 'tm',
+  'UAE': 'ae', 'Uganda': 'ug', 'Ukraine': 'ua', 'United Kingdom': 'gb',
+  'United States': 'us', 'Uruguay': 'uy', 'Uzbekistan': 'uz', 'Vatican City': 'va',
+  'Venezuela': 've', 'Vietnam': 'vn', 'Yemen': 'ye', 'Zambia': 'zm', 'Zimbabwe': 'zw',
 };
+
+/** Sorted list of country names for dropdowns */
+export const COUNTRY_LIST = Object.keys(COUNTRY_MAP).sort();
 
 /** Convert a country name to ISO 3166-1 alpha-2 code */
 export function countryToISO(country: string): string | null {
   if (!country) return null;
-  const code = COUNTRY_TO_ISO[country.trim().toLowerCase()];
-  return code || null;
+  // Try exact match first, then case-insensitive
+  if (COUNTRY_MAP[country]) return COUNTRY_MAP[country];
+  const lower = country.trim().toLowerCase();
+  const entry = Object.entries(COUNTRY_MAP).find(([k]) => k.toLowerCase() === lower);
+  return entry ? entry[1] : null;
 }

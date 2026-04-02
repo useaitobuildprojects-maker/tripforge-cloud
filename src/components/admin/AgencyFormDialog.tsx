@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Agency, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { useCreateAgency, useUpdateAgency } from '@/hooks/use-agency-mutations';
+import { COUNTRY_LIST } from '@/lib/country-utils';
 
 interface AgencyFormDialogProps {
   open: boolean;
@@ -120,7 +121,18 @@ const AgencyFormDialog = ({ open, onOpenChange, agency }: AgencyFormDialogProps)
             </div>
             <div className="space-y-2">
               <Label htmlFor="country">Country</Label>
-              <Input id="country" value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} required placeholder="France" />
+              <select
+                id="country"
+                value={form.country}
+                onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
+                required
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="">Select a country</option>
+                {COUNTRY_LIST.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
           </div>
 
