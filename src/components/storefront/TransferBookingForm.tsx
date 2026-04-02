@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { TransferRoute, TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
-import { getMatrixPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
+import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
