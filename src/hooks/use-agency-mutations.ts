@@ -65,6 +65,8 @@ export const useUpdateAgency = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agencies'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['agency-admin'] });
+      queryClient.invalidateQueries({ queryKey: ['agency-by-domain'] });
       toast.success('Agency updated successfully');
     },
     onError: (error: Error) => {
