@@ -339,18 +339,13 @@ const DB: POI[] = [
 ];
 
 /**
- * Get POIs for specified countries. If no countries match, returns all POIs.
- * @param countries Comma-separated list of countries the agency operates in
+ * Get POIs for a specified country. If empty, returns all POIs.
+ * @param country The country name the agency operates in
  */
-export function getPOIsForCountries(countries: string): POI[] {
-  const countryList = countries
-    .split(',')
-    .map((c) => c.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (countryList.length === 0) return DB;
-
-  return DB.filter((poi) => countryList.includes(poi.country.toLowerCase()));
+export function getPOIsForCountries(country: string): POI[] {
+  const trimmed = country.trim().toLowerCase();
+  if (!trimmed) return DB;
+  return DB.filter((poi) => poi.country.toLowerCase() === trimmed);
 }
 
 /**
