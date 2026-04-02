@@ -1,5 +1,5 @@
-/** Country name → ISO 3166-1 alpha-2 mapping for Mapbox country filtering */
-const COUNTRY_TO_ISO: Record<string, string> = {
+/** Country display name → ISO 3166-1 alpha-2 mapping */
+const COUNTRY_ENTRIES: [string, string][] = [
   'afghanistan': 'af', 'albania': 'al', 'algeria': 'dz', 'andorra': 'ad', 'angola': 'ao',
   'argentina': 'ar', 'armenia': 'am', 'australia': 'au', 'austria': 'at', 'azerbaijan': 'az',
   'bahrain': 'bh', 'bangladesh': 'bd', 'belarus': 'by', 'belgium': 'be', 'benin': 'bj',
