@@ -78,29 +78,17 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const [showSettings, setShowSettings] = useState(false);
 
-  const locations = storefrontConfig.locations ?? [];
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
   const multVan = storefrontConfig.transfer_multiplier_van ?? 1.8;
 
   return (
     <div className="space-y-5">
-      {/* Step 1: Locations */}
-      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 1 — Define Locations</h4>
-        <p className="text-[11px] text-muted-foreground">Add airports, hotels, cities, and stations that will appear in the booking form's autocomplete.</p>
-        <LocationsEditor
-          locations={locations}
-          onChange={(locs) => onConfigChange({ ...storefrontConfig, locations: locs })}
-          country={country}
-        />
-      </div>
-
-      {/* Step 2: Category Multipliers */}
+      {/* Step 1: Category Multipliers */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 2 — Category Multipliers</h4>
+            <h4 className="text-xs font-semibold text-foreground">Step 1 — Category Multipliers</h4>
             <p className="text-[11px] text-muted-foreground mt-0.5">Economy is the base (1.0×). Other categories are multiplied automatically.</p>
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSettings(!showSettings)}>
