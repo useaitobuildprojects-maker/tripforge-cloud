@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Plane, X, Search, Loader2, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchPOIs } from '@/data/poi-database';
+import { countryToISO } from '@/lib/country-utils';
 
 interface LocationOption {
   id: string;
