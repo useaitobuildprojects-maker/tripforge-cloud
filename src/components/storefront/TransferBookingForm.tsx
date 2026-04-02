@@ -150,27 +150,6 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
         {/* Get Quote / Results */}
         {effectiveOrigin && effectiveDest && effectiveOrigin !== effectiveDest && (
           <>
-            {matrixPrices && matrixPrices[selectedCategory] !== undefined ? (
-              /* Instant price from matrix */
-              <div className="rounded-xl p-5 text-center space-y-3" style={{ backgroundColor: `${buttonColor}10` }}>
-                <p className="text-sm text-muted-foreground">
-                  {effectiveOrigin} → {effectiveDest} · {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}
-                </p>
-                <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{matrixPrices[selectedCategory]}</p>
-                <p className="text-xs text-muted-foreground">Fixed price • No hidden fees</p>
-
-                {config.whatsapp_number && (
-                  <Button
-                    className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
-                    style={{ backgroundColor: '#25D366' }}
-                    onClick={handleWhatsApp}
-                  >
-                    <MessageCircle className="h-5 w-5" /> Book via WhatsApp
-                  </Button>
-                )}
-              </div>
-            ) : (
-              /* Need to calculate via OSRM */
               <>
                 {!quote && (
                   <Button

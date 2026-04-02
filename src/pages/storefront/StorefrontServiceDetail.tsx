@@ -114,7 +114,6 @@ const StorefrontServiceDetail = () => {
           <TransferBookingForm
             agency={agency}
             config={cfg}
-            routes={transferRoutes}
             buttonColor={buttonColor}
           />
         </section>

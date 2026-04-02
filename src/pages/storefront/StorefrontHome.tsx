@@ -271,7 +271,6 @@ const StorefrontHome = () => {
                 <TransferBookingForm
                   agency={agency}
                   config={cfg}
-                  routes={transferRoutes}
                   buttonColor={buttonColor}
                 />
               </motion.div>
