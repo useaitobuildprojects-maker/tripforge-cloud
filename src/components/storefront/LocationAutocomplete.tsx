@@ -56,18 +56,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const countryHints = useMemo(() => {
-    const fromAgency = (agencyCountry || '')
-      .split(',')
-      .map((c) => c.trim())
-      .filter(Boolean);
-
-    const fromAddresses = locations
-      .map((l) => l.address?.split(',').pop()?.trim())
-      .filter((c): c is string => !!c);
-
-    return Array.from(new Set([...fromAgency, ...fromAddresses])).slice(0, 6);
-  }, [agencyCountry, locations]);
+  const countryCode = useMemo(() => countryToISO(agencyCountry || ''), [agencyCountry]);
 
 
   useEffect(() => { setQuery(value); }, [value]);
