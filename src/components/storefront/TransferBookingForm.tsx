@@ -220,7 +220,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                   </div>
                 )}
               </>
-            )}
+
           </>
         )}
       </motion.div>
