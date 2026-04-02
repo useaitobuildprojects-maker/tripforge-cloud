@@ -44,7 +44,7 @@ const StorefrontHome = () => {
 
   const enabledServices = agency.services ?? [];
   const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
-  const { data: transferRoutes = [] } = useTransferRoutes(agency.id);
+  
 
   // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>(enabledServices[0] ?? 'car_rental');

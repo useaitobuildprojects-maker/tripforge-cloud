@@ -46,7 +46,7 @@ const StorefrontServiceDetail = () => {
   const features = SERVICE_FEATURES[service] ?? [];
 
   const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
-  const { data: transferRoutes = [] } = useTransferRoutes(service === 'transfer' ? agency.id : undefined);
+  
 
   const isTransfer = service === 'transfer';
 
