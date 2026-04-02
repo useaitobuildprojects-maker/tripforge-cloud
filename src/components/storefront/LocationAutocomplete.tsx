@@ -101,7 +101,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     } finally {
       setLoading(false);
     }
-  }, [agencyCity, countryHints]);
+  }, [agencyCity, countryCode]);
 
   // Filter configured locations
   const filteredConfigured = locations.filter((loc) =>
