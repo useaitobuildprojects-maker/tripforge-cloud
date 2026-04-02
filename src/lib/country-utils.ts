@@ -43,3 +43,8 @@ export function countryToISO(country: string): string | null {
   const code = COUNTRY_TO_ISO[country.trim().toLowerCase()];
   return code || null;
 }
+
+/** Full country list for dropdowns */
+export const COUNTRY_LIST = Object.keys(COUNTRY_TO_ISO).map(
+  (k) => k.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+).sort();
