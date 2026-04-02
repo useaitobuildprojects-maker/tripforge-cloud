@@ -1,9 +1,14 @@
 import { useState, useMemo } from 'react';
+import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
@@ -35,10 +40,23 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [destination, setDestination] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
+  const [date, setDate] = useState<Date>();
+  const [time, setTime] = useState('');
   const [loading, setLoading] = useState(false);
 
   const effectiveOrigin = origin;
   const effectiveDest = destination;
+
+  // Generate time slots every 30 minutes
+  const timeSlots = useMemo(() => {
+    const slots: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+      }
+    }
+    return slots;
+  }, []);
 
   // Resolve a location name to a geocoding-friendly string by appending its address if configured
   const resolveLocationQuery = (name: string): string => {
@@ -67,7 +85,9 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!quote || !config.whatsapp_number) return;
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const dateStr = date ? format(date, 'PPP') : 'Not specified';
+    const timeStr = time || 'Not specified';
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -116,6 +136,54 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
               agencyCity={agency.city}
               agencyCountry={agency.country}
             />
+          </div>
+        </div>
+
+        {/* Date & Time */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium flex items-center gap-1.5">
+              <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Date
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal h-10",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Time
+            </Label>
+            <Select value={time} onValueChange={setTime}>
+              <SelectTrigger className="h-10">
+                <SelectValue placeholder="Select time" />
+              </SelectTrigger>
+              <SelectContent>
+                {timeSlots.map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
