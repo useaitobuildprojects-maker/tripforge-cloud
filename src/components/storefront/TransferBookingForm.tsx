@@ -85,7 +85,9 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!quote || !config.whatsapp_number) return;
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const dateStr = date ? format(date, 'PPP') : 'Not specified';
+    const timeStr = time || 'Not specified';
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
