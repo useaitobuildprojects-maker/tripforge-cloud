@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import {
-  useTransferRoutes, useAddTransferRoute, useDeleteTransferRoute, TRANSFER_CATEGORIES,
+  TRANSFER_CATEGORIES,
   useLimoTourPricing, useAddLimoTourPrice, useDeleteLimoTourPrice,
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
