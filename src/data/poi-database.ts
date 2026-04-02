@@ -339,30 +339,22 @@ const DB: POI[] = [
 ];
 
 /**
- * Get POIs for specified countries. If no countries match, returns all POIs.
- * @param countries Comma-separated list of countries the agency operates in
+ * Get POIs for a specified country. If empty, returns all POIs.
+ * @param country The country name the agency operates in
  */
-export function getPOIsForCountries(countries: string): POI[] {
-  const countryList = countries
-    .split(',')
-    .map((c) => c.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (countryList.length === 0) return DB;
-
-  return DB.filter((poi) => countryList.includes(poi.country.toLowerCase()));
+export function getPOIsForCountries(country: string): POI[] {
+  const trimmed = country.trim().toLowerCase();
+  if (!trimmed) return DB;
+  return DB.filter((poi) => poi.country.toLowerCase() === trimmed);
 }
 
 /**
  * Search POIs by query string. Returns matched POIs sorted by relevance.
  */
-export function searchPOIs(query: string, countries: string): POI[] {
+export function searchPOIs(query: string, country: string): POI[] {
   if (!query || query.trim().length < 1) return [];
 
-  // Search ALL POIs, but boost agency countries
-  const countryList = new Set(
-    countries.split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
-  );
+  const agencyCountry = country.trim().toLowerCase();
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   const scored = DB
@@ -399,8 +391,8 @@ export function searchPOIs(query: string, countries: string): POI[] {
       // Type bonus for airports (most common transfer)
       if (poi.type === 'airport') score += 5;
 
-      // Boost agency's own countries
-      if (countryList.size > 0 && countryList.has(poi.country.toLowerCase())) score += 30;
+      // Boost agency's own country
+      if (agencyCountry && poi.country.toLowerCase() === agencyCountry) score += 30;
 
       return { ...poi, score };
     })

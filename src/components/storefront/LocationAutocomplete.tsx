@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { MapPin, Plane, X, Search, Loader2, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { searchPOIs } from '@/data/poi-database';
+import { countryToISO } from '@/lib/country-utils';
 
 interface LocationOption {
   id: string;
@@ -55,18 +56,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  const countryHints = useMemo(() => {
-    const fromAgency = (agencyCountry || '')
-      .split(',')
-      .map((c) => c.trim())
-      .filter(Boolean);
-
-    const fromAddresses = locations
-      .map((l) => l.address?.split(',').pop()?.trim())
-      .filter((c): c is string => !!c);
-
-    return Array.from(new Set([...fromAgency, ...fromAddresses])).slice(0, 6);
-  }, [agencyCountry, locations]);
+  const countryCode = useMemo(() => countryToISO(agencyCountry || ''), [agencyCountry]);
 
 
   useEffect(() => { setQuery(value); }, [value]);
@@ -89,11 +79,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
       if (!token) { setSearchResults([]); setLoading(false); return; }
 
       const types = 'place,poi,address,locality';
-      // Build country codes from hints (ISO 3166-1 alpha-2)
-      const countryCodes = countryHints
-        .map(c => c.trim().slice(0, 2).toLowerCase())
-        .filter(c => c.length === 2);
-      const countryParam = countryCodes.length > 0 ? `&country=${countryCodes.join(',')}` : '';
+      const countryParam = countryCode ? `&country=${countryCode}` : '';
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10&language=en${countryParam}`;
 
       const res = await fetch(url);
@@ -115,7 +101,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     } finally {
       setLoading(false);
     }
-  }, [agencyCity, countryHints]);
+  }, [agencyCity, countryCode]);
 
   // Filter configured locations
   const filteredConfigured = locations.filter((loc) =>
