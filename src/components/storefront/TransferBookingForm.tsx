@@ -128,7 +128,6 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             {TRANSFER_CATEGORIES.map((cat) => {
               const Icon = CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
-              const matrixPrice = matrixPrices?.[cat.id];
 
               return (
                 <button
@@ -142,9 +141,6 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                   <Icon className="h-6 w-6 mb-2 opacity-60" />
                   <p className="text-sm font-bold">{cat.label}</p>
                   <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                  {matrixPrice !== undefined && (
-                    <p className="text-sm font-bold mt-2" style={{ color: buttonColor }}>€{matrixPrice}</p>
-                  )}
                 </button>
               );
             })}
