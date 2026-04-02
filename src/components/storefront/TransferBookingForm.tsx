@@ -19,7 +19,6 @@ const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
 interface Props {
   agency: Agency;
   config: StorefrontConfig;
-  routes: TransferRoute[];
   buttonColor: string;
 }
 
