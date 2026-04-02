@@ -40,21 +40,6 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const effectiveOrigin = origin;
   const effectiveDest = destination;
 
-  // Quick matrix prices for all categories (instant, no API call)
-  const matrixPrices = useMemo(() => {
-    if (!effectiveOrigin || !effectiveDest || effectiveOrigin === effectiveDest) return null;
-    const prices: Partial<Record<TransferCategory, number>> = {};
-    let hasAny = false;
-    for (const cat of TRANSFER_CATEGORIES) {
-      const p = getMatrixPrice(routes, effectiveOrigin, effectiveDest, cat.id);
-      if (p !== null) {
-        prices[cat.id] = p;
-        hasAny = true;
-      }
-    }
-    return hasAny ? prices : null;
-  }, [routes, effectiveOrigin, effectiveDest]);
-
   // Resolve a location name to a geocoding-friendly string by appending its address if configured
   const resolveLocationQuery = (name: string): string => {
     const loc = agencyLocations.find((l) => l.name === name);
