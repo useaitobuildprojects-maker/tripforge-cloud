@@ -108,35 +108,6 @@ const AgencyAdminSettings = () => {
     services: agency.services as string[],
   });
 
-  // Country autocomplete
-  const [countryQuery, setCountryQuery] = useState('');
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const countryWrapperRef = useRef<HTMLDivElement>(null);
-  const countryInputRef = useRef<HTMLInputElement>(null);
-
-  const selectedCountries = useMemo(() => form.country.split(',').filter(Boolean).map(s => s.trim().toLowerCase()), [form.country]);
-
-  const filteredCountries = useMemo(() => {
-    if (!countryQuery.trim()) return COUNTRY_LIST.filter(c => !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
-    const q = countryQuery.toLowerCase();
-    return COUNTRY_LIST.filter(c => c.toLowerCase().includes(q) && !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
-  }, [countryQuery, selectedCountries]);
-
-  const addCountry = (val: string) => {
-    if (selectedCountries.includes(val.toLowerCase())) return;
-    const newCountry = form.country ? `${form.country}, ${val}` : val;
-    setForm(f => ({ ...f, country: newCountry }));
-    setCountryQuery('');
-    setShowCountryDropdown(false);
-  };
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (countryWrapperRef.current && !countryWrapperRef.current.contains(e.target as Node)) setShowCountryDropdown(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
 
   const [pageSeo, setPageSeo] = useState<Record<StorefrontPage, PageSeoEntry>>(() => {
     const existing = agency.page_seo ?? {};
