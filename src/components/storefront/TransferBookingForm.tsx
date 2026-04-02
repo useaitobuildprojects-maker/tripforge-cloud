@@ -40,10 +40,23 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [destination, setDestination] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
+  const [date, setDate] = useState<Date>();
+  const [time, setTime] = useState('');
   const [loading, setLoading] = useState(false);
 
   const effectiveOrigin = origin;
   const effectiveDest = destination;
+
+  // Generate time slots every 30 minutes
+  const timeSlots = useMemo(() => {
+    const slots: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+      }
+    }
+    return slots;
+  }, []);
 
   // Resolve a location name to a geocoding-friendly string by appending its address if configured
   const resolveLocationQuery = (name: string): string => {
