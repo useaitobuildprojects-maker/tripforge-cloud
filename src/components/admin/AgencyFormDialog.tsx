@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Agency, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { useCreateAgency, useUpdateAgency } from '@/hooks/use-agency-mutations';
+import { COUNTRY_LIST } from '@/lib/country-utils';
 
 interface AgencyFormDialogProps {
   open: boolean;
