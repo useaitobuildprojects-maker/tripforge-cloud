@@ -127,9 +127,9 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 3: Pricing Formula */}
+      {/* Step 2: Pricing Formula */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 3 — Pricing Formula</h4>
+        <h4 className="text-xs font-semibold text-foreground">Step 2 — Pricing Formula</h4>
         <p className="text-[11px] text-muted-foreground">Price = Base Fee + (Distance × Per-KM Rate × Category Multiplier). Distance is calculated automatically via GPS.</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
