@@ -74,13 +74,8 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
   );
 };
 
-// ── Transfer Tab with Zone Matrix ──
+// ── Transfer Tab ──
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
-  const { data: routes = [], isLoading } = useTransferRoutes(agencyId);
-  const addRoute = useAddTransferRoute();
-  const deleteRoute = useDeleteTransferRoute();
-  const fileRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   const locations = storefrontConfig.locations ?? [];
@@ -88,149 +83,12 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
   const multVan = storefrontConfig.transfer_multiplier_van ?? 1.8;
 
-  // Build a lookup map: "origin|destination" -> route
-  const routeMap = useMemo(() => {
-    const map: Record<string, typeof routes[0]> = {};
-    routes.forEach(r => {
-      map[`${r.origin}|${r.destination}`] = r;
-    });
-    return map;
-  }, [routes]);
-
-  // Generate all unique pairs from locations
-  const pairs = useMemo(() => {
-    const result: { origin: string; destination: string }[] = [];
-    for (let i = 0; i < locations.length; i++) {
-      for (let j = i + 1; j < locations.length; j++) {
-        result.push({ origin: locations[i].name, destination: locations[j].name });
-      }
-    }
-    return result;
-  }, [locations]);
-
-  // Save/update a route price
-  const handlePriceChange = async (origin: string, destination: string, economyPrice: number) => {
-    // Check if route exists (either direction)
-    const existingKey1 = `${origin}|${destination}`;
-    const existingKey2 = `${destination}|${origin}`;
-    const existing = routeMap[existingKey1] || routeMap[existingKey2];
-
-    if (existing) {
-      // Delete old and re-add with new price
-      await deleteRoute.mutateAsync({ id: existing.id, agencyId });
-    }
-
-    if (economyPrice > 0) {
-      await addRoute.mutateAsync({
-        agency_id: agencyId,
-        origin,
-        destination,
-        price_economy: economyPrice,
-        price_business: Math.round(economyPrice * multBusiness),
-        price_first_class: Math.round(economyPrice * multFirstClass),
-        price_van: Math.round(economyPrice * multVan),
-        distance_km: null,
-        notes: null,
-      });
-    }
-  };
-
-  // Recalculate all category prices when multipliers change
-  const recalculateAllPrices = async () => {
-    for (const route of routes) {
-      if (route.price_economy > 0) {
-        await deleteRoute.mutateAsync({ id: route.id, agencyId });
-        await addRoute.mutateAsync({
-          agency_id: agencyId,
-          origin: route.origin,
-          destination: route.destination,
-          price_economy: route.price_economy,
-          price_business: Math.round(route.price_economy * multBusiness),
-          price_first_class: Math.round(route.price_economy * multFirstClass),
-          price_van: Math.round(route.price_economy * multVan),
-          distance_km: route.distance_km,
-          notes: route.notes,
-        });
-      }
-    }
-    toast.success('All category prices recalculated');
-  };
-
-  const getEconomyPrice = (origin: string, destination: string): string => {
-    const route = routeMap[`${origin}|${destination}`] || routeMap[`${destination}|${origin}`];
-    return route ? String(route.price_economy) : '';
-  };
-
-  // Excel import/export
-  const downloadTemplate = () => {
-    const data = pairs.length > 0
-      ? pairs.map(p => ({ Origin: p.origin, Destination: p.destination, 'Economy Price (€)': '' }))
-      : [{ Origin: 'Airport', Destination: 'City Center', 'Economy Price (€)': 35 }];
-    const ws = XLSX.utils.json_to_sheet(data);
-    ws['!cols'] = [{ wch: 25 }, { wch: 25 }, { wch: 18 }];
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
-    XLSX.writeFile(wb, 'transfer_routes_template.xlsx');
-  };
-
-  const downloadCurrent = () => {
-    if (!routes.length) { toast.info('No routes to export'); return; }
-    const data = routes.map(r => ({
-      Origin: r.origin, Destination: r.destination,
-      'Economy (€)': r.price_economy, 'Business (€)': r.price_business,
-      'First Class (€)': r.price_first_class, 'VAN (€)': r.price_van,
-    }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Transfer Routes');
-    XLSX.writeFile(wb, 'transfer_routes_export.xlsx');
-  };
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const ab = await file.arrayBuffer();
-      const wb = XLSX.read(ab);
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows: any[] = XLSX.utils.sheet_to_json(ws);
-      let added = 0;
-      for (const row of rows) {
-        const o = row['Origin'] || row['origin'] || '';
-        const d = row['Destination'] || row['destination'] || '';
-        const pe = Number(row['Economy Price (€)'] || row['Economy (€)'] || row['price_economy'] || row['Price'] || 0);
-        if (!o || !d || !pe) continue;
-        // Delete existing route for this pair
-        const existingKey1 = `${o}|${d}`;
-        const existingKey2 = `${d}|${o}`;
-        const existing = routeMap[existingKey1] || routeMap[existingKey2];
-        if (existing) await deleteRoute.mutateAsync({ id: existing.id, agencyId });
-        await addRoute.mutateAsync({
-          agency_id: agencyId, origin: o, destination: d,
-          price_economy: pe,
-          price_business: Math.round(pe * multBusiness),
-          price_first_class: Math.round(pe * multFirstClass),
-          price_van: Math.round(pe * multVan),
-          distance_km: null, notes: null,
-        });
-        added++;
-      }
-      toast.success(`Imported ${added} routes`);
-    } catch (err: any) {
-      toast.error('Failed to parse file: ' + err.message);
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = '';
-    }
-  };
-
   return (
     <div className="space-y-5">
       {/* Step 1: Locations */}
       <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
         <h4 className="text-xs font-semibold text-foreground">Step 1 — Define Locations</h4>
-        <p className="text-[11px] text-muted-foreground">Add airports, hotels, cities, and stations. The system auto-generates price pairs between all locations.</p>
+        <p className="text-[11px] text-muted-foreground">Add airports, hotels, cities, and stations that will appear in the booking form's autocomplete.</p>
         <LocationsEditor
           locations={locations}
           onChange={(locs) => onConfigChange({ ...storefrontConfig, locations: locs })}
@@ -243,7 +101,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-xs font-semibold text-foreground">Step 2 — Category Multipliers</h4>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Set the economy base price per route. Other categories are auto-calculated.</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Economy is the base (1.0×). Other categories are multiplied automatically.</p>
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSettings(!showSettings)}>
             <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSettings ? 'Hide' : 'Edit'} Multipliers
@@ -279,116 +137,12 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
             <span>VAN: <strong className="text-foreground">{multVan}×</strong></span>
           </div>
         )}
-        {showSettings && routes.length > 0 && (
-          <Button variant="outline" size="sm" className="text-xs" onClick={recalculateAllPrices}>
-            Recalculate all {routes.length} routes with new multipliers
-          </Button>
-        )}
       </div>
 
-      {/* Excel import/export */}
-      <div className="flex gap-2 flex-wrap">
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
-          <Download className="h-3.5 w-3.5 mr-1" /> {pairs.length > 0 ? `Download Template (${pairs.length} pairs)` : 'Download Template'}
-        </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!routes.length}>
-          <Download className="h-3.5 w-3.5 mr-1" /> Export Current
-        </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
-          <Upload className="h-3.5 w-3.5 mr-1" /> {uploading ? 'Importing...' : 'Import Excel'}
-        </Button>
-        <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
-      </div>
-
-      {/* Step 3: Price Matrix */}
-      {locations.length < 2 ? (
-        <p className="text-xs text-muted-foreground py-8 text-center">Add at least 2 locations above to see the price matrix</p>
-      ) : isLoading ? (
-        <p className="text-xs text-muted-foreground">Loading routes...</p>
-      ) : (
-        <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-foreground">Step 3 — Price Matrix (Economy base price in €)</h4>
-          <p className="text-[11px] text-muted-foreground">Enter the economy price for each route. Business, First Class, and VAN are calculated automatically.</p>
-          <div className="border border-border rounded-lg overflow-x-auto">
-            <table className="text-xs">
-              <thead className="bg-secondary/50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground sticky left-0 bg-secondary/50 z-10 min-w-[140px]">From ↓ / To →</th>
-                  {locations.map((loc, i) => (
-                    <th key={i} className="px-2 py-2 text-center font-medium text-muted-foreground min-w-[90px] whitespace-nowrap">
-                      {loc.name.length > 15 ? loc.name.substring(0, 13) + '…' : loc.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {locations.map((rowLoc, ri) => (
-                  <tr key={ri} className="border-t border-border">
-                    <td className="px-3 py-2 font-medium text-foreground sticky left-0 bg-background z-10 whitespace-nowrap">
-                      {rowLoc.name.length > 18 ? rowLoc.name.substring(0, 16) + '…' : rowLoc.name}
-                    </td>
-                    {locations.map((colLoc, ci) => {
-                      if (ri === ci) {
-                        return <td key={ci} className="px-2 py-1 text-center bg-muted/30">—</td>;
-                      }
-                      // Only show editable cells for upper triangle (ri < ci), mirror for lower
-                      const isUpper = ri < ci;
-                      const origin = isUpper ? rowLoc.name : colLoc.name;
-                      const destination = isUpper ? colLoc.name : rowLoc.name;
-                      const currentPrice = getEconomyPrice(origin, destination);
-                      
-                      if (!isUpper) {
-                        // Lower triangle: show read-only mirror
-                        return (
-                          <td key={ci} className="px-2 py-1 text-center text-muted-foreground bg-muted/10 font-mono">
-                            {currentPrice ? `€${currentPrice}` : ''}
-                          </td>
-                        );
-                      }
-
-                      return (
-                        <td key={ci} className="px-1 py-1">
-                          <Input
-                            type="number"
-                            min={0}
-                            placeholder="—"
-                            defaultValue={currentPrice}
-                            onBlur={(e) => {
-                              const val = Number(e.target.value) || 0;
-                              const prev = Number(currentPrice) || 0;
-                              if (val !== prev) {
-                                handlePriceChange(origin, destination, val);
-                              }
-                            }}
-                            className="text-xs font-mono h-7 w-[80px] text-center px-1"
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Summary with calculated prices */}
-          {routes.length > 0 && (
-            <div className="text-[11px] text-muted-foreground pt-2">
-              {routes.length} route{routes.length !== 1 ? 's' : ''} configured. 
-              Example: {routes[0].origin} → {routes[0].destination}: 
-              Economy €{routes[0].price_economy} · 
-              Business €{routes[0].price_business} · 
-              First Class €{routes[0].price_first_class} · 
-              VAN €{routes[0].price_van}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Fallback formula */}
+      {/* Step 3: Pricing Formula */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Fallback Formula (optional)</h4>
-        <p className="text-[11px] text-muted-foreground">For custom addresses not in your locations list: Price = Base Fee + (Distance × Per-KM Rate)</p>
+        <h4 className="text-xs font-semibold text-foreground">Step 3 — Pricing Formula</h4>
+        <p className="text-[11px] text-muted-foreground">Price = Base Fee + (Distance × Per-KM Rate × Category Multiplier). Distance is calculated automatically via GPS.</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
