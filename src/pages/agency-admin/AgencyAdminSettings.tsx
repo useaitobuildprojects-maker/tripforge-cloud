@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry, StorefrontTemplate, StorefrontConfig } from '@/types/agency';
@@ -108,35 +108,6 @@ const AgencyAdminSettings = () => {
     services: agency.services as string[],
   });
 
-  // Country autocomplete
-  const [countryQuery, setCountryQuery] = useState('');
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const countryWrapperRef = useRef<HTMLDivElement>(null);
-  const countryInputRef = useRef<HTMLInputElement>(null);
-
-  const selectedCountries = useMemo(() => form.country.split(',').filter(Boolean).map(s => s.trim().toLowerCase()), [form.country]);
-
-  const filteredCountries = useMemo(() => {
-    if (!countryQuery.trim()) return COUNTRY_LIST.filter(c => !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
-    const q = countryQuery.toLowerCase();
-    return COUNTRY_LIST.filter(c => c.toLowerCase().includes(q) && !selectedCountries.includes(c.toLowerCase())).slice(0, 8);
-  }, [countryQuery, selectedCountries]);
-
-  const addCountry = (val: string) => {
-    if (selectedCountries.includes(val.toLowerCase())) return;
-    const newCountry = form.country ? `${form.country}, ${val}` : val;
-    setForm(f => ({ ...f, country: newCountry }));
-    setCountryQuery('');
-    setShowCountryDropdown(false);
-  };
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (countryWrapperRef.current && !countryWrapperRef.current.contains(e.target as Node)) setShowCountryDropdown(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
 
   const [pageSeo, setPageSeo] = useState<Record<StorefrontPage, PageSeoEntry>>(() => {
     const existing = agency.page_seo ?? {};
@@ -367,57 +338,19 @@ const AgencyAdminSettings = () => {
             <Label htmlFor="city">City</Label>
             <Input id="city" value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} />
           </div>
-          <div className="space-y-2 relative" ref={countryWrapperRef}>
-            <Label>Countries</Label>
-            <div className="flex flex-wrap gap-1.5 p-2 min-h-[40px] rounded-md border border-input bg-background">
-              {form.country.split(',').filter(Boolean).map((c, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-accent/15 text-accent-foreground px-2.5 py-0.5 text-xs font-medium">
-                  {c.trim()}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const countries = form.country.split(',').filter(Boolean).map(s => s.trim());
-                      countries.splice(i, 1);
-                      setForm(f => ({ ...f, country: countries.join(', ') }));
-                    }}
-                    className="h-3.5 w-3.5 rounded-full flex items-center justify-center hover:bg-destructive/20 hover:text-destructive transition-colors"
-                  >
-                    ×
-                  </button>
-                </span>
+          <div className="space-y-2">
+            <Label htmlFor="country">Country</Label>
+            <select
+              id="country"
+              value={form.country}
+              onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <option value="">Select a country</option>
+              {COUNTRY_LIST.map((c) => (
+                <option key={c} value={c}>{c}</option>
               ))}
-              <input
-                ref={countryInputRef}
-                value={countryQuery}
-                onChange={(e) => setCountryQuery(e.target.value)}
-                className="flex-1 min-w-[120px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                placeholder="Type to search countries..."
-                onFocus={() => setShowCountryDropdown(true)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const val = countryQuery.trim();
-                    if (!val) return;
-                    addCountry(filteredCountries[0] || val);
-                  }
-                }}
-              />
-            </div>
-            {showCountryDropdown && filteredCountries.length > 0 && (
-              <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-popover border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
-                {filteredCountries.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => addCountry(c)}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-accent/50 transition-colors"
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            )}
-            <p className="text-[10px] text-muted-foreground">Add multiple countries where this agency operates.</p>
+            </select>
           </div>
         </div>
         <div className="space-y-2">
