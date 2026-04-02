@@ -22,7 +22,7 @@ interface Props {
   buttonColor: string;
 }
 
-const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => {
+const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
