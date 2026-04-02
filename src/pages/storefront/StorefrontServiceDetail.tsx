@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
-import { useTransferRoutes } from '@/hooks/use-service-pricing';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo } from 'react';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
@@ -46,7 +46,7 @@ const StorefrontServiceDetail = () => {
   const features = SERVICE_FEATURES[service] ?? [];
 
   const { data: vehicles = [], isLoading: vehiclesLoading } = useStorefrontVehicles(agency.id);
-  const { data: transferRoutes = [] } = useTransferRoutes(service === 'transfer' ? agency.id : undefined);
+  
 
   const isTransfer = service === 'transfer';
 
@@ -114,7 +114,6 @@ const StorefrontServiceDetail = () => {
           <TransferBookingForm
             agency={agency}
             config={cfg}
-            routes={transferRoutes}
             buttonColor={buttonColor}
           />
         </section>

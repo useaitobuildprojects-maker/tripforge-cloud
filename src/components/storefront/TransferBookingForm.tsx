@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle } from 'lucide-react';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { TransferRoute, TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
-import { getMatrixPrice, calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
+import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
@@ -19,11 +19,10 @@ const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
 interface Props {
   agency: Agency;
   config: StorefrontConfig;
-  routes: TransferRoute[];
   buttonColor: string;
 }
 
-const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => {
+const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -41,21 +40,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
   const effectiveOrigin = origin;
   const effectiveDest = destination;
 
-  // Quick matrix prices for all categories (instant, no API call)
-  const matrixPrices = useMemo(() => {
-    if (!effectiveOrigin || !effectiveDest || effectiveOrigin === effectiveDest) return null;
-    const prices: Partial<Record<TransferCategory, number>> = {};
-    let hasAny = false;
-    for (const cat of TRANSFER_CATEGORIES) {
-      const p = getMatrixPrice(routes, effectiveOrigin, effectiveDest, cat.id);
-      if (p !== null) {
-        prices[cat.id] = p;
-        hasAny = true;
-      }
-    }
-    return hasAny ? prices : null;
-  }, [routes, effectiveOrigin, effectiveDest]);
-
   // Resolve a location name to a geocoding-friendly string by appending its address if configured
   const resolveLocationQuery = (name: string): string => {
     const loc = agencyLocations.find((l) => l.name === name);
@@ -68,7 +52,7 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
     setLoading(true);
     try {
       const result = await calculateTransferPrice(
-        routes, config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country
+        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country
       );
       // Keep original names in the quote for display
       result.origin = effectiveOrigin;
@@ -144,7 +128,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
             {TRANSFER_CATEGORIES.map((cat) => {
               const Icon = CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
-              const matrixPrice = matrixPrices?.[cat.id];
 
               return (
                 <button
@@ -158,9 +141,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
                   <Icon className="h-6 w-6 mb-2 opacity-60" />
                   <p className="text-sm font-bold">{cat.label}</p>
                   <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                  {matrixPrice !== undefined && (
-                    <p className="text-sm font-bold mt-2" style={{ color: buttonColor }}>€{matrixPrice}</p>
-                  )}
                 </button>
               );
             })}
@@ -170,27 +150,6 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
         {/* Get Quote / Results */}
         {effectiveOrigin && effectiveDest && effectiveOrigin !== effectiveDest && (
           <>
-            {matrixPrices && matrixPrices[selectedCategory] !== undefined ? (
-              /* Instant price from matrix */
-              <div className="rounded-xl p-5 text-center space-y-3" style={{ backgroundColor: `${buttonColor}10` }}>
-                <p className="text-sm text-muted-foreground">
-                  {effectiveOrigin} → {effectiveDest} · {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}
-                </p>
-                <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{matrixPrices[selectedCategory]}</p>
-                <p className="text-xs text-muted-foreground">Fixed price • No hidden fees</p>
-
-                {config.whatsapp_number && (
-                  <Button
-                    className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
-                    style={{ backgroundColor: '#25D366' }}
-                    onClick={handleWhatsApp}
-                  >
-                    <MessageCircle className="h-5 w-5" /> Book via WhatsApp
-                  </Button>
-                )}
-              </div>
-            ) : (
-              /* Need to calculate via OSRM */
               <>
                 {!quote && (
                   <Button
@@ -261,7 +220,7 @@ const TransferBookingForm = ({ agency, config, routes, buttonColor }: Props) => 
                   </div>
                 )}
               </>
-            )}
+
           </>
         )}
       </motion.div>
