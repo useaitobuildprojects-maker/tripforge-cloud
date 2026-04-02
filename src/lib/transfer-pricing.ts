@@ -95,9 +95,8 @@ export async function geocodePlace(name: string, country?: string): Promise<[num
   }
 }
 
-/** Full hybrid pricing: matrix first, then OSRM formula fallback */
+/** Calculate transfer price using OSRM distance + formula */
 export async function calculateTransferPrice(
-  routes: TransferRoute[],
   config: StorefrontConfig,
   origin: string,
   destination: string,
@@ -107,14 +106,6 @@ export async function calculateTransferPrice(
   console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
   console.log('[Transfer] Config:', { base: config.transfer_base_fee, perKm: config.transfer_per_km_rate });
 
-  // 1. Check matrix
-  const matrixPrice = getMatrixPrice(routes, origin, destination, category);
-  if (matrixPrice !== null) {
-    console.log('[Transfer] Matrix hit:', matrixPrice);
-    return { origin, destination, category, price: matrixPrice, source: 'matrix', distance_km: null };
-  }
-
-  // 2. Fallback: OSRM distance + formula
   const baseFee = config.transfer_base_fee ?? 0;
   const perKmRate = config.transfer_per_km_rate ?? 0;
   if (baseFee === 0 && perKmRate === 0) {
