@@ -1,4 +1,4 @@
-import { TransferRoute, TransferCategory } from '@/hooks/use-service-pricing';
+import { TransferCategory } from '@/hooks/use-service-pricing';
 import { StorefrontConfig } from '@/types/agency';
 
 export interface TransferQuote {
@@ -6,32 +6,9 @@ export interface TransferQuote {
   destination: string;
   category: TransferCategory;
   price: number;
-  source: 'matrix' | 'formula';
+  source: 'formula';
   distance_km: number | null;
   error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
-}
-
-const CATEGORY_PRICE_KEY: Record<TransferCategory, keyof TransferRoute> = {
-  economy: 'price_economy',
-  business: 'price_business',
-  first_class: 'price_first_class',
-  van: 'price_van',
-};
-
-/** Look up a fixed price from the route matrix (bidirectional) */
-export function getMatrixPrice(
-  routes: TransferRoute[],
-  origin: string,
-  destination: string,
-  category: TransferCategory
-): number | null {
-  const route = routes.find(
-    (r) =>
-      (r.origin === origin && r.destination === destination) ||
-      (r.origin === destination && r.destination === origin)
-  );
-  if (!route) return null;
-  return route[CATEGORY_PRICE_KEY[category]] as number;
 }
 
 /** Get multiplier for a category from config */

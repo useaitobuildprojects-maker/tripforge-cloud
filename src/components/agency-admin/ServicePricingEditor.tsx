@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2 } from 'lucide-react';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-</    >
 import { toast } from 'sonner';
 import {
   TRANSFER_CATEGORIES,
