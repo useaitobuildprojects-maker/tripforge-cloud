@@ -351,13 +351,10 @@ export function getPOIsForCountries(country: string): POI[] {
 /**
  * Search POIs by query string. Returns matched POIs sorted by relevance.
  */
-export function searchPOIs(query: string, countries: string): POI[] {
+export function searchPOIs(query: string, country: string): POI[] {
   if (!query || query.trim().length < 1) return [];
 
-  // Search ALL POIs, but boost agency countries
-  const countryList = new Set(
-    countries.split(',').map((c) => c.trim().toLowerCase()).filter(Boolean)
-  );
+  const agencyCountry = country.trim().toLowerCase();
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   const scored = DB
