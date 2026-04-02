@@ -79,11 +79,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
       if (!token) { setSearchResults([]); setLoading(false); return; }
 
       const types = 'place,poi,address,locality';
-      // Build country codes from hints (ISO 3166-1 alpha-2)
-      const countryCodes = countryHints
-        .map(c => c.trim().slice(0, 2).toLowerCase())
-        .filter(c => c.length === 2);
-      const countryParam = countryCodes.length > 0 ? `&country=${countryCodes.join(',')}` : '';
+      const countryParam = countryCode ? `&country=${countryCode}` : '';
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10&language=en${countryParam}`;
 
       const res = await fetch(url);

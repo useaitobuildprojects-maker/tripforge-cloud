@@ -391,8 +391,8 @@ export function searchPOIs(query: string, country: string): POI[] {
       // Type bonus for airports (most common transfer)
       if (poi.type === 'airport') score += 5;
 
-      // Boost agency's own countries
-      if (countryList.size > 0 && countryList.has(poi.country.toLowerCase())) score += 30;
+      // Boost agency's own country
+      if (agencyCountry && poi.country.toLowerCase() === agencyCountry) score += 30;
 
       return { ...poi, score };
     })
