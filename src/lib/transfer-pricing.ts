@@ -166,7 +166,9 @@ export async function calculateTransferPrice(
   destination: string,
   category: TransferCategory,
   country?: string,
-  cityPricing: CityPricing[] = []
+  cityPricing: CityPricing[] = [],
+  preOriginCoords?: [number, number],
+  preDestCoords?: [number, number]
 ): Promise<TransferQuote> {
   console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
 
@@ -187,9 +189,13 @@ export async function calculateTransferPrice(
   }
 
   const [originCoords, destCoords] = await Promise.all([
-    geocodePlace(origin, country),
-    geocodePlace(destination, country),
+    preOriginCoords ? Promise.resolve(preOriginCoords) : geocodePlace(origin, country),
+    preDestCoords ? Promise.resolve(preDestCoords) : geocodePlace(destination, country),
   ]);
+
+  if (preOriginCoords || preDestCoords) {
+    console.log('[Transfer] Using pre-resolved coords:', { origin: !!preOriginCoords, dest: !!preDestCoords });
+  }
 
   if (!originCoords) {
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_origin' };
