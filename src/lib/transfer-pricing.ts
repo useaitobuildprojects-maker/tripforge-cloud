@@ -35,13 +35,36 @@ export function getFormulaPrice(
   return Math.round(baseFee + distanceKm * perKmRate * multiplier);
 }
 
-/** Fetch driving distance between two points using OSRM (free, no API key) */
-export async function getOsrmDistance(
+/** Fetch driving distance using Mapbox Directions API (primary) or OSRM (fallback) */
+export async function getDrivingDistance(
   originCoords: [number, number],
   destCoords: [number, number]
 ): Promise<number | null> {
+  // Try Mapbox Directions first
+  const token = import.meta.env.VITE_MAPBOX_TOKEN;
+  if (token) {
+    try {
+      const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${originCoords[0]},${originCoords[1]};${destCoords[0]},${destCoords[1]}?overview=false&access_token=${token}`;
+      console.log('[Transfer] Distance via Mapbox Directions');
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.code === 'Ok' && data.routes?.[0]) {
+          const km = Math.round(data.routes[0].distance / 1000);
+          console.log('[Transfer] Mapbox distance:', km, 'km');
+          return km;
+        }
+      }
+      console.warn('[Transfer] Mapbox Directions failed, trying OSRM fallback');
+    } catch (e) {
+      console.warn('[Transfer] Mapbox Directions error, trying OSRM:', e);
+    }
+  }
+
+  // Fallback: OSRM (free, no API key)
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${originCoords[0]},${originCoords[1]};${destCoords[0]},${destCoords[1]}?overview=false`;
+    console.log('[Transfer] Distance via OSRM fallback');
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();
@@ -175,9 +198,9 @@ export async function calculateTransferPrice(
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_destination' };
   }
 
-  const distanceKm = await getOsrmDistance(originCoords, destCoords);
+  const distanceKm = await getDrivingDistance(originCoords, destCoords);
   if (!distanceKm) {
-    console.warn('[Transfer] OSRM returned no distance');
+    console.warn('[Transfer] No distance from any provider');
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'osrm_failed' };
   }
 
