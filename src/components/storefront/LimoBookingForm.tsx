@@ -168,7 +168,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           <LocationAutocomplete
             value={origin}
             onChange={(v) => { setOrigin(v); setQuote(null); }}
-            onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
             placeholder="Airport, hotel, or address"
             locations={agencyLocations}
             agencyCity={agency.city}
@@ -185,8 +184,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             <LocationAutocomplete
               value={destination}
               onChange={(v) => { setDestination(v); setQuote(null); }}
-            onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
-              placeholder="Destination address"
+            placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
               agencyCountry={agency.country}
