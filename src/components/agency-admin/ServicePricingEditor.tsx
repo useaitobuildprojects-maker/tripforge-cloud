@@ -98,7 +98,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         {showSettings && (
           <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
             <div className="space-y-1">
-              <Label className="text-[11px]">Business (×)</Label>
+              <Label className="text-[11px]">Comfort (×)</Label>
               <Input type="number" min={1} step={0.1} value={multBusiness}
                 onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_business: Number(e.target.value) || 1.6 })}
                 className="text-xs font-mono" />
