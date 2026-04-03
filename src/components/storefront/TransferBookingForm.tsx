@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
