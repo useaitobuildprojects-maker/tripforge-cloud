@@ -25,7 +25,7 @@ const SERVICE_HERO_TEXTS: Record<ServiceType, { title: string; subtitle: string 
   car_rental: { title: 'Car Rental', subtitle: 'Find the perfect car for your journey with competitive prices and top-quality vehicles.' },
   apartment: { title: 'Apartments', subtitle: 'Comfortable furnished apartments for short and long-term stays.' },
   transfer: { title: 'Transfer', subtitle: 'Reliable airport transfers and point-to-point rides with professional drivers.' },
-  limo_tour: { title: 'Limo Tour', subtitle: 'Multi-day luxury chauffeured tours — explore cities and countries in style.' },
+  limo_tour: { title: 'Limo Service', subtitle: 'Premium chauffeur service — hourly hire or point-to-point with luxury vehicles.' },
   city_tour: { title: 'City Tour', subtitle: 'Guided city tours covering top landmarks with knowledgeable local drivers.' },
 };
 
