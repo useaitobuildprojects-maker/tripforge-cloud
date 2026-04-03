@@ -43,16 +43,16 @@ export interface StorefrontConfig {
   car_rental_extra_km_rate?: number;
   // Limo amenities (displayed on storefront)
   limo_amenities?: string[];
-  // Limo service pricing (hourly chauffeur) — no economy, uses suv instead
-  limo_hourly_rate_business?: number;
-  limo_hourly_rate_first_class?: number;
-  limo_hourly_rate_van?: number;
-  limo_hourly_rate_suv?: number;
-  limo_min_hours?: number;
-  limo_max_hours_business?: number;
-  limo_max_hours_first_class?: number;
-  limo_max_hours_van?: number;
-  limo_max_hours_suv?: number;
+  // Limo service fixed package pricing (per category)
+  limo_price_8h_business?: number;
+  limo_price_8h_first_class?: number;
+  limo_price_8h_van?: number;
+  limo_price_8h_suv?: number;
+  limo_price_10h_business?: number;
+  limo_price_10h_first_class?: number;
+  limo_price_10h_van?: number;
+  limo_price_10h_suv?: number;
+  limo_max_km?: number;
   limo_max_km?: number;
   // Limo point-to-point uses the same transfer formula (base + per-km × multiplier)
   limo_p2p_base_fee?: number;
