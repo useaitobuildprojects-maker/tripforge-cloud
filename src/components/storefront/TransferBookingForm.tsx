@@ -33,13 +33,15 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
-      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address }));
+      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address, fullName: l.address ? `${l.name}, ${l.address}` : l.name }));
     }
     return getAgencyLocations(agency.city, agency.country);
   }, [config.locations, agency.city, agency.country]);
 
   const [origin, setOrigin] = useState('');
+  const [originLabel, setOriginLabel] = useState('');
   const [destination, setDestination] = useState('');
+  const [destLabel, setDestLabel] = useState('');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
@@ -107,7 +109,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={origin}
-              onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginLabel(sel?.name?.split(',')[0] || v); setOriginCoords(sel?.coords); setQuote(null); }}
               placeholder="Airport, hotel, or address"
               locations={agencyLocations}
               agencyCity={agency.city}
@@ -125,7 +127,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={destination}
-              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestLabel(sel?.name?.split(',')[0] || v); setDestCoords(sel?.coords); setQuote(null); }}
               placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
@@ -237,7 +239,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                     style={{ backgroundColor: `${buttonColor}10` }}
                   >
                     <p className="text-sm text-muted-foreground">
-                      {effectiveOrigin} → {effectiveDest}
+                      {originLabel || effectiveOrigin} → {destLabel || effectiveDest}
                       {quote.distance_km && ` · ~${quote.distance_km} km`}
                     </p>
                     <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
