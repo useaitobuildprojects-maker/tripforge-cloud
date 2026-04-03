@@ -275,8 +275,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
         <div className="space-y-3">
           <Label className="text-xs font-medium">Vehicle Category</Label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {TRANSFER_CATEGORIES.map((cat) => {
-              const Icon = CATEGORY_ICONS[cat.id];
+            {LIMO_CATEGORIES.map((cat) => {
+              const Icon = LIMO_CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
               const hourlyRate = getHourlyRate(cat.id);
 
