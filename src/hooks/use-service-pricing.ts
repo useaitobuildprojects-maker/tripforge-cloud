@@ -7,10 +7,10 @@ export type TransferCategory = 'economy' | 'business' | 'first_class' | 'van';
 export type LimoCategory = 'business' | 'first_class' | 'van' | 'suv';
 
 export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string }[] = [
-  { id: 'economy', label: 'Economy', description: 'Sedan (1-3 pax)' },
-  { id: 'business', label: 'Business', description: 'Premium sedan (1-3 pax)' },
-  { id: 'first_class', label: 'First Class', description: 'Luxury (1-3 pax)' },
-  { id: 'van', label: 'VAN', description: 'Minivan (4-7 pax)' },
+  { id: 'economy', label: 'Economy', description: 'Skoda Octavia, Toyota Corolla (1-3 pax)' },
+  { id: 'business', label: 'Comfort', description: 'VW Passat, Toyota Camry (1-3 pax)' },
+  { id: 'first_class', label: 'Business', description: 'Mercedes E-Class, BMW 5 (1-3 pax)' },
+  { id: 'van', label: 'Van', description: 'VW Caravelle, Mercedes Vito (4-7 pax)' },
 ];
 
 export const LIMO_CATEGORIES: { id: LimoCategory; label: string; description: string }[] = [
