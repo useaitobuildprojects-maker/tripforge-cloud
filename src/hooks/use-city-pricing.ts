@@ -9,6 +9,7 @@ export interface CityPricing {
   country: string;
   transfer_base_fee: number;
   transfer_per_km_rate: number;
+  drop_off_fee: number;
   created_at: string;
 }
 
@@ -22,7 +23,10 @@ export const useCityPricing = (agencyId: string | undefined) =>
         .eq('agency_id', agencyId!)
         .order('city_name');
       if (error) throw error;
-      return (data ?? []) as CityPricing[];
+      return (data ?? []).map((row: any) => ({
+        ...row,
+        drop_off_fee: row.drop_off_fee ?? 0,
+      })) as CityPricing[];
     },
     enabled: !!agencyId,
   });

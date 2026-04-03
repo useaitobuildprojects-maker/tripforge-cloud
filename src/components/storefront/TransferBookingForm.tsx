@@ -243,6 +243,9 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                       {quote.distance_km && ` · ~${quote.distance_km} km`}
                     </p>
                     <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
+                    {quote.drop_off_fee > 0 && (
+                      <p className="text-xs text-muted-foreground">Includes €{quote.drop_off_fee} drop-off fee</p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
                     </p>

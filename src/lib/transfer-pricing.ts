@@ -10,6 +10,7 @@ export interface TransferQuote {
   price: number;
   source: 'formula';
   distance_km: number | null;
+  drop_off_fee: number;
   error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
 }
 
@@ -192,7 +193,7 @@ export async function calculateTransferPrice(
 
   if (baseFee === 0 && perKmRate === 0) {
     console.warn('[Transfer] No formula configured (base=0, perKm=0)');
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'no_formula' };
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'no_formula' };
   }
 
   const [originCoords, destCoords] = await Promise.all([
@@ -205,21 +206,26 @@ export async function calculateTransferPrice(
   }
 
   if (!originCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_origin' };
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'geocode_origin' };
   }
   if (!destCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'geocode_destination' };
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'geocode_destination' };
   }
 
   const distanceKm = await getDrivingDistance(originCoords, destCoords);
   if (!distanceKm) {
     console.warn('[Transfer] No distance from any provider');
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'osrm_failed' };
+    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'osrm_failed' };
   }
+
+  // Determine drop-off fee: applies when destination is outside the origin city
+  const dropOffFee = cityRate?.drop_off_fee ?? 0;
+  const isIntercity = cityRate ? !destination.toLowerCase().includes(cityRate.city_name.toLowerCase()) : false;
+  const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   // Use city-specific or global rates for formula
   const multiplier = getCategoryMultiplier(config, category);
-  const price = Math.round(baseFee + distanceKm * perKmRate * multiplier);
-  console.log('[Transfer] Formula result:', { distanceKm, price, cityRate: cityRate?.city_name ?? 'global' });
-  return { origin, destination, category, price, source: 'formula', distance_km: distanceKm };
+  const price = Math.round(baseFee + distanceKm * perKmRate * multiplier + appliedDropOff);
+  console.log('[Transfer] Formula result:', { distanceKm, price, dropOff: appliedDropOff, cityRate: cityRate?.city_name ?? 'global' });
+  return { origin, destination, category, price, source: 'formula', distance_km: distanceKm, drop_off_fee: appliedDropOff };
 }
