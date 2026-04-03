@@ -139,6 +139,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         type: p.type,
         address: p.address,
         source: 'poi' as const,
+        coords: p.coords,
       }));
   }, [query, agencyCountry, locations]);
 
