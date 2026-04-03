@@ -310,7 +310,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             style={{ backgroundColor: `${buttonColor}10` }}
           >
             <p className="text-sm text-muted-foreground">
-              {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {hours} hour{Number(hours) > 1 ? 's' : ''}
+              {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {hours} hour{Number(hours) > 1 ? 's' : ''}
             </p>
             <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{hourlyPrice}</p>
             <p className="text-xs text-muted-foreground">Estimated price · Min {minHours}h</p>
