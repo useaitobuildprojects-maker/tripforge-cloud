@@ -7,18 +7,18 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
+import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
-const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
-  economy: Car,
+const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   business: Car,
   first_class: Crown,
   van: Truck,
+  suv: Shield,
 };
 
 type LimoMode = 'hourly' | 'p2p';
