@@ -163,14 +163,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-[11px]">Economy (€/hr)</Label>
-            <Input type="number" min={0} step={1} placeholder="40"
-              value={storefrontConfig.limo_hourly_rate_economy ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_economy: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Business (€/hr)</Label>
+            <Label className="text-[11px]">Business Sedan (€/hr)</Label>
             <Input type="number" min={0} step={1} placeholder="65"
               value={storefrontConfig.limo_hourly_rate_business ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_business: e.target.value ? Number(e.target.value) : undefined })}
@@ -184,10 +177,17 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               className="text-xs font-mono" />
           </div>
           <div className="space-y-1">
-            <Label className="text-[11px]">VAN (€/hr)</Label>
+            <Label className="text-[11px]">Business Van (€/hr)</Label>
             <Input type="number" min={0} step={1} placeholder="75"
               value={storefrontConfig.limo_hourly_rate_van ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_van: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Luxury SUV (€/hr)</Label>
+            <Input type="number" min={0} step={1} placeholder="120"
+              value={storefrontConfig.limo_hourly_rate_suv ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_suv: e.target.value ? Number(e.target.value) : undefined })}
               className="text-xs font-mono" />
           </div>
         </div>
@@ -211,13 +211,6 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         </div>
         <div className="grid grid-cols-4 gap-3 pt-2 border-t border-border">
           <div className="space-y-1">
-            <Label className="text-[11px]">Max Hours Economy</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="8"
-              value={storefrontConfig.limo_max_hours_economy ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_economy: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
             <Label className="text-[11px]">Max Hours Business</Label>
             <Input type="number" min={1} max={12} step={1} placeholder="8"
               value={storefrontConfig.limo_max_hours_business ?? ''}
@@ -236,6 +229,13 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <Input type="number" min={1} max={12} step={1} placeholder="10"
               value={storefrontConfig.limo_max_hours_van ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_van: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Hours SUV</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="10"
+              value={storefrontConfig.limo_max_hours_suv ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_suv: e.target.value ? Number(e.target.value) : undefined })}
               className="text-xs font-mono" />
           </div>
         </div>
