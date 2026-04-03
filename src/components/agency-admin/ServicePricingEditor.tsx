@@ -85,6 +85,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const [cityCountry, setCityCountry] = useState(country ?? '');
   const [cityBase, setCityBase] = useState('');
   const [cityPerKm, setCityPerKm] = useState('');
+  const [cityDropOff, setCityDropOff] = useState('');
 
   const handleAddCity = () => {
     if (!cityName || (!cityBase && !cityPerKm)) return;
@@ -94,8 +95,9 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
       country: cityCountry || country || '',
       transfer_base_fee: Number(cityBase) || 0,
       transfer_per_km_rate: Number(cityPerKm) || 0,
+      drop_off_fee: Number(cityDropOff) || 0,
     });
-    setCityName(''); setCityBase(''); setCityPerKm('');
+    setCityName(''); setCityBase(''); setCityPerKm(''); setCityDropOff('');
   };
 
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
