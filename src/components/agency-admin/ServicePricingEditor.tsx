@@ -191,7 +191,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               className="text-xs font-mono" />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
           <div className="space-y-1">
             <Label className="text-[11px]">Minimum Hours</Label>
             <Input type="number" min={1} max={12} step={1} placeholder="2"
@@ -199,14 +199,6 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               onChange={(e) => onConfigChange({ ...storefrontConfig, limo_min_hours: e.target.value ? Number(e.target.value) : undefined })}
               className="text-xs font-mono" />
             <p className="text-[10px] text-muted-foreground">Min booking (default: 2h)</p>
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Maximum Hours</Label>
-            <Input type="number" min={1} max={10} step={1} placeholder="10"
-              value={storefrontConfig.limo_max_hours ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-            <p className="text-[10px] text-muted-foreground">Max booking (8-10h)</p>
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">Max P2P Distance (km)</Label>
@@ -217,6 +209,37 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <p className="text-[10px] text-muted-foreground">Max distance for P2P (default: 35km)</p>
           </div>
         </div>
+        <div className="grid grid-cols-4 gap-3 pt-2 border-t border-border">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Hours Economy</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="8"
+              value={storefrontConfig.limo_max_hours_economy ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_economy: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Hours Business</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="8"
+              value={storefrontConfig.limo_max_hours_business ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_business: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Hours First Class</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="10"
+              value={storefrontConfig.limo_max_hours_first_class ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_first_class: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Hours Van</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="10"
+              value={storefrontConfig.limo_max_hours_van ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_van: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+        </div>
+      </div>
       </div>
 
       {/* Point-to-Point Pricing */}
