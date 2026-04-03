@@ -277,57 +277,14 @@ const StorefrontHome = () => {
               </motion.div>
             )}
 
-            {/* ---- LIMO TOUR ---- */}
+            {/* ---- LIMO SERVICE ---- */}
             {activeService === 'limo_tour' && (
               <motion.div key="limo-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold">Plan a Limo Tour</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Multi-day luxury chauffeured tours across cities & countries</p>
-                </div>
-                <div className="space-y-5">
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                        <MapPin className="h-3 w-3" style={{ color: buttonColor }} />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Starting city</label>
-                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="e.g. Paris, Rome, Barcelona" locations={agencyLocations} agencyCity={agency.city} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 pl-8">
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Start date</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Number of days</label>
-                      <div className="relative w-full">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                          {[1, 2, 3, 5, 7, 10, 14].map(n => <option key={n} value={n}>{n} {n === 1 ? 'day' : 'days'}</option>)}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pl-8">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
-                    <div className="relative w-48">
-                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                  onClick={() => { setSearchActive(true); }}>
-                  <Search className="h-4 w-4" /> Get a quote
-                </Button>
+                <LimoBookingForm
+                  agency={agency}
+                  config={cfg}
+                  buttonColor={buttonColor}
+                />
               </motion.div>
             )}
 
