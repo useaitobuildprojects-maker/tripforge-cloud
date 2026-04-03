@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Agency, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { useCreateAgency, useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { COUNTRY_LIST } from '@/lib/country-utils';
+import { getCitiesForCountry } from '@/data/city-database';
 
 interface AgencyFormDialogProps {
   open: boolean;
