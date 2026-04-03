@@ -141,22 +141,34 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
   }
 }
 
-/** Try to find city-specific pricing for origin or destination */
+/** Choose the strongest matching city rate for the route.
+ * If both origin and destination match different city rules,
+ * prefer the higher-priced rule instead of the first alphabetical row.
+ */
 function findCityRate(
   cityPricing: CityPricing[],
   origin: string,
   destination: string
 ): CityPricing | null {
   if (!cityPricing.length) return null;
+
   const normalize = (s: string) => s.toLowerCase().trim();
   const o = normalize(origin);
   const d = normalize(destination);
-  // Match on origin city first, then destination
-  for (const cp of cityPricing) {
-    const cn = normalize(cp.city_name);
-    if (o.includes(cn) || d.includes(cn)) return cp;
-  }
-  return null;
+
+  const matches = cityPricing.filter((cp) => {
+    const city = normalize(cp.city_name);
+    return o.includes(city) || d.includes(city);
+  });
+
+  if (!matches.length) return null;
+
+  return matches.sort((a, b) => {
+    if (b.transfer_per_km_rate !== a.transfer_per_km_rate) {
+      return b.transfer_per_km_rate - a.transfer_per_km_rate;
+    }
+    return b.transfer_base_fee - a.transfer_base_fee;
+  })[0];
 }
 
 /** Calculate transfer price using OSRM distance + formula */
