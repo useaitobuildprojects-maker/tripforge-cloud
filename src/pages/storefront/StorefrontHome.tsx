@@ -13,6 +13,7 @@ import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, count
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
+import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
