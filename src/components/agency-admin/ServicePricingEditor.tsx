@@ -155,88 +155,91 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   return (
     <div className="space-y-5">
-      {/* Hourly Rates */}
+      {/* Package Pricing */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div>
-          <h4 className="text-xs font-semibold text-foreground">Hourly Rates (per category)</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Set the hourly rate for each vehicle category. Customers book by the hour.</p>
+          <h4 className="text-xs font-semibold text-foreground">Package Pricing</h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Set fixed prices for 8-hour and 10-hour packages per vehicle category.</p>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Business Sedan (€/hr)</Label>
-            <Input type="number" min={0} step={1} placeholder="65"
-              value={storefrontConfig.limo_hourly_rate_business ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_business: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">First Class (€/hr)</Label>
-            <Input type="number" min={0} step={1} placeholder="100"
-              value={storefrontConfig.limo_hourly_rate_first_class ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_first_class: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Business Van (€/hr)</Label>
-            <Input type="number" min={0} step={1} placeholder="75"
-              value={storefrontConfig.limo_hourly_rate_van ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_van: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Luxury SUV (€/hr)</Label>
-            <Input type="number" min={0} step={1} placeholder="120"
-              value={storefrontConfig.limo_hourly_rate_suv ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_suv: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
+        
+        {/* 8h Packages */}
+        <div className="space-y-2">
+          <p className="text-[11px] font-semibold text-muted-foreground">8 Hours Package</p>
+          <div className="grid grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Business Sedan (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="400"
+                value={storefrontConfig.limo_price_8h_business ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_8h_business: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">First Class (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="600"
+                value={storefrontConfig.limo_price_8h_first_class ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_8h_first_class: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Business Van (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="500"
+                value={storefrontConfig.limo_price_8h_van ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_8h_van: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Luxury SUV (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="700"
+                value={storefrontConfig.limo_price_8h_suv ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_8h_suv: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Minimum Hours</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="2"
-              value={storefrontConfig.limo_min_hours ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_min_hours: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-            <p className="text-[10px] text-muted-foreground">Min booking (default: 2h)</p>
+
+        {/* 10h Packages */}
+        <div className="space-y-2 pt-2 border-t border-border">
+          <p className="text-[11px] font-semibold text-muted-foreground">10 Hours Package</p>
+          <div className="grid grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Business Sedan (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="480"
+                value={storefrontConfig.limo_price_10h_business ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_10h_business: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">First Class (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="750"
+                value={storefrontConfig.limo_price_10h_first_class ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_10h_first_class: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Business Van (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="600"
+                value={storefrontConfig.limo_price_10h_van ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_10h_van: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Luxury SUV (€)</Label>
+              <Input type="number" min={0} step={10} placeholder="900"
+                value={storefrontConfig.limo_price_10h_suv ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, limo_price_10h_suv: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
           </div>
+        </div>
+
+        <div className="pt-2 border-t border-border">
           <div className="space-y-1">
             <Label className="text-[11px]">Max P2P Distance (km)</Label>
             <Input type="number" min={1} max={100} step={1} placeholder="35"
               value={storefrontConfig.limo_max_km ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_km: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-            <p className="text-[10px] text-muted-foreground">Max distance for P2P (default: 35km)</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-4 gap-3 pt-2 border-t border-border">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Max Hours Business</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="8"
-              value={storefrontConfig.limo_max_hours_business ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_business: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Max Hours First Class</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="10"
-              value={storefrontConfig.limo_max_hours_first_class ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_first_class: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Max Hours Van</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="10"
-              value={storefrontConfig.limo_max_hours_van ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_van: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Max Hours SUV</Label>
-            <Input type="number" min={1} max={12} step={1} placeholder="10"
-              value={storefrontConfig.limo_max_hours_suv ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours_suv: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
+              className="text-xs font-mono w-32" />
+            <p className="text-[10px] text-muted-foreground">Max distance for point-to-point (default: 35km)</p>
           </div>
         </div>
       </div>
