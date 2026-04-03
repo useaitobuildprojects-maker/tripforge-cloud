@@ -51,24 +51,32 @@ export async function getOsrmDistance(
   }
 }
 
-/** Try to find a POI match and build a better geocoding query */
-function resolvePoiQuery(name: string): string {
-  // Check POI database for known locations — use their address for accurate geocoding
+/** Try to find a POI match — returns coords if available, or a better query string */
+function resolvePoiMatch(name: string): { coords?: [number, number]; query: string } {
   const normalized = name.toLowerCase().trim();
   const poi = POI_DB.find(p => 
     p.name.toLowerCase() === normalized ||
     (p.iata && p.iata.toLowerCase() === normalized)
   );
   if (poi) {
-    return `${poi.name}, ${poi.address}`;
+    if (poi.coords) {
+      return { coords: poi.coords, query: `${poi.name}, ${poi.address}` };
+    }
+    return { query: `${poi.name}, ${poi.address}` };
   }
-  return name;
+  return { query: name };
 }
 
-/** Geocode a place name using Mapbox and return [lng, lat] */
+/** Geocode a place name and return [lng, lat] */
 export async function geocodePlace(name: string, _country?: string): Promise<[number, number] | null> {
-  // Resolve via POI database first for accurate queries
-  const query = resolvePoiQuery(name);
+  // Check POI database first — if coords exist, skip geocoding entirely
+  const match = resolvePoiMatch(name);
+  if (match.coords) {
+    console.log('[Transfer] POI coords hit:', name, '→', match.coords);
+    return match.coords;
+  }
+
+  const query = match.query;
 
   // Try Mapbox first
   const token = import.meta.env.VITE_MAPBOX_TOKEN;
