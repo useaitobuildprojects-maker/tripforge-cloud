@@ -109,8 +109,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
         transfer_base_fee: config.limo_p2p_base_fee ?? config.transfer_base_fee,
         transfer_per_km_rate: config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate,
       };
+      const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), selectedCategory, agency.country
+        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country
       );
       result.origin = origin;
       result.destination = destination;
