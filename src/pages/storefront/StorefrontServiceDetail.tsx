@@ -10,6 +10,7 @@ import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo } from 'react';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
+import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
@@ -24,7 +25,7 @@ const SERVICE_HERO_TEXTS: Record<ServiceType, { title: string; subtitle: string 
   car_rental: { title: 'Car Rental', subtitle: 'Find the perfect car for your journey with competitive prices and top-quality vehicles.' },
   apartment: { title: 'Apartments', subtitle: 'Comfortable furnished apartments for short and long-term stays.' },
   transfer: { title: 'Transfer', subtitle: 'Reliable airport transfers and point-to-point rides with professional drivers.' },
-  limo_tour: { title: 'Limo Tour', subtitle: 'Multi-day luxury chauffeured tours — explore cities and countries in style.' },
+  limo_tour: { title: 'Limo Service', subtitle: 'Premium chauffeur service — hourly hire or point-to-point with luxury vehicles.' },
   city_tour: { title: 'City Tour', subtitle: 'Guided city tours covering top landmarks with knowledgeable local drivers.' },
 };
 
@@ -32,7 +33,7 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   car_rental: ['Wide selection of vehicles', 'Flexible pick-up & drop-off', 'Full insurance included', '24/7 roadside assistance', 'No hidden fees'],
   apartment: ['Fully furnished', 'Central locations', 'Short & long term stays', 'All utilities included', 'Cleaning service available'],
   transfer: ['Professional drivers', 'Airport pickup & drop-off', 'Flight tracking', 'Meet & greet service', 'Fixed prices'],
-  limo_tour: ['Multi-day itineraries', 'Luxury vehicles', 'Experienced chauffeurs', 'Custom routes', 'Hotel coordination'],
+  limo_tour: ['Professional chauffeurs', 'Hourly & point-to-point options', 'Luxury vehicles', 'Airport & event service', 'Custom routes available'],
   city_tour: ['Half-day & full-day options', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules', 'Private tours available'],
 };
 
@@ -49,6 +50,7 @@ const StorefrontServiceDetail = () => {
   
 
   const isTransfer = service === 'transfer';
+  const isLimo = service === 'limo_tour';
 
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -109,13 +111,12 @@ const StorefrontServiceDetail = () => {
       </section>
 
       {isTransfer ? (
-        /* Transfer Booking Form */
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <TransferBookingForm
-            agency={agency}
-            config={cfg}
-            buttonColor={buttonColor}
-          />
+          <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+        </section>
+      ) : isLimo ? (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : (
         /* Vehicle/Package Listings with Filter Sidebar */
