@@ -27,7 +27,7 @@ const SERVICE_SHORT_DESC: Record<ServiceType, string> = {
   car_rental: 'Wide selection of quality vehicles for every need.',
   apartment: 'Furnished apartments for comfortable stays.',
   transfer: 'Airport transfers & point-to-point rides with professional drivers.',
-  limo_tour: 'Multi-day luxury chauffeured tours across cities and countries.',
+  limo_tour: 'Premium chauffeur service — hourly hire or luxury point-to-point rides.',
   city_tour: 'Guided city tours with local expert drivers.',
 };
 
