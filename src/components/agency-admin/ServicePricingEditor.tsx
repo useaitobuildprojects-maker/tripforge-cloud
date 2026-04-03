@@ -66,7 +66,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
         </TabsList>
 
         {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} country={country} /></TabsContent>}
-        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoTourPricingTab agencyId={agencyId} /></TabsContent>}
+        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} /></TabsContent>}
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
