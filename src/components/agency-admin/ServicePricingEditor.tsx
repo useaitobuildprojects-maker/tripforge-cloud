@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Check, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,8 @@ import {
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
 } from '@/hooks/use-service-pricing';
-import { useCityPricing, useAddCityPricing, useDeleteCityPricing } from '@/hooks/use-city-pricing';
+import { useCityPricing, useAddCityPricing, useDeleteCityPricing, useUpdateCityPricing } from '@/hooks/use-city-pricing';
+import { CITY_COUNTRIES, getCitiesForCountry } from '@/data/city-database';
 
 import { StorefrontConfig } from '@/types/agency';
 
