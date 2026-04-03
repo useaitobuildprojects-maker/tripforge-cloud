@@ -41,7 +41,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [mode, setMode] = useState<LimoMode>('hourly');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('business');
+  const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [hours, setHours] = useState('3');
