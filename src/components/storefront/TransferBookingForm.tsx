@@ -109,7 +109,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={origin}
-              onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginLabel(sel?.name?.split(',')[0] || v); setOriginCoords(sel?.coords); setQuote(null); }}
               placeholder="Airport, hotel, or address"
               locations={agencyLocations}
               agencyCity={agency.city}
