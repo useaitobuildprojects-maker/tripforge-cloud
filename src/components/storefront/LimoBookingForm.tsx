@@ -64,9 +64,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const hourOptions = useMemo(() => {
     const opts: number[] = [];
-    for (let h = minHours; h <= 12; h++) opts.push(h);
+    for (let h = minHours; h <= maxHours; h++) opts.push(h);
     return opts;
-  }, [minHours]);
+  }, [minHours, maxHours]);
 
   const getHourlyRate = (cat: TransferCategory): number => {
     switch (cat) {
