@@ -111,13 +111,12 @@ const StorefrontServiceDetail = () => {
       </section>
 
       {isTransfer ? (
-        /* Transfer Booking Form */
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <TransferBookingForm
-            agency={agency}
-            config={cfg}
-            buttonColor={buttonColor}
-          />
+          <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+        </section>
+      ) : isLimo ? (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : (
         /* Vehicle/Package Listings with Filter Sidebar */
