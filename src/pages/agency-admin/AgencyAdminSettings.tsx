@@ -14,6 +14,7 @@ import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
 import ServicePricingEditor from '@/components/agency-admin/ServicePricingEditor';
 import { COUNTRY_LIST } from '@/lib/country-utils';
+import { getCitiesForCountry } from '@/data/city-database';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
