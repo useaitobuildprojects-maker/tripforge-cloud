@@ -1,5 +1,6 @@
 import { TransferCategory } from '@/hooks/use-service-pricing';
 import { StorefrontConfig } from '@/types/agency';
+import POI_DB from '@/data/poi-database';
 
 export interface TransferQuote {
   origin: string;
@@ -35,7 +36,7 @@ export function getFormulaPrice(
 
 /** Fetch driving distance between two points using OSRM (free, no API key) */
 export async function getOsrmDistance(
-  originCoords: [number, number], // [lng, lat]
+  originCoords: [number, number],
   destCoords: [number, number]
 ): Promise<number | null> {
   try {
@@ -44,18 +45,35 @@ export async function getOsrmDistance(
     if (!res.ok) return null;
     const data = await res.json();
     if (data.code !== 'Ok' || !data.routes?.[0]) return null;
-    return Math.round(data.routes[0].distance / 1000); // meters → km
+    return Math.round(data.routes[0].distance / 1000);
   } catch {
     return null;
   }
 }
 
+/** Try to find a POI match and build a better geocoding query */
+function resolvePoiQuery(name: string): string {
+  // Check POI database for known locations — use their address for accurate geocoding
+  const normalized = name.toLowerCase().trim();
+  const poi = POI_DB.find(p => 
+    p.name.toLowerCase() === normalized ||
+    (p.iata && p.iata.toLowerCase() === normalized)
+  );
+  if (poi) {
+    return `${poi.name}, ${poi.address}`;
+  }
+  return name;
+}
+
 /** Geocode a place name using Mapbox and return [lng, lat] */
-export async function geocodePlace(name: string, country?: string): Promise<[number, number] | null> {
+export async function geocodePlace(name: string, _country?: string): Promise<[number, number] | null> {
   try {
     const token = import.meta.env.VITE_MAPBOX_TOKEN;
     if (!token) { console.warn('[Transfer] No Mapbox token configured'); return null; }
-    const query = country ? `${name}, ${country}` : name;
+    
+    // Resolve via POI database first for accurate queries
+    const query = resolvePoiQuery(name);
+    
     const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&limit=1`;
     console.log('[Transfer] Geocoding:', query);
     const res = await fetch(url);
