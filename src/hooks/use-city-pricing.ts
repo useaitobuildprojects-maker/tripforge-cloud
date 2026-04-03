@@ -47,6 +47,21 @@ export const useAddCityPricing = () => {
   });
 };
 
+export const useUpdateCityPricing = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, agencyId, ...updates }: { id: string; agencyId: string } & Partial<Pick<CityPricing, 'city_name' | 'country' | 'transfer_base_fee' | 'transfer_per_km_rate' | 'drop_off_fee'>>) => {
+      const { error } = await supabase.from('city_pricing').update(updates as any).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: (_, v) => {
+      qc.invalidateQueries({ queryKey: ['city-pricing', v.agencyId] });
+      toast.success('City pricing updated');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 export const useDeleteCityPricing = () => {
   const qc = useQueryClient();
   return useMutation({

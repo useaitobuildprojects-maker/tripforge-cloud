@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Check, X } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,8 @@ import {
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
 } from '@/hooks/use-service-pricing';
-import { useCityPricing, useAddCityPricing, useDeleteCityPricing } from '@/hooks/use-city-pricing';
+import { useCityPricing, useAddCityPricing, useDeleteCityPricing, useUpdateCityPricing } from '@/hooks/use-city-pricing';
+import { CITY_COUNTRIES, getCitiesForCountry } from '@/data/city-database';
 
 import { StorefrontConfig } from '@/types/agency';
 
@@ -81,11 +82,19 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const { data: cityPrices = [], isLoading: cityLoading } = useCityPricing(agencyId);
   const addCityPrice = useAddCityPricing();
   const deleteCityPrice = useDeleteCityPricing();
-  const [cityName, setCityName] = useState('');
+  const updateCityPrice = useUpdateCityPricing();
   const [cityCountry, setCityCountry] = useState(country ?? '');
+  const [cityName, setCityName] = useState('');
   const [cityBase, setCityBase] = useState('');
   const [cityPerKm, setCityPerKm] = useState('');
   const [cityDropOff, setCityDropOff] = useState('');
+
+  // Inline editing state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<{ city_name: string; country: string; transfer_base_fee: string; transfer_per_km_rate: string; drop_off_fee: string }>({ city_name: '', country: '', transfer_base_fee: '', transfer_per_km_rate: '', drop_off_fee: '' });
+
+  const availableCities = useMemo(() => getCitiesForCountry(cityCountry), [cityCountry]);
+  const editCities = useMemo(() => getCitiesForCountry(editValues.country), [editValues.country]);
 
   const handleAddCity = () => {
     if (!cityName || (!cityBase && !cityPerKm)) return;
@@ -99,6 +108,33 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     });
     setCityName(''); setCityBase(''); setCityPerKm(''); setCityDropOff('');
   };
+
+  const startEdit = (cp: typeof cityPrices[0]) => {
+    setEditingId(cp.id);
+    setEditValues({
+      city_name: cp.city_name,
+      country: cp.country,
+      transfer_base_fee: String(cp.transfer_base_fee),
+      transfer_per_km_rate: String(cp.transfer_per_km_rate),
+      drop_off_fee: String(cp.drop_off_fee || 0),
+    });
+  };
+
+  const saveEdit = () => {
+    if (!editingId) return;
+    updateCityPrice.mutate({
+      id: editingId,
+      agencyId,
+      city_name: editValues.city_name,
+      country: editValues.country,
+      transfer_base_fee: Number(editValues.transfer_base_fee) || 0,
+      transfer_per_km_rate: Number(editValues.transfer_per_km_rate) || 0,
+      drop_off_fee: Number(editValues.drop_off_fee) || 0,
+    });
+    setEditingId(null);
+  };
+
+  const cancelEdit = () => setEditingId(null);
 
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
@@ -179,12 +215,30 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         </div>
         <div className="grid grid-cols-5 gap-2">
           <div className="space-y-1">
-            <Label className="text-[11px]">City Name *</Label>
-            <Input placeholder="Dubai" value={cityName} onChange={(e) => setCityName(e.target.value)} className="text-xs" />
+            <Label className="text-[11px]">Country *</Label>
+            <Select value={cityCountry} onValueChange={(v) => { setCityCountry(v); setCityName(''); }}>
+              <SelectTrigger className="text-xs h-9">
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {CITY_COUNTRIES.map((c) => (
+                  <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
-            <Label className="text-[11px]">Country</Label>
-            <Input placeholder={country || 'Country'} value={cityCountry} onChange={(e) => setCityCountry(e.target.value)} className="text-xs" />
+            <Label className="text-[11px]">City *</Label>
+            <Select value={cityName} onValueChange={setCityName} disabled={!cityCountry}>
+              <SelectTrigger className="text-xs h-9">
+                <SelectValue placeholder={cityCountry ? 'Select city' : 'Choose country first'} />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {availableCities.map((c) => (
+                  <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
@@ -210,27 +264,84 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
             <table className="w-full text-xs">
               <thead className="bg-secondary/50">
                 <tr>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Country</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Base Fee</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per-KM</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
-                  <th className="px-3 py-2 w-10" />
+                  <th className="px-3 py-2 w-20" />
                 </tr>
               </thead>
               <tbody>
                 {cityPrices.map((cp) => (
                   <tr key={cp.id} className="border-t border-border hover:bg-secondary/20">
-                    <td className="px-3 py-2 text-foreground font-medium">{cp.city_name}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
-                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
-                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
-                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.drop_off_fee || 0}</td>
-                    <td className="px-3 py-2">
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    </td>
+                    {editingId === cp.id ? (
+                      <>
+                        <td className="px-2 py-1">
+                          <Select value={editValues.country} onValueChange={(v) => setEditValues({ ...editValues, country: v, city_name: '' })}>
+                            <SelectTrigger className="text-xs h-7">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                              {CITY_COUNTRIES.map((c) => (
+                                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-2 py-1">
+                          <Select value={editValues.city_name} onValueChange={(v) => setEditValues({ ...editValues, city_name: v })}>
+                            <SelectTrigger className="text-xs h-7">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                              {editCities.map((c) => (
+                                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                        <td className="px-2 py-1">
+                          <Input type="number" min={0} step={0.5} value={editValues.transfer_base_fee}
+                            onChange={(e) => setEditValues({ ...editValues, transfer_base_fee: e.target.value })}
+                            className="text-xs font-mono h-7 text-right w-20" />
+                        </td>
+                        <td className="px-2 py-1">
+                          <Input type="number" min={0} step={0.1} value={editValues.transfer_per_km_rate}
+                            onChange={(e) => setEditValues({ ...editValues, transfer_per_km_rate: e.target.value })}
+                            className="text-xs font-mono h-7 text-right w-20" />
+                        </td>
+                        <td className="px-2 py-1">
+                          <Input type="number" min={0} step={1} value={editValues.drop_off_fee}
+                            onChange={(e) => setEditValues({ ...editValues, drop_off_fee: e.target.value })}
+                            className="text-xs font-mono h-7 text-right w-20" />
+                        </td>
+                        <td className="px-2 py-1 flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={saveEdit}>
+                            <Check className="h-3.5 w-3.5 text-green-600" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={cancelEdit}>
+                            <X className="h-3.5 w-3.5 text-muted-foreground" />
+                          </Button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
+                        <td className="px-3 py-2 text-foreground font-medium">{cp.city_name}</td>
+                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
+                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
+                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.drop_off_fee || 0}</td>
+                        <td className="px-3 py-2 flex gap-1">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => startEdit(cp)}>
+                            <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>
