@@ -11,6 +11,8 @@ export interface POI {
   country: string;
   /** Optional IATA code for airports */
   iata?: string;
+  /** Optional coordinates [lng, lat] — skips geocoding entirely when present */
+  coords?: [number, number];
 }
 
 const DB: POI[] = [
