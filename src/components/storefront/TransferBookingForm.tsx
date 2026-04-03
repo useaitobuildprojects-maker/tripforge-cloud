@@ -71,7 +71,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     setLoading(true);
     try {
       const result = await calculateTransferPrice(
-        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country
+        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country, cityPricingData
       );
       // Keep original names in the quote for display
       result.origin = effectiveOrigin;
