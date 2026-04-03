@@ -1,5 +1,6 @@
 import { TransferCategory } from '@/hooks/use-service-pricing';
 import { StorefrontConfig } from '@/types/agency';
+import { CityPricing } from '@/hooks/use-city-pricing';
 import POI_DB from '@/data/poi-database';
 
 export interface TransferQuote {
