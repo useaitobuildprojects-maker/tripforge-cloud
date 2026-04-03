@@ -54,6 +54,13 @@ function buildMapboxAddress(feature: MapboxFeature): string {
   return parts.join(', ') || feature.place_name.split(',').slice(1).map(s => s.trim()).join(', ');
 }
 
+function extractCoordsFromMapbox(feature: MapboxFeature): [number, number] | undefined {
+  const f = feature as any;
+  if (f.center) return [f.center[0], f.center[1]];
+  if (f.geometry?.coordinates) return [f.geometry.coordinates[0], f.geometry.coordinates[1]];
+  return undefined;
+}
+
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
 
 const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry }: LocationAutocompleteProps) => {
