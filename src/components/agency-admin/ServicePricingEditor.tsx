@@ -261,93 +261,103 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         {cityLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : cityPrices.length === 0 ? (
           <p className="text-xs text-muted-foreground py-3 text-center">No city-specific rates configured. The default formula will be used everywhere.</p>
         ) : (
-          <div className="border border-border rounded-lg overflow-hidden">
-            <table className="w-full text-xs">
-              <thead className="bg-secondary/50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Country</th>
-                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Base Fee</th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per-KM</th>
-                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
-                  <th className="px-3 py-2 w-20" />
-                </tr>
-              </thead>
-              <tbody>
-                {cityPrices.map((cp) => (
-                  <tr key={cp.id} className="border-t border-border hover:bg-secondary/20">
-                    {editingId === cp.id ? (
-                      <>
-                        <td className="px-2 py-1">
-                          <Select value={editValues.country} onValueChange={(v) => setEditValues({ ...editValues, country: v, city_name: '' })}>
-                            <SelectTrigger className="text-xs h-7">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-60">
-                              {CITY_COUNTRIES.map((c) => (
-                                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-2 py-1">
-                          <Select value={editValues.city_name} onValueChange={(v) => setEditValues({ ...editValues, city_name: v })}>
-                            <SelectTrigger className="text-xs h-7">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-60">
-                              {editCities.map((c) => (
-                                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-2 py-1">
-                          <Input type="number" min={0} step={0.5} value={editValues.transfer_base_fee}
-                            onChange={(e) => setEditValues({ ...editValues, transfer_base_fee: e.target.value })}
-                            className="text-xs font-mono h-7 text-right w-20" />
-                        </td>
-                        <td className="px-2 py-1">
-                          <Input type="number" min={0} step={0.1} value={editValues.transfer_per_km_rate}
-                            onChange={(e) => setEditValues({ ...editValues, transfer_per_km_rate: e.target.value })}
-                            className="text-xs font-mono h-7 text-right w-20" />
-                        </td>
-                        <td className="px-2 py-1">
-                          <Input type="number" min={0} step={1} value={editValues.drop_off_fee}
-                            onChange={(e) => setEditValues({ ...editValues, drop_off_fee: e.target.value })}
-                            className="text-xs font-mono h-7 text-right w-20" />
-                        </td>
-                        <td className="px-2 py-1 flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={saveEdit}>
-                            <Check className="h-3.5 w-3.5 text-green-600" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={cancelEdit}>
-                            <X className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
-                        <td className="px-3 py-2 text-foreground font-medium">{cp.city_name}</td>
-                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
-                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
-                        <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.drop_off_fee || 0}</td>
-                        <td className="px-3 py-2 flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => startEdit(cp)}>
-                            <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full justify-between text-xs h-8">
+                <span>{cityPrices.length} city rate{cityPrices.length !== 1 ? 's' : ''} configured</span>
+                <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 [&[data-state=open]>svg]:rotate-180" />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2">
+              <div className="border border-border rounded-lg overflow-hidden max-h-64 overflow-y-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-secondary/50 sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">Country</th>
+                      <th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th>
+                      <th className="px-3 py-2 text-right font-medium text-muted-foreground">Base Fee</th>
+                      <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per-KM</th>
+                      <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
+                      <th className="px-3 py-2 w-20" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cityPrices.map((cp) => (
+                      <tr key={cp.id} className="border-t border-border hover:bg-secondary/20">
+                        {editingId === cp.id ? (
+                          <>
+                            <td className="px-2 py-1">
+                              <Select value={editValues.country} onValueChange={(v) => setEditValues({ ...editValues, country: v, city_name: '' })}>
+                                <SelectTrigger className="text-xs h-7">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-60">
+                                  {CITY_COUNTRIES.map((c) => (
+                                    <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="px-2 py-1">
+                              <Select value={editValues.city_name} onValueChange={(v) => setEditValues({ ...editValues, city_name: v })}>
+                                <SelectTrigger className="text-xs h-7">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-60">
+                                  {editCities.map((c) => (
+                                    <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="px-2 py-1">
+                              <Input type="number" min={0} step={0.5} value={editValues.transfer_base_fee}
+                                onChange={(e) => setEditValues({ ...editValues, transfer_base_fee: e.target.value })}
+                                className="text-xs font-mono h-7 text-right w-20" />
+                            </td>
+                            <td className="px-2 py-1">
+                              <Input type="number" min={0} step={0.1} value={editValues.transfer_per_km_rate}
+                                onChange={(e) => setEditValues({ ...editValues, transfer_per_km_rate: e.target.value })}
+                                className="text-xs font-mono h-7 text-right w-20" />
+                            </td>
+                            <td className="px-2 py-1">
+                              <Input type="number" min={0} step={1} value={editValues.drop_off_fee}
+                                onChange={(e) => setEditValues({ ...editValues, drop_off_fee: e.target.value })}
+                                className="text-xs font-mono h-7 text-right w-20" />
+                            </td>
+                            <td className="px-2 py-1 flex gap-1">
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={saveEdit}>
+                                <Check className="h-3.5 w-3.5 text-green-600" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={cancelEdit}>
+                                <X className="h-3.5 w-3.5 text-muted-foreground" />
+                              </Button>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
+                            <td className="px-3 py-2 text-foreground font-medium">{cp.city_name}</td>
+                            <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
+                            <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
+                            <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.drop_off_fee || 0}</td>
+                            <td className="px-3 py-2 flex gap-1">
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => startEdit(cp)}>
+                                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
+                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                              </Button>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
       </div>
     </div>
