@@ -67,22 +67,41 @@ function resolvePoiQuery(name: string): string {
 
 /** Geocode a place name using Mapbox and return [lng, lat] */
 export async function geocodePlace(name: string, _country?: string): Promise<[number, number] | null> {
+  // Resolve via POI database first for accurate queries
+  const query = resolvePoiQuery(name);
+
+  // Try Mapbox first
+  const token = import.meta.env.VITE_MAPBOX_TOKEN;
+  if (token) {
+    try {
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&limit=1`;
+      console.log('[Transfer] Geocoding (Mapbox):', query);
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        const feature = data?.features?.[0];
+        if (feature) {
+          const [lng, lat] = feature.center;
+          console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
+          return [lng, lat];
+        }
+      }
+    } catch (e) {
+      console.warn('[Transfer] Mapbox geocode error, trying fallback:', e);
+    }
+  }
+
+  // Fallback: Nominatim (OpenStreetMap) — free, no API key
   try {
-    const token = import.meta.env.VITE_MAPBOX_TOKEN;
-    if (!token) { console.warn('[Transfer] No Mapbox token configured'); return null; }
-    
-    // Resolve via POI database first for accurate queries
-    const query = resolvePoiQuery(name);
-    
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&limit=1`;
-    console.log('[Transfer] Geocoding:', query);
-    const res = await fetch(url);
-    if (!res.ok) { console.warn('[Transfer] Mapbox HTTP error:', res.status); return null; }
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+    console.log('[Transfer] Geocoding (Nominatim):', query);
+    const res = await fetch(url, { headers: { 'User-Agent': 'TripForge/1.0' } });
+    if (!res.ok) { console.warn('[Transfer] Nominatim HTTP error:', res.status); return null; }
     const data = await res.json();
-    const feature = data?.features?.[0];
-    if (!feature) { console.warn('[Transfer] No geocode result for:', query); return null; }
-    const [lng, lat] = feature.center;
-    console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
+    if (!data?.[0]) { console.warn('[Transfer] No geocode result for:', query); return null; }
+    const lng = parseFloat(data[0].lon);
+    const lat = parseFloat(data[0].lat);
+    console.log('[Transfer] Geocoded (Nominatim):', query, '→', [lng, lat]);
     return [lng, lat];
   } catch (e) {
     console.error('[Transfer] Geocode error:', e);
