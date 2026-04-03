@@ -9,6 +9,7 @@ export interface CityPricing {
   country: string;
   transfer_base_fee: number;
   transfer_per_km_rate: number;
+  drop_off_fee: number;
   created_at: string;
 }
 

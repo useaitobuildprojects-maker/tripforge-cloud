@@ -10,6 +10,7 @@ export interface TransferQuote {
   price: number;
   source: 'formula';
   distance_km: number | null;
+  drop_off_fee: number;
   error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
 }
 
