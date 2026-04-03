@@ -151,38 +151,80 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     </div>
   );
 };
-const LimoTourPricingTab = ({ agencyId }: { agencyId: string }) => {
-  const { data: prices = [], isLoading } = useLimoTourPricing(agencyId);
-  const addPrice = useAddLimoTourPrice();
-  const deletePrice = useDeleteLimoTourPrice();
-  const [city, setCity] = useState('');
-  const [rate, setRate] = useState('');
-  const [minDays, setMinDays] = useState('1');
-  const [desc, setDesc] = useState('');
-
-  const handleAdd = () => {
-    if (!city || !rate) return;
-    addPrice.mutate({ agency_id: agencyId, city, daily_rate: Number(rate), min_days: Number(minDays) || 1, description: desc || null });
-    setCity(''); setRate(''); setMinDays('1'); setDesc('');
-  };
-
+// ── Limo Service Tab (category-based hourly + P2P) ──
+const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-2">
-        <div className="space-y-1"><Label className="text-[11px]">City</Label><Input placeholder="Paris" value={city} onChange={(e) => setCity(e.target.value)} className="text-xs" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Daily Rate (€)</Label><Input type="number" min={0} placeholder="350" value={rate} onChange={(e) => setRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Min Days</Label><Input type="number" min={1} placeholder="1" value={minDays} onChange={(e) => setMinDays(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !city || !rate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
-      </div>
-      <div className="space-y-1"><Label className="text-[11px]">Description / Itinerary (optional)</Label><Input placeholder="E.g. 10-day Europe tour covering Paris, Rome, Barcelona..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No limo tour pricing configured yet</p> : (
-        <div className="border border-border rounded-lg overflow-hidden">
-          <table className="w-full text-xs">
-            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Daily Rate</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Min Days</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Description</th><th className="px-3 py-2 w-10" /></tr></thead>
-            <tbody>{prices.map((p) => (<tr key={p.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground font-medium">{p.city}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}/day</td><td className="px-3 py-2 text-right text-muted-foreground">{p.min_days ?? 1}</td><td className="px-3 py-2 text-muted-foreground max-w-[200px] truncate">{p.description || '—'}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
-          </table>
+    <div className="space-y-5">
+      {/* Hourly Rates */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <div>
+          <h4 className="text-xs font-semibold text-foreground">Hourly Rates (per category)</h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Set the hourly rate for each vehicle category. Customers book by the hour.</p>
         </div>
-      )}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Economy (€/hr)</Label>
+            <Input type="number" min={0} step={1} placeholder="40"
+              value={storefrontConfig.limo_hourly_rate_economy ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_economy: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Business (€/hr)</Label>
+            <Input type="number" min={0} step={1} placeholder="65"
+              value={storefrontConfig.limo_hourly_rate_business ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_business: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">First Class (€/hr)</Label>
+            <Input type="number" min={0} step={1} placeholder="100"
+              value={storefrontConfig.limo_hourly_rate_first_class ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_first_class: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">VAN (€/hr)</Label>
+            <Input type="number" min={0} step={1} placeholder="75"
+              value={storefrontConfig.limo_hourly_rate_van ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_hourly_rate_van: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+        </div>
+        <div className="space-y-1 pt-2 border-t border-border">
+          <Label className="text-[11px]">Minimum Hours</Label>
+          <Input type="number" min={1} max={12} step={1} placeholder="2"
+            value={storefrontConfig.limo_min_hours ?? ''}
+            onChange={(e) => onConfigChange({ ...storefrontConfig, limo_min_hours: e.target.value ? Number(e.target.value) : undefined })}
+            className="text-xs font-mono w-24" />
+          <p className="text-[10px] text-muted-foreground">Minimum booking duration (default: 2 hours)</p>
+        </div>
+      </div>
+
+      {/* Point-to-Point Pricing */}
+      <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
+        <div>
+          <h4 className="text-xs font-semibold text-foreground">Point-to-Point Pricing (optional)</h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Set separate base fee & per-km rate for limo P2P rides. If empty, falls back to your Transfer pricing formula.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Base Fee (€)</Label>
+            <Input type="number" min={0} step={0.5} placeholder="Same as Transfer"
+              value={storefrontConfig.limo_p2p_base_fee ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_p2p_base_fee: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Per-KM Rate (€)</Label>
+            <Input type="number" min={0} step={0.1} placeholder="Same as Transfer"
+              value={storefrontConfig.limo_p2p_per_km_rate ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_p2p_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+        </div>
+        <p className="text-[10px] text-muted-foreground">Uses the same category multipliers as Transfer (Economy 1×, Business {storefrontConfig.transfer_multiplier_business ?? 1.6}×, etc.)</p>
+      </div>
     </div>
   );
 };
