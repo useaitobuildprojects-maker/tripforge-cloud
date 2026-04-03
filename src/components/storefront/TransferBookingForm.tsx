@@ -17,7 +17,7 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
   business: Car,
-  first_class: Crown,
+  first_class: Car,
   van: Truck,
 };
 
