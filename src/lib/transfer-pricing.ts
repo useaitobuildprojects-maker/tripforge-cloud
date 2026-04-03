@@ -141,9 +141,8 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
   }
 }
 
-/** Choose the strongest matching city rate for the route.
- * If both origin and destination match different city rules,
- * prefer the higher-priced rule instead of the first alphabetical row.
+/** Find city rate: origin city first (driver's base), then destination, then null.
+ * Real agencies price based on where the driver starts from.
  */
 function findCityRate(
   cityPricing: CityPricing[],
@@ -156,19 +155,15 @@ function findCityRate(
   const o = normalize(origin);
   const d = normalize(destination);
 
-  const matches = cityPricing.filter((cp) => {
-    const city = normalize(cp.city_name);
-    return o.includes(city) || d.includes(city);
-  });
+  // Priority 1: origin city (driver's base cost)
+  const originMatch = cityPricing.find((cp) => o.includes(normalize(cp.city_name)));
+  if (originMatch) return originMatch;
 
-  if (!matches.length) return null;
+  // Priority 2: destination city
+  const destMatch = cityPricing.find((cp) => d.includes(normalize(cp.city_name)));
+  if (destMatch) return destMatch;
 
-  return matches.sort((a, b) => {
-    if (b.transfer_per_km_rate !== a.transfer_per_km_rate) {
-      return b.transfer_per_km_rate - a.transfer_per_km_rate;
-    }
-    return b.transfer_base_fee - a.transfer_base_fee;
-  })[0];
+  return null;
 }
 
 /** Calculate transfer price using OSRM distance + formula */
