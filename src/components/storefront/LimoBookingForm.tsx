@@ -49,12 +49,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const minHours = config.limo_min_hours ?? 2;
-  const getMaxHours = (cat: TransferCategory): number => {
+  const getMaxHours = (cat: LimoCategory): number => {
     switch (cat) {
-      case 'economy': return config.limo_max_hours_economy ?? 8;
       case 'business': return config.limo_max_hours_business ?? 8;
       case 'first_class': return config.limo_max_hours_first_class ?? 10;
       case 'van': return config.limo_max_hours_van ?? 10;
+      case 'suv': return config.limo_max_hours_suv ?? 10;
     }
   };
   const maxHours = getMaxHours(selectedCategory);
