@@ -41,16 +41,16 @@ export interface StorefrontConfig {
   // Car rental mileage settings
   car_rental_free_km?: number;
   car_rental_extra_km_rate?: number;
-  // Limo service pricing (hourly chauffeur)
-  limo_hourly_rate_economy?: number;
+  // Limo service pricing (hourly chauffeur) — no economy, uses suv instead
   limo_hourly_rate_business?: number;
   limo_hourly_rate_first_class?: number;
   limo_hourly_rate_van?: number;
+  limo_hourly_rate_suv?: number;
   limo_min_hours?: number;
-  limo_max_hours_economy?: number;
   limo_max_hours_business?: number;
   limo_max_hours_first_class?: number;
   limo_max_hours_van?: number;
+  limo_max_hours_suv?: number;
   limo_max_km?: number;
   // Limo point-to-point uses the same transfer formula (base + per-km × multiplier)
   limo_p2p_base_fee?: number;
