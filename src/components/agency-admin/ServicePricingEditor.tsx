@@ -177,7 +177,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
           <h4 className="text-xs font-semibold text-foreground">Step 3 — City-Specific Rates (Optional)</h4>
           <p className="text-[11px] text-muted-foreground mt-0.5">Override the default formula for specific cities. If origin or destination matches a city, its rates will be used instead.</p>
         </div>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           <div className="space-y-1">
             <Label className="text-[11px]">City Name *</Label>
             <Input placeholder="Dubai" value={cityName} onChange={(e) => setCityName(e.target.value)} className="text-xs" />
@@ -193,6 +193,10 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
           <div className="space-y-1">
             <Label className="text-[11px]">Per-KM Rate (€)</Label>
             <Input type="number" min={0} step={0.1} placeholder="2.00" value={cityPerKm} onChange={(e) => setCityPerKm(e.target.value)} className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Drop-off Fee (€)</Label>
+            <Input type="number" min={0} step={1} placeholder="50" value={cityDropOff} onChange={(e) => setCityDropOff(e.target.value)} className="text-xs font-mono" />
           </div>
         </div>
         <Button size="sm" onClick={handleAddCity} disabled={addCityPrice.isPending || !cityName || (!cityBase && !cityPerKm)} className="gradient-accent text-accent-foreground">
