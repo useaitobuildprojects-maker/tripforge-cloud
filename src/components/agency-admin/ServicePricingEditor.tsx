@@ -214,6 +214,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                   <th className="px-3 py-2 text-left font-medium text-muted-foreground">Country</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Base Fee</th>
                   <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per-KM</th>
+                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
                   <th className="px-3 py-2 w-10" />
                 </tr>
               </thead>
@@ -224,6 +225,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                     <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
                     <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
                     <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
+                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.drop_off_fee || 0}</td>
                     <td className="px-3 py-2">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
