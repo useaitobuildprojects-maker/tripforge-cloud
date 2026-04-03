@@ -129,9 +129,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     
     let msg: string;
     if (mode === 'hourly') {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Hourly):\n📍 Pickup: ${origin || 'To be confirmed'}\n📅 ${dateStr} at ${timeStr}\n⏱️ Duration: ${hours} hours\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${hourlyPrice}\n\nPlease confirm availability.`;
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Hourly):\n📍 Pickup: ${origin || 'To be confirmed'}\n📅 ${dateStr} at ${timeStr}\n⏱️ Duration: ${hours} hours\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${hourlyPrice}\n\nPlease confirm availability.`;
     } else {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
     }
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
