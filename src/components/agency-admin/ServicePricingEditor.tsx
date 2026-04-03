@@ -78,6 +78,25 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 // ── Transfer Tab ──
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const [showSettings, setShowSettings] = useState(false);
+  const { data: cityPrices = [], isLoading: cityLoading } = useCityPricing(agencyId);
+  const addCityPrice = useAddCityPricing();
+  const deleteCityPrice = useDeleteCityPricing();
+  const [cityName, setCityName] = useState('');
+  const [cityCountry, setCityCountry] = useState(country ?? '');
+  const [cityBase, setCityBase] = useState('');
+  const [cityPerKm, setCityPerKm] = useState('');
+
+  const handleAddCity = () => {
+    if (!cityName || (!cityBase && !cityPerKm)) return;
+    addCityPrice.mutate({
+      agency_id: agencyId,
+      city_name: cityName,
+      country: cityCountry || country || '',
+      transfer_base_fee: Number(cityBase) || 0,
+      transfer_per_km_rate: Number(cityPerKm) || 0,
+    });
+    setCityName(''); setCityBase(''); setCityPerKm('');
+  };
 
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
@@ -128,10 +147,10 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 2: Pricing Formula */}
+      {/* Step 2: Global Pricing Formula */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 2 — Pricing Formula</h4>
-        <p className="text-[11px] text-muted-foreground">Price = Base Fee + (Distance × Per-KM Rate × Category Multiplier). Distance is calculated automatically via GPS.</p>
+        <h4 className="text-xs font-semibold text-foreground">Step 2 — Default Pricing Formula</h4>
+        <p className="text-[11px] text-muted-foreground">Price = Base Fee + (Distance × Per-KM Rate × Category Multiplier). This is the fallback for cities without specific rates.</p>
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
@@ -148,6 +167,68 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
               className="text-xs font-mono" />
           </div>
         </div>
+      </div>
+
+      {/* Step 3: City-Specific Pricing */}
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
+        <div>
+          <h4 className="text-xs font-semibold text-foreground">Step 3 — City-Specific Rates (Optional)</h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Override the default formula for specific cities. If origin or destination matches a city, its rates will be used instead.</p>
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-1">
+            <Label className="text-[11px]">City Name *</Label>
+            <Input placeholder="Dubai" value={cityName} onChange={(e) => setCityName(e.target.value)} className="text-xs" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Country</Label>
+            <Input placeholder={country || 'Country'} value={cityCountry} onChange={(e) => setCityCountry(e.target.value)} className="text-xs" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Base Fee (€)</Label>
+            <Input type="number" min={0} step={0.5} placeholder="20" value={cityBase} onChange={(e) => setCityBase(e.target.value)} className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Per-KM Rate (€)</Label>
+            <Input type="number" min={0} step={0.1} placeholder="2.00" value={cityPerKm} onChange={(e) => setCityPerKm(e.target.value)} className="text-xs font-mono" />
+          </div>
+        </div>
+        <Button size="sm" onClick={handleAddCity} disabled={addCityPrice.isPending || !cityName || (!cityBase && !cityPerKm)} className="gradient-accent text-accent-foreground">
+          <Plus className="h-3.5 w-3.5 mr-1" /> Add City Rate
+        </Button>
+
+        {cityLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : cityPrices.length === 0 ? (
+          <p className="text-xs text-muted-foreground py-3 text-center">No city-specific rates configured. The default formula will be used everywhere.</p>
+        ) : (
+          <div className="border border-border rounded-lg overflow-hidden">
+            <table className="w-full text-xs">
+              <thead className="bg-secondary/50">
+                <tr>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">City</th>
+                  <th className="px-3 py-2 text-left font-medium text-muted-foreground">Country</th>
+                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Base Fee</th>
+                  <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per-KM</th>
+                  <th className="px-3 py-2 w-10" />
+                </tr>
+              </thead>
+              <tbody>
+                {cityPrices.map((cp) => (
+                  <tr key={cp.id} className="border-t border-border hover:bg-secondary/20">
+                    <td className="px-3 py-2 text-foreground font-medium">{cp.city_name}</td>
+                    <td className="px-3 py-2 text-muted-foreground">{cp.country}</td>
+                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_base_fee}</td>
+                    <td className="px-3 py-2 text-right font-mono text-foreground">€{cp.transfer_per_km_rate}</td>
+                    <td className="px-3 py-2">
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteCityPrice.mutate({ id: cp.id, agencyId })}>
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
