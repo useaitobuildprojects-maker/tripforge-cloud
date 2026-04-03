@@ -49,6 +49,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const minHours = config.limo_min_hours ?? 2;
+  const maxHours = config.limo_max_hours ?? 10;
+  const maxKm = config.limo_max_km ?? 35;
 
   const timeSlots = useMemo(() => {
     const slots: string[] = [];
@@ -62,9 +64,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const hourOptions = useMemo(() => {
     const opts: number[] = [];
-    for (let h = minHours; h <= 12; h++) opts.push(h);
+    for (let h = minHours; h <= maxHours; h++) opts.push(h);
     return opts;
-  }, [minHours]);
+  }, [minHours, maxHours]);
 
   const getHourlyRate = (cat: TransferCategory): number => {
     switch (cat) {
@@ -344,7 +346,24 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               </Button>
             )}
 
-            {quote && quote.price > 0 && (
+            {quote && quote.price > 0 && quote.distance_km && quote.distance_km > maxKm ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 text-center space-y-2"
+              >
+                <AlertCircle className="h-5 w-5 mx-auto text-destructive" />
+                <p className="text-sm font-medium">Route too long for Limo Service</p>
+                <p className="text-xs text-muted-foreground">
+                  This route is ~{quote.distance_km} km, but Limo P2P is limited to {maxKm} km. Please use our <strong>Transfer</strong> service instead, or contact us directly.
+                </p>
+                {config.whatsapp_number && (
+                  <Button variant="outline" size="sm" className="mt-2 gap-1" onClick={handleWhatsApp}>
+                    <MessageCircle className="h-3.5 w-3.5" /> Contact Us
+                  </Button>
+                )}
+              </motion.div>
+            ) : quote && quote.price > 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -369,7 +388,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   </Button>
                 )}
               </motion.div>
-            )}
+            ) : null}
 
             {quote && quote.price === 0 && (
               <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
