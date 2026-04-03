@@ -94,7 +94,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
       if (!token) { setSearchResults([]); setLoading(false); return; }
 
       const types = 'place,poi,address,locality';
-      const countryParam = countryCode ? `&country=${countryCode}` : '';
+      const euroCountries = 'al,ad,at,be,ba,bg,hr,cy,cz,dk,ee,fi,fr,de,gr,hu,is,ie,it,xk,lv,li,lt,lu,mt,md,mc,me,nl,mk,no,pl,pt,ro,rs,sk,si,es,se,ch,tr,ua,gb';
+      const countryParam = `&country=${countryCode ? countryCode : euroCountries}`;
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10&language=en${countryParam}`;
 
       const res = await fetch(url);
