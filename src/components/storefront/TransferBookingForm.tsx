@@ -33,7 +33,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
-      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address }));
+      return configLocs.map((l, i) => ({ id: `loc-${i}`, name: l.name, type: l.type, address: l.address, fullName: l.address ? `${l.name}, ${l.address}` : l.name }));
     }
     return getAgencyLocations(agency.city, agency.country);
   }, [config.locations, agency.city, agency.country]);
