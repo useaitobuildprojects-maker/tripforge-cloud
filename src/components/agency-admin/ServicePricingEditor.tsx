@@ -175,7 +175,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
       <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
         <div>
           <h4 className="text-xs font-semibold text-foreground">Step 3 — City-Specific Rates (Optional)</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Override the default formula for specific cities. If origin or destination matches a city, its rates will be used instead.</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Override the default formula for specific cities. Drop-off fee is added when the destination is outside that city.</p>
         </div>
         <div className="grid grid-cols-5 gap-2">
           <div className="space-y-1">
