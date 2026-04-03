@@ -1,6 +1,5 @@
 /** Country → major cities mapping for dropdowns */
 const CITY_DATABASE: Record<string, string[]> = {
-  'Morocco': ['Casablanca', 'Marrakech', 'Rabat', 'Fes', 'Tangier', 'Agadir', 'Meknes', 'Oujda', 'Kenitra', 'Tetouan', 'Nador', 'Essaouira', 'El Jadida', 'Ouarzazate', 'Errachidia'],
   'France': ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille', 'Rennes', 'Reims', 'Toulon', 'Grenoble', 'Dijon', 'Cannes'],
   'Germany': ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Essen', 'Leipzig', 'Bremen', 'Dresden', 'Hanover', 'Nuremberg'],
   'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Malaga', 'Bilbao', 'Alicante', 'Zaragoza', 'Palma de Mallorca', 'Granada', 'Marbella', 'Ibiza'],

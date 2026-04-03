@@ -7,7 +7,6 @@ const COUNTRY_MAP: Record<string, string> = {
   'Iceland': 'is', 'Ireland': 'ie', 'Italy': 'it', 'Kosovo': 'xk',
   'Latvia': 'lv', 'Liechtenstein': 'li', 'Lithuania': 'lt', 'Luxembourg': 'lu',
   'Malta': 'mt', 'Moldova': 'md', 'Monaco': 'mc', 'Montenegro': 'me',
-  'Morocco': 'ma', 'Netherlands': 'nl', 'North Macedonia': 'mk', 'Norway': 'no',
   'Poland': 'pl', 'Portugal': 'pt', 'Romania': 'ro', 'Serbia': 'rs',
   'Slovakia': 'sk', 'Slovenia': 'si', 'Spain': 'es', 'Sweden': 'se',
   'Switzerland': 'ch', 'Turkey': 'tr', 'Ukraine': 'ua', 'United Kingdom': 'gb',
