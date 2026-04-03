@@ -33,7 +33,7 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   car_rental: ['Wide selection of vehicles', 'Flexible pick-up & drop-off', 'Full insurance included', '24/7 roadside assistance', 'No hidden fees'],
   apartment: ['Fully furnished', 'Central locations', 'Short & long term stays', 'All utilities included', 'Cleaning service available'],
   transfer: ['Professional drivers', 'Airport pickup & drop-off', 'Flight tracking', 'Meet & greet service', 'Fixed prices'],
-  limo_tour: ['Multi-day itineraries', 'Luxury vehicles', 'Experienced chauffeurs', 'Custom routes', 'Hotel coordination'],
+  limo_tour: ['Professional chauffeurs', 'Hourly & point-to-point options', 'Luxury vehicles', 'Airport & event service', 'Custom routes available'],
   city_tour: ['Half-day & full-day options', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules', 'Private tours available'],
 };
 
