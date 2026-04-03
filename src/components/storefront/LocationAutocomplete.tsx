@@ -10,11 +10,19 @@ interface LocationOption {
   type: 'station' | 'airport' | 'city' | 'hotel_zone';
   address?: string;
   source?: 'configured' | 'search' | 'poi';
+  coords?: [number, number];
+  fullName?: string;
+}
+
+export interface LocationSelection {
+  name: string;
+  fullName?: string;
+  coords?: [number, number];
 }
 
 interface LocationAutocompleteProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, selection?: LocationSelection) => void;
   placeholder?: string;
   locations: LocationOption[];
   agencyCity: string;
