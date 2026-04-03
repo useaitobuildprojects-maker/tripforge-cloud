@@ -137,7 +137,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     window.open(url, '_blank');
   };
 
-  const hasHourlyPricing = getHourlyRate('economy') > 0 || getHourlyRate('business') > 0 || getHourlyRate('first_class') > 0 || getHourlyRate('van') > 0;
+  const hasHourlyPricing = getHourlyRate('business') > 0 || getHourlyRate('first_class') > 0 || getHourlyRate('van') > 0 || getHourlyRate('suv') > 0;
   const hasP2PPricing = (config.limo_p2p_base_fee ?? config.transfer_base_fee ?? 0) > 0 || (config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate ?? 0) > 0;
 
   return (
