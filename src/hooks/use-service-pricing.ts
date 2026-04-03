@@ -4,12 +4,20 @@ import { toast } from 'sonner';
 
 // ── Types ──
 export type TransferCategory = 'economy' | 'business' | 'first_class' | 'van';
+export type LimoCategory = 'business' | 'first_class' | 'van' | 'suv';
 
 export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string }[] = [
   { id: 'economy', label: 'Economy', description: 'Sedan (1-3 pax)' },
   { id: 'business', label: 'Business', description: 'Premium sedan (1-3 pax)' },
   { id: 'first_class', label: 'First Class', description: 'Luxury (1-3 pax)' },
   { id: 'van', label: 'VAN', description: 'Minivan (4-7 pax)' },
+];
+
+export const LIMO_CATEGORIES: { id: LimoCategory; label: string; description: string }[] = [
+  { id: 'business', label: 'Business Sedan', description: 'E-Class, BMW 5 (1-3 pax)' },
+  { id: 'first_class', label: 'First Class', description: 'S-Class, BMW 7 (1-3 pax)' },
+  { id: 'van', label: 'Business Van', description: 'V-Class (4-7 pax)' },
+  { id: 'suv', label: 'Luxury SUV', description: 'Range Rover, Escalade (1-4 pax)' },
 ];
 
 export interface TransferRoute {

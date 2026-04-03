@@ -7,18 +7,18 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
+import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 
-const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
-  economy: Car,
+const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   business: Car,
   first_class: Crown,
   van: Truck,
+  suv: Shield,
 };
 
 type LimoMode = 'hourly' | 'p2p';
@@ -41,7 +41,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [mode, setMode] = useState<LimoMode>('hourly');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('business');
+  const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [hours, setHours] = useState('3');
@@ -49,12 +49,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const minHours = config.limo_min_hours ?? 2;
-  const getMaxHours = (cat: TransferCategory): number => {
+  const getMaxHours = (cat: LimoCategory): number => {
     switch (cat) {
-      case 'economy': return config.limo_max_hours_economy ?? 8;
       case 'business': return config.limo_max_hours_business ?? 8;
       case 'first_class': return config.limo_max_hours_first_class ?? 10;
       case 'van': return config.limo_max_hours_van ?? 10;
+      case 'suv': return config.limo_max_hours_suv ?? 10;
     }
   };
   const maxHours = getMaxHours(selectedCategory);
@@ -79,12 +79,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return opts;
   }, [minHours, maxHours]);
 
-  const getHourlyRate = (cat: TransferCategory): number => {
+  const getHourlyRate = (cat: LimoCategory): number => {
     switch (cat) {
-      case 'economy': return config.limo_hourly_rate_economy ?? 0;
       case 'business': return config.limo_hourly_rate_business ?? 0;
       case 'first_class': return config.limo_hourly_rate_first_class ?? 0;
       case 'van': return config.limo_hourly_rate_van ?? 0;
+      case 'suv': return config.limo_hourly_rate_suv ?? 0;
     }
   };
 
@@ -109,8 +109,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
         transfer_base_fee: config.limo_p2p_base_fee ?? config.transfer_base_fee,
         transfer_per_km_rate: config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate,
       };
+      const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), selectedCategory, agency.country
+        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country
       );
       result.origin = origin;
       result.destination = destination;
@@ -129,15 +130,15 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     
     let msg: string;
     if (mode === 'hourly') {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Hourly):\n📍 Pickup: ${origin || 'To be confirmed'}\n📅 ${dateStr} at ${timeStr}\n⏱️ Duration: ${hours} hours\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${hourlyPrice}\n\nPlease confirm availability.`;
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Hourly):\n📍 Pickup: ${origin || 'To be confirmed'}\n📅 ${dateStr} at ${timeStr}\n⏱️ Duration: ${hours} hours\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${hourlyPrice}\n\nPlease confirm availability.`;
     } else {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
     }
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
 
-  const hasHourlyPricing = getHourlyRate('economy') > 0 || getHourlyRate('business') > 0 || getHourlyRate('first_class') > 0 || getHourlyRate('van') > 0;
+  const hasHourlyPricing = getHourlyRate('business') > 0 || getHourlyRate('first_class') > 0 || getHourlyRate('van') > 0 || getHourlyRate('suv') > 0;
   const hasP2PPricing = (config.limo_p2p_base_fee ?? config.transfer_base_fee ?? 0) > 0 || (config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate ?? 0) > 0;
 
   return (
@@ -274,8 +275,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
         <div className="space-y-3">
           <Label className="text-xs font-medium">Vehicle Category</Label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {TRANSFER_CATEGORIES.map((cat) => {
-              const Icon = CATEGORY_ICONS[cat.id];
+            {LIMO_CATEGORIES.map((cat) => {
+              const Icon = LIMO_CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
               const hourlyRate = getHourlyRate(cat.id);
 
@@ -309,7 +310,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             style={{ backgroundColor: `${buttonColor}10` }}
           >
             <p className="text-sm text-muted-foreground">
-              {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {hours} hour{Number(hours) > 1 ? 's' : ''}
+              {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {hours} hour{Number(hours) > 1 ? 's' : ''}
             </p>
             <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{hourlyPrice}</p>
             <p className="text-xs text-muted-foreground">Estimated price · Min {minHours}h</p>
@@ -387,7 +388,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 </p>
                 <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
                 <p className="text-xs text-muted-foreground">
-                  {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
+                  {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
                 </p>
                 {config.whatsapp_number && (
                   <Button
