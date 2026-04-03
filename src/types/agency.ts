@@ -41,6 +41,8 @@ export interface StorefrontConfig {
   // Car rental mileage settings
   car_rental_free_km?: number;
   car_rental_extra_km_rate?: number;
+  // Limo amenities (displayed on storefront)
+  limo_amenities?: string[];
   // Limo service pricing (hourly chauffeur) — no economy, uses suv instead
   limo_hourly_rate_business?: number;
   limo_hourly_rate_first_class?: number;
