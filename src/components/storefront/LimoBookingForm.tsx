@@ -100,7 +100,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country
+        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country, cityPricingData
       );
       result.origin = origin;
       result.destination = destination;
