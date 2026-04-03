@@ -1,5 +1,6 @@
 import { TransferCategory } from '@/hooks/use-service-pricing';
 import { StorefrontConfig } from '@/types/agency';
+import { CityPricing } from '@/hooks/use-city-pricing';
 import POI_DB from '@/data/poi-database';
 
 export interface TransferQuote {
@@ -117,19 +118,46 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
   }
 }
 
+/** Try to find city-specific pricing for origin or destination */
+function findCityRate(
+  cityPricing: CityPricing[],
+  origin: string,
+  destination: string
+): CityPricing | null {
+  if (!cityPricing.length) return null;
+  const normalize = (s: string) => s.toLowerCase().trim();
+  const o = normalize(origin);
+  const d = normalize(destination);
+  // Match on origin city first, then destination
+  for (const cp of cityPricing) {
+    const cn = normalize(cp.city_name);
+    if (o.includes(cn) || d.includes(cn)) return cp;
+  }
+  return null;
+}
+
 /** Calculate transfer price using OSRM distance + formula */
 export async function calculateTransferPrice(
   config: StorefrontConfig,
   origin: string,
   destination: string,
   category: TransferCategory,
-  country?: string
+  country?: string,
+  cityPricing: CityPricing[] = []
 ): Promise<TransferQuote> {
   console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
-  console.log('[Transfer] Config:', { base: config.transfer_base_fee, perKm: config.transfer_per_km_rate });
 
-  const baseFee = config.transfer_base_fee ?? 0;
-  const perKmRate = config.transfer_per_km_rate ?? 0;
+  // Check for city-specific rates first
+  const cityRate = findCityRate(cityPricing, origin, destination);
+  const baseFee = cityRate?.transfer_base_fee ?? config.transfer_base_fee ?? 0;
+  const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
+
+  if (cityRate) {
+    console.log('[Transfer] Using city-specific rate for:', cityRate.city_name, { baseFee, perKmRate });
+  } else {
+    console.log('[Transfer] Using global rate:', { baseFee, perKmRate });
+  }
+
   if (baseFee === 0 && perKmRate === 0) {
     console.warn('[Transfer] No formula configured (base=0, perKm=0)');
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'no_formula' };
@@ -153,7 +181,9 @@ export async function calculateTransferPrice(
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, error: 'osrm_failed' };
   }
 
-  const price = getFormulaPrice(config, distanceKm, category);
-  console.log('[Transfer] Formula result:', { distanceKm, price });
+  // Use city-specific or global rates for formula
+  const multiplier = getCategoryMultiplier(config, category);
+  const price = Math.round(baseFee + distanceKm * perKmRate * multiplier);
+  console.log('[Transfer] Formula result:', { distanceKm, price, cityRate: cityRate?.city_name ?? 'global' });
   return { origin, destination, category, price, source: 'formula', distance_km: distanceKm };
 }

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+  const { data: cityPricingData = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -98,7 +100,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country
+        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country, cityPricingData
       );
       result.origin = origin;
       result.destination = destination;

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ interface Props {
 }
 
 const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
+  const { data: cityPricingData = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -70,7 +72,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     setLoading(true);
     try {
       const result = await calculateTransferPrice(
-        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country
+        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country, cityPricingData
       );
       // Keep original names in the quote for display
       result.origin = effectiveOrigin;
