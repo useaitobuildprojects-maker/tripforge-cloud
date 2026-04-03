@@ -53,7 +53,6 @@ export interface StorefrontConfig {
   limo_price_10h_van?: number;
   limo_price_10h_suv?: number;
   limo_max_km?: number;
-  limo_max_km?: number;
   // Limo point-to-point uses the same transfer formula (base + per-km × multiplier)
   limo_p2p_base_fee?: number;
   limo_p2p_per_km_rate?: number;
