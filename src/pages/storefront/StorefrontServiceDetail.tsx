@@ -50,6 +50,7 @@ const StorefrontServiceDetail = () => {
   
 
   const isTransfer = service === 'transfer';
+  const isLimo = service === 'limo_tour';
 
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
