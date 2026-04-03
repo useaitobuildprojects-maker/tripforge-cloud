@@ -388,7 +388,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 </p>
                 <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
                 <p className="text-xs text-muted-foreground">
-                  {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
+                  {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
                 </p>
                 {config.whatsapp_number && (
                   <Button
