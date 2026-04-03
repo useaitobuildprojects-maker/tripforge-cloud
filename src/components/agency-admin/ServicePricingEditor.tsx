@@ -36,7 +36,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 
   const tabs = [
     ...(hasTransfer ? [{ id: 'transfer', label: 'Transfer', icon: Navigation }] : []),
-    ...(hasLimo ? [{ id: 'limo_tour', label: 'Limo Tour', icon: Globe }] : []),
+    ...(hasLimo ? [{ id: 'limo_tour', label: 'Limo Service', icon: Globe }] : []),
     ...(hasCityTour ? [{ id: 'city_tour', label: 'City Tour', icon: Map }] : []),
     ...(hasCarRental ? [{ id: 'car_rental', label: 'Car Rental', icon: Car }] : []),
   ];
