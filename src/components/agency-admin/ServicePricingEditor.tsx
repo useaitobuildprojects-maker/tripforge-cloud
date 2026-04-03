@@ -240,7 +240,6 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
         </div>
       </div>
-      </div>
 
       {/* Point-to-Point Pricing */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
