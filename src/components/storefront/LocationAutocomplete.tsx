@@ -10,11 +10,19 @@ interface LocationOption {
   type: 'station' | 'airport' | 'city' | 'hotel_zone';
   address?: string;
   source?: 'configured' | 'search' | 'poi';
+  coords?: [number, number];
+  fullName?: string;
+}
+
+export interface LocationSelection {
+  name: string;
+  fullName?: string;
+  coords?: [number, number];
 }
 
 interface LocationAutocompleteProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, selection?: LocationSelection) => void;
   placeholder?: string;
   locations: LocationOption[];
   agencyCity: string;
@@ -44,6 +52,13 @@ function buildMapboxAddress(feature: MapboxFeature): string {
   const ctx = feature.context || [];
   const parts = ctx.map(c => c.text).filter(Boolean);
   return parts.join(', ') || feature.place_name.split(',').slice(1).map(s => s.trim()).join(', ');
+}
+
+function extractCoordsFromMapbox(feature: MapboxFeature): [number, number] | undefined {
+  const f = feature as any;
+  if (f.center) return [f.center[0], f.center[1]];
+  if (f.geometry?.coordinates) return [f.geometry.coordinates[0], f.geometry.coordinates[1]];
+  return undefined;
 }
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
@@ -93,6 +108,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         type: detectTypeFromMapbox(f),
         address: buildMapboxAddress(f),
         source: 'search' as const,
+        coords: extractCoordsFromMapbox(f),
+        fullName: f.place_name,
       }));
 
       setSearchResults(results.slice(0, 12));
@@ -122,6 +139,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         type: p.type,
         address: p.address,
         source: 'poi' as const,
+        coords: p.coords,
       }));
   }, [query, agencyCountry, locations]);
 

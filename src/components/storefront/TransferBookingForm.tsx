@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
-import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
+import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
@@ -40,6 +40,8 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
+  const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [date, setDate] = useState<Date>();
@@ -60,23 +62,14 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     return slots;
   }, []);
 
-  // Resolve a location name to a geocoding-friendly string by appending its address if configured
-  const resolveLocationQuery = (name: string): string => {
-    const loc = agencyLocations.find((l) => l.name === name);
-    if (loc?.address) return `${name}, ${loc.address}`;
-    return name;
-  };
-
   const handleGetQuote = async () => {
     if (!effectiveOrigin || !effectiveDest) return;
     setLoading(true);
     try {
       const result = await calculateTransferPrice(
-        config, resolveLocationQuery(effectiveOrigin), resolveLocationQuery(effectiveDest), selectedCategory, agency.country, cityPricingData
+        config, effectiveOrigin, effectiveDest, selectedCategory, agency.country, cityPricingData,
+        originCoords, destCoords
       );
-      // Keep original names in the quote for display
-      result.origin = effectiveOrigin;
-      result.destination = effectiveDest;
       setQuote(result);
     } catch {
       setQuote(null);
@@ -114,7 +107,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={origin}
-              onChange={(v) => { setOrigin(v); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
               placeholder="Airport, hotel, or address"
               locations={agencyLocations}
               agencyCity={agency.city}
@@ -132,7 +125,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={destination}
-              onChange={(v) => { setDestination(v); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
               placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
