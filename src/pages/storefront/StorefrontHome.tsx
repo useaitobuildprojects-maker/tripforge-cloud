@@ -35,7 +35,7 @@ const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: st
   car_rental: { icon: Car, items: ['Free cancellation up to 24h', 'Unlimited mileage options', 'Full insurance included', 'Airport pickup available'] },
   apartment: { icon: Building, items: ['Fully furnished', 'Weekly & monthly rates', 'Central locations', 'Self check-in'] },
   transfer: { icon: Users, items: ['Professional drivers', 'Airport pickup & drop-off', 'Flight tracking', 'Meet & greet service'] },
-  limo_tour: { icon: Briefcase, items: ['Multi-day itineraries', 'Luxury vehicles', 'Experienced chauffeurs', 'Custom routes available'] },
+  limo_tour: { icon: Briefcase, items: ['Professional chauffeurs', 'Hourly & point-to-point', 'Luxury vehicles', 'Airport & event service'] },
   city_tour: { icon: Star, items: ['Half-day & full-day tours', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules'] },
 };
 

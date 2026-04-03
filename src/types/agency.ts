@@ -107,7 +107,7 @@ export const SERVICE_LABELS: Record<ServiceType, string> = {
   car_rental: 'Car Rental',
   apartment: 'Apartment',
   transfer: 'Transfer',
-  limo_tour: 'Limo Tour',
+  limo_tour: 'Limo Service',
   city_tour: 'City Tour',
 };
 
