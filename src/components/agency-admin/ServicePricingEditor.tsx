@@ -110,7 +110,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                 className="text-xs font-mono" />
             </div>
             <div className="space-y-1">
-              <Label className="text-[11px]">VAN (×)</Label>
+              <Label className="text-[11px]">Van (×)</Label>
               <Input type="number" min={1} step={0.1} value={multVan}
                 onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_van: Number(e.target.value) || 1.8 })}
                 className="text-xs font-mono" />
