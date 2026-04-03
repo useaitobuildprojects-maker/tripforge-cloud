@@ -32,6 +32,7 @@ interface Props {
 }
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+  const { data: cityPricingData = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
