@@ -79,12 +79,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return opts;
   }, [minHours, maxHours]);
 
-  const getHourlyRate = (cat: TransferCategory): number => {
+  const getHourlyRate = (cat: LimoCategory): number => {
     switch (cat) {
-      case 'economy': return config.limo_hourly_rate_economy ?? 0;
       case 'business': return config.limo_hourly_rate_business ?? 0;
       case 'first_class': return config.limo_hourly_rate_first_class ?? 0;
       case 'van': return config.limo_hourly_rate_van ?? 0;
+      case 'suv': return config.limo_hourly_rate_suv ?? 0;
     }
   };
 
