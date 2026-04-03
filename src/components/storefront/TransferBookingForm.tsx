@@ -239,7 +239,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                     style={{ backgroundColor: `${buttonColor}10` }}
                   >
                     <p className="text-sm text-muted-foreground">
-                      {effectiveOrigin} → {effectiveDest}
+                      {originLabel || effectiveOrigin} → {destLabel || effectiveDest}
                       {quote.distance_km && ` · ~${quote.distance_km} km`}
                     </p>
                     <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
