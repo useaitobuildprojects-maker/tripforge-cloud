@@ -351,7 +351,19 @@ export function getPOIsForCountries(country: string): POI[] {
 }
 
 /**
+const EUROPEAN_COUNTRIES = new Set([
+  'albania', 'andorra', 'austria', 'belgium', 'bosnia and herzegovina', 'bulgaria',
+  'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france',
+  'germany', 'greece', 'hungary', 'iceland', 'ireland', 'italy', 'kosovo', 'latvia',
+  'liechtenstein', 'lithuania', 'luxembourg', 'malta', 'moldova', 'monaco', 'montenegro',
+  'netherlands', 'north macedonia', 'norway', 'poland', 'portugal', 'romania', 'serbia',
+  'slovakia', 'slovenia', 'spain', 'sweden', 'switzerland', 'turkey', 'ukraine',
+  'united kingdom',
+]);
+
+/**
  * Search POIs by query string. Returns matched POIs sorted by relevance.
+ * Only returns results from European countries.
  */
 export function searchPOIs(query: string, country: string): POI[] {
   if (!query || query.trim().length < 1) return [];
