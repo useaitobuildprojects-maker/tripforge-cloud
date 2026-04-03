@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
-import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
+import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
 const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   business: Car,
@@ -44,6 +44,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [mode, setMode] = useState<LimoMode>('package');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
+  const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
   const [selectedPackage, setSelectedPackage] = useState<LimoPackage>('8h');
   const [date, setDate] = useState<Date>();
@@ -83,12 +85,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const packagePrice = getPackagePrice(selectedCategory, selectedPackage);
 
-  const resolveLocationQuery = (name: string): string => {
-    const loc = agencyLocations.find((l) => l.name === name);
-    if (loc?.address) return `${name}, ${loc.address}`;
-    return name;
-  };
-
   const handleGetP2PQuote = async () => {
     if (!origin || !destination) return;
     setLoading(true);
@@ -100,10 +96,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, resolveLocationQuery(origin), resolveLocationQuery(destination), transferCategory, agency.country, cityPricingData
+        limoConfig, origin, destination, transferCategory, agency.country, cityPricingData,
+        originCoords, destCoords
       );
-      result.origin = origin;
-      result.destination = destination;
       setQuote(result);
     } catch {
       setQuote(null);
@@ -173,6 +168,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           <LocationAutocomplete
             value={origin}
             onChange={(v) => { setOrigin(v); setQuote(null); }}
+            onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
             placeholder="Airport, hotel, or address"
             locations={agencyLocations}
             agencyCity={agency.city}
@@ -189,6 +185,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             <LocationAutocomplete
               value={destination}
               onChange={(v) => { setDestination(v); setQuote(null); }}
+            onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
               placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
