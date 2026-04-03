@@ -372,6 +372,7 @@ export function searchPOIs(query: string, country: string): POI[] {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   const scored = DB
+    .filter((poi) => EUROPEAN_COUNTRIES.has(poi.country.toLowerCase()))
     .map((poi) => {
       const haystack = `${poi.name} ${poi.address} ${poi.iata || ''}`.toLowerCase();
       let score = 0;
