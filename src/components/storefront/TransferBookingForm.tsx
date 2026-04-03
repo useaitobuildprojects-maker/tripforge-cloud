@@ -39,7 +39,9 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   }, [config.locations, agency.city, agency.country]);
 
   const [origin, setOrigin] = useState('');
+  const [originLabel, setOriginLabel] = useState('');
   const [destination, setDestination] = useState('');
+  const [destLabel, setDestLabel] = useState('');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
