@@ -191,13 +191,31 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               className="text-xs font-mono" />
           </div>
         </div>
-        <div className="space-y-1 pt-2 border-t border-border">
-          <Label className="text-[11px]">Minimum Hours</Label>
-          <Input type="number" min={1} max={12} step={1} placeholder="2"
-            value={storefrontConfig.limo_min_hours ?? ''}
-            onChange={(e) => onConfigChange({ ...storefrontConfig, limo_min_hours: e.target.value ? Number(e.target.value) : undefined })}
-            className="text-xs font-mono w-24" />
-          <p className="text-[10px] text-muted-foreground">Minimum booking duration (default: 2 hours)</p>
+        <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Minimum Hours</Label>
+            <Input type="number" min={1} max={12} step={1} placeholder="2"
+              value={storefrontConfig.limo_min_hours ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_min_hours: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+            <p className="text-[10px] text-muted-foreground">Min booking (default: 2h)</p>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Maximum Hours</Label>
+            <Input type="number" min={1} max={10} step={1} placeholder="10"
+              value={storefrontConfig.limo_max_hours ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_hours: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+            <p className="text-[10px] text-muted-foreground">Max booking (8-10h)</p>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max P2P Distance (km)</Label>
+            <Input type="number" min={1} max={100} step={1} placeholder="35"
+              value={storefrontConfig.limo_max_km ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_km: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+            <p className="text-[10px] text-muted-foreground">Max distance for P2P (default: 35km)</p>
+          </div>
         </div>
       </div>
 

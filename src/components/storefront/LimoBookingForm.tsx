@@ -49,6 +49,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const minHours = config.limo_min_hours ?? 2;
+  const maxHours = config.limo_max_hours ?? 10;
+  const maxKm = config.limo_max_km ?? 35;
 
   const timeSlots = useMemo(() => {
     const slots: string[] = [];
