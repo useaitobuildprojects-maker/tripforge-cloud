@@ -350,7 +350,7 @@ export function getPOIsForCountries(country: string): POI[] {
   return DB.filter((poi) => poi.country.toLowerCase() === trimmed);
 }
 
-/**
+
 const EUROPEAN_COUNTRIES = new Set([
   'albania', 'andorra', 'austria', 'belgium', 'bosnia and herzegovina', 'bulgaria',
   'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france',
