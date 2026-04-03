@@ -350,8 +350,20 @@ export function getPOIsForCountries(country: string): POI[] {
   return DB.filter((poi) => poi.country.toLowerCase() === trimmed);
 }
 
+
+const EUROPEAN_COUNTRIES = new Set([
+  'albania', 'andorra', 'austria', 'belgium', 'bosnia and herzegovina', 'bulgaria',
+  'croatia', 'cyprus', 'czech republic', 'denmark', 'estonia', 'finland', 'france',
+  'germany', 'greece', 'hungary', 'iceland', 'ireland', 'italy', 'kosovo', 'latvia',
+  'liechtenstein', 'lithuania', 'luxembourg', 'malta', 'moldova', 'monaco', 'montenegro',
+  'netherlands', 'north macedonia', 'norway', 'poland', 'portugal', 'romania', 'serbia',
+  'slovakia', 'slovenia', 'spain', 'sweden', 'switzerland', 'turkey', 'ukraine',
+  'united kingdom',
+]);
+
 /**
  * Search POIs by query string. Returns matched POIs sorted by relevance.
+ * Only returns results from European countries.
  */
 export function searchPOIs(query: string, country: string): POI[] {
   if (!query || query.trim().length < 1) return [];
@@ -360,6 +372,7 @@ export function searchPOIs(query: string, country: string): POI[] {
   const tokens = query.toLowerCase().split(/\s+/).filter(Boolean);
 
   const scored = DB
+    .filter((poi) => EUROPEAN_COUNTRIES.has(poi.country.toLowerCase()))
     .map((poi) => {
       const haystack = `${poi.name} ${poi.address} ${poi.iata || ''}`.toLowerCase();
       let score = 0;
