@@ -15,6 +15,7 @@ import {
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
 } from '@/hooks/use-service-pricing';
+import { useCityPricing, useAddCityPricing, useDeleteCityPricing } from '@/hooks/use-city-pricing';
 
 import { StorefrontConfig } from '@/types/agency';
 
