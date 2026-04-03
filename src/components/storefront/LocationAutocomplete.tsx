@@ -165,7 +165,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   };
 
   const handleSelect = (loc: LocationOption) => {
-    onChange(loc.name);
+    const displayName = loc.fullName || loc.name;
+    onChange(displayName, { name: displayName, fullName: loc.fullName, coords: loc.coords });
     setQuery(loc.name);
     setOpen(false);
   };
