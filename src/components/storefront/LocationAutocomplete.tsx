@@ -108,6 +108,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         type: detectTypeFromMapbox(f),
         address: buildMapboxAddress(f),
         source: 'search' as const,
+        coords: extractCoordsFromMapbox(f),
+        fullName: f.place_name,
       }));
 
       setSearchResults(results.slice(0, 12));
