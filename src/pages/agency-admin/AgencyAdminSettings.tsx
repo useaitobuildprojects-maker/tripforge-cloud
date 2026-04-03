@@ -233,8 +233,8 @@ const AgencyAdminSettings = () => {
         agencyName={agency.name}
       />
 
-      {/* Service Pricing */}
-      <ServicePricingEditor agencyId={agency.id} enabledServices={form.services} storefrontConfig={storefrontConfig} onConfigChange={setStorefrontConfig} country={form.country} />
+
+
 
       {/* Branding — Logo & Favicon */}
       <motion.div
@@ -352,6 +352,9 @@ const AgencyAdminSettings = () => {
             ))}
           </div>
         </div>
+
+        {/* Service Pricing — nested under Services */}
+        <ServicePricingEditor agencyId={agency.id} enabledServices={form.services} storefrontConfig={storefrontConfig} onConfigChange={setStorefrontConfig} country={form.country} />
       </motion.div>
 
       {/* Per-Page SEO Settings */}
