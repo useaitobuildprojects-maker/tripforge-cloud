@@ -49,7 +49,15 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const minHours = config.limo_min_hours ?? 2;
-  const maxHours = config.limo_max_hours ?? 10;
+  const getMaxHours = (cat: TransferCategory): number => {
+    switch (cat) {
+      case 'economy': return config.limo_max_hours_economy ?? 8;
+      case 'business': return config.limo_max_hours_business ?? 8;
+      case 'first_class': return config.limo_max_hours_first_class ?? 10;
+      case 'van': return config.limo_max_hours_van ?? 10;
+    }
+  };
+  const maxHours = getMaxHours(selectedCategory);
   const maxKm = config.limo_max_km ?? 35;
 
   const timeSlots = useMemo(() => {
@@ -65,6 +73,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const hourOptions = useMemo(() => {
     const opts: number[] = [];
     for (let h = minHours; h <= maxHours; h++) opts.push(h);
+    // Clamp selected hours if out of range
+    if (Number(hours) > maxHours) setHours(String(maxHours));
+    if (Number(hours) < minHours) setHours(String(minHours));
     return opts;
   }, [minHours, maxHours]);
 
