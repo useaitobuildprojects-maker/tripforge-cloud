@@ -10,6 +10,7 @@ import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo } from 'react';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
+import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
