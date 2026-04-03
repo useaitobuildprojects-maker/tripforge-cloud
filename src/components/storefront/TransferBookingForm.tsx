@@ -127,7 +127,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </Label>
             <LocationAutocomplete
               value={destination}
-              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
+              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestLabel(sel?.name?.split(',')[0] || v); setDestCoords(sel?.coords); setQuote(null); }}
               placeholder="Destination address"
               locations={agencyLocations}
               agencyCity={agency.city}
