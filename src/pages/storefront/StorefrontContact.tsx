@@ -23,9 +23,9 @@ const StorefrontContact = () => {
       <section className={`py-16 ${ts.subHeroClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">Contact Us</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{cfg.contact_title || 'Contact Us'}</h1>
             <p className="opacity-60 max-w-2xl mx-auto">
-              Have a question or need assistance? We'd love to hear from you.
+              {cfg.contact_subtitle || "Have a question or need assistance? We'd love to hear from you."}
             </p>
           </motion.div>
         </div>
@@ -33,7 +33,6 @@ const StorefrontContact = () => {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Info */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
@@ -59,7 +58,6 @@ const StorefrontContact = () => {
             </div>
           </motion.div>
 
-          {/* Contact Form */}
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
             <div className={`p-8 ${ts.cardClass}`}>
               <h3 className="text-lg font-bold mb-5">Send us a message</h3>

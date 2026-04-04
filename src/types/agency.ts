@@ -56,6 +56,31 @@ export interface StorefrontConfig {
   // Limo point-to-point uses the same transfer formula (base + per-km × multiplier)
   limo_p2p_base_fee?: number;
   limo_p2p_per_km_rate?: number;
+
+  // ── Page Content (editable from admin) ──
+  // Home
+  home_hero_image?: string;
+
+  // About
+  about_title?: string;
+  about_subtitle?: string;
+  about_story_1?: string;
+  about_story_2?: string;
+  about_image_url?: string;
+  about_values?: { title: string; description: string }[];
+
+  // Contact
+  contact_title?: string;
+  contact_subtitle?: string;
+
+  // Fleet
+  fleet_title?: string;
+  fleet_subtitle?: string;
+
+  // Services
+  services_title?: string;
+  services_subtitle?: string;
+  service_descriptions?: Partial<Record<ServiceType, string>>;
 }
 
 export interface PageSeoEntry {

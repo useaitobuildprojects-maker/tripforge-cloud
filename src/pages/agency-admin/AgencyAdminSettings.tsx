@@ -12,6 +12,7 @@ import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
 import { Upload, Image } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
+import PageContentEditor from '@/components/agency-admin/PageContentEditor';
 import ServicePricingEditor from '@/components/agency-admin/ServicePricingEditor';
 import { COUNTRY_LIST } from '@/lib/country-utils';
 import { getCitiesForCountry } from '@/data/city-database';
@@ -234,8 +235,15 @@ const AgencyAdminSettings = () => {
         agencyName={agency.name}
       />
 
-
-
+      {/* Page Content Editor */}
+      <PageContentEditor
+        config={storefrontConfig}
+        onChange={setStorefrontConfig}
+        agencyId={agency.id}
+        agencySlug={agency.slug}
+        agencyName={agency.name}
+        enabledServices={form.services}
+      />
 
       {/* Branding — Logo & Favicon */}
       <motion.div
