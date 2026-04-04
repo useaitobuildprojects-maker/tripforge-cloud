@@ -152,12 +152,14 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
       </div>
 
       <Tabs defaultValue="home" className="w-full">
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-7 w-full">
           <TabsTrigger value="home" className="gap-1.5 text-xs"><Home className="h-3.5 w-3.5" /> Home</TabsTrigger>
           <TabsTrigger value="about" className="gap-1.5 text-xs"><Info className="h-3.5 w-3.5" /> About</TabsTrigger>
           <TabsTrigger value="contact" className="gap-1.5 text-xs"><Phone className="h-3.5 w-3.5" /> Contact</TabsTrigger>
           <TabsTrigger value="fleet" className="gap-1.5 text-xs"><Car className="h-3.5 w-3.5" /> Fleet</TabsTrigger>
           <TabsTrigger value="services" className="gap-1.5 text-xs"><Layers className="h-3.5 w-3.5" /> Services</TabsTrigger>
+          <TabsTrigger value="blog" className="gap-1.5 text-xs"><BookOpen className="h-3.5 w-3.5" /> Blog</TabsTrigger>
+          <TabsTrigger value="reviews" className="gap-1.5 text-xs"><Star className="h-3.5 w-3.5" /> Reviews</TabsTrigger>
         </TabsList>
 
         {/* HOME */}
