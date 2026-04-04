@@ -118,10 +118,16 @@ const StorefrontHome = () => {
   const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
 
-  const testimonials = [
+  const testimonials = cfg.reviews ?? [
     { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles. The staff was incredibly helpful throughout the entire rental process.', rating: 5 },
     { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had. Will definitely be coming back for our next trip!', rating: 5 },
     { name: 'Sarah Klein', text: 'Great selection of vehicles and transparent pricing. The booking process was seamless.', rating: 4 },
+  ];
+
+  const blogPosts = cfg.blog_posts ?? [
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
   ];
 
   return (
