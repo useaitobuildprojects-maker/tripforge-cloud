@@ -338,6 +338,101 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
             </div>
           )}
         </TabsContent>
+
+        {/* BLOG */}
+        <TabsContent value="blog" className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={config.blog_title ?? ''}
+                onChange={(e) => update('blog_title', e.target.value)}
+                placeholder="Blog"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input
+                value={config.blog_subtitle ?? ''}
+                onChange={(e) => update('blog_subtitle', e.target.value)}
+                placeholder="Discover the latest news and useful articles about car rental and travel tips"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Blog Posts</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addBlogPost} className="gap-1 text-xs">
+                <Plus className="h-3 w-3" /> Add
+              </Button>
+            </div>
+            {blogPosts.map((post, i) => (
+              <div key={i} className="flex gap-3 items-start p-3 rounded-lg border border-border bg-secondary/20">
+                <div className="flex-1 space-y-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input value={post.title} onChange={(e) => updateBlogPost(i, 'title', e.target.value)} placeholder="Post title" className="h-8 text-sm" />
+                    <Input value={post.category} onChange={(e) => updateBlogPost(i, 'category', e.target.value)} placeholder="Category" className="h-8 text-sm" />
+                    <Input value={post.author} onChange={(e) => updateBlogPost(i, 'author', e.target.value)} placeholder="Author" className="h-8 text-sm" />
+                  </div>
+                  <Textarea value={post.excerpt} onChange={(e) => updateBlogPost(i, 'excerpt', e.target.value)} placeholder="Post excerpt..." rows={2} className="text-sm" />
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeBlogPost(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* REVIEWS */}
+        <TabsContent value="reviews" className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={config.reviews_title ?? ''}
+                onChange={(e) => update('reviews_title', e.target.value)}
+                placeholder="Trusted by Thousands of Happy Customers"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input
+                value={config.reviews_subtitle ?? ''}
+                onChange={(e) => update('reviews_subtitle', e.target.value)}
+                placeholder="Our customers' opinions help us improve your experience"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Customer Reviews</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addReview} className="gap-1 text-xs">
+                <Plus className="h-3 w-3" /> Add
+              </Button>
+            </div>
+            {reviews.map((review, i) => (
+              <div key={i} className="flex gap-3 items-start p-3 rounded-lg border border-border bg-secondary/20">
+                <div className="flex-1 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input value={review.name} onChange={(e) => updateReview(i, 'name', e.target.value)} placeholder="Customer name" className="h-8 text-sm" />
+                    <select
+                      value={review.rating}
+                      onChange={(e) => updateReview(i, 'rating', Number(e.target.value))}
+                      className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      {[5, 4, 3, 2, 1].map(r => <option key={r} value={r}>{r} ★</option>)}
+                    </select>
+                  </div>
+                  <Textarea value={review.text} onChange={(e) => updateReview(i, 'text', e.target.value)} placeholder="Review text..." rows={2} className="text-sm" />
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeReview(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
       </Tabs>
     </motion.div>
   );
