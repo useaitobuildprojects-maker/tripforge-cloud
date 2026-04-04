@@ -689,24 +689,22 @@ const StorefrontHome = () => {
       {/* Blog Section */}
       <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Blog</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
-            Discover the latest news and useful articles about car rental and travel tips
+            {cfg.blog_subtitle || 'Discover the latest news and useful articles about car rental and travel tips'}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((_, i) => (
+            {blogPosts.map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
                 <div className="h-48 opacity-10 bg-current" />
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold uppercase">Blog Title</span>
-                    <span className="text-[10px] text-accent font-medium uppercase">Category</span>
+                    <span className="text-xs font-semibold uppercase">{post.title}</span>
+                    <span className="text-[10px] text-accent font-medium uppercase">{post.category}</span>
                   </div>
-                  <p className="text-xs opacity-50 mb-2">Author · a min ago</p>
-                  <p className="text-sm opacity-60 leading-relaxed">
-                    Discover useful tips and insights about car rental, travel, and getting the most from your journey.
-                  </p>
+                  <p className="text-xs opacity-50 mb-2">{post.author} · a min ago</p>
+                  <p className="text-sm opacity-60 leading-relaxed">{post.excerpt}</p>
                 </div>
               </motion.div>
             ))}
