@@ -81,6 +81,16 @@ export interface StorefrontConfig {
   services_title?: string;
   services_subtitle?: string;
   service_descriptions?: Partial<Record<ServiceType, string>>;
+
+  // Blog
+  blog_title?: string;
+  blog_subtitle?: string;
+  blog_posts?: { title: string; category: string; author: string; excerpt: string; image_url?: string }[];
+
+  // Testimonials / Reviews
+  reviews_title?: string;
+  reviews_subtitle?: string;
+  reviews?: { name: string; text: string; rating: number }[];
 }
 
 export interface PageSeoEntry {

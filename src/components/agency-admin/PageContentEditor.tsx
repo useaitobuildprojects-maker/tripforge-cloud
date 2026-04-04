@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Upload, Plus, Trash2, Home, Info, Phone, Car, Layers } from 'lucide-react';
+import { Upload, Plus, Trash2, Home, Info, Phone, Car, Layers, BookOpen, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
