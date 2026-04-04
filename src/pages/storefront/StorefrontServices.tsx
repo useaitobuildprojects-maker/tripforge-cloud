@@ -2,7 +2,6 @@ import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Car, UserCheck, Crown, Building, Truck, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 
@@ -37,19 +36,19 @@ const StorefrontServices = () => {
         fallbackDescription={`Explore the services offered by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero */}
       <section className={`py-16 ${ts.subHeroClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+              {cfg.services_title || 'Our Services'}
+            </h1>
             <p className="opacity-60 max-w-2xl mx-auto">
-              Discover our range of premium services tailored to your needs in {agency.city}.
+              {cfg.services_subtitle || `Discover our range of premium services tailored to your needs in ${agency.city}.`}
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Services Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {enabledServices.length === 0 ? (
           <p className="text-center opacity-50">No services configured yet.</p>
@@ -58,7 +57,8 @@ const StorefrontServices = () => {
             {enabledServices.map((service, i) => {
               const Icon = SERVICE_ICONS[service] ?? Car;
               const label = SERVICE_LABELS[service] ?? service;
-              const desc = SERVICE_DESCRIPTIONS[service] ?? 'Explore this service.';
+              const customDesc = cfg.service_descriptions?.[service];
+              const desc = customDesc || SERVICE_DESCRIPTIONS[service] || 'Explore this service.';
 
               return (
                 <motion.div

@@ -27,19 +27,17 @@ const StorefrontFleet = () => {
         fallbackDescription={`Browse our premium fleet of vehicles available for rent at ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero */}
       <section className={`py-16 ${ts.subHeroClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">Our Fleet</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">{cfg.fleet_title || 'Our Fleet'}</h1>
             <p className="opacity-60 max-w-2xl mx-auto">
-              Explore our carefully curated selection of premium vehicles, ready for your next adventure in {agency.city}.
+              {cfg.fleet_subtitle || `Explore our carefully curated selection of premium vehicles, ready for your next adventure in ${agency.city}.`}
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sampleCars.map((car, i) => (
