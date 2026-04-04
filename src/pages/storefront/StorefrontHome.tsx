@@ -118,10 +118,16 @@ const StorefrontHome = () => {
   const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
 
-  const testimonials = [
+  const testimonials = cfg.reviews ?? [
     { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles. The staff was incredibly helpful throughout the entire rental process.', rating: 5 },
     { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had. Will definitely be coming back for our next trip!', rating: 5 },
     { name: 'Sarah Klein', text: 'Great selection of vehicles and transparent pricing. The booking process was seamless.', rating: 4 },
+  ];
+
+  const blogPosts = cfg.blog_posts ?? [
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
   ];
 
   return (
@@ -683,24 +689,22 @@ const StorefrontHome = () => {
       {/* Blog Section */}
       <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Blog</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
           <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
-            Discover the latest news and useful articles about car rental and travel tips
+            {cfg.blog_subtitle || 'Discover the latest news and useful articles about car rental and travel tips'}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((_, i) => (
+            {blogPosts.map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
                 <div className="h-48 opacity-10 bg-current" />
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold uppercase">Blog Title</span>
-                    <span className="text-[10px] text-accent font-medium uppercase">Category</span>
+                    <span className="text-xs font-semibold uppercase">{post.title}</span>
+                    <span className="text-[10px] text-accent font-medium uppercase">{post.category}</span>
                   </div>
-                  <p className="text-xs opacity-50 mb-2">Author · a min ago</p>
-                  <p className="text-sm opacity-60 leading-relaxed">
-                    Discover useful tips and insights about car rental, travel, and getting the most from your journey.
-                  </p>
+                  <p className="text-xs opacity-50 mb-2">{post.author} · a min ago</p>
+                  <p className="text-sm opacity-60 leading-relaxed">{post.excerpt}</p>
                 </div>
               </motion.div>
             ))}
@@ -713,9 +717,9 @@ const StorefrontHome = () => {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Trusted by Thousands of Happy Customers</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.reviews_title || 'Trusted by Thousands of Happy Customers'}</h2>
         <p className="text-center text-sm opacity-60 mb-12 max-w-lg mx-auto">
-          Our customers' opinions help us improve your experience and offer the best services
+          {cfg.reviews_subtitle || "Our customers' opinions help us improve your experience and offer the best services"}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (

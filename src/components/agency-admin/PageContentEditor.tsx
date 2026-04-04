@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Upload, Plus, Trash2, Home, Info, Phone, Car, Layers } from 'lucide-react';
+import { Upload, Plus, Trash2, Home, Info, Phone, Car, Layers, BookOpen, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
@@ -111,6 +111,34 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
     update('service_descriptions', { ...serviceDescs, [service]: desc });
   };
 
+  // Blog
+  const blogPosts = config.blog_posts ?? [
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+  ];
+  const updateBlogPost = (index: number, field: string, value: string) => {
+    const updated = [...blogPosts];
+    updated[index] = { ...updated[index], [field]: value };
+    update('blog_posts', updated);
+  };
+  const addBlogPost = () => update('blog_posts', [...blogPosts, { title: '', category: '', author: '', excerpt: '' }]);
+  const removeBlogPost = (index: number) => update('blog_posts', blogPosts.filter((_, i) => i !== index));
+
+  // Reviews
+  const reviews = config.reviews ?? [
+    { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles.', rating: 5 },
+    { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had.', rating: 5 },
+    { name: 'Sarah Klein', text: 'Great selection of vehicles and transparent pricing.', rating: 4 },
+  ];
+  const updateReview = (index: number, field: string, value: any) => {
+    const updated = [...reviews];
+    updated[index] = { ...updated[index], [field]: value };
+    update('reviews', updated);
+  };
+  const addReview = () => update('reviews', [...reviews, { name: '', text: '', rating: 5 }]);
+  const removeReview = (index: number) => update('reviews', reviews.filter((_, i) => i !== index));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -124,12 +152,14 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
       </div>
 
       <Tabs defaultValue="home" className="w-full">
-        <TabsList className="grid grid-cols-5 w-full">
+        <TabsList className="grid grid-cols-7 w-full">
           <TabsTrigger value="home" className="gap-1.5 text-xs"><Home className="h-3.5 w-3.5" /> Home</TabsTrigger>
           <TabsTrigger value="about" className="gap-1.5 text-xs"><Info className="h-3.5 w-3.5" /> About</TabsTrigger>
           <TabsTrigger value="contact" className="gap-1.5 text-xs"><Phone className="h-3.5 w-3.5" /> Contact</TabsTrigger>
           <TabsTrigger value="fleet" className="gap-1.5 text-xs"><Car className="h-3.5 w-3.5" /> Fleet</TabsTrigger>
           <TabsTrigger value="services" className="gap-1.5 text-xs"><Layers className="h-3.5 w-3.5" /> Services</TabsTrigger>
+          <TabsTrigger value="blog" className="gap-1.5 text-xs"><BookOpen className="h-3.5 w-3.5" /> Blog</TabsTrigger>
+          <TabsTrigger value="reviews" className="gap-1.5 text-xs"><Star className="h-3.5 w-3.5" /> Reviews</TabsTrigger>
         </TabsList>
 
         {/* HOME */}
@@ -307,6 +337,101 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
               ))}
             </div>
           )}
+        </TabsContent>
+
+        {/* BLOG */}
+        <TabsContent value="blog" className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={config.blog_title ?? ''}
+                onChange={(e) => update('blog_title', e.target.value)}
+                placeholder="Blog"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input
+                value={config.blog_subtitle ?? ''}
+                onChange={(e) => update('blog_subtitle', e.target.value)}
+                placeholder="Discover the latest news and useful articles about car rental and travel tips"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Blog Posts</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addBlogPost} className="gap-1 text-xs">
+                <Plus className="h-3 w-3" /> Add
+              </Button>
+            </div>
+            {blogPosts.map((post, i) => (
+              <div key={i} className="flex gap-3 items-start p-3 rounded-lg border border-border bg-secondary/20">
+                <div className="flex-1 space-y-2">
+                  <div className="grid grid-cols-3 gap-2">
+                    <Input value={post.title} onChange={(e) => updateBlogPost(i, 'title', e.target.value)} placeholder="Post title" className="h-8 text-sm" />
+                    <Input value={post.category} onChange={(e) => updateBlogPost(i, 'category', e.target.value)} placeholder="Category" className="h-8 text-sm" />
+                    <Input value={post.author} onChange={(e) => updateBlogPost(i, 'author', e.target.value)} placeholder="Author" className="h-8 text-sm" />
+                  </div>
+                  <Textarea value={post.excerpt} onChange={(e) => updateBlogPost(i, 'excerpt', e.target.value)} placeholder="Post excerpt..." rows={2} className="text-sm" />
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeBlogPost(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+
+        {/* REVIEWS */}
+        <TabsContent value="reviews" className="space-y-4 mt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Section Title</Label>
+              <Input
+                value={config.reviews_title ?? ''}
+                onChange={(e) => update('reviews_title', e.target.value)}
+                placeholder="Trusted by Thousands of Happy Customers"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtitle</Label>
+              <Input
+                value={config.reviews_subtitle ?? ''}
+                onChange={(e) => update('reviews_subtitle', e.target.value)}
+                placeholder="Our customers' opinions help us improve your experience"
+              />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Customer Reviews</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addReview} className="gap-1 text-xs">
+                <Plus className="h-3 w-3" /> Add
+              </Button>
+            </div>
+            {reviews.map((review, i) => (
+              <div key={i} className="flex gap-3 items-start p-3 rounded-lg border border-border bg-secondary/20">
+                <div className="flex-1 space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input value={review.name} onChange={(e) => updateReview(i, 'name', e.target.value)} placeholder="Customer name" className="h-8 text-sm" />
+                    <select
+                      value={review.rating}
+                      onChange={(e) => updateReview(i, 'rating', Number(e.target.value))}
+                      className="h-8 rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      {[5, 4, 3, 2, 1].map(r => <option key={r} value={r}>{r} ★</option>)}
+                    </select>
+                  </div>
+                  <Textarea value={review.text} onChange={(e) => updateReview(i, 'text', e.target.value)} placeholder="Review text..." rows={2} className="text-sm" />
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-destructive" onClick={() => removeReview(i)}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </motion.div>
