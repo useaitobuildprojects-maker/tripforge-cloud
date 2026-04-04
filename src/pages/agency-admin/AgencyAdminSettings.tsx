@@ -235,8 +235,15 @@ const AgencyAdminSettings = () => {
         agencyName={agency.name}
       />
 
-
-
+      {/* Page Content Editor */}
+      <PageContentEditor
+        config={storefrontConfig}
+        onChange={setStorefrontConfig}
+        agencyId={agency.id}
+        agencySlug={agency.slug}
+        agencyName={agency.name}
+        enabledServices={form.services}
+      />
 
       {/* Branding — Logo & Favicon */}
       <motion.div
