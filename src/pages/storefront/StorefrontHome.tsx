@@ -717,9 +717,9 @@ const StorefrontHome = () => {
 
       {/* Testimonials */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Trusted by Thousands of Happy Customers</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.reviews_title || 'Trusted by Thousands of Happy Customers'}</h2>
         <p className="text-center text-sm opacity-60 mb-12 max-w-lg mx-auto">
-          Our customers' opinions help us improve your experience and offer the best services
+          {cfg.reviews_subtitle || "Our customers' opinions help us improve your experience and offer the best services"}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
