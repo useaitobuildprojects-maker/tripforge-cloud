@@ -135,8 +135,9 @@ const StorefrontHome = () => {
 
       {/* Hero Section */}
       <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}), minHeight: '420px' }}>
+        {cfg.home_hero_image && <img src={cfg.home_hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
+        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && !cfg.home_hero_image && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
             <p className={`text-xs uppercase tracking-[0.25em] font-semibold mb-4 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
