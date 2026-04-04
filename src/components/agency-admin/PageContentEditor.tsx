@@ -111,6 +111,34 @@ const PageContentEditor = ({ config, onChange, agencyId, agencySlug, agencyName,
     update('service_descriptions', { ...serviceDescs, [service]: desc });
   };
 
+  // Blog
+  const blogPosts = config.blog_posts ?? [
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+    { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
+  ];
+  const updateBlogPost = (index: number, field: string, value: string) => {
+    const updated = [...blogPosts];
+    updated[index] = { ...updated[index], [field]: value };
+    update('blog_posts', updated);
+  };
+  const addBlogPost = () => update('blog_posts', [...blogPosts, { title: '', category: '', author: '', excerpt: '' }]);
+  const removeBlogPost = (index: number) => update('blog_posts', blogPosts.filter((_, i) => i !== index));
+
+  // Reviews
+  const reviews = config.reviews ?? [
+    { name: 'Eva Hicks', text: 'Excellent service and well-maintained vehicles.', rating: 5 },
+    { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had.', rating: 5 },
+    { name: 'Sarah Klein', text: 'Great selection of vehicles and transparent pricing.', rating: 4 },
+  ];
+  const updateReview = (index: number, field: string, value: any) => {
+    const updated = [...reviews];
+    updated[index] = { ...updated[index], [field]: value };
+    update('reviews', updated);
+  };
+  const addReview = () => update('reviews', [...reviews, { name: '', text: '', rating: 5 }]);
+  const removeReview = (index: number) => update('reviews', reviews.filter((_, i) => i !== index));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
