@@ -45,6 +45,14 @@ const SERVICE_FEATURES: Record<ServiceType, { icon: React.ElementType; items: st
   city_tour: { icon: Star, items: ['Half-day & full-day tours', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules'] },
 };
 
+const SERVICE_IMAGES: Record<ServiceType, string> = {
+  transfer: serviceTransfer,
+  limo_tour: serviceLimo,
+  car_rental: serviceRental,
+  apartment: serviceApartment,
+  city_tour: serviceCityTour,
+};
+
 const StorefrontHome = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
