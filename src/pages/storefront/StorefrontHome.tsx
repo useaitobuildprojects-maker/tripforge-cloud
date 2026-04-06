@@ -139,278 +139,253 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero Section */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}), minHeight: '420px' }}>
-        {cfg.home_hero_image && <img src={cfg.home_hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && !cfg.home_hero_image && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={{ ...ts.heroOverlayStyle, opacity: 0.85 }} />}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-            <p className={`text-xs uppercase tracking-[0.25em] font-semibold mb-4 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
-              {agency.city} - {agency.country}
-            </p>
-            <h1 className={`text-3xl md:text-5xl font-bold mb-4 leading-tight tracking-tight uppercase ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
-              {cfg.hero_title || <>Your All-in-One Travel<br />& Mobility Partner</>}
-            </h1>
-            <p className={`text-sm md:text-base max-w-xl mx-auto mb-8 ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
-              {cfg.hero_subtitle || `Car rental, chauffeur services, apartments & more — all from ${agency.name} in ${agency.city}`}
-            </p>
+      {/* Hero Section — Blacklane-style split layout */}
+      <section className="relative overflow-hidden" style={{ minHeight: '520px' }}>
+        {/* Background image */}
+        {cfg.home_hero_image ? (
+          <img src={cfg.home_hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ backgroundColor: ts.heroStyle?.backgroundColor ?? '#1a1f36' }} />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
 
-            {/* Service Tabs in Hero */}
-            {enabledServices.length > 1 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                className="inline-flex items-center gap-1 p-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20">
-                {enabledServices.map((service) => {
-                  const Icon = SERVICE_ICONS[service] ?? Car;
-                  return (
-                    <button
-                      key={service}
-                      onClick={() => setActiveService(service)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeService === service ? 'text-white shadow-lg' : 'text-white/70 hover:text-white hover:bg-white/10'}`}
-                      style={activeService === service ? { backgroundColor: buttonColor } : undefined}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
-                    </button>
-                  );
-                })}
-              </motion.div>
-            )}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex flex-col md:flex-row items-start gap-10">
+          {/* Left — headline */}
+          <div className="flex-1 pt-4 md:pt-12">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
+                {cfg.hero_title || <>Your Premium<br />Chauffeur Service</>}
+              </h1>
+              <p className="text-base md:text-lg text-white/70 max-w-md mb-8" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
+                {cfg.hero_subtitle || `Professional car rental, transfers & chauffeur services in ${agency.city}`}
+              </p>
+
+              {/* Service Tabs */}
+              {enabledServices.length > 1 && (
+                <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+                  {enabledServices.map((service) => {
+                    const Icon = SERVICE_ICONS[service] ?? Car;
+                    return (
+                      <button
+                        key={service}
+                        onClick={() => setActiveService(service)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${activeService === service ? 'text-white shadow-md' : 'text-white/60 hover:text-white hover:bg-white/10'}`}
+                        style={activeService === service ? { backgroundColor: buttonColor } : undefined}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Right — Booking form card floating over hero */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="w-full md:w-[420px] lg:w-[460px] shrink-0"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+              <AnimatePresence mode="wait">
+                {/* ---- CAR RENTAL / ALL ---- */}
+                {(activeService === 'all' || activeService === 'car_rental') && (
+                  <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-lg font-bold text-gray-900">Book your ride</h3>
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <button
+                          type="button"
+                          onClick={() => setSameReturn(!sameReturn)}
+                          className="h-5 w-5 rounded border-2 flex items-center justify-center transition-all duration-200"
+                          style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: '#d1d5db' }}
+                        >
+                          {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
+                        </button>
+                        <span className="text-xs text-gray-500">Same return</span>
+                      </label>
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* Pickup */}
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">From</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
+                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Address, airport, hotel, ..." locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      {/* Dropoff */}
+                      <div className={sameReturn ? 'opacity-40 pointer-events-none' : ''}>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">To</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
+                          <LocationAutocomplete value={sameReturn ? pickupLocation : dropoffLocation} onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }} placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'} locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      {/* Date & Time row */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Pickup date</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Pickup time</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Return date & time */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Return date</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Return time</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                      <Search className="h-4 w-4" /> Search
+                    </Button>
+                    <p className="text-[11px] text-gray-400 text-center mt-3">Free cancellation up to 24h before pickup</p>
+                  </motion.div>
+                )}
+
+                {/* ---- TRANSFER ---- */}
+                {activeService === 'transfer' && (
+                  <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+                  </motion.div>
+                )}
+
+                {/* ---- LIMO SERVICE ---- */}
+                {activeService === 'limo_tour' && (
+                  <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+                  </motion.div>
+                )}
+
+                {/* ---- CITY TOUR ---- */}
+                {activeService === 'city_tour' && (
+                  <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <div className="mb-5">
+                      <h3 className="text-lg font-bold text-gray-900">Book a City Tour</h3>
+                      <p className="text-sm text-gray-500 mt-1">Guided tours with local expert drivers</p>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">City</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <Star className="h-4 w-4 text-gray-400 shrink-0" />
+                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={`e.g. ${agency.city}`} locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Date</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Duration</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
+                            <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
+                              <option value="8">Full day (8h)</option>
+                              <option value="12">Extended (12h)</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Passengers</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100 w-40">
+                          <Users className="h-4 w-4 text-gray-400 shrink-0" />
+                          <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
+                            {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} pax</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                      onClick={() => { setSearchActive(true); }}>
+                      <Search className="h-4 w-4" /> Find tours
+                    </Button>
+                  </motion.div>
+                )}
+
+                {/* ---- APARTMENT ---- */}
+                {activeService === 'apartment' && (
+                  <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                    <div className="mb-5">
+                      <h3 className="text-lg font-bold text-gray-900">Find an Apartment</h3>
+                      <p className="text-sm text-gray-500 mt-1">Furnished apartments for short & long stays</p>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Location</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                          <Building className="h-4 w-4 text-gray-400 shrink-0" />
+                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Neighborhood or area" locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Check-in</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Check-out</label>
+                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                            <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Guests</label>
+                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100 w-40">
+                          <Users className="h-4 w-4 text-gray-400 shrink-0" />
+                          <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
+                            {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} guest{n > 1 ? 's' : ''}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
+                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                      <Search className="h-4 w-4" /> Search apartments
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* Contextual Search Bar */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}
-          className={`p-6 md:p-8 ${ts.searchBarClass}`} style={ts.searchBarStyle}>
-
-          <AnimatePresence mode="wait">
-            {/* ---- CAR RENTAL / ALL ---- */}
-            {(activeService === 'all' || activeService === 'car_rental') && (
-              <motion.div key="vehicle-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">Book your ride</h3>
-                  <label className="flex items-center gap-2 cursor-pointer select-none">
-                    <button
-                      type="button"
-                      onClick={() => setSameReturn(!sameReturn)}
-                      className="h-5 w-5 rounded border-2 flex items-center justify-center transition-all duration-200"
-                      style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: 'hsl(var(--border))' }}
-                    >
-                      {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
-                    </button>
-                    <span className="text-sm text-muted-foreground">Return to same location</span>
-                  </label>
-                </div>
-
-                <div className="space-y-5">
-                  {/* Pickup row */}
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 bottom-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                        <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: buttonColor }} />
-                      </div>
-                      <div className="w-0.5 flex-1 bg-border my-1" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup location</label>
-                        <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="City, airport, or address" locations={agencyLocations} agencyCity={agency.city} />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup date</label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Pickup time</label>
-                        <div className="relative">
-                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Return row */}
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0 bg-muted" style={{ borderColor: 'hsl(var(--border))' }}>
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_auto] gap-3 items-start">
-                      <div className={sameReturn ? 'opacity-50 pointer-events-none' : ''}>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return location</label>
-                        <LocationAutocomplete value={sameReturn ? pickupLocation : dropoffLocation} onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }} placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'} locations={agencyLocations} agencyCity={agency.city} />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return date</label>
-                        <div className="relative">
-                          <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-[180px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Return time</label>
-                        <div className="relative">
-                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                          <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-[170px] h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                  <Search className="h-4 w-4" /> Search available vehicles
-                </Button>
-              </motion.div>
-            )}
-
-            {/* ---- TRANSFER ---- */}
-            {activeService === 'transfer' && (
-              <motion.div key="transfer-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <TransferBookingForm
-                  agency={agency}
-                  config={cfg}
-                  buttonColor={buttonColor}
-                />
-              </motion.div>
-            )}
-
-            {/* ---- LIMO SERVICE ---- */}
-            {activeService === 'limo_tour' && (
-              <motion.div key="limo-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <LimoBookingForm
-                  agency={agency}
-                  config={cfg}
-                  buttonColor={buttonColor}
-                />
-              </motion.div>
-            )}
-
-            {/* ---- CITY TOUR ---- */}
-            {activeService === 'city_tour' && (
-              <motion.div key="city-tour-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold">Book a City Tour</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Guided tours with local expert drivers</p>
-                </div>
-                <div className="space-y-5">
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                        <Star className="h-3 w-3" style={{ color: buttonColor }} />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">City</label>
-                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={`e.g. ${agency.city}`} locations={agencyLocations} agencyCity={agency.city} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 pl-8">
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Date</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Duration</label>
-                      <div className="relative w-full">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                          <option value="8">Full day (8 hours)</option>
-                          <option value="12">Extended day (12 hours)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="pl-8">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Passengers</label>
-                    <div className="relative w-48">
-                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'passenger' : 'passengers'}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                  onClick={() => { setSearchActive(true); }}>
-                  <Search className="h-4 w-4" /> Find tours
-                </Button>
-              </motion.div>
-            )}
-
-            {/* ---- APARTMENT ---- */}
-            {activeService === 'apartment' && (
-              <motion.div key="apartment-form" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
-                <div className="mb-6">
-                  <h3 className="text-lg font-bold">Find an apartment</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Furnished apartments for short & long stays</p>
-                </div>
-
-                <div className="space-y-5">
-                  {/* Location */}
-                  <div className="relative pl-8">
-                    <div className="absolute left-0 top-0 flex flex-col items-center">
-                      <div className="h-6 w-6 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: buttonColor }}>
-                        <Building className="h-3 w-3" style={{ color: buttonColor }} />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Location</label>
-                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Neighborhood or area" locations={agencyLocations} agencyCity={agency.city} />
-                    </div>
-                  </div>
-
-                  {/* Check-in / Check-out */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-8">
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-in</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Check-out</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                        <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Guests */}
-                  <div className="pl-8">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">Guests</label>
-                    <div className="relative w-48">
-                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-                      <select className="w-full h-11 rounded-lg border border-border bg-background pl-10 pr-3 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow appearance-none">
-                        {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="w-full h-12 mt-6 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                  <Search className="h-4 w-4" /> Search apartments
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-        </motion.div>
       </section>
 
       {/* Why Choose Us */}
