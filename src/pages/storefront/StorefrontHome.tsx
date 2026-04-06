@@ -427,9 +427,9 @@ const StorefrontHome = () => {
 
       {/* ═══════════════ VEHICLE LISTINGS — Majestic-style cards ═══════════════ */}
       {showVehicles && (
-        <section ref={vehiclesRef} className="max-w-6xl mx-auto px-4 pb-20 scroll-mt-8">
+        <section ref={vehiclesRef} className="max-w-5xl mx-auto px-4 pb-20 scroll-mt-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-3 rounded-lg border border-gray-200 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
               <MapPin className="h-4 w-4 text-gray-400" />
               <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
               <span className="text-gray-300">→</span>
