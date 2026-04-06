@@ -159,7 +159,7 @@ const StorefrontHome = () => {
 
         {/* Service tabs pinned to bottom of hero */}
         {enabledServices.length > 1 && (
-          <div className="absolute bottom-0 left-0 right-0 z-10">
+          <div className="absolute -bottom-1 left-0 right-0 z-10">
             <div className="max-w-7xl mx-auto px-4 flex items-end">
               {enabledServices.map((service) => {
                 const Icon = SERVICE_ICONS[service] ?? Car;
