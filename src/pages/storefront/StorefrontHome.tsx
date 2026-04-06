@@ -163,7 +163,7 @@ const StorefrontHome = () => {
         <div className="max-w-7xl mx-auto">
           {/* Service tabs */}
           {enabledServices.length > 1 && (
-            <div className="flex items-end">
+            <div className="flex items-end justify-center">
               {enabledServices.map((service) => {
                 const Icon = SERVICE_ICONS[service] ?? Car;
                 const isActive = activeService === service;
@@ -171,15 +171,15 @@ const StorefrontHome = () => {
                   <button
                     key={service}
                     onClick={() => setActiveService(service)}
-                    className={`relative flex items-center gap-2.5 px-6 py-3.5 text-sm font-semibold tracking-wide transition-all duration-200 ${
+                    className={`relative flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold tracking-wide transition-all duration-200 ${
                       isActive
-                        ? 'bg-white text-gray-900 rounded-t-2xl shadow-lg z-10'
-                        : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-xl'
+                        ? 'bg-white text-gray-900 rounded-t-xl shadow-lg z-10'
+                        : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-lg'
                     }`}
                   >
-                    <Icon className={`h-4.5 w-4.5 ${isActive ? '' : 'opacity-70'}`} style={isActive ? { color: buttonColor } : undefined} />
+                    <Icon className={`h-3.5 w-3.5 ${isActive ? '' : 'opacity-70'}`} style={isActive ? { color: buttonColor } : undefined} />
                     <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
-                    {isActive && <div className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full" style={{ backgroundColor: buttonColor }} />}
+                    {isActive && <div className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full" style={{ backgroundColor: buttonColor }} />}
                   </button>
                 );
               })}
