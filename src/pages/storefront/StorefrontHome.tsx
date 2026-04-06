@@ -156,11 +156,14 @@ const StorefrontHome = () => {
             </p>
           </motion.div>
         </div>
+      </section>
 
-        {/* Service tabs pinned to bottom of hero */}
-        {enabledServices.length > 1 && (
-          <div className="absolute bottom-4 left-0 right-0 z-10">
-            <div className="max-w-7xl mx-auto px-4 flex items-end">
+      {/* ═══════════════ TABS + BOOKING FORM (overlapping hero) ═══════════════ */}
+      <section className="relative z-10 px-4 pb-8 -mt-20">
+        <div className="max-w-7xl mx-auto">
+          {/* Service tabs */}
+          {enabledServices.length > 1 && (
+            <div className="flex items-end">
               {enabledServices.map((service) => {
                 const Icon = SERVICE_ICONS[service] ?? Car;
                 const isActive = activeService === service;
@@ -181,13 +184,8 @@ const StorefrontHome = () => {
                 );
               })}
             </div>
-          </div>
-        )}
-      </section>
+          )}
 
-      {/* ═══════════════ BOOKING FORM SECTION ═══════════════ */}
-      <section className="relative z-10 px-4 pb-8" style={{ marginTop: enabledServices.length > 1 ? '0' : '-40px' }}>
-        <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {/* ---- CAR RENTAL (inline card) ---- */}
             {(activeService === 'all' || activeService === 'car_rental') && (
