@@ -6,6 +6,7 @@ import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
+import defaultHeroImage from '@/assets/hero-chauffeur.jpg';
 import { useMarketplaceVehicles, MarketplaceVehicle } from '@/hooks/use-marketplace-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
