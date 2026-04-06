@@ -554,40 +554,64 @@ const StorefrontHome = () => {
       )}
 
       {/* ═══════════════ OUR SERVICES ═══════════════ */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
-        <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">Everything you need for seamless travel, all in one place</p>
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
+          <p className="text-center text-sm text-gray-500 mb-14 max-w-lg mx-auto">Everything you need for seamless travel, all in one place</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {enabledServices.map((service, i) => {
-            const Icon = SERVICE_ICONS[service] ?? Car;
-            const label = SERVICE_LABELS[service] ?? service;
-            const desc = SERVICE_SHORT_DESC[service];
-            const image = SERVICE_IMAGES[service];
+          <div className="space-y-16">
+            {enabledServices.map((service, i) => {
+              const Icon = SERVICE_ICONS[service] ?? Car;
+              const label = SERVICE_LABELS[service] ?? service;
+              const desc = SERVICE_SHORT_DESC[service];
+              const image = SERVICE_IMAGES[service];
+              const features = SERVICE_FEATURES[service]?.items ?? [];
+              const isReversed = i % 2 !== 0;
 
-            return (
-              <motion.div key={service} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}>
-                <Link to={`/agency/${slug}/services/${service}`} className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
-                  <div className="relative h-48 overflow-hidden">
-                    <img src={image} alt={label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                    <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                        <Icon className="h-4 w-4 text-gray-800" />
-                      </div>
-                      <span className="text-white font-bold text-lg drop-shadow-md">{label}</span>
+              return (
+                <motion.div
+                  key={service}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                  className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 items-center`}
+                >
+                  {/* Image side */}
+                  <Link to={`/agency/${slug}/services/${service}`} className="w-full md:w-1/2 group">
+                    <div className="relative rounded-2xl overflow-hidden shadow-lg">
+                      <img src={image} alt={label} className="w-full h-64 md:h-72 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                     </div>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-sm text-gray-500 leading-relaxed mb-4">{desc}</p>
-                    <span className="inline-flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all" style={{ color: buttonColor }}>
+                  </Link>
+
+                  {/* Text side */}
+                  <div className="w-full md:w-1/2 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 w-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${buttonColor}15` }}>
+                        <Icon className="h-5 w-5" style={{ color: buttonColor }} />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">{label}</h3>
+                    </div>
+                    <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+                    <ul className="space-y-2">
+                      {features.map((feat, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm text-gray-600">
+                          <Check className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+                          {feat}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link to={`/agency/${slug}/services/${service}`} className="inline-flex items-center gap-1.5 text-sm font-semibold mt-2 hover:gap-2.5 transition-all" style={{ color: buttonColor }}>
                       Learn more <ChevronRight className="h-4 w-4" />
-                    </span>
+                    </Link>
                   </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
         </div>
       </section>
 
