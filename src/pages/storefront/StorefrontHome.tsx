@@ -159,7 +159,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ TABS + BOOKING FORM (overlapping hero) ═══════════════ */}
-      <section className="relative z-10 px-4 pb-8 -mt-20">
+      <section className="relative z-10 px-4 pb-8 -mt-28">
         <div className="max-w-7xl mx-auto">
           {/* Service tabs */}
           {enabledServices.length > 1 && (
