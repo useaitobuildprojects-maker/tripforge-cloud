@@ -140,13 +140,15 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO — Full-bleed with centered text ═══════════════ */}
-      <section className="relative" style={{ minHeight: '420px' }}>
+      {/* ═══════════════ HERO — Full-bleed with centered text + tabs at bottom ═══════════════ */}
+      <section className="relative" style={{ minHeight: '480px' }}>
         <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={960} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
-        <div className="relative flex flex-col items-center justify-center text-center px-4 py-20 md:py-28">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/60" />
+
+        {/* Centered headline */}
+        <div className="relative flex flex-col items-center justify-center text-center px-4 pt-20 md:pt-28 pb-32 md:pb-36">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4 uppercase tracking-wide" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white mb-4 uppercase tracking-wider drop-shadow-lg" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
               {cfg.hero_title || `Mobility Made Easy: Rent a Car Tailored to Your Needs`}
             </h1>
             <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
@@ -154,22 +156,22 @@ const StorefrontHome = () => {
             </p>
           </motion.div>
         </div>
-      </section>
 
-      {/* ═══════════════ HORIZONTAL BOOKING BAR ═══════════════ */}
-      <section className="relative z-10 -mt-10 px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Service tabs above form */}
-          {enabledServices.length > 1 && (
-            <div className="flex items-center gap-1 mb-2">
+        {/* Service tabs pinned to bottom of hero */}
+        {enabledServices.length > 1 && (
+          <div className="absolute bottom-0 left-0 right-0 z-10">
+            <div className="max-w-4xl mx-auto px-4 flex items-end gap-0">
               {enabledServices.map((service) => {
                 const Icon = SERVICE_ICONS[service] ?? Car;
+                const isActive = activeService === service;
                 return (
                   <button
                     key={service}
                     onClick={() => setActiveService(service)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-medium transition-all ${
-                      activeService === service ? 'bg-white text-gray-900 shadow-sm' : 'bg-white/80 text-gray-500 hover:bg-white hover:text-gray-800'
+                    className={`flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all border-b-2 ${
+                      isActive
+                        ? 'bg-white/95 backdrop-blur-sm text-gray-900 border-transparent rounded-t-xl shadow-sm'
+                        : 'bg-transparent text-white/80 hover:text-white border-transparent hover:bg-white/10'
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -178,9 +180,15 @@ const StorefrontHome = () => {
                 );
               })}
             </div>
-          )}
+          </div>
+        )}
+      </section>
 
-          <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 md:p-6">
+      {/* ═══════════════ BOOKING FORM CARD ═══════════════ */}
+      <section className="relative z-10 px-4 pb-8" style={{ marginTop: enabledServices.length > 1 ? '0' : '-40px' }}>
+        <div className="max-w-4xl mx-auto">
+
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
             <AnimatePresence mode="wait">
               {/* ---- CAR RENTAL ---- */}
               {(activeService === 'all' || activeService === 'car_rental') && (
