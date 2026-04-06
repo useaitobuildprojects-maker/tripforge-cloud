@@ -612,8 +612,8 @@ const StorefrontHome = () => {
           </div>
         </div>
       </section>
-        </div>
-      </section>
+
+
 
       {/* ═══════════════ BLOG ═══════════════ */}
       <section className="bg-gray-50 py-20">
