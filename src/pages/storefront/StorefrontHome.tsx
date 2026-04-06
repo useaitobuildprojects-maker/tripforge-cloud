@@ -358,10 +358,10 @@ const StorefrontHome = () => {
                       <Search className="h-4 w-4" /> Search
                     </Button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
 
