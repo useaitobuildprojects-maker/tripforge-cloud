@@ -140,18 +140,18 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO — Full-bleed with centered text + tabs at bottom ═══════════════ */}
-      <section className="relative" style={{ minHeight: '480px' }}>
+      {/* ═══════════════ HERO — Full-bleed with centered text ═══════════════ */}
+      <section className="relative" style={{ minHeight: '520px' }}>
         <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={960} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70" />
 
         {/* Centered headline */}
-        <div className="relative flex flex-col items-center justify-center text-center px-4 pt-20 md:pt-28 pb-32 md:pb-36">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-white mb-4 uppercase tracking-wider drop-shadow-lg" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
-              {cfg.hero_title || `Mobility Made Easy: Rent a Car Tailored to Your Needs`}
+        <div className="relative flex flex-col items-center justify-center text-center px-4 pt-24 md:pt-32 pb-36 md:pb-40">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] text-white mb-5 tracking-tight drop-shadow-lg" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
+              {cfg.hero_title || `Mobility Made Easy: Rent a Car\nTailored to Your Needs`}
             </h1>
-            <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
+            <p className="text-sm md:text-base text-white/60 max-w-xl mx-auto font-light" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
               {cfg.hero_subtitle || `Professional car rental, transfers & chauffeur services in ${agency.city}`}
             </p>
           </motion.div>
