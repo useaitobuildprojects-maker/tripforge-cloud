@@ -171,7 +171,7 @@ const StorefrontHome = () => {
                   <button
                     key={service}
                     onClick={() => setActiveService(service)}
-                    className={`relative flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold tracking-wide transition-all duration-200 ${
+                    className={`relative flex items-center gap-2 px-5 py-3 text-sm font-semibold tracking-wide transition-all duration-200 ${
                       isActive
                         ? 'bg-white text-gray-900 rounded-t-xl shadow-lg z-10'
                         : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-lg'
