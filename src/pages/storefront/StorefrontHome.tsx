@@ -499,7 +499,7 @@ const StorefrontHome = () => {
                       const mv = vehicle as MarketplaceVehicle;
                       return (
                         <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                          className="rounded-xl border border-gray-100 bg-white overflow-hidden hover:shadow-lg transition-shadow group relative">
+                          className="rounded-lg border border-gray-100 bg-white overflow-hidden hover:shadow-md transition-all duration-200 group relative">
                           {mv.agency_name && !mv.is_own && (
                             <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
                               {mv.agency_logo_url ? (
@@ -562,12 +562,13 @@ const StorefrontHome = () => {
       )}
 
       {/* ═══════════════ OUR SERVICES ═══════════════ */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="bg-gray-50/70 py-20 border-y border-gray-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>What We Offer</p>
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
-          <p className="text-center text-sm text-gray-500 mb-14 max-w-lg mx-auto">Everything you need for seamless travel, all in one place</p>
+          <p className="text-center text-sm text-gray-500 mb-14 max-w-md mx-auto">Everything you need for seamless travel, all in one place</p>
 
-          <div className="space-y-16">
+          <div className="space-y-14">
             {enabledServices.map((service, i) => {
               const Icon = SERVICE_ICONS[service] ?? Car;
               const label = SERVICE_LABELS[service] ?? service;
@@ -587,31 +588,31 @@ const StorefrontHome = () => {
                 >
                   {/* Image side */}
                   <Link to={`/agency/${slug}/services/${service}`} className="w-full md:w-1/2 group">
-                    <div className="relative rounded-2xl overflow-hidden shadow-lg">
-                      <img src={image} alt={label} className="w-full h-64 md:h-72 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                    <div className="relative rounded-lg overflow-hidden shadow-md">
+                      <img src={image} alt={label} className="w-full h-56 md:h-64 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
                   </Link>
 
                   {/* Text side */}
-                  <div className="w-full md:w-1/2 space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${buttonColor}15` }}>
-                        <Icon className="h-5 w-5" style={{ color: buttonColor }} />
+                  <div className="w-full md:w-1/2 space-y-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ backgroundColor: `${buttonColor}12` }}>
+                        <Icon className="h-4 w-4" style={{ color: buttonColor }} />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900">{label}</h3>
+                      <h3 className="text-lg font-bold text-gray-900">{label}</h3>
                     </div>
                     <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1.5">
                       {features.map((feat, j) => (
-                        <li key={j} className="flex items-center gap-2 text-sm text-gray-600">
-                          <Check className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+                        <li key={j} className="flex items-center gap-2 text-[13px] text-gray-600">
+                          <Check className="h-3.5 w-3.5 shrink-0" style={{ color: buttonColor }} />
                           {feat}
                         </li>
                       ))}
                     </ul>
-                    <Link to={`/agency/${slug}/services/${service}`} className="inline-flex items-center gap-1.5 text-sm font-semibold mt-2 hover:gap-2.5 transition-all" style={{ color: buttonColor }}>
-                      Learn more <ChevronRight className="h-4 w-4" />
+                    <Link to={`/agency/${slug}/services/${service}`} className="inline-flex items-center gap-1 text-[13px] font-semibold mt-1 hover:gap-2 transition-all" style={{ color: buttonColor }}>
+                      Learn more <ChevronRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </motion.div>
