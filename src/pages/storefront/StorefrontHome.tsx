@@ -625,86 +625,90 @@ const StorefrontHome = () => {
 
 
       {/* ═══════════════ BLOG ═══════════════ */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="py-20">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Latest News</p>
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
-          <p className="text-center text-sm text-gray-500 mb-10 max-w-lg mx-auto">
+          <p className="text-center text-sm text-gray-500 mb-10 max-w-md mx-auto">
             {cfg.blog_subtitle || 'Discover the latest news and useful articles about car rental and travel tips'}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {blogPosts.map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gray-200" />
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-gray-900 uppercase">{post.title}</span>
-                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{post.category}</span>
+                className="bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 group">
+                <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <span className="text-xs text-gray-400 font-medium">Image</span>
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md bg-gray-100 text-gray-500">{post.category}</span>
                   </div>
-                  <p className="text-[11px] text-gray-400 mb-3">{post.author} · a min ago</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{post.excerpt}</p>
+                  <h4 className="text-sm font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">{post.title}</h4>
+                  <p className="text-[11px] text-gray-400 mb-2">{post.author} · a min ago</p>
+                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{post.excerpt}</p>
                 </div>
               </motion.div>
             ))}
           </div>
           <div className="text-center mt-8">
-            <button className="text-sm font-medium hover:underline" style={{ color: buttonColor }}>More →</button>
+            <button className="text-[13px] font-medium hover:underline" style={{ color: buttonColor }}>View all articles →</button>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ TESTIMONIALS — Carousel style ═══════════════ */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-          {cfg.reviews_title || 'Trusted by Thousands of Happy Customers'}
-        </h2>
-        <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">
-          {cfg.reviews_subtitle || "Our customers' opinions help us improve your experience and offer the best services"}
-        </p>
+      {/* ═══════════════ TESTIMONIALS ═══════════════ */}
+      <section className="bg-gray-50/70 border-y border-gray-100 py-20">
+        <div className="max-w-5xl mx-auto px-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Testimonials</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+            {cfg.reviews_title || 'What Our Customers Say'}
+          </h2>
+          <p className="text-center text-sm text-gray-500 mb-12 max-w-md mx-auto">
+            {cfg.reviews_subtitle || "Real feedback from real customers"}
+          </p>
 
-        <h3 className="text-lg font-bold text-center mb-8 text-gray-900">Reviews</h3>
+          <div className="relative">
+            <div className="flex items-center gap-3 justify-center">
+              <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" style={{ color: buttonColor }}>
+                <ChevronLeft className="h-4 w-4" />
+              </button>
 
-        <div className="relative">
-          <div className="flex items-center gap-4 justify-center">
-            <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-
-            <div className="flex gap-4 overflow-hidden max-w-4xl">
-              {testimonials.map((t, i) => {
-                const isCenter = i === reviewIndex;
-                return (
-                  <motion.div
-                    key={i}
-                    layout
-                    className={`p-6 rounded-2xl border transition-all duration-300 min-w-[260px] flex-1 ${
-                      isCenter
-                        ? 'bg-gray-900 text-white border-gray-800 scale-105 shadow-xl'
-                        : 'bg-white text-gray-700 border-gray-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-bold ${isCenter ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
-                        {t.name.split(' ').map(n => n[0]).join('')}
-                      </div>
-                      <div>
-                        <p className={`font-semibold text-sm ${isCenter ? 'text-white' : 'text-gray-900'}`}>{t.name}</p>
-                        <div className="flex gap-0.5 mt-0.5">
-                          {[...Array(t.rating)].map((_, j) => (
-                            <Star key={j} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          ))}
+              <div className="flex gap-4 overflow-hidden max-w-3xl">
+                {testimonials.map((t, i) => {
+                  const isCenter = i === reviewIndex;
+                  return (
+                    <motion.div
+                      key={i}
+                      layout
+                      className={`p-5 rounded-lg border transition-all duration-300 min-w-[240px] flex-1 ${
+                        isCenter
+                          ? 'bg-gray-900 text-white border-gray-800 shadow-lg'
+                          : 'bg-white text-gray-700 border-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <div className={`h-10 w-10 rounded-md flex items-center justify-center text-xs font-bold ${isCenter ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                          {t.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <p className={`font-semibold text-[13px] ${isCenter ? 'text-white' : 'text-gray-900'}`}>{t.name}</p>
+                          <div className="flex gap-0.5 mt-0.5">
+                            {[...Array(t.rating)].map((_, j) => (
+                              <Star key={j} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <p className={`text-sm leading-relaxed ${isCenter ? 'text-white/80' : 'text-gray-500'}`}>{t.text}</p>
-                  </motion.div>
-                );
-              })}
-            </div>
+                      <p className={`text-xs leading-relaxed ${isCenter ? 'text-white/70' : 'text-gray-500'}`}>{t.text}</p>
+                    </motion.div>
+                  );
+                })}
+              </div>
 
-            <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
-              <ChevronRight className="h-5 w-5" />
-            </button>
+              <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" style={{ color: buttonColor }}>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
