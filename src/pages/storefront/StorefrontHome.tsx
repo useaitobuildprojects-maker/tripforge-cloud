@@ -1,7 +1,7 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, ChevronLeft, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check, Fuel, Settings2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -59,12 +59,8 @@ const StorefrontHome = () => {
 
   const enabledServices = agency.services ?? [];
   const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
-  
 
-  // Active service tab
   const [activeService, setActiveService] = useState<ServiceType | 'all'>(enabledServices[0] ?? 'car_rental');
-
-  // Search state
   const [pickupLocation, setPickupLocation] = useState('');
   const [pickupDate, setPickupDate] = useState('');
   const [pickupTime, setPickupTime] = useState('');
@@ -82,19 +78,14 @@ const StorefrontHome = () => {
     return getAgencyLocations(agency.city, agency.country);
   }, [cfg?.locations, agency.city, agency.country]);
 
-  // Filter state
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const filteredVehicles = useMemo(() => applyFilters(vehicles, filters), [vehicles, filters]);
   const activeFilterCount = countActiveFilters(filters);
 
-  // Booking dialog
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
   const isOneWay = !sameReturn && pickupLocation !== dropoffLocation && !!dropoffLocation;
-  // Today's date as minimum for pickup
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
-
-  // Minimum next-day date for return/checkout
   const minReturnDate = useMemo(() => {
     if (!pickupDate) return todayStr;
     const d = new Date(pickupDate);
@@ -102,21 +93,17 @@ const StorefrontHome = () => {
     return d.toISOString().split('T')[0];
   }, [pickupDate, todayStr]);
 
-  // Auto-correct dropoff date if it's before the minimum
   const handlePickupDateChange = (val: string) => {
     setPickupDate(val);
     if (val) {
       const min = new Date(val);
       min.setDate(min.getDate() + 1);
       const minStr = min.toISOString().split('T')[0];
-      if (!dropoffDate || dropoffDate < minStr) {
-        setDropoffDate(minStr);
-      }
+      if (!dropoffDate || dropoffDate < minStr) setDropoffDate(minStr);
     }
   };
-
   const handleDropoffDateChange = (val: string) => {
-    if (pickupDate && val <= pickupDate) return; // prevent same-day or earlier
+    if (pickupDate && val <= pickupDate) return;
     setDropoffDate(val);
   };
 
@@ -128,7 +115,6 @@ const StorefrontHome = () => {
     return 1;
   }, [pickupDate, dropoffDate]);
 
-  // Show vehicles section only for car-related services
   const vehicleServices: ServiceType[] = ['car_rental'];
   const showVehicles = activeService === 'all' || vehicleServices.includes(activeService);
 
@@ -137,6 +123,7 @@ const StorefrontHome = () => {
     { name: 'Donald Wolf', text: 'Best car rental experience I\'ve ever had. Will definitely be coming back for our next trip!', rating: 5 },
     { name: 'Sarah Klein', text: 'Great selection of vehicles and transparent pricing. The booking process was seamless.', rating: 4 },
   ];
+  const [reviewIndex, setReviewIndex] = useState(0);
 
   const blogPosts = cfg.blog_posts ?? [
     { title: 'Blog Title', category: 'Category', author: 'Author', excerpt: 'Discover useful tips and insights about car rental, travel, and getting the most from your journey.' },
@@ -153,275 +140,413 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero Section — Blacklane-style split layout */}
-      <section className="relative overflow-hidden" style={{ minHeight: '560px' }}>
-        {/* Full-bleed hero image */}
+      {/* ═══════════════ HERO — Full-bleed with centered text ═══════════════ */}
+      <section className="relative" style={{ minHeight: '420px' }}>
         <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={960} />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex flex-col md:flex-row items-start gap-10">
-          {/* Left — headline */}
-          <div className="flex-1 pt-4 md:pt-12">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
-                {cfg.hero_title || <>Your Premium<br />Chauffeur Service</>}
-              </h1>
-              <p className="text-base md:text-lg text-white/70 max-w-md mb-8" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
-                {cfg.hero_subtitle || `Professional car rental, transfers & chauffeur services in ${agency.city}`}
-              </p>
-
-              {/* Service Tabs */}
-              {enabledServices.length > 1 && (
-                <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                  {enabledServices.map((service) => {
-                    const Icon = SERVICE_ICONS[service] ?? Car;
-                    return (
-                      <button
-                        key={service}
-                        onClick={() => setActiveService(service)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${activeService === service ? 'text-white shadow-md' : 'text-white/60 hover:text-white hover:bg-white/10'}`}
-                        style={activeService === service ? { backgroundColor: buttonColor } : undefined}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </motion.div>
-          </div>
-
-          {/* Right — Booking form card floating over hero */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-full md:w-[420px] lg:w-[460px] shrink-0"
-          >
-            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
-              <AnimatePresence mode="wait">
-                {/* ---- CAR RENTAL / ALL ---- */}
-                {(activeService === 'all' || activeService === 'car_rental') && (
-                  <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-lg font-bold text-gray-900">Book your ride</h3>
-                      <label className="flex items-center gap-2 cursor-pointer select-none">
-                        <button
-                          type="button"
-                          onClick={() => setSameReturn(!sameReturn)}
-                          className="h-5 w-5 rounded border-2 flex items-center justify-center transition-all duration-200"
-                          style={sameReturn ? { backgroundColor: buttonColor, borderColor: buttonColor } : { borderColor: '#d1d5db' }}
-                        >
-                          {sameReturn && <Check className="h-3.5 w-3.5 text-white" />}
-                        </button>
-                        <span className="text-xs text-gray-500">Same return</span>
-                      </label>
-                    </div>
-
-                    <div className="space-y-4">
-                      {/* Pickup */}
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">From</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                          <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
-                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Address, airport, hotel, ..." locations={agencyLocations} agencyCity={agency.city} />
-                        </div>
-                      </div>
-                      {/* Dropoff */}
-                      <div className={sameReturn ? 'opacity-40 pointer-events-none' : ''}>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">To</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                          <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
-                          <LocationAutocomplete value={sameReturn ? pickupLocation : dropoffLocation} onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }} placeholder={sameReturn ? pickupLocation || 'Same as pickup' : 'Return city or airport'} locations={agencyLocations} agencyCity={agency.city} />
-                        </div>
-                      </div>
-                      {/* Date & Time row */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Pickup date</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Pickup time</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                      </div>
-                      {/* Return date & time */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Return date</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Return time</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                      <Search className="h-4 w-4" /> Search
-                    </Button>
-                    <p className="text-[11px] text-gray-400 text-center mt-3">Free cancellation up to 24h before pickup</p>
-                  </motion.div>
-                )}
-
-                {/* ---- TRANSFER ---- */}
-                {activeService === 'transfer' && (
-                  <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
-                  </motion.div>
-                )}
-
-                {/* ---- LIMO SERVICE ---- */}
-                {activeService === 'limo_tour' && (
-                  <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
-                  </motion.div>
-                )}
-
-                {/* ---- CITY TOUR ---- */}
-                {activeService === 'city_tour' && (
-                  <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="mb-5">
-                      <h3 className="text-lg font-bold text-gray-900">Book a City Tour</h3>
-                      <p className="text-sm text-gray-500 mt-1">Guided tours with local expert drivers</p>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">City</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                          <Star className="h-4 w-4 text-gray-400 shrink-0" />
-                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={`e.g. ${agency.city}`} locations={agencyLocations} agencyCity={agency.city} />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Date</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Duration</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Clock className="h-4 w-4 text-gray-400 shrink-0" />
-                            <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
-                              <option value="8">Full day (8h)</option>
-                              <option value="12">Extended (12h)</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Passengers</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100 w-40">
-                          <Users className="h-4 w-4 text-gray-400 shrink-0" />
-                          <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
-                            {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} pax</option>)}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                      onClick={() => { setSearchActive(true); }}>
-                      <Search className="h-4 w-4" /> Find tours
-                    </Button>
-                  </motion.div>
-                )}
-
-                {/* ---- APARTMENT ---- */}
-                {activeService === 'apartment' && (
-                  <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                    <div className="mb-5">
-                      <h3 className="text-lg font-bold text-gray-900">Find an Apartment</h3>
-                      <p className="text-sm text-gray-500 mt-1">Furnished apartments for short & long stays</p>
-                    </div>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Location</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                          <Building className="h-4 w-4 text-gray-400 shrink-0" />
-                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Neighborhood or area" locations={agencyLocations} agencyCity={agency.city} />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Check-in</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 block mb-1.5">Check-out</label>
-                          <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                            <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
-                            <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none min-w-0" />
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 block mb-1.5">Guests</label>
-                        <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 border border-gray-100 w-40">
-                          <Users className="h-4 w-4 text-gray-400 shrink-0" />
-                          <select className="flex-1 bg-transparent text-sm font-medium text-gray-900 focus:outline-none appearance-none min-w-0">
-                            {[1, 2, 3, 4, 5, 6].map(n => <option key={n} value={n}>{n} guest{n > 1 ? 's' : ''}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <Button className="w-full h-12 mt-5 rounded-xl font-bold gap-2.5 text-white text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-200" style={{ backgroundColor: buttonColor }}
-                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                      <Search className="h-4 w-4" /> Search apartments
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
+        <div className="relative flex flex-col items-center justify-center text-center px-4 py-20 md:py-28">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-white mb-4 uppercase tracking-wide" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
+              {cfg.hero_title || `Mobility Made Easy: Rent a Car Tailored to Your Needs`}
+            </h1>
+            <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
+              {cfg.hero_subtitle || `Professional car rental, transfers & chauffeur services in ${agency.city}`}
+            </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Why Choose Us — clean grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Why choose {agency.name}</h2>
-        <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">Professional service, competitive prices, and a seamless booking experience</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* ═══════════════ HORIZONTAL BOOKING BAR ═══════════════ */}
+      <section className="relative z-10 -mt-10 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Service tabs above form */}
+          {enabledServices.length > 1 && (
+            <div className="flex items-center gap-1 mb-2">
+              {enabledServices.map((service) => {
+                const Icon = SERVICE_ICONS[service] ?? Car;
+                return (
+                  <button
+                    key={service}
+                    onClick={() => setActiveService(service)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-medium transition-all ${
+                      activeService === service ? 'bg-white text-gray-900 shadow-sm' : 'bg-white/80 text-gray-500 hover:bg-white hover:text-gray-800'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 md:p-6">
+            <AnimatePresence mode="wait">
+              {/* ---- CAR RENTAL ---- */}
+              {(activeService === 'all' || activeService === 'car_rental') && (
+                <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                  {/* Toggle row */}
+                  <div className="flex items-center gap-6 mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="trip" checked={sameReturn} onChange={() => setSameReturn(true)} className="accent-current" style={{ accentColor: buttonColor }} />
+                      <span className="text-sm font-medium text-gray-700">Same return</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="radio" name="trip" checked={!sameReturn} onChange={() => setSameReturn(false)} className="accent-current" style={{ accentColor: buttonColor }} />
+                      <span className="text-sm font-medium text-gray-700">Different return</span>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {/* Pickup group */}
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1"><MapPin className="h-3 w-3" /> Pickup</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="col-span-1">
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Location</label>
+                          <div className="border border-gray-200 rounded-lg p-2">
+                            <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="City" locations={agencyLocations} agencyCity={agency.city} />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Date</label>
+                          <div className="border border-gray-200 rounded-lg p-2">
+                            <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Time</label>
+                          <div className="border border-gray-200 rounded-lg p-2">
+                            <input type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Return group */}
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1"><MapPin className="h-3 w-3" /> Return</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="col-span-1">
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Location</label>
+                          <div className={`border border-gray-200 rounded-lg p-2 ${sameReturn ? 'opacity-40' : ''}`}>
+                            <LocationAutocomplete
+                              value={sameReturn ? pickupLocation : dropoffLocation}
+                              onChange={(val) => { if (!sameReturn) setDropoffLocation(val); }}
+                              placeholder={sameReturn ? 'Same' : 'City'}
+                              locations={agencyLocations}
+                              agencyCity={agency.city}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Date</label>
+                          <div className="border border-gray-200 rounded-lg p-2">
+                            <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] text-gray-400 block mb-0.5">Time</label>
+                          <div className="border border-gray-200 rounded-lg p-2">
+                            <input type="time" value={dropoffTime} onChange={(e) => setDropoffTime(e.target.value)} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button className="h-11 px-8 rounded-lg font-bold gap-2 text-white text-sm shadow-lg" style={{ backgroundColor: buttonColor }}
+                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                      <Search className="h-4 w-4" /> Search
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ---- TRANSFER ---- */}
+              {activeService === 'transfer' && (
+                <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+                </motion.div>
+              )}
+
+              {/* ---- LIMO SERVICE ---- */}
+              {activeService === 'limo_tour' && (
+                <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+                </motion.div>
+              )}
+
+              {/* ---- CITY TOUR ---- */}
+              {activeService === 'city_tour' && (
+                <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">City</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={`e.g. ${agency.city}`} locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">Date</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">Duration</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <select className="w-full bg-transparent text-sm text-gray-900 focus:outline-none appearance-none">
+                            <option value="8">Full day (8h)</option>
+                            <option value="12">Extended (12h)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <Button className="h-11 px-8 rounded-lg font-bold gap-2 text-white text-sm shadow-lg" style={{ backgroundColor: buttonColor }}
+                      onClick={() => setSearchActive(true)}>
+                      <Search className="h-4 w-4" /> Find tours
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ---- APARTMENT ---- */}
+              {activeService === 'apartment' && (
+                <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <div className="flex flex-col md:flex-row gap-4 items-end">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">Location</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Neighborhood" locations={agencyLocations} agencyCity={agency.city} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">Check-in</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-gray-400 block mb-0.5">Check-out</label>
+                        <div className="border border-gray-200 rounded-lg p-2">
+                          <input type="date" value={dropoffDate} onChange={(e) => handleDropoffDateChange(e.target.value)} min={minReturnDate} className="w-full bg-transparent text-sm text-gray-900 focus:outline-none" />
+                        </div>
+                      </div>
+                    </div>
+                    <Button className="h-11 px-8 rounded-lg font-bold gap-2 text-white text-sm shadow-lg" style={{ backgroundColor: buttonColor }}
+                      onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                      <Search className="h-4 w-4" /> Search
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+          Why Choose Us
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {[
-            { icon: Phone, title: '24/7 Support', desc: 'Our dedicated team is available around the clock to assist you with any questions.' },
-            { icon: Shield, title: 'Best Price Guarantee', desc: 'We guarantee the best prices on all our vehicles with no hidden fees.' },
-            { icon: MapPin, title: 'Flexible Locations', desc: 'Pick up and drop off at convenient locations across the region.' },
+            { icon: Phone, title: 'Customer Support', desc: 'Our dedicated team is available around the clock to assist you with any questions or needs.' },
+            { icon: Shield, title: 'Best Price Guarantee', desc: 'We guarantee the best prices on all our vehicles with full transparency — no hidden fees.' },
+            { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off at convenient locations across the region with flexible options.' },
           ].map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="text-center p-8 rounded-2xl bg-white border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="inline-flex items-center justify-center h-14 w-14 rounded-full mb-5 bg-gray-50">
-                <item.icon className="h-6 w-6 text-gray-700" />
+              className="flex flex-col items-center text-center">
+              <div className="h-16 w-16 rounded-full border-2 border-gray-200 flex items-center justify-center mb-5">
+                <item.icon className="h-7 w-7" style={{ color: buttonColor }} />
               </div>
               <h3 className="text-base font-bold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+              <p className="text-sm text-gray-500 leading-relaxed max-w-xs">{item.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Our Services — Blacklane-style horizontal cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      {/* ═══════════════ FEATURED VEHICLE — Dark banner ═══════════════ */}
+      {showVehicles && vehicles.length > 0 && (
+        <section className="max-w-6xl mx-auto px-4 py-8">
+          <div className="rounded-2xl overflow-hidden bg-gray-900 relative">
+            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex-1 text-white">
+                <span className="text-xs uppercase tracking-[0.2em] font-semibold text-gray-400">Best Offer</span>
+                <h3 className="text-2xl md:text-3xl font-bold mt-2 mb-1">
+                  {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
+                </h3>
+                {vehicles[0].display_price_per_km ? (
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="text-2xl font-bold" style={{ color: buttonColor }}>{vehicles[0].display_price_per_km} €/km</span>
+                  </div>
+                ) : vehicles[0].daily_rate ? (
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="text-2xl font-bold" style={{ color: buttonColor }}>{vehicles[0].daily_rate.toLocaleString()} €/day</span>
+                  </div>
+                ) : null}
+                <div className="flex items-center gap-1 mt-3">
+                  {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                </div>
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                {vehicles[0].photo_url ? (
+                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-80 h-48 rounded-xl object-cover" />
+                ) : (
+                  <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
+                    <Car className="h-24 w-24 opacity-20 text-white" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════ VEHICLE LISTINGS — Majestic-style cards ═══════════════ */}
+      {showVehicles && (
+        <section ref={vehiclesRef} className="max-w-6xl mx-auto px-4 pb-20 scroll-mt-8">
+          {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
+              <MapPin className="h-4 w-4 text-gray-400" />
+              <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
+              <span className="text-gray-300">→</span>
+              <span><strong>Return:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
+              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium text-gray-500 hover:text-gray-800 underline">Clear</button>
+            </motion.div>
+          )}
+
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Deals & Offers</h2>
+              <p className="text-sm text-gray-500 mt-1">Find the perfect car for your journey with competitive prices.</p>
+            </div>
+            <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
+              <SlidersHorizontal className="h-4 w-4" /> Filter
+              {activeFilterCount > 0 && (
+                <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+          </div>
+
+          <div className="flex gap-8">
+            <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
+
+            {mobileFiltersOpen && (
+              <div className="fixed inset-0 z-50 lg:hidden">
+                <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
+                <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white p-6 overflow-y-auto shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-bold text-lg">Filters</span>
+                    <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
+                  </div>
+                  <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 min-w-0">
+              {vehiclesLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="rounded-xl border border-gray-100 overflow-hidden">
+                      <Skeleton className="h-40 w-full" />
+                      <div className="p-4 space-y-2">
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                        <Skeleton className="h-10 w-full mt-3" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : filteredVehicles.length === 0 ? (
+                <div className="text-center py-16 text-gray-400">
+                  <Car className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">{hasAnyFilter(filters) ? 'No vehicles match your filters.' : 'No vehicles available at the moment.'}</p>
+                  {hasAnyFilter(filters) && (
+                    <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>Clear all filters</button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-400 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                    {filteredVehicles.map((vehicle, i) => {
+                      const mv = vehicle as MarketplaceVehicle;
+                      return (
+                        <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+                          className="rounded-xl border border-gray-100 bg-white overflow-hidden hover:shadow-lg transition-shadow group relative">
+                          {mv.agency_name && !mv.is_own && (
+                            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
+                              {mv.agency_logo_url ? (
+                                <img src={mv.agency_logo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
+                              ) : (
+                                <Briefcase className="h-3 w-3" />
+                              )}
+                              via {mv.agency_name}
+                            </div>
+                          )}
+                          {vehicle.photo_url ? (
+                            <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-40 w-full object-cover" />
+                          ) : (
+                            <div className="h-40 flex items-center justify-center bg-gray-50">
+                              <Car className="h-12 w-12 text-gray-200" />
+                            </div>
+                          )}
+                          <div className="p-4">
+                            <h4 className="font-bold text-sm text-gray-900">{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
+                            {/* Specs row */}
+                            <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400">
+                              <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
+                              <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
+                              <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
+                            </div>
+                            {/* Rating */}
+                            <div className="flex items-center gap-1 mt-2">
+                              {[...Array(5)].map((_, j) => <Star key={j} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
+                              <span className="text-[10px] text-gray-400 ml-1">(450+)</span>
+                            </div>
+                            {/* Price */}
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                              {vehicle.display_price_per_km ? (
+                                <p className="text-base font-bold text-gray-900">{vehicle.display_price_per_km} €<span className="text-xs font-normal text-gray-400"> /km</span></p>
+                              ) : vehicle.daily_rate ? (
+                                <p className="text-base font-bold text-gray-900">{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal text-gray-400"> /day</span></p>
+                              ) : (
+                                <p className="text-sm text-gray-400">Contact</p>
+                              )}
+                              <Button size="sm" className="rounded-lg text-xs font-bold text-white h-8 px-4" style={{ backgroundColor: buttonColor }}
+                                onClick={() => setBookingVehicle(mv)}>
+                                {cfg.cta_text || 'Book Now'}
+                              </Button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                  <div className="text-center mt-8">
+                    <Link to={`/agency/${slug}/fleet`} className="text-sm font-medium hover:underline" style={{ color: buttonColor }}>
+                      Show more vehicles →
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════ OUR SERVICES ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
         <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">Everything you need for seamless travel, all in one place</p>
 
@@ -433,26 +558,10 @@ const StorefrontHome = () => {
             const image = SERVICE_IMAGES[service];
 
             return (
-              <motion.div
-                key={service}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-              >
-                <Link
-                  to={`/agency/${slug}/services/${service}`}
-                  className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
-                >
+              <motion.div key={service} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.5 }}>
+                <Link to={`/agency/${slug}/services/${service}`} className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300">
                   <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={image}
-                      alt={label}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                      width={960}
-                      height={640}
-                    />
+                    <img src={image} alt={label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                     <div className="absolute bottom-4 left-4 flex items-center gap-2">
                       <div className="h-8 w-8 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center">
@@ -474,215 +583,88 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Featured Vehicle — first from database */}
-      {showVehicles && vehicles.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className={`rounded-2xl overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, position: 'relative', ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
-            {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
-            <div className="relative p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1">
-                <span className={`text-xs uppercase tracking-[0.2em] font-semibold ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>Best Offer</span>
-                <h3 className={`text-2xl md:text-3xl font-bold mt-2 mb-1 ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
-                  {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
-                </h3>
-                {vehicles[0].display_price_per_km ? (
-                  <p className="text-2xl font-bold text-accent">{vehicles[0].display_price_per_km} €/km</p>
-                ) : vehicles[0].daily_rate ? (
-                  <p className="text-2xl font-bold text-accent">{vehicles[0].daily_rate.toLocaleString()} €/day</p>
-                ) : null}
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                {vehicles[0].photo_url ? (
-                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-80 h-48 rounded-xl object-cover" />
-                ) : (
-                  <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
-                    <Car className="h-24 w-24 opacity-20" />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Full Vehicle Listings */}
-      {showVehicles && (
-        <section ref={vehiclesRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 scroll-mt-8">
-          {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 rounded-xl border border-border bg-muted/30 flex flex-wrap items-center gap-4 text-sm">
-              <MapPin className="h-4 w-4 opacity-50" />
-              <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
-              <span className="opacity-30">→</span>
-              <span><strong>Drop-off:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
-              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium underline opacity-60 hover:opacity-100">Clear</button>
-            </motion.div>
-          )}
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Choose Your Vehicle</h2>
-              <p className="text-sm opacity-60 mt-1">Find the perfect car for your journey with competitive prices and top-quality vehicles.</p>
-            </div>
-            <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
-              <SlidersHorizontal className="h-4 w-4" /> Filter
-              {activeFilterCount > 0 && (
-                <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
-                  {activeFilterCount}
-                </span>
-              )}
-            </Button>
-          </div>
-
-          <div className="flex gap-8">
-            <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
-
-            {mobileFiltersOpen && (
-              <div className="fixed inset-0 z-50 lg:hidden">
-                <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
-                <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background p-6 overflow-y-auto shadow-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-bold text-lg">Filters</span>
-                    <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
-                  </div>
-                  <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
-                </div>
-              </div>
-            )}
-
-            <div className="flex-1 min-w-0">
-              {vehiclesLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="rounded-xl border border-current/10 overflow-hidden" style={ts.cardStyle}>
-                      <Skeleton className="h-44 w-full" />
-                      <div className="p-5 space-y-2">
-                        <Skeleton className="h-5 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                        <Skeleton className="h-10 w-full mt-3" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : filteredVehicles.length === 0 ? (
-                <div className="text-center py-16 opacity-50">
-                  <Car className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">{hasAnyFilter(filters) ? 'No vehicles match your filters.' : 'No vehicles available at the moment.'}</p>
-                  {hasAnyFilter(filters) && (
-                    <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>Clear all filters</button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <p className="text-sm opacity-50 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredVehicles.map((vehicle, i) => {
-                      const mv = vehicle as MarketplaceVehicle;
-                      return (
-                      <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
-                        className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg relative" style={ts.cardStyle}>
-                        {/* Partner badge */}
-                        {mv.agency_name && !mv.is_own && (
-                          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
-                            {mv.agency_logo_url ? (
-                              <img src={mv.agency_logo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
-                            ) : (
-                              <Briefcase className="h-3 w-3" />
-                            )}
-                            via {mv.agency_name}
-                          </div>
-                        )}
-                        {vehicle.photo_url ? (
-                          <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
-                        ) : (
-                          <div className="h-44 flex items-center justify-center opacity-10 bg-current">
-                            <Car className="h-14 w-14" />
-                          </div>
-                        )}
-                        <div className="p-5">
-                          <h4 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h4>
-                          <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
-                          <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                            {vehicle.display_price_per_km ? (
-                              <p className="text-lg font-bold">{vehicle.display_price_per_km} €<span className="text-xs font-normal opacity-50"> / km</span></p>
-                            ) : vehicle.daily_rate ? (
-                              <p className="text-lg font-bold">{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal opacity-50"> / day</span></p>
-                            ) : (
-                              <p className="text-sm opacity-50">Contact for price</p>
-                            )}
-                            <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2"
-                              style={{ borderColor: buttonColor, color: buttonColor }}
-                              onMouseEnter={e => { const el = e.target as HTMLElement; el.style.backgroundColor = buttonColor; el.style.color = '#fff'; }}
-                              onMouseLeave={e => { const el = e.target as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = buttonColor; }}
-                              onClick={() => setBookingVehicle(mv)}>
-                              {cfg.cta_text || 'Book Now'}
-                            </Button>
-                          </div>
-                        </div>
-                      </motion.div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Blog Section */}
-      <section className={`py-20 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
-          <p className="text-center text-sm opacity-60 mb-10 max-w-lg mx-auto">
+      {/* ═══════════════ BLOG ═══════════════ */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
+          <p className="text-center text-sm text-gray-500 mb-10 max-w-lg mx-auto">
             {cfg.blog_subtitle || 'Discover the latest news and useful articles about car rental and travel tips'}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {blogPosts.map((post, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className={`overflow-hidden transition-all ${ts.cardClass} ${ts.cardHoverClass}`} style={ts.cardStyle}>
-                <div className="h-48 opacity-10 bg-current" />
+                className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                <div className="h-48 bg-gray-200" />
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold uppercase">{post.title}</span>
-                    <span className="text-[10px] text-accent font-medium uppercase">{post.category}</span>
+                    <span className="text-xs font-bold text-gray-900 uppercase">{post.title}</span>
+                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{post.category}</span>
                   </div>
-                  <p className="text-xs opacity-50 mb-2">{post.author} · a min ago</p>
-                  <p className="text-sm opacity-60 leading-relaxed">{post.excerpt}</p>
+                  <p className="text-[11px] text-gray-400 mb-3">{post.author} · a min ago</p>
+                  <p className="text-sm text-gray-500 leading-relaxed">{post.excerpt}</p>
                 </div>
               </motion.div>
             ))}
           </div>
           <div className="text-center mt-8">
-            <button className="text-sm font-medium text-accent hover:opacity-80 transition-opacity">More →</button>
+            <button className="text-sm font-medium hover:underline" style={{ color: buttonColor }}>More →</button>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.reviews_title || 'Trusted by Thousands of Happy Customers'}</h2>
-        <p className="text-center text-sm opacity-60 mb-12 max-w-lg mx-auto">
+      {/* ═══════════════ TESTIMONIALS — Carousel style ═══════════════ */}
+      <section className="max-w-6xl mx-auto px-4 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+          {cfg.reviews_title || 'Trusted by Thousands of Happy Customers'}
+        </h2>
+        <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">
           {cfg.reviews_subtitle || "Our customers' opinions help us improve your experience and offer the best services"}
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className={`p-6 rounded-2xl border ${i === 1 ? ts.testimonialHighlightClass : ts.testimonialNormalClass}`} style={i === 1 ? ts.testimonialHighlightStyle : ts.testimonialNormalStyle}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-bold ${i === 1 ? 'bg-white/20' : 'opacity-30 bg-current'}`}>
-                  {t.name.split(' ').map(n => n[0]).join('')}
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{t.name}</p>
-                  <div className="flex gap-0.5 mt-0.5">
-                    {[...Array(t.rating)].map((_, j) => (
-                      <Star key={j} className="h-3 w-3 fill-accent text-accent" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <p className={`text-sm leading-relaxed ${i === 1 ? 'opacity-80' : 'opacity-60'}`}>{t.text}</p>
-            </motion.div>
-          ))}
+
+        <h3 className="text-lg font-bold text-center mb-8 text-gray-900">Reviews</h3>
+
+        <div className="relative">
+          <div className="flex items-center gap-4 justify-center">
+            <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+
+            <div className="flex gap-4 overflow-hidden max-w-4xl">
+              {testimonials.map((t, i) => {
+                const isCenter = i === reviewIndex;
+                return (
+                  <motion.div
+                    key={i}
+                    layout
+                    className={`p-6 rounded-2xl border transition-all duration-300 min-w-[260px] flex-1 ${
+                      isCenter
+                        ? 'bg-gray-900 text-white border-gray-800 scale-105 shadow-xl'
+                        : 'bg-white text-gray-700 border-gray-100'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`h-12 w-12 rounded-full flex items-center justify-center text-sm font-bold ${isCenter ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                        {t.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <p className={`font-semibold text-sm ${isCenter ? 'text-white' : 'text-gray-900'}`}>{t.name}</p>
+                        <div className="flex gap-0.5 mt-0.5">
+                          {[...Array(t.rating)].map((_, j) => (
+                            <Star key={j} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className={`text-sm leading-relaxed ${isCenter ? 'text-white/80' : 'text-gray-500'}`}>{t.text}</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </section>
 
