@@ -69,39 +69,34 @@ const StorefrontLayout = () => {
   return (
     <div className={`min-h-screen ${fontClass} ${!bgColor ? ts.bodyClass : ''}`} style={bodyStyle}>
 
-      {/* Navigation */}
-      <header className={`sticky top-0 z-50 ${ts.headerClass}`} style={headerStyle}>
+      {/* Navigation — Blacklane-style clean white */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100" style={cfg.nav_bg_color ? { backgroundColor: cfg.nav_bg_color, borderColor: 'transparent' } : undefined}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to={`/agency/${slug}`} className="flex items-center gap-3">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-10 rounded-lg object-contain" />
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-auto object-contain" />
               ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-                  {agency.name.charAt(0)}
-                </div>
+                <span className="text-xl font-bold tracking-tight text-gray-900" style={cfg.nav_text_color ? { color: cfg.nav_text_color } : undefined}>
+                  {agency.name.toUpperCase()}
+                </span>
               )}
-              <div>
-                <span className="text-lg font-bold tracking-tight">{agency.name}</span>
-                <p className="text-[10px] opacity-60 uppercase tracking-[0.15em] -mt-0.5">
-                  {agency.city} - {agency.country}
-                </p>
-              </div>
             </Link>
 
             <nav className="hidden md:flex items-center gap-8">
-              <Link to={`/agency/${slug}`} className="text-sm font-medium hover:opacity-80 transition-opacity">Home</Link>
-              <Link to={`/agency/${slug}/services`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">Services</Link>
-              <Link to={`/agency/${slug}/contact`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">Contact</Link>
-              <Link to={`/agency/${slug}/about`} className="text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">About us</Link>
+              <Link to={`/agency/${slug}`} className="text-sm font-medium text-gray-900 hover:text-gray-600 transition-colors" style={cfg.nav_text_color ? { color: cfg.nav_text_color } : undefined}>Home</Link>
+              <Link to={`/agency/${slug}/services`} className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Services</Link>
+              <Link to={`/agency/${slug}/contact`} className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">Contact</Link>
+              <Link to={`/agency/${slug}/about`} className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">About us</Link>
             </nav>
 
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9" title="Share this page">
+              <Button variant="ghost" size="icon" onClick={handleShare} className="h-9 w-9 text-gray-500 hover:text-gray-900" title="Share this page">
                 <Share2 className="h-4 w-4" />
               </Button>
-              <Link to={`/agency/${slug}`} className="text-sm opacity-60 hover:opacity-100 transition-opacity">Register</Link>
-              <Link to={`/agency/${slug}`} className="text-sm font-medium px-4 py-2 rounded-lg transition-colors text-white" style={{ backgroundColor: btnColor }}>Sign in</Link>
+              <Link to={`/agency/${slug}`} className="text-sm font-medium px-5 py-2 rounded-full border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-colors">
+                Sign in
+              </Link>
             </div>
           </div>
         </div>
