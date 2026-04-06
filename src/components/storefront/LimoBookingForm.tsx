@@ -127,7 +127,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const hasP2PPricing = (config.limo_p2p_base_fee ?? config.transfer_base_fee ?? 0) > 0 || (config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate ?? 0) > 0;
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
