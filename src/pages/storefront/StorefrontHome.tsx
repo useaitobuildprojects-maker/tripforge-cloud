@@ -390,33 +390,33 @@ const StorefrontHome = () => {
 
       {/* ═══════════════ FEATURED VEHICLE — Dark banner ═══════════════ */}
       {showVehicles && vehicles.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 py-8">
-          <div className="rounded-2xl overflow-hidden bg-gray-900 relative">
-            <div className="p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+        <section className="max-w-5xl mx-auto px-4 py-8">
+          <div className="rounded-lg overflow-hidden bg-gray-900 relative">
+            <div className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
               <div className="flex-1 text-white">
-                <span className="text-xs uppercase tracking-[0.2em] font-semibold text-gray-400">Best Offer</span>
-                <h3 className="text-2xl md:text-3xl font-bold mt-2 mb-1">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-400">Best Offer</span>
+                <h3 className="text-xl md:text-2xl font-bold mt-2 mb-1">
                   {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
                 </h3>
                 {vehicles[0].display_price_per_km ? (
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="text-2xl font-bold" style={{ color: buttonColor }}>{vehicles[0].display_price_per_km} €/km</span>
+                    <span className="text-xl font-bold" style={{ color: buttonColor }}>{vehicles[0].display_price_per_km} €/km</span>
                   </div>
                 ) : vehicles[0].daily_rate ? (
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="text-2xl font-bold" style={{ color: buttonColor }}>{vehicles[0].daily_rate.toLocaleString()} €/day</span>
+                    <span className="text-xl font-bold" style={{ color: buttonColor }}>{vehicles[0].daily_rate.toLocaleString()} €/day</span>
                   </div>
                 ) : null}
-                <div className="flex items-center gap-1 mt-3">
-                  {[...Array(5)].map((_, j) => <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
+                <div className="flex items-center gap-0.5 mt-3">
+                  {[...Array(5)].map((_, j) => <Star key={j} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />)}
                 </div>
               </div>
               <div className="flex-1 flex items-center justify-center">
                 {vehicles[0].photo_url ? (
-                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-80 h-48 rounded-xl object-cover" />
+                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-72 h-44 rounded-lg object-cover" />
                 ) : (
-                  <div className="w-80 h-48 rounded-xl flex items-center justify-center bg-white/5">
-                    <Car className="h-24 w-24 opacity-20 text-white" />
+                  <div className="w-72 h-44 rounded-lg flex items-center justify-center bg-white/5">
+                    <Car className="h-20 w-20 opacity-20 text-white" />
                   </div>
                 )}
               </div>
