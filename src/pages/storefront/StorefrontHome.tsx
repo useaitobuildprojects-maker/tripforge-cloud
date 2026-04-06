@@ -141,14 +141,10 @@ const StorefrontHome = () => {
       />
 
       {/* Hero Section — Blacklane-style split layout */}
-      <section className="relative overflow-hidden" style={{ minHeight: '520px' }}>
-        {/* Background image */}
-        {cfg.home_hero_image ? (
-          <img src={cfg.home_hero_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{ backgroundColor: ts.heroStyle?.backgroundColor ?? '#1a1f36' }} />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+      <section className="relative overflow-hidden" style={{ minHeight: '560px' }}>
+        {/* Full-bleed hero image */}
+        <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={960} />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex flex-col md:flex-row items-start gap-10">
           {/* Left — headline */}
