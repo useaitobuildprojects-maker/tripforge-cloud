@@ -186,7 +186,7 @@ const StorefrontHome = () => {
 
       {/* ═══════════════ BOOKING FORM SECTION ═══════════════ */}
       <section className="relative z-10 px-4 pb-8" style={{ marginTop: enabledServices.length > 1 ? '0' : '-40px' }}>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <AnimatePresence mode="wait">
             {/* ---- CAR RENTAL (inline card) ---- */}
             {(activeService === 'all' || activeService === 'car_rental') && (
