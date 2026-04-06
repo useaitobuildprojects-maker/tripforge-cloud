@@ -160,7 +160,7 @@ const StorefrontHome = () => {
         {/* Service tabs pinned to bottom of hero */}
         {enabledServices.length > 1 && (
           <div className="absolute bottom-0 left-0 right-0 z-10">
-            <div className="max-w-4xl mx-auto px-4 flex items-end gap-0">
+            <div className="max-w-7xl mx-auto px-4 flex items-end">
               {enabledServices.map((service) => {
                 const Icon = SERVICE_ICONS[service] ?? Car;
                 const isActive = activeService === service;
@@ -168,14 +168,15 @@ const StorefrontHome = () => {
                   <button
                     key={service}
                     onClick={() => setActiveService(service)}
-                    className={`flex items-center gap-2 px-5 py-3 text-sm font-medium transition-all border-b-2 ${
+                    className={`relative flex items-center gap-2.5 px-6 py-3.5 text-sm font-semibold tracking-wide transition-all duration-200 ${
                       isActive
-                        ? 'bg-white/95 backdrop-blur-sm text-gray-900 border-transparent rounded-t-xl shadow-sm'
-                        : 'bg-transparent text-white/80 hover:text-white border-transparent hover:bg-white/10'
+                        ? 'bg-white text-gray-900 rounded-t-2xl shadow-lg z-10'
+                        : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-xl'
                     }`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className={`h-4.5 w-4.5 ${isActive ? '' : 'opacity-70'}`} style={isActive ? { color: buttonColor } : undefined} />
                     <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
+                    {isActive && <div className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full" style={{ backgroundColor: buttonColor }} />}
                   </button>
                 );
               })}
