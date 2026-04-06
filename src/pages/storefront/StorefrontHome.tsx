@@ -420,103 +420,59 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Unified Service Sections */}
-      <AnimatePresence mode="wait">
-        {(activeService === 'all' ? enabledServices : [activeService]).map((service, sectionIdx) => {
-          const Icon = SERVICE_ICONS[service] ?? Car;
-          const label = SERVICE_LABELS[service] ?? service;
-          const desc = SERVICE_SHORT_DESC[service];
-          const features = SERVICE_FEATURES[service];
+      {/* Our Services — Blacklane-style horizontal cards */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
+        <p className="text-center text-sm text-gray-500 mb-12 max-w-lg mx-auto">Everything you need for seamless travel, all in one place</p>
 
-          return (
-            <motion.section
-              key={service}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ delay: sectionIdx * 0.1 }}
-              className={`py-16 ${sectionIdx % 2 === 0 ? ts.sectionAltClass : ''}`}
-              style={sectionIdx % 2 === 0 ? ts.sectionAltStyle : undefined}
-            >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row items-start gap-12">
-                  {/* Service Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`inline-flex items-center justify-center h-12 w-12 rounded-xl ${ts.iconBgClass}`} style={ts.iconBgStyle}>
-                        <Icon className="h-6 w-6" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {enabledServices.map((service, i) => {
+            const Icon = SERVICE_ICONS[service] ?? Car;
+            const label = SERVICE_LABELS[service] ?? service;
+            const desc = SERVICE_SHORT_DESC[service];
+            const image = SERVICE_IMAGES[service];
+
+            return (
+              <motion.div
+                key={service}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.08, duration: 0.5 }}
+              >
+                <Link
+                  to={`/agency/${slug}/services/${service}`}
+                  className="group block rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={image}
+                      alt={label}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
+                      width={960}
+                      height={640}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                        <Icon className="h-4 w-4 text-gray-800" />
                       </div>
-                      <h2 className="text-2xl md:text-3xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-                        {label}
-                      </h2>
+                      <span className="text-white font-bold text-lg drop-shadow-md">{label}</span>
                     </div>
-                    <p className="text-sm opacity-60 leading-relaxed mb-6 max-w-lg">{desc}</p>
-
-                    {/* Feature checklist */}
-                    <ul className="space-y-3 mb-6">
-                      {features.items.map((feat, fi) => (
-                        <motion.li
-                          key={fi}
-                          initial={{ opacity: 0, x: -10 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: fi * 0.05 }}
-                          className="flex items-center gap-3 text-sm"
-                        >
-                          <span className="h-5 w-5 rounded-full flex items-center justify-center text-white text-xs shrink-0" style={{ backgroundColor: buttonColor }}>✓</span>
-                          {feat}
-                        </motion.li>
-                      ))}
-                    </ul>
-
-                    <Link to={`/agency/${slug}/services/${service}`}>
-                      <Button className="rounded-lg font-semibold gap-2 text-white" style={{ backgroundColor: buttonColor }}>
-                        Explore {label} <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
                   </div>
-
-                  {/* Service visual / mini cards */}
-                  <div className="flex-1 min-w-0 w-full">
-                    {vehicleServices.includes(service) && vehicles.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {vehicles.slice(0, 4).map((vehicle) => (
-                          <div key={vehicle.id} className={`rounded-xl border border-current/10 overflow-hidden ${ts.cardClass}`} style={ts.cardStyle}>
-                            {vehicle.photo_url ? (
-                              <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-32 w-full object-cover" />
-                            ) : (
-                              <div className="h-32 flex items-center justify-center opacity-10 bg-current">
-                                <Car className="h-10 w-10" />
-                              </div>
-                            )}
-                            <div className="p-3">
-                              <h4 className="font-bold text-sm">{vehicle.brand} {vehicle.model}</h4>
-                              <div className="flex items-center justify-between mt-1">
-                                <span className="text-xs opacity-50">{vehicle.year}</span>
-                                {vehicle.display_price_per_km ? (
-                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.display_price_per_km} €/km</span>
-                                ) : vehicle.daily_rate ? (
-                                  <span className="text-sm font-bold" style={{ color: buttonColor }}>{vehicle.daily_rate} €/day</span>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className={`rounded-2xl p-8 text-center ${ts.cardClass}`} style={ts.cardStyle}>
-                        <Icon className="h-16 w-16 mx-auto mb-4 opacity-20" />
-                        <p className="text-lg font-bold mb-2">{label}</p>
-                        <p className="text-sm opacity-50">Contact us for availability and pricing</p>
-                      </div>
-                    )}
+                  <div className="p-5">
+                    <p className="text-sm text-gray-500 leading-relaxed mb-4">{desc}</p>
+                    <span className="inline-flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all" style={{ color: buttonColor }}>
+                      Learn more <ChevronRight className="h-4 w-4" />
+                    </span>
                   </div>
-                </div>
-              </div>
-            </motion.section>
-          );
-        })}
-      </AnimatePresence>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Featured Vehicle — first from database */}
       {showVehicles && vehicles.length > 0 && (
