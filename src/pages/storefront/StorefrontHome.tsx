@@ -184,16 +184,14 @@ const StorefrontHome = () => {
         )}
       </section>
 
-      {/* ═══════════════ BOOKING FORM CARD ═══════════════ */}
+      {/* ═══════════════ BOOKING FORM SECTION ═══════════════ */}
       <section className="relative z-10 px-4 pb-8" style={{ marginTop: enabledServices.length > 1 ? '0' : '-40px' }}>
         <div className="max-w-4xl mx-auto">
-
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
-            <AnimatePresence mode="wait">
-              {/* ---- CAR RENTAL ---- */}
-              {(activeService === 'all' || activeService === 'car_rental') && (
-                <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                  {/* Toggle row */}
+          <AnimatePresence mode="wait">
+            {/* ---- CAR RENTAL (inline card) ---- */}
+            {(activeService === 'all' || activeService === 'car_rental') && (
+              <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
                   <div className="flex items-center gap-6 mb-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="radio" name="trip" checked={sameReturn} onChange={() => setSameReturn(true)} className="accent-current" style={{ accentColor: buttonColor }} />
@@ -206,7 +204,6 @@ const StorefrontHome = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    {/* Pickup group */}
                     <div className="space-y-1">
                       <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1"><MapPin className="h-3 w-3" /> Pickup</span>
                       <div className="grid grid-cols-3 gap-2">
@@ -231,7 +228,6 @@ const StorefrontHome = () => {
                       </div>
                     </div>
 
-                    {/* Return group */}
                     <div className="space-y-1">
                       <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-1"><MapPin className="h-3 w-3" /> Return</span>
                       <div className="grid grid-cols-3 gap-2">
@@ -269,26 +265,32 @@ const StorefrontHome = () => {
                       <Search className="h-4 w-4" /> Search
                     </Button>
                   </div>
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
+            )}
 
-              {/* ---- TRANSFER ---- */}
-              {activeService === 'transfer' && (
-                <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                  <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
-                </motion.div>
-              )}
+            {/* ---- TRANSFER (own card) ---- */}
+            {activeService === 'transfer' && (
+              <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+              </motion.div>
+            )}
 
-              {/* ---- LIMO SERVICE ---- */}
-              {activeService === 'limo_tour' && (
-                <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                  <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
-                </motion.div>
-              )}
+            {/* ---- LIMO SERVICE (own card) ---- */}
+            {activeService === 'limo_tour' && (
+              <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+              </motion.div>
+            )}
 
-              {/* ---- CITY TOUR ---- */}
-              {activeService === 'city_tour' && (
-                <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+            {/* ---- CITY TOUR (inline card) ---- */}
+            {activeService === 'city_tour' && (
+              <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-900">Book a City Tour</h3>
+                    <p className="text-sm text-gray-500 mt-1">Guided tours with local expert drivers</p>
+                  </div>
                   <div className="flex flex-col md:flex-row gap-4 items-end">
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
@@ -318,12 +320,18 @@ const StorefrontHome = () => {
                       <Search className="h-4 w-4" /> Find tours
                     </Button>
                   </div>
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
+            )}
 
-              {/* ---- APARTMENT ---- */}
-              {activeService === 'apartment' && (
-                <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+            {/* ---- APARTMENT (inline card) ---- */}
+            {activeService === 'apartment' && (
+              <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-gray-900">Find an Apartment</h3>
+                    <p className="text-sm text-gray-500 mt-1">Furnished apartments for short & long stays</p>
+                  </div>
                   <div className="flex flex-col md:flex-row gap-4 items-end">
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div>
@@ -350,10 +358,10 @@ const StorefrontHome = () => {
                       <Search className="h-4 w-4" /> Search
                     </Button>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
 
