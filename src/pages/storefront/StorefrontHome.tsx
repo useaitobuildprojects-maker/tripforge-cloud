@@ -188,7 +188,7 @@ const StorefrontHome = () => {
       <section className="relative z-10 px-4 pb-8" style={{ marginTop: enabledServices.length > 1 ? '0' : '-40px' }}>
         <div className="max-w-4xl mx-auto">
 
-          <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 md:p-6">
+          <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
             <AnimatePresence mode="wait">
               {/* ---- CAR RENTAL ---- */}
               {(activeService === 'all' || activeService === 'car_rental') && (
