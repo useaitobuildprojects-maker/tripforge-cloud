@@ -190,7 +190,7 @@ const StorefrontHome = () => {
             {/* ---- CAR RENTAL (inline card) ---- */}
             {(activeService === 'all' || activeService === 'car_rental') && (
               <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
+                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
                   <div className="flex items-center gap-6 mb-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="radio" name="trip" checked={sameReturn} onChange={() => setSameReturn(true)} className="accent-current" style={{ accentColor: buttonColor }} />
@@ -285,7 +285,7 @@ const StorefrontHome = () => {
             {/* ---- CITY TOUR (inline card) ---- */}
             {activeService === 'city_tour' && (
               <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
+                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900">Book a City Tour</h3>
                     <p className="text-sm text-gray-500 mt-1">Guided tours with local expert drivers</p>
@@ -326,7 +326,7 @@ const StorefrontHome = () => {
             {/* ---- APARTMENT (inline card) ---- */}
             {activeService === 'apartment' && (
               <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 md:p-10">
+                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900">Find an Apartment</h3>
                     <p className="text-sm text-gray-500 mt-1">Furnished apartments for short & long stays</p>
@@ -365,23 +365,24 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-          Why Choose Us
+      <section className="max-w-5xl mx-auto px-4 py-20">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Why Choose Us</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-14 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+          The Best Way To Travel
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { icon: Phone, title: 'Customer Support', desc: 'Our dedicated team is available around the clock to assist you with any questions or needs.' },
-            { icon: Shield, title: 'Best Price Guarantee', desc: 'We guarantee the best prices on all our vehicles with full transparency — no hidden fees.' },
-            { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off at convenient locations across the region with flexible options.' },
+            { icon: Phone, title: '24/7 Support', desc: 'Our dedicated team is available around the clock to assist you with any questions.' },
+            { icon: Shield, title: 'Best Price Guarantee', desc: 'We guarantee the best prices with full transparency — no hidden fees ever.' },
+            { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off at convenient locations across the region.' },
           ].map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="flex flex-col items-center text-center">
-              <div className="h-16 w-16 rounded-full border-2 border-gray-200 flex items-center justify-center mb-5">
-                <item.icon className="h-7 w-7" style={{ color: buttonColor }} />
+              className="flex flex-col items-center text-center p-6 rounded-lg bg-gray-50/80 border border-gray-100/50 hover:shadow-md transition-shadow">
+              <div className="h-12 w-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: `${buttonColor}12` }}>
+                <item.icon className="h-5 w-5" style={{ color: buttonColor }} />
               </div>
-              <h3 className="text-base font-bold text-gray-900 mb-2">{item.title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed max-w-xs">{item.desc}</p>
+              <h3 className="text-sm font-bold text-gray-900 mb-1.5">{item.title}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}
         </div>
