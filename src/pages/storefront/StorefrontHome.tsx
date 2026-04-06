@@ -159,8 +159,8 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ TABS + BOOKING FORM (overlapping hero) ═══════════════ */}
-      <section className="relative z-10 px-4 pb-8 -mt-28">
-        <div className="max-w-7xl mx-auto">
+      <section className="relative z-10 px-4 pb-10 -mt-28">
+        <div className="max-w-5xl mx-auto">
           {/* Service tabs */}
           {enabledServices.length > 1 && (
             <div className="flex items-end justify-center">
@@ -171,15 +171,15 @@ const StorefrontHome = () => {
                   <button
                     key={service}
                     onClick={() => setActiveService(service)}
-                    className={`relative flex items-center gap-2 px-5 py-3 text-sm font-semibold tracking-wide transition-all duration-200 ${
+                    className={`relative flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold tracking-wide transition-all duration-200 ${
                       isActive
-                        ? 'bg-white text-gray-900 rounded-t-xl shadow-lg z-10'
-                        : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-lg'
+                        ? 'bg-white text-gray-900 rounded-t-lg shadow-lg z-10'
+                        : 'text-white/60 hover:text-white hover:bg-white/10 rounded-t-md'
                     }`}
                   >
-                    <Icon className={`h-3.5 w-3.5 ${isActive ? '' : 'opacity-70'}`} style={isActive ? { color: buttonColor } : undefined} />
+                    <Icon className={`h-4 w-4 ${isActive ? '' : 'opacity-60'}`} style={isActive ? { color: buttonColor } : undefined} />
                     <span className="hidden sm:inline">{SERVICE_LABELS[service]}</span>
-                    {isActive && <div className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full" style={{ backgroundColor: buttonColor }} />}
+                    {isActive && <div className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full" style={{ backgroundColor: buttonColor }} />}
                   </button>
                 );
               })}
