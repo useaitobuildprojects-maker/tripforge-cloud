@@ -36,29 +36,51 @@ export function getFormulaPrice(
   return Math.round(baseFee + distanceKm * perKmRate * multiplier);
 }
 
-/** Fetch driving distance using Mapbox Directions API (primary) or OSRM (fallback) */
+/** Fetch driving distance using Google Routes API (primary) or OSRM (fallback) */
 export async function getDrivingDistance(
   originCoords: [number, number],
   destCoords: [number, number]
 ): Promise<number | null> {
-  // Try Mapbox Directions first
-  const token = import.meta.env.VITE_MAPBOX_TOKEN;
-  if (token) {
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+  if (apiKey) {
     try {
-      const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${originCoords[0]},${originCoords[1]};${destCoords[0]},${destCoords[1]}?overview=false&access_token=${token}`;
-      console.log('[Transfer] Distance via Mapbox Directions');
-      const res = await fetch(url);
+      const body = {
+        origin: {
+          location: {
+            latLng: { latitude: originCoords[1], longitude: originCoords[0] },
+          },
+        },
+        destination: {
+          location: {
+            latLng: { latitude: destCoords[1], longitude: destCoords[0] },
+          },
+        },
+        travelMode: 'DRIVE',
+        routingPreference: 'TRAFFIC_UNAWARE',
+      };
+
+      console.log('[Transfer] Distance via Google Routes API');
+      const res = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'routes.distanceMeters',
+        },
+        body: JSON.stringify(body),
+      });
+
       if (res.ok) {
         const data = await res.json();
-        if (data.code === 'Ok' && data.routes?.[0]) {
-          const km = Math.round(data.routes[0].distance / 1000);
-          console.log('[Transfer] Mapbox distance:', km, 'km');
+        if (data.routes?.[0]?.distanceMeters) {
+          const km = Math.round(data.routes[0].distanceMeters / 1000);
+          console.log('[Transfer] Google Routes distance:', km, 'km');
           return km;
         }
       }
-      console.warn('[Transfer] Mapbox Directions failed, trying OSRM fallback');
+      console.warn('[Transfer] Google Routes failed, trying OSRM fallback');
     } catch (e) {
-      console.warn('[Transfer] Mapbox Directions error, trying OSRM:', e);
+      console.warn('[Transfer] Google Routes error, trying OSRM:', e);
     }
   }
 
@@ -92,7 +114,7 @@ function resolvePoiMatch(name: string): { coords?: [number, number]; query: stri
   return { query: name };
 }
 
-/** Geocode a place name and return [lng, lat] */
+/** Geocode a place name using Google Places Text Search (New) with OSRM fallback */
 export async function geocodePlace(name: string, _country?: string): Promise<[number, number] | null> {
   // Check POI database first — if coords exist, skip geocoding entirely
   const match = resolvePoiMatch(name);
@@ -103,24 +125,31 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
 
   const query = match.query;
 
-  // Try Mapbox first
-  const token = import.meta.env.VITE_MAPBOX_TOKEN;
-  if (token) {
+  // Try Google Places Text Search (New API)
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+  if (apiKey) {
     try {
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${token}&limit=1`;
-      console.log('[Transfer] Geocoding (Mapbox):', query);
-      const res = await fetch(url);
+      console.log('[Transfer] Geocoding (Google Places):', query);
+      const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'places.location',
+        },
+        body: JSON.stringify({ textQuery: query, maxResultCount: 1 }),
+      });
       if (res.ok) {
         const data = await res.json();
-        const feature = data?.features?.[0];
-        if (feature) {
-          const [lng, lat] = feature.center;
-          console.log('[Transfer] Geocoded:', query, '→', [lng, lat]);
-          return [lng, lat];
+        const place = data.places?.[0];
+        if (place?.location) {
+          const coords: [number, number] = [place.location.longitude, place.location.latitude];
+          console.log('[Transfer] Geocoded (Google):', query, '→', coords);
+          return coords;
         }
       }
     } catch (e) {
-      console.warn('[Transfer] Mapbox geocode error, trying fallback:', e);
+      console.warn('[Transfer] Google geocode error, trying fallback:', e);
     }
   }
 
@@ -142,9 +171,7 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
   }
 }
 
-/** Find city rate: origin city first (driver's base), then destination, then null.
- * Real agencies price based on where the driver starts from.
- */
+/** Find city rate: origin city first (driver's base), then destination, then null. */
 function findCityRate(
   cityPricing: CityPricing[],
   origin: string,
@@ -156,18 +183,16 @@ function findCityRate(
   const o = normalize(origin);
   const d = normalize(destination);
 
-  // Priority 1: origin city (driver's base cost)
   const originMatch = cityPricing.find((cp) => o.includes(normalize(cp.city_name)));
   if (originMatch) return originMatch;
 
-  // Priority 2: destination city
   const destMatch = cityPricing.find((cp) => d.includes(normalize(cp.city_name)));
   if (destMatch) return destMatch;
 
   return null;
 }
 
-/** Calculate transfer price using OSRM distance + formula */
+/** Calculate transfer price using distance + formula */
 export async function calculateTransferPrice(
   config: StorefrontConfig,
   origin: string,
@@ -180,7 +205,6 @@ export async function calculateTransferPrice(
 ): Promise<TransferQuote> {
   console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
 
-  // Check for city-specific rates first
   const cityRate = findCityRate(cityPricing, origin, destination);
   const baseFee = cityRate?.transfer_base_fee ?? config.transfer_base_fee ?? 0;
   const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
@@ -218,12 +242,10 @@ export async function calculateTransferPrice(
     return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'osrm_failed' };
   }
 
-  // Determine drop-off fee: applies when destination is outside the origin city
   const dropOffFee = cityRate?.drop_off_fee ?? 0;
   const isIntercity = cityRate ? !destination.toLowerCase().includes(cityRate.city_name.toLowerCase()) : false;
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
-  // Use city-specific or global rates for formula
   const multiplier = getCategoryMultiplier(config, category);
   const price = Math.round(baseFee + distanceKm * perKmRate * multiplier + appliedDropOff);
   console.log('[Transfer] Formula result:', { distanceKm, price, dropOff: appliedDropOff, cityRate: cityRate?.city_name ?? 'global' });

@@ -29,36 +29,22 @@ interface LocationAutocompleteProps {
   agencyCountry?: string;
 }
 
-interface MapboxFeature {
-  id: string;
-  place_name: string;
-  text: string;
-  place_type: string[];
-  properties: { category?: string; maki?: string };
-  context?: Array<{ id: string; text: string }>;
+interface GooglePlaceSuggestion {
+  placePrediction: {
+    placeId: string;
+    text: { text: string };
+    structuredFormat?: {
+      mainText: { text: string };
+      secondaryText?: { text: string };
+    };
+    types?: string[];
+  };
 }
 
-function detectTypeFromMapbox(feature: MapboxFeature): LocationOption['type'] {
-  const types = feature.place_type || [];
-  const text = feature.text.toLowerCase();
-  const placeName = feature.place_name.toLowerCase();
-  const category = (feature.properties?.category || '').toLowerCase();
-  if (types.includes('poi') && (text.includes('airport') || placeName.includes('airport') || category.includes('airport') || feature.properties?.maki === 'airport')) return 'airport';
-  if (types.includes('place') || types.includes('locality')) return 'city';
+function detectTypeFromGoogle(types: string[]): LocationOption['type'] {
+  if (types.some(t => t === 'airport' || t === 'aerodrome')) return 'airport';
+  if (types.some(t => ['locality', 'administrative_area_level_3', 'administrative_area_level_2', 'sublocality'].includes(t))) return 'city';
   return 'station';
-}
-
-function buildMapboxAddress(feature: MapboxFeature): string {
-  const ctx = feature.context || [];
-  const parts = ctx.map(c => c.text).filter(Boolean);
-  return parts.join(', ') || feature.place_name.split(',').slice(1).map(s => s.trim()).join(', ');
-}
-
-function extractCoordsFromMapbox(feature: MapboxFeature): [number, number] | undefined {
-  const f = feature as any;
-  if (f.center) return [f.center[0], f.center[1]];
-  if (f.geometry?.coordinates) return [f.geometry.coordinates[0], f.geometry.coordinates[1]];
-  return undefined;
 }
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
@@ -72,7 +58,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const countryCode = useMemo(() => countryToISO(agencyCountry || ''), [agencyCountry]);
-
 
   useEffect(() => { setQuery(value); }, [value]);
 
@@ -90,28 +75,76 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
     setLoading(true);
     try {
-      const token = import.meta.env.VITE_MAPBOX_TOKEN;
-      if (!token) { setSearchResults([]); setLoading(false); return; }
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
+      if (!apiKey) { setSearchResults([]); setLoading(false); return; }
 
-      const types = 'place,poi,address,locality,neighborhood,street';
-      const euroCountries = 'al,ad,at,be,ba,bg,hr,cy,cz,dk,ee,fi,fr,de,gr,hu,is,ie,it,xk,lv,li,lt,lu,mt,md,mc,me,nl,mk,no,pl,pt,ro,rs,sk,si,es,se,ch,tr,ua,gb';
-      const countryParam = `&country=${countryCode ? countryCode : euroCountries}`;
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(normalized)}.json?access_token=${token}&types=${types}&limit=10&language=en${countryParam}`;
+      // Use Google Places Autocomplete (New) API
+      const euroCountries = ['al','ad','at','be','ba','bg','hr','cy','cz','dk','ee','fi','fr','de','gr','hu','is','ie','it','xk','lv','li','lt','lu','mt','md','mc','me','nl','mk','no','pl','pt','ro','rs','sk','si','es','se','ch','tr','ua','gb'];
+      const countries = countryCode ? [countryCode] : euroCountries;
 
-      const res = await fetch(url);
+      const body: any = {
+        input: normalized,
+        languageCode: 'en',
+        includedRegionCodes: countries,
+      };
+
+      // Bias toward agency city
+      if (agencyCity) {
+        body.inputOffset = normalized.length;
+      }
+
+      const res = await fetch('https://places.googleapis.com/v1/places:autocomplete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+        },
+        body: JSON.stringify(body),
+      });
+
       if (!res.ok) { setSearchResults([]); setLoading(false); return; }
       const data = await res.json();
-      const features = (data.features || []) as MapboxFeature[];
+      const suggestions = (data.suggestions || []) as GooglePlaceSuggestion[];
 
-      const results: LocationOption[] = features.map((f, i) => ({
-        id: `search-${i}`,
-        name: f.text,
-        type: detectTypeFromMapbox(f),
-        address: buildMapboxAddress(f),
-        source: 'search' as const,
-        coords: extractCoordsFromMapbox(f),
-        fullName: f.place_name,
-      }));
+      // Fetch place details for coords in parallel
+      const results: LocationOption[] = await Promise.all(
+        suggestions.slice(0, 10).map(async (s, i) => {
+          const pred = s.placePrediction;
+          const mainText = pred.structuredFormat?.mainText?.text || pred.text.text;
+          const secondaryText = pred.structuredFormat?.secondaryText?.text || '';
+          const types = pred.types || [];
+
+          // Fetch place details for coordinates
+          let coords: [number, number] | undefined;
+          try {
+            const detailRes = await fetch(
+              `https://places.googleapis.com/v1/places/${pred.placeId}?languageCode=en`,
+              {
+                headers: {
+                  'X-Goog-Api-Key': apiKey,
+                  'X-Goog-FieldMask': 'location',
+                },
+              }
+            );
+            if (detailRes.ok) {
+              const detail = await detailRes.json();
+              if (detail.location) {
+                coords = [detail.location.longitude, detail.location.latitude];
+              }
+            }
+          } catch { /* coords will be undefined */ }
+
+          return {
+            id: `search-${i}`,
+            name: mainText,
+            type: detectTypeFromGoogle(types),
+            address: secondaryText,
+            source: 'search' as const,
+            coords,
+            fullName: pred.text.text,
+          };
+        })
+      );
 
       setSearchResults(results.slice(0, 12));
     } catch {
@@ -172,9 +205,6 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     setQuery(loc.name);
     setOpen(false);
   };
-
-
-
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -248,7 +278,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
               </div>
             )}
 
-            {/* Search results from web (Photon fallback) */}
+            {/* Search results from Google Places */}
             {grouped.searchResults.length > 0 && (
               <div>
                 <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${(grouped.configured.length > 0 || grouped.poi.length > 0) ? 'border-t border-border' : ''}`}>
