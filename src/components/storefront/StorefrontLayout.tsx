@@ -1,21 +1,23 @@
 import { Outlet, useParams, useLocation, Link } from 'react-router-dom';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { useFavicon } from '@/hooks/use-favicon';
-import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2 } from 'lucide-react';
+import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2, Search, Menu, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getShareUrl } from '@/lib/share-url';
 import { getTemplateStyles } from '@/lib/template-styles';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 const StorefrontLayout = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const { data: agency, isLoading } = useAgencyBySlug(slug ?? '');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const pathParts = location.pathname.split('/');
   const currentPage = pathParts[pathParts.length - 1] || 'home';
-  const page = ['fleet', 'contact', 'about'].includes(currentPage) ? currentPage : 'home';
+  const page = ['fleet', 'contact', 'about', 'services'].includes(currentPage) ? currentPage : 'home';
 
   const handleShare = () => {
     const shareUrl = getShareUrl(slug ?? '', page);
@@ -50,70 +52,153 @@ const StorefrontLayout = () => {
   const bgColor = agency.background_color ?? undefined;
   const cfg = agency.storefront_config ?? {};
 
-  // Font class mapping
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
 
-  // Build styles with color overrides from config
-  const headerStyle: React.CSSProperties = {
-    ...(ts.headerStyle ?? {}),
-    ...(cfg.nav_bg_color ? { backgroundColor: cfg.nav_bg_color } : {}),
-    ...(cfg.nav_text_color ? { color: cfg.nav_text_color } : {}),
-  };
-  const footerStyle: React.CSSProperties = {
-    ...(ts.footerStyle ?? {}),
-    ...(cfg.footer_bg_color ? { backgroundColor: cfg.footer_bg_color } : {}),
-    ...(cfg.footer_text_color ? { color: cfg.footer_text_color } : {}),
-  };
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : (ts.bodyStyle ?? {});
+
+  const navLinks = [
+    { label: 'Homepage', to: `/agency/${slug}` },
+    { label: 'About', to: `/agency/${slug}/about` },
+    { label: 'Services', to: `/agency/${slug}/services` },
+  ];
+  const navLinksRight = [
+    { label: 'Blog', to: `/agency/${slug}` },
+    { label: 'Contact', to: `/agency/${slug}/contact` },
+  ];
 
   return (
     <div className={`min-h-screen ${fontClass} ${!bgColor ? ts.bodyClass : ''}`} style={bodyStyle}>
 
-      {/* Navigation — Clean with backdrop blur */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100/80 shadow-sm" style={cfg.nav_bg_color ? { backgroundColor: cfg.nav_bg_color, borderColor: 'transparent' } : undefined}>
+      {/* ═══ Navigation — Centered logo, editorial style ═══ */}
+      <header
+        className="sticky top-0 z-50 border-b transition-all duration-300"
+        style={{
+          backgroundColor: cfg.nav_bg_color || '#ffffff',
+          borderColor: cfg.nav_bg_color ? 'transparent' : 'rgba(0,0,0,0.06)',
+          color: cfg.nav_text_color || '#1a1a1a',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[60px]">
-            <Link to={`/agency/${slug}`} className="flex items-center gap-3">
+          <div className="flex items-center justify-between h-[64px]">
+            {/* Left nav */}
+            <div className="hidden md:flex items-center gap-1">
+              <button onClick={handleShare} className="p-2 rounded-full hover:bg-black/5 transition-colors" title="Search">
+                <Search className="h-4 w-4 opacity-50" />
+              </button>
+            </div>
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="text-[13px] font-medium tracking-wide hover:opacity-60 transition-opacity"
+                  style={{ color: cfg.nav_text_color || '#1a1a1a' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Center logo */}
+            <Link to={`/agency/${slug}`} className="flex items-center gap-2">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-9 w-auto object-contain" />
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-auto object-contain" />
               ) : (
-                <span className="text-lg font-bold tracking-tight text-gray-900" style={cfg.nav_text_color ? { color: cfg.nav_text_color } : undefined}>
-                  {agency.name.toUpperCase()}
-                </span>
+                <div className="text-center">
+                  <span
+                    className="text-lg font-bold tracking-tight leading-none"
+                    style={{ color: cfg.nav_text_color || '#1a1a1a' }}
+                  >
+                    {agency.name.toLowerCase()}
+                  </span>
+                </div>
               )}
             </Link>
 
-            <nav className="hidden md:flex items-center gap-7">
-              <Link to={`/agency/${slug}`} className="text-[13px] font-medium text-gray-900 hover:text-gray-600 transition-colors" style={cfg.nav_text_color ? { color: cfg.nav_text_color } : undefined}>Home</Link>
-              <Link to={`/agency/${slug}/services`} className="text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors">Services</Link>
-              <Link to={`/agency/${slug}/contact`} className="text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors">Contact</Link>
-              <Link to={`/agency/${slug}/about`} className="text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors">About us</Link>
+            {/* Right nav */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinksRight.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="text-[13px] font-medium tracking-wide hover:opacity-60 transition-opacity"
+                  style={{ color: cfg.nav_text_color || '#1a1a1a' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
-
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={handleShare} className="h-8 w-8 text-gray-400 hover:text-gray-900" title="Share this page">
-                <Share2 className="h-4 w-4" />
-              </Button>
-              <Link to={`/agency/${slug}`} className="text-[13px] font-medium px-4 py-1.5 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-200">
-                Sign in
-              </Link>
+            <div className="hidden md:flex items-center gap-1">
+              <button className="p-2 rounded-full hover:bg-black/5 transition-colors">
+                <Menu className="h-4 w-4 opacity-50" />
+              </button>
             </div>
+
+            {/* Mobile menu toggle */}
+            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-black/5 bg-white px-4 py-4 space-y-3">
+            {[...navLinks, ...navLinksRight].map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="block text-sm font-medium py-1"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Page Content */}
       <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white" style={cfg.footer_bg_color ? { backgroundColor: cfg.footer_bg_color, color: cfg.footer_text_color ?? '#ffffff' } : undefined}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-base font-bold mb-2">{agency.name}</h3>
-              <p className="text-xs text-white/40 leading-relaxed mb-4">
-                Your trusted partner for premium car rentals and travel services in {agency.city}, {agency.country}.
+      {/* ═══ Footer — Dark editorial ═══ */}
+      <footer
+        className="text-white"
+        style={{
+          backgroundColor: cfg.footer_bg_color || '#1a1a1a',
+          color: cfg.footer_text_color || '#ffffff',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div className="md:col-span-1">
+              {agency.logo_url ? (
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-auto object-contain mb-4 brightness-0 invert" />
+              ) : (
+                <h3 className="text-xl font-bold mb-4 tracking-tight">{agency.name.toLowerCase()}</h3>
+              )}
+              <p className="text-xs text-white/40 leading-relaxed">
+                Your trusted partner for premium travel services in {agency.city}, {agency.country}.
               </p>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] mb-4 text-white/60">Navigation</h4>
+              <ul className="space-y-2 text-sm text-white/40">
+                <li><Link to={`/agency/${slug}`} className="hover:text-white transition-colors">Home</Link></li>
+                <li><Link to={`/agency/${slug}/about`} className="hover:text-white transition-colors">About</Link></li>
+                <li><Link to={`/agency/${slug}/services`} className="hover:text-white transition-colors">Services</Link></li>
+                <li><Link to={`/agency/${slug}/contact`} className="hover:text-white transition-colors">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] mb-4 text-white/60">Contact</h4>
+              <ul className="space-y-2 text-sm text-white/40">
+                <li className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> {agency.contact_email}</li>
+                <li className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> {agency.city}, {agency.country}</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.15em] mb-4 text-white/60">Social</h4>
               <div className="flex items-center gap-3">
                 {cfg.facebook_url && <a href={cfg.facebook_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors"><Facebook className="h-4 w-4" /></a>}
                 {cfg.twitter_url && <a href={cfg.twitter_url} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors"><Twitter className="h-4 w-4" /></a>}
@@ -128,35 +213,9 @@ const StorefrontLayout = () => {
                 )}
               </div>
             </div>
-            <div>
-              <h4 className="text-sm font-semibold mb-3">Quick Links</h4>
-              <ul className="space-y-1.5 text-xs text-white/40">
-                <li><Link to={`/agency/${slug}/services`} className="hover:text-white transition-colors">Our Services</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Special Offers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold mb-3">Contact</h4>
-              <ul className="space-y-1.5 text-xs text-white/40">
-                <li className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> {agency.contact_email}</li>
-                <li className="flex items-center gap-2"><MapPin className="h-3.5 w-3.5" /> {agency.city}, {agency.country}</li>
-              </ul>
-              {agency.domain && (
-                <p className="text-[10px] text-white/20 mt-3">🌐 {agency.domain}</p>
-              )}
-            </div>
           </div>
-          <div className="border-t border-white/8 mt-8 pt-5 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {agency.logo_url ? (
-                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-7 w-7 rounded object-contain" />
-              ) : (
-                <span className="text-xs font-bold">{agency.name}</span>
-              )}
-            </div>
-            <p className="text-[10px] text-white/30">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
+          <div className="border-t border-white/8 mt-10 pt-6 text-center">
+            <p className="text-[11px] text-white/25">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
