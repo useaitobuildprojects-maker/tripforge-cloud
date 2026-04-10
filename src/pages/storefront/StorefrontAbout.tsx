@@ -1,9 +1,12 @@
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Shield, Award, Users, Clock } from 'lucide-react';
+import { Shield, Award, Users, Clock, ArrowRight, Star, MapPin, Heart } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
+import { Button } from '@/components/ui/button';
+import destTemple from '@/assets/dest-temple.jpg';
+import adventureMountain from '@/assets/adventure-mountain.jpg';
 
 const DEFAULT_VALUES = [
   { title: 'Trust & Safety', description: 'Every vehicle is thoroughly inspected and insured for your peace of mind.', icon: Shield },
@@ -13,8 +16,17 @@ const DEFAULT_VALUES = [
 ];
 
 const ICONS = [Shield, Award, Users, Clock];
+const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
+
+const STATS = [
+  { value: '10K+', label: 'Happy Travelers' },
+  { value: '500+', label: 'Destinations' },
+  { value: '99%', label: 'Satisfaction Rate' },
+  { value: '24/7', label: 'Customer Support' },
+];
 
 const StorefrontAbout = () => {
+  const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
 
   const values = cfg.about_values && cfg.about_values.length > 0
@@ -22,7 +34,7 @@ const StorefrontAbout = () => {
     : DEFAULT_VALUES;
 
   return (
-    <div>
+    <div className="bg-white">
       <StorefrontSeo
         agency={agency}
         page="about"
@@ -30,22 +42,50 @@ const StorefrontAbout = () => {
         fallbackDescription={`Learn more about ${agency.name}, your trusted travel partner in ${agency.city}, ${agency.country}.`}
       />
 
-      <section className={`py-16 ${ts.subHeroClass}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">{cfg.about_title || `About ${agency.name}`}</h1>
-            <p className="opacity-60 max-w-2xl mx-auto">
+      {/* Hero */}
+      <section className="relative bg-gray-950 overflow-hidden" style={{ minHeight: '340px' }}>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '340px' }}>
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-4" style={{ color: buttonColor }}>Our Story</p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5" style={serifFont}>
+              {cfg.about_title || `About ${agency.name}`}
+            </h1>
+            <p className="text-white/40 max-w-xl mx-auto text-base leading-relaxed">
               {cfg.about_subtitle || `Your trusted partner for premium travel services in ${agency.city}, ${agency.country}.`}
             </p>
           </motion.div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 60" fill="none" className="w-full"><path d="M0 60V30C360 0 720 0 1080 30C1260 45 1350 52 1440 60H0Z" fill="white"/></svg>
+        </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
-            <h2 className="text-2xl font-bold mb-4">Our Story</h2>
-            <div className="space-y-4 opacity-60 leading-relaxed">
+      {/* Stats bar */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {STATS.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              className="text-center py-6 px-4 rounded-2xl border border-gray-100 bg-white shadow-sm"
+            >
+              <p className="text-2xl md:text-3xl font-bold text-gray-900" style={serifFont}>{stat.value}</p>
+              <p className="text-xs text-gray-400 mt-1 font-medium">{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Story section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: buttonColor }}>Who We Are</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6" style={serifFont}>Our Story</h2>
+            <div className="space-y-5 text-gray-500 leading-relaxed">
               <p>
                 {cfg.about_story_1 || `Founded with a passion for exceptional travel experiences, ${agency.name} has grown into one of the most trusted travel service providers in ${agency.city}. We believe that every journey should be memorable, comfortable, and hassle-free.`}
               </p>
@@ -53,45 +93,87 @@ const StorefrontAbout = () => {
                 {cfg.about_story_2 || `Our team of dedicated professionals works tirelessly to ensure that every customer receives personalized attention and the highest quality of service, from the moment you book to the moment you return.`}
               </p>
             </div>
+            <Link to={`/agency/${slug}/contact`}>
+              <Button className="rounded-full font-semibold gap-2 text-white px-8 h-12 text-sm mt-8" style={{ backgroundColor: buttonColor }}>
+                Get In Touch <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className={`rounded-2xl h-64 flex items-center justify-center overflow-hidden ${cfg.about_image_url ? '' : ts.subHeroClass}`}
+            initial={{ opacity: 0, x: 24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative"
           >
-            {cfg.about_image_url ? (
-              <img src={cfg.about_image_url} alt={`About ${agency.name}`} className="h-full w-full object-cover rounded-2xl" />
-            ) : (
-              <div className="text-center">
-                <p className="text-5xl font-bold mb-1">{agency.name.charAt(0)}</p>
-                <p className="text-sm opacity-50">{agency.city}, {agency.country}</p>
+            <div className="rounded-3xl overflow-hidden shadow-xl">
+              {cfg.about_image_url ? (
+                <img src={cfg.about_image_url} alt={`About ${agency.name}`} className="w-full h-80 lg:h-[420px] object-cover" />
+              ) : (
+                <img src={destTemple} alt="Travel" className="w-full h-80 lg:h-[420px] object-cover" />
+              )}
+            </div>
+            {/* Floating card */}
+            <div className="absolute -bottom-6 -left-4 bg-white rounded-2xl shadow-lg p-5 border border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${buttonColor}15` }}>
+                  <Heart className="h-5 w-5" style={{ color: buttonColor }} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Trusted by thousands</p>
+                  <p className="text-xs text-gray-400">Since establishment</p>
+                </div>
               </div>
-            )}
+            </div>
           </motion.div>
         </div>
+      </section>
 
-        {/* Values */}
-        <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold mb-2">Our Values</h2>
-          <p className="opacity-60">What makes us different</p>
+      {/* Values */}
+      <section className="bg-gray-50 py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style={{ color: buttonColor }}>Why Choose Us</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3" style={serifFont}>Our Values</h2>
+            <p className="text-gray-400 max-w-lg mx-auto">The principles that guide everything we do</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((v, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.08 * i, duration: 0.5 }}
+                className="bg-white p-8 rounded-2xl border border-gray-100 text-center hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ backgroundColor: `${buttonColor}12` }}>
+                  <v.icon className="h-6 w-6" style={{ color: buttonColor }} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">{v.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{v.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {values.map((v, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i }}
-              className={`p-6 text-center ${ts.cardClass}`}
-            >
-              <div className={`flex h-12 w-12 items-center justify-center rounded-lg mx-auto mb-4 ${ts.iconBgClass}`}>
-                <v.icon className="h-6 w-6" />
-              </div>
-              <h3 className="font-bold mb-2">{v.title}</h3>
-              <p className="text-sm opacity-60">{v.description}</p>
-            </motion.div>
-          ))}
+      </section>
+
+      {/* CTA */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src={adventureMountain} alt="" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gray-950/80" />
+        </div>
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={serifFont}>Ready to Explore?</h2>
+            <p className="text-white/40 mb-8 max-w-lg mx-auto">Let us help you plan an unforgettable journey. Premium service, professional team, and memorable experiences await.</p>
+            <Link to={`/agency/${slug}/services`}>
+              <Button className="rounded-full font-semibold gap-2 text-white px-10 h-12 text-sm" style={{ backgroundColor: buttonColor }}>
+                View Our Services <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
     </div>
