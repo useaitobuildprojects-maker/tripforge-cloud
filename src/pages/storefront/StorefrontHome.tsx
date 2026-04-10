@@ -1,17 +1,21 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, ChevronLeft, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check, Fuel, Settings2 } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, Phone, Shield, Star, ChevronRight, ChevronLeft, Car, Building, SlidersHorizontal, X, Users, Briefcase, Check, Fuel, Settings2, ChevronDown, Play, ArrowDown } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
-import defaultHeroImage from '@/assets/hero-chauffeur.jpg';
+import defaultHeroImage from '@/assets/hero-desert.jpg';
 import serviceTransfer from '@/assets/service-transfer.jpg';
 import serviceLimo from '@/assets/service-limo.jpg';
 import serviceRental from '@/assets/service-rental.jpg';
 import serviceApartment from '@/assets/service-apartment.jpg';
 import serviceCityTour from '@/assets/service-city-tour.jpg';
+import destTemple from '@/assets/dest-temple.jpg';
+import destPalace from '@/assets/dest-palace.jpg';
+import destMonument from '@/assets/dest-monument.jpg';
+import adventureMountain from '@/assets/adventure-mountain.jpg';
 import { useMarketplaceVehicles, MarketplaceVehicle } from '@/hooks/use-marketplace-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo, useRef } from 'react';
@@ -52,6 +56,12 @@ const SERVICE_IMAGES: Record<ServiceType, string> = {
   apartment: serviceApartment,
   city_tour: serviceCityTour,
 };
+
+const DESTINATIONS = [
+  { name: 'Ancient Temple\nRuins', location: 'Egypt, North Africa', rating: 4.5, image: destTemple },
+  { name: 'Royal Palace\nof Europe', location: 'Vienna, Europe', rating: 4.7, image: destPalace },
+  { name: 'Gothic\nCathedral', location: 'Germany, Europe', rating: 4.6, image: destMonument },
+];
 
 const StorefrontHome = () => {
   const { slug } = useParams();
@@ -140,26 +150,62 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO — Full-bleed with centered text ═══════════════ */}
-      <section className="relative" style={{ minHeight: '520px' }}>
-        <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={960} />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70" />
+      {/* ═══════════════ HERO — Dramatic full-bleed with editorial typography ═══════════════ */}
+      <section className="relative" style={{ minHeight: '85vh' }}>
+        <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="absolute inset-0 w-full h-full object-cover" width={1920} height={1080} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
 
-        {/* Centered headline */}
-        <div className="relative flex flex-col items-center justify-center text-center px-4 pt-24 md:pt-32 pb-36 md:pb-40">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="text-3xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] text-white mb-5 tracking-tight drop-shadow-lg" style={cfg.hero_text_color ? { color: cfg.hero_text_color } : undefined}>
-              {cfg.hero_title || `Mobility Made Easy: Rent a Car\nTailored to Your Needs`}
-            </h1>
-            <p className="text-sm md:text-base text-white/60 max-w-xl mx-auto font-light" style={cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : undefined}>
-              {cfg.hero_subtitle || `Professional car rental, transfers & chauffeur services in ${agency.city}`}
+        {/* Hero content */}
+        <div className="relative flex flex-col items-center justify-center text-center px-4 h-full" style={{ minHeight: '85vh' }}>
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }}>
+            <p className="text-white/70 text-base md:text-lg font-light italic mb-3 tracking-wide">
+              {cfg.hero_subtitle || `Discover ${agency.city}`}
             </p>
+            <h1
+              className="text-4xl md:text-6xl lg:text-[5rem] font-bold leading-[1.05] text-white mb-6 tracking-tight"
+              style={{
+                fontFamily: "'Georgia', 'Times New Roman', serif",
+                ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}),
+              }}
+            >
+              {cfg.hero_title || (
+                <>
+                  Mysteries of<br />
+                  <span className="italic font-extrabold">The Journey</span>
+                </>
+              )}
+            </h1>
+          </motion.div>
+
+          {/* Scroll Down indicator */}
+          <motion.div
+            className="absolute bottom-8 left-8 flex items-center gap-3 text-white/60"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.6 }}
+          >
+            <div className="h-10 w-10 rounded-full border border-white/30 flex items-center justify-center">
+              <ArrowDown className="h-4 w-4 animate-bounce" />
+            </div>
+            <span className="text-xs font-semibold uppercase tracking-[0.15em]">Scroll Down</span>
+          </motion.div>
+
+          {/* Play button */}
+          <motion.div
+            className="absolute bottom-8 right-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+          >
+            <button className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors">
+              <Play className="h-4 w-4 text-white fill-white ml-0.5" />
+            </button>
           </motion.div>
         </div>
       </section>
 
-      {/* ═══════════════ TABS + BOOKING FORM (overlapping hero) ═══════════════ */}
-      <section className="relative z-10 px-4 pb-10 -mt-28">
+      {/* ═══════════════ BOOKING BAR — Overlapping hero bottom ═══════════════ */}
+      <section className="relative z-10 px-4 -mt-20 pb-10">
         <div className="max-w-5xl mx-auto">
           {/* Service tabs */}
           {enabledServices.length > 1 && (
@@ -174,7 +220,7 @@ const StorefrontHome = () => {
                     className={`relative flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold tracking-wide transition-all duration-200 ${
                       isActive
                         ? 'bg-white text-gray-900 rounded-t-lg shadow-lg z-10'
-                        : 'text-white/60 hover:text-white hover:bg-white/10 rounded-t-md'
+                        : 'text-white/70 hover:text-white hover:bg-white/10 rounded-t-md'
                     }`}
                   >
                     <Icon className={`h-4 w-4 ${isActive ? '' : 'opacity-60'}`} style={isActive ? { color: buttonColor } : undefined} />
@@ -190,7 +236,7 @@ const StorefrontHome = () => {
             {/* ---- CAR RENTAL (inline card) ---- */}
             {(activeService === 'all' || activeService === 'car_rental') && (
               <motion.div key="vehicle-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
+                <div className="bg-white rounded-lg shadow-2xl border border-gray-100/50 p-6 md:p-8">
                   <div className="flex items-center gap-6 mb-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="radio" name="trip" checked={sameReturn} onChange={() => setSameReturn(true)} className="accent-current" style={{ accentColor: buttonColor }} />
@@ -261,31 +307,28 @@ const StorefrontHome = () => {
                   <div className="flex justify-end">
                     <Button className="h-11 px-8 rounded-lg font-bold gap-2 text-white text-sm shadow-lg" style={{ backgroundColor: buttonColor }}
                       onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                      <Search className="h-4 w-4" /> Search
+                      <Search className="h-4 w-4" /> Explore All
                     </Button>
                   </div>
                 </div>
               </motion.div>
             )}
 
-            {/* ---- TRANSFER (own card) ---- */}
             {activeService === 'transfer' && (
               <motion.div key="transfer-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
                 <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
               </motion.div>
             )}
 
-            {/* ---- LIMO SERVICE (own card) ---- */}
             {activeService === 'limo_tour' && (
               <motion.div key="limo-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
                 <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
               </motion.div>
             )}
 
-            {/* ---- CITY TOUR (inline card) ---- */}
             {activeService === 'city_tour' && (
               <motion.div key="city-tour-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
+                <div className="bg-white rounded-lg shadow-2xl border border-gray-100/50 p-6 md:p-8">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900">Book a City Tour</h3>
                     <p className="text-sm text-gray-500 mt-1">Guided tours with local expert drivers</p>
@@ -323,10 +366,9 @@ const StorefrontHome = () => {
               </motion.div>
             )}
 
-            {/* ---- APARTMENT (inline card) ---- */}
             {activeService === 'apartment' && (
               <motion.div key="apartment-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                <div className="bg-white rounded-lg shadow-xl border border-gray-100/50 p-6 md:p-8">
+                <div className="bg-white rounded-lg shadow-2xl border border-gray-100/50 p-6 md:p-8">
                   <div className="text-center mb-6">
                     <h3 className="text-xl font-bold text-gray-900">Find an Apartment</h3>
                     <p className="text-sm text-gray-500 mt-1">Furnished apartments for short & long stays</p>
@@ -364,70 +406,103 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* ═══════════════ WHY CHOOSE US ═══════════════ */}
-      <section className="max-w-5xl mx-auto px-4 py-20">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Why Choose Us</p>
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-14 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-          The Best Way To Travel
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: Phone, title: '24/7 Support', desc: 'Our dedicated team is available around the clock to assist you with any questions.' },
-            { icon: Shield, title: 'Best Price Guarantee', desc: 'We guarantee the best prices with full transparency — no hidden fees ever.' },
-            { icon: MapPin, title: 'Many Locations', desc: 'Pick up and drop off at convenient locations across the region.' },
-          ].map((item, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="flex flex-col items-center text-center p-6 rounded-lg bg-gray-50/80 border border-gray-100/50 hover:shadow-md transition-shadow">
-              <div className="h-12 w-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: `${buttonColor}12` }}>
-                <item.icon className="h-5 w-5" style={{ color: buttonColor }} />
-              </div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1.5">{item.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{item.desc}</p>
-            </motion.div>
-          ))}
+      {/* ═══════════════ EXPLORE DESTINATIONS — Editorial card grid ═══════════════ */}
+      <section className="py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <p className="text-sm text-gray-400 font-light mb-2">Explore the</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+              <span className="font-normal italic">beautiful</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {DESTINATIONS.map((dest, i) => (
+              <motion.div
+                key={dest.name}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                className="group relative rounded-2xl overflow-hidden aspect-[3/4] cursor-pointer"
+              >
+                <img src={dest.image} alt={dest.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" width={800} height={1024} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+                {/* Rating badge */}
+                <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm">
+                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs font-bold text-gray-900">{dest.rating}</span>
+                </div>
+
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <h3 className="text-xl font-bold text-white leading-tight mb-1 whitespace-pre-line">{dest.name}</h3>
+                  <div className="flex items-center gap-1 text-white/60 text-xs">
+                    <MapPin className="h-3 w-3" />
+                    <span>{dest.location}</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ═══════════════ FEATURED VEHICLE — Dark banner ═══════════════ */}
-      {showVehicles && vehicles.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 py-8">
-          <div className="rounded-lg overflow-hidden bg-gray-900 relative">
-            <div className="p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-1 text-white">
-                <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-gray-400">Best Offer</span>
-                <h3 className="text-xl md:text-2xl font-bold mt-2 mb-1">
-                  {vehicles[0].brand} {vehicles[0].model} {vehicles[0].year}
-                </h3>
-                {vehicles[0].display_price_per_km ? (
-                  <div className="flex items-baseline gap-2 mt-2">
-                    <span className="text-xl font-bold" style={{ color: buttonColor }}>{vehicles[0].display_price_per_km} €/km</span>
+      {/* ═══════════════ ADVENTURE SECTION — Full-bleed image with stats ═══════════════ */}
+      <section className="relative py-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-10">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-2">Travel with us</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+              Conquer the<br />
+              <span className="italic font-extrabold text-4xl md:text-5xl">Epic Trails</span>
+            </h2>
+          </div>
+
+          <div className="relative rounded-2xl overflow-hidden" style={{ minHeight: '420px' }}>
+            <img src={adventureMountain} alt="Adventure" className="absolute inset-0 w-full h-full object-cover" loading="lazy" width={1920} height={900} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+            {/* Stats overlay */}
+            <div className="absolute bottom-6 left-6 flex items-end gap-6">
+              <div className="text-white">
+                <p className="text-3xl font-bold">529+</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="flex -space-x-1">
+                    {[1,2,3].map(j => (
+                      <div key={j} className="h-5 w-5 rounded-full bg-white/30 border border-white/50" />
+                    ))}
                   </div>
-                ) : vehicles[0].daily_rate ? (
-                  <div className="flex items-baseline gap-2 mt-2">
-                    <span className="text-xl font-bold" style={{ color: buttonColor }}>{vehicles[0].daily_rate.toLocaleString()} €/day</span>
-                  </div>
-                ) : null}
-                <div className="flex items-center gap-0.5 mt-3">
-                  {[...Array(5)].map((_, j) => <Star key={j} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />)}
                 </div>
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                {vehicles[0].photo_url ? (
-                  <img src={vehicles[0].photo_url} alt={`${vehicles[0].brand} ${vehicles[0].model}`} className="w-72 h-44 rounded-lg object-cover" />
-                ) : (
-                  <div className="w-72 h-44 rounded-lg flex items-center justify-center bg-white/5">
-                    <Car className="h-20 w-20 opacity-20 text-white" />
-                  </div>
-                )}
+                <p className="text-xs text-white/60 mt-1">People Already<br/>Booked</p>
               </div>
             </div>
-          </div>
-        </section>
-      )}
 
-      {/* ═══════════════ VEHICLE LISTINGS — Majestic-style cards ═══════════════ */}
+            {/* Play button center */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <button className="h-14 w-14 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center hover:bg-white/25 transition-colors">
+                <Play className="h-5 w-5 text-white fill-white ml-0.5" />
+              </button>
+            </div>
+
+            {/* Temperature badge */}
+            <div className="absolute bottom-6 right-6 text-white text-right">
+              <p className="text-[10px] uppercase tracking-wider text-white/50">Temperature</p>
+              <p className="text-sm font-bold">-20°C to -40°C</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ VEHICLE LISTINGS ═══════════════ */}
       {showVehicles && (
-        <section ref={vehiclesRef} className="max-w-5xl mx-auto px-4 pb-20 scroll-mt-8">
+        <section ref={vehiclesRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 scroll-mt-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-3 rounded-lg border border-gray-200 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
               <MapPin className="h-4 w-4 text-gray-400" />
@@ -440,8 +515,8 @@ const StorefrontHome = () => {
 
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Best Deals & Offers</h2>
-              <p className="text-sm text-gray-500 mt-1">Find the perfect car for your journey with competitive prices.</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", ...(cfg.heading_color ? { color: cfg.heading_color } : {}) }}>Best Deals & Offers</h2>
+              <p className="text-sm text-gray-400 mt-1">Find the perfect vehicle for your journey.</p>
             </div>
             <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
               <SlidersHorizontal className="h-4 w-4" /> Filter
@@ -471,10 +546,10 @@ const StorefrontHome = () => {
 
             <div className="flex-1 min-w-0">
               {vehiclesLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
-                  {[1, 2, 3, 4].map((i) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {[1, 2, 3].map((i) => (
                     <div key={i} className="rounded-xl border border-gray-100 overflow-hidden">
-                      <Skeleton className="h-40 w-full" />
+                      <Skeleton className="h-44 w-full" />
                       <div className="p-4 space-y-2">
                         <Skeleton className="h-5 w-3/4" />
                         <Skeleton className="h-4 w-1/2" />
@@ -494,12 +569,12 @@ const StorefrontHome = () => {
               ) : (
                 <>
                   <p className="text-sm text-gray-400 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {filteredVehicles.map((vehicle, i) => {
                       const mv = vehicle as MarketplaceVehicle;
                       return (
                         <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                          className="rounded-lg border border-gray-100 bg-white overflow-hidden hover:shadow-md transition-all duration-200 group relative">
+                          className="rounded-xl border border-gray-100 bg-white overflow-hidden hover:shadow-lg transition-all duration-300 group relative">
                           {mv.agency_name && !mv.is_own && (
                             <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
                               {mv.agency_logo_url ? (
@@ -511,26 +586,23 @@ const StorefrontHome = () => {
                             </div>
                           )}
                           {vehicle.photo_url ? (
-                            <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-40 w-full object-cover" />
+                            <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
                           ) : (
-                            <div className="h-40 flex items-center justify-center bg-gray-50">
+                            <div className="h-44 flex items-center justify-center bg-gray-50">
                               <Car className="h-12 w-12 text-gray-200" />
                             </div>
                           )}
                           <div className="p-4">
                             <h4 className="font-bold text-sm text-gray-900">{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
-                            {/* Specs row */}
                             <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400">
                               <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
                               <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
                               <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
                             </div>
-                            {/* Rating */}
                             <div className="flex items-center gap-1 mt-2">
                               {[...Array(5)].map((_, j) => <Star key={j} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
                               <span className="text-[10px] text-gray-400 ml-1">(450+)</span>
                             </div>
-                            {/* Price */}
                             <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                               {vehicle.display_price_per_km ? (
                                 <p className="text-base font-bold text-gray-900">{vehicle.display_price_per_km} €<span className="text-xs font-normal text-gray-400"> /km</span></p>
@@ -562,13 +634,13 @@ const StorefrontHome = () => {
       )}
 
       {/* ═══════════════ OUR SERVICES ═══════════════ */}
-      <section className="bg-gray-50/70 py-20 border-y border-gray-100">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>What We Offer</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Our Services</h2>
-          <p className="text-center text-sm text-gray-500 mb-14 max-w-md mx-auto">Everything you need for seamless travel, all in one place</p>
+      <section className="bg-gray-50/70 py-24 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>What We Offer</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-3" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", ...(cfg.heading_color ? { color: cfg.heading_color } : {}) }}>Our Services</h2>
+          <p className="text-center text-sm text-gray-400 mb-14 max-w-md mx-auto">Everything you need for seamless travel, all in one place</p>
 
-          <div className="space-y-14">
+          <div className="space-y-16">
             {enabledServices.map((service, i) => {
               const Icon = SERVICE_ICONS[service] ?? Car;
               const label = SERVICE_LABELS[service] ?? service;
@@ -586,18 +658,16 @@ const StorefrontHome = () => {
                   transition={{ delay: 0.1, duration: 0.5 }}
                   className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 items-center`}
                 >
-                  {/* Image side */}
                   <Link to={`/agency/${slug}/services/${service}`} className="w-full md:w-1/2 group">
-                    <div className="relative rounded-lg overflow-hidden shadow-md">
-                      <img src={image} alt={label} className="w-full h-56 md:h-64 object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" width={960} height={640} />
+                    <div className="relative rounded-2xl overflow-hidden shadow-md">
+                      <img src={image} alt={label} className="w-full h-56 md:h-72 object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" width={960} height={640} />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
                   </Link>
 
-                  {/* Text side */}
                   <div className="w-full md:w-1/2 space-y-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="h-9 w-9 rounded-md flex items-center justify-center" style={{ backgroundColor: `${buttonColor}12` }}>
+                      <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${buttonColor}12` }}>
                         <Icon className="h-4 w-4" style={{ color: buttonColor }} />
                       </div>
                       <h3 className="text-lg font-bold text-gray-900">{label}</h3>
@@ -622,54 +692,20 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-
-
-      {/* ═══════════════ BLOG ═══════════════ */}
-      <section className="py-20">
-        <div className="max-w-5xl mx-auto px-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Latest News</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>{cfg.blog_title || 'Blog'}</h2>
-          <p className="text-center text-sm text-gray-500 mb-10 max-w-md mx-auto">
-            {cfg.blog_subtitle || 'Discover the latest news and useful articles about car rental and travel tips'}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {blogPosts.map((post, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-200 group">
-                <div className="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <span className="text-xs text-gray-400 font-medium">Image</span>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-md bg-gray-100 text-gray-500">{post.category}</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">{post.title}</h4>
-                  <p className="text-[11px] text-gray-400 mb-2">{post.author} · a min ago</p>
-                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{post.excerpt}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <button className="text-[13px] font-medium hover:underline" style={{ color: buttonColor }}>View all articles →</button>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════ TESTIMONIALS ═══════════════ */}
-      <section className="bg-gray-50/70 border-y border-gray-100 py-20">
+      <section className="py-24 bg-white">
         <div className="max-w-5xl mx-auto px-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Testimonials</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Testimonials</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", ...(cfg.heading_color ? { color: cfg.heading_color } : {}) }}>
             {cfg.reviews_title || 'What Our Customers Say'}
           </h2>
-          <p className="text-center text-sm text-gray-500 mb-12 max-w-md mx-auto">
+          <p className="text-center text-sm text-gray-400 mb-12 max-w-md mx-auto">
             {cfg.reviews_subtitle || "Real feedback from real customers"}
           </p>
 
           <div className="relative">
             <div className="flex items-center gap-3 justify-center">
-              <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" style={{ color: buttonColor }}>
+              <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
@@ -680,14 +716,14 @@ const StorefrontHome = () => {
                     <motion.div
                       key={i}
                       layout
-                      className={`p-5 rounded-lg border transition-all duration-300 min-w-[240px] flex-1 ${
+                      className={`p-6 rounded-2xl border transition-all duration-300 min-w-[240px] flex-1 ${
                         isCenter
-                          ? 'bg-gray-900 text-white border-gray-800 shadow-lg'
+                          ? 'bg-gray-900 text-white border-gray-800 shadow-xl'
                           : 'bg-white text-gray-700 border-gray-100'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 mb-3">
-                        <div className={`h-10 w-10 rounded-md flex items-center justify-center text-xs font-bold ${isCenter ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                        <div className={`h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold ${isCenter ? 'bg-white/15 text-white' : 'bg-gray-100 text-gray-500'}`}>
                           {t.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
@@ -705,10 +741,42 @@ const StorefrontHome = () => {
                 })}
               </div>
 
-              <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-9 w-9 rounded-md border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition-colors shrink-0" style={{ color: buttonColor }}>
+              <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors shrink-0" style={{ color: buttonColor }}>
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ BLOG ═══════════════ */}
+      <section className="py-24 bg-gray-50/50 border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-center mb-2" style={{ color: buttonColor }}>Latest News</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif", ...(cfg.heading_color ? { color: cfg.heading_color } : {}) }}>{cfg.blog_title || 'Blog'}</h2>
+          <p className="text-center text-sm text-gray-400 mb-10 max-w-md mx-auto">
+            {cfg.blog_subtitle || 'Discover the latest news and useful articles about travel tips'}
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {blogPosts.map((post, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 group">
+                <div className="h-44 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <span className="text-xs text-gray-400 font-medium">Image</span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-medium uppercase px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">{post.category}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-gray-900 mb-1 group-hover:text-gray-600 transition-colors">{post.title}</h4>
+                  <p className="text-[11px] text-gray-400 mb-2">{post.author} · a min ago</p>
+                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{post.excerpt}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <button className="text-[13px] font-medium hover:underline" style={{ color: buttonColor }}>View all articles →</button>
           </div>
         </div>
       </section>
