@@ -145,15 +145,15 @@ const StorefrontHome = () => {
               <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.5 }}>
                 <div className="space-y-3 max-w-md">
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-white" />
-                    <div className="bg-white/10 rounded-lg">
-                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pickup location" locations={agencyLocations} agencyCity={agency.city} className="bg-transparent text-white placeholder:text-white/40 pl-10 pr-4 py-3.5 text-sm w-full focus:outline-none" />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-white z-10" />
+                    <div className="bg-white/10 rounded-lg pl-10">
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pickup location" locations={agencyLocations} agencyCity={agency.city} />
                     </div>
                   </div>
                   <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 h-2 w-2 bg-white" />
-                    <div className="bg-white/10 rounded-lg">
-                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Dropoff location" locations={agencyLocations} agencyCity={agency.city} className="bg-transparent text-white placeholder:text-white/40 pl-10 pr-4 py-3.5 text-sm w-full focus:outline-none" />
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 h-2 w-2 bg-white z-10" />
+                    <div className="bg-white/10 rounded-lg pl-10">
+                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Dropoff location" locations={agencyLocations} agencyCity={agency.city} />
                     </div>
                   </div>
                   <div className="flex gap-3">

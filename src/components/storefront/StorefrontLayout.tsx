@@ -142,7 +142,7 @@ const StorefrontLayout = () => {
                 <h3 className="text-2xl font-bold mb-6">{agency.name}</h3>
               )}
               <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
-                {cfg.footer_text || `Your trusted travel partner in ${agency.city}. Premium services, professional team.`}
+                {(cfg as any).footer_text || `Your trusted travel partner in ${agency.city}. Premium services, professional team.`}
               </p>
               <div className="flex items-center gap-3">
                 {[
