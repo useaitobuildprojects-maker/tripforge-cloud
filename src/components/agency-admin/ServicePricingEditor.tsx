@@ -18,8 +18,6 @@ import {
 
 import { StorefrontConfig } from '@/types/agency';
 
-import { StorefrontConfig } from '@/types/agency';
-
 interface Props {
   agencyId: string;
   enabledServices: string[];
