@@ -84,7 +84,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     if (!quote || !config.whatsapp_number) return;
     const dateStr = date ? format(date, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -235,24 +235,65 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl p-5 text-center space-y-3"
+                    className="rounded-xl p-5 space-y-4"
                     style={{ backgroundColor: `${buttonColor}10` }}
                   >
-                    <p className="text-sm text-muted-foreground">
-                      {originLabel || effectiveOrigin} → {destLabel || effectiveDest}
-                      {quote.distance_km && ` · ~${quote.distance_km} km`}
-                    </p>
-                    <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
-                    {quote.drop_off_fee > 0 && (
-                      <p className="text-xs text-muted-foreground">Includes €{quote.drop_off_fee} drop-off fee</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">
+                        {originLabel || effectiveOrigin} → {destLabel || effectiveDest}
+                      </p>
+                      <div className="flex items-center justify-center gap-3 mt-1 text-xs text-muted-foreground">
+                        {quote.distance_km && <span>~{quote.distance_km} km</span>}
+                        {quote.duration_min && <span>· ~{quote.duration_min} min</span>}
+                      </div>
+                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{quote.price}</p>
+                    </div>
+
+                    {/* Uber-style fare breakdown */}
+                    <div className="space-y-1.5 text-xs border-t border-border/50 pt-3">
+                      {quote.base_fee > 0 && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Base fare</span>
+                          <span>€{quote.base_fee}</span>
+                        </div>
+                      )}
+                      {quote.distance_charge > 0 && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Distance ({quote.distance_km} km)</span>
+                          <span>€{quote.distance_charge}</span>
+                        </div>
+                      )}
+                      {quote.time_charge > 0 && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Time ({quote.duration_min} min)</span>
+                          <span>€{quote.time_charge}</span>
+                        </div>
+                      )}
+                      {quote.drop_off_fee > 0 && (
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>Drop-off fee</span>
+                          <span>€{quote.drop_off_fee}</span>
+                        </div>
+                      )}
+                      {quote.minimum_fare > 0 && quote.price === Math.round(quote.minimum_fare) && (
+                        <div className="flex justify-between text-muted-foreground italic">
+                          <span>Minimum fare applied</span>
+                          <span>€{Math.round(quote.minimum_fare)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-semibold text-sm pt-1 border-t border-border/30">
+                        <span>Total</span>
+                        <span style={{ color: buttonColor }}>€{quote.price}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-muted-foreground text-center">
+                      {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated fare
                     </p>
 
                     {config.whatsapp_number && (
                       <Button
-                        className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
+                        className="w-full h-12 rounded-xl font-bold text-white gap-2"
                         style={{ backgroundColor: '#25D366' }}
                         onClick={handleWhatsApp}
                       >

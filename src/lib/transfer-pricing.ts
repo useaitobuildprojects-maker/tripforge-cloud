@@ -10,8 +10,19 @@ export interface TransferQuote {
   price: number;
   source: 'formula';
   distance_km: number | null;
+  duration_min: number | null;
   drop_off_fee: number;
+  // Uber-style breakdown
+  base_fee: number;
+  distance_charge: number;
+  time_charge: number;
+  minimum_fare: number;
   error?: 'no_formula' | 'geocode_origin' | 'geocode_destination' | 'no_route' | 'osrm_failed';
+}
+
+export interface RouteInfo {
+  distance_km: number;
+  duration_min: number;
 }
 
 /** Get multiplier for a category from config */
@@ -24,23 +35,27 @@ function getCategoryMultiplier(config: StorefrontConfig, category: TransferCateg
   }
 }
 
-/** Calculate price using the fallback formula: Base + (Distance × Per-KM × Multiplier) */
+/** Calculate price using formula: (Base + Distance×PerKM + Duration×PerMin) × Multiplier, with minimum fare */
 export function getFormulaPrice(
   config: StorefrontConfig,
   distanceKm: number,
-  category: TransferCategory
+  category: TransferCategory,
+  durationMin?: number
 ): number {
   const baseFee = config.transfer_base_fee ?? 0;
   const perKmRate = config.transfer_per_km_rate ?? 0;
+  const perMinRate = config.transfer_per_minute_rate ?? 0;
+  const minFare = config.transfer_minimum_fare ?? 0;
   const multiplier = getCategoryMultiplier(config, category);
-  return Math.round(baseFee + distanceKm * perKmRate * multiplier);
+  const raw = (baseFee + distanceKm * perKmRate + (durationMin ?? 0) * perMinRate) * multiplier;
+  return Math.round(Math.max(raw, minFare * multiplier));
 }
 
-/** Fetch driving distance using Google Routes API (primary) or OSRM (fallback) */
-export async function getDrivingDistance(
+/** Fetch driving distance and duration using Google Routes API (primary) or OSRM (fallback) */
+export async function getDrivingRoute(
   originCoords: [number, number],
   destCoords: [number, number]
-): Promise<number | null> {
+): Promise<RouteInfo | null> {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
   if (apiKey) {
     try {
@@ -59,23 +74,26 @@ export async function getDrivingDistance(
         routingPreference: 'TRAFFIC_UNAWARE',
       };
 
-      console.log('[Transfer] Distance via Google Routes API');
+      console.log('[Transfer] Route via Google Routes API');
       const res = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Goog-Api-Key': apiKey,
-          'X-Goog-FieldMask': 'routes.distanceMeters',
+          'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration',
         },
         body: JSON.stringify(body),
       });
 
       if (res.ok) {
         const data = await res.json();
-        if (data.routes?.[0]?.distanceMeters) {
-          const km = Math.round(data.routes[0].distanceMeters / 1000);
-          console.log('[Transfer] Google Routes distance:', km, 'km');
-          return km;
+        const route = data.routes?.[0];
+        if (route?.distanceMeters) {
+          const km = Math.round(route.distanceMeters / 1000);
+          const durationSec = parseInt(route.duration?.replace('s', '') ?? '0', 10);
+          const min = Math.round(durationSec / 60);
+          console.log('[Transfer] Google Routes:', km, 'km,', min, 'min');
+          return { distance_km: km, duration_min: min };
         }
       }
       console.warn('[Transfer] Google Routes failed, trying OSRM fallback');
@@ -87,15 +105,26 @@ export async function getDrivingDistance(
   // Fallback: OSRM (free, no API key)
   try {
     const url = `https://router.project-osrm.org/route/v1/driving/${originCoords[0]},${originCoords[1]};${destCoords[0]},${destCoords[1]}?overview=false`;
-    console.log('[Transfer] Distance via OSRM fallback');
+    console.log('[Transfer] Route via OSRM fallback');
     const res = await fetch(url);
     if (!res.ok) return null;
     const data = await res.json();
     if (data.code !== 'Ok' || !data.routes?.[0]) return null;
-    return Math.round(data.routes[0].distance / 1000);
+    const km = Math.round(data.routes[0].distance / 1000);
+    const min = Math.round(data.routes[0].duration / 60);
+    return { distance_km: km, duration_min: min };
   } catch {
     return null;
   }
+}
+
+/** Backwards-compatible wrapper */
+export async function getDrivingDistance(
+  originCoords: [number, number],
+  destCoords: [number, number]
+): Promise<number | null> {
+  const route = await getDrivingRoute(originCoords, destCoords);
+  return route?.distance_km ?? null;
 }
 
 /** Try to find a POI match — returns coords if available, or a better query string */
@@ -114,9 +143,8 @@ function resolvePoiMatch(name: string): { coords?: [number, number]; query: stri
   return { query: name };
 }
 
-/** Geocode a place name using Google Places Text Search (New) with OSRM fallback */
+/** Geocode a place name using Google Places Text Search (New) with Nominatim fallback */
 export async function geocodePlace(name: string, _country?: string): Promise<[number, number] | null> {
-  // Check POI database first — if coords exist, skip geocoding entirely
   const match = resolvePoiMatch(name);
   if (match.coords) {
     console.log('[Transfer] POI coords hit:', name, '→', match.coords);
@@ -125,7 +153,6 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
 
   const query = match.query;
 
-  // Try Google Places Text Search (New API)
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
   if (apiKey) {
     try {
@@ -153,7 +180,6 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
     }
   }
 
-  // Fallback: Nominatim (OpenStreetMap) — free, no API key
   try {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
     console.log('[Transfer] Geocoding (Nominatim):', query);
@@ -178,21 +204,17 @@ function findCityRate(
   destination: string
 ): CityPricing | null {
   if (!cityPricing.length) return null;
-
   const normalize = (s: string) => s.toLowerCase().trim();
   const o = normalize(origin);
   const d = normalize(destination);
-
   const originMatch = cityPricing.find((cp) => o.includes(normalize(cp.city_name)));
   if (originMatch) return originMatch;
-
   const destMatch = cityPricing.find((cp) => d.includes(normalize(cp.city_name)));
   if (destMatch) return destMatch;
-
   return null;
 }
 
-/** Calculate transfer price using distance + formula */
+/** Calculate transfer price using distance + duration + formula */
 export async function calculateTransferPrice(
   config: StorefrontConfig,
   origin: string,
@@ -205,19 +227,28 @@ export async function calculateTransferPrice(
 ): Promise<TransferQuote> {
   console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
 
+  const emptyQuote = (error: TransferQuote['error']): TransferQuote => ({
+    origin, destination, category, price: 0, source: 'formula',
+    distance_km: null, duration_min: null, drop_off_fee: 0,
+    base_fee: 0, distance_charge: 0, time_charge: 0, minimum_fare: 0,
+    error,
+  });
+
   const cityRate = findCityRate(cityPricing, origin, destination);
   const baseFee = cityRate?.transfer_base_fee ?? config.transfer_base_fee ?? 0;
   const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
+  const perMinRate = config.transfer_per_minute_rate ?? 0;
+  const minFare = config.transfer_minimum_fare ?? 0;
 
   if (cityRate) {
     console.log('[Transfer] Using city-specific rate for:', cityRate.city_name, { baseFee, perKmRate });
   } else {
-    console.log('[Transfer] Using global rate:', { baseFee, perKmRate });
+    console.log('[Transfer] Using global rate:', { baseFee, perKmRate, perMinRate });
   }
 
-  if (baseFee === 0 && perKmRate === 0) {
-    console.warn('[Transfer] No formula configured (base=0, perKm=0)');
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'no_formula' };
+  if (baseFee === 0 && perKmRate === 0 && perMinRate === 0) {
+    console.warn('[Transfer] No formula configured');
+    return emptyQuote('no_formula');
   }
 
   const [originCoords, destCoords] = await Promise.all([
@@ -225,29 +256,36 @@ export async function calculateTransferPrice(
     preDestCoords ? Promise.resolve(preDestCoords) : geocodePlace(destination, country),
   ]);
 
-  if (preOriginCoords || preDestCoords) {
-    console.log('[Transfer] Using pre-resolved coords:', { origin: !!preOriginCoords, dest: !!preDestCoords });
+  if (!originCoords) return emptyQuote('geocode_origin');
+  if (!destCoords) return emptyQuote('geocode_destination');
+
+  const route = await getDrivingRoute(originCoords, destCoords);
+  if (!route) {
+    console.warn('[Transfer] No route from any provider');
+    return emptyQuote('osrm_failed');
   }
 
-  if (!originCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'geocode_origin' };
-  }
-  if (!destCoords) {
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'geocode_destination' };
-  }
-
-  const distanceKm = await getDrivingDistance(originCoords, destCoords);
-  if (!distanceKm) {
-    console.warn('[Transfer] No distance from any provider');
-    return { origin, destination, category, price: 0, source: 'formula', distance_km: null, drop_off_fee: 0, error: 'osrm_failed' };
-  }
+  const { distance_km: distanceKm, duration_min: durationMin } = route;
 
   const dropOffFee = cityRate?.drop_off_fee ?? 0;
   const isIntercity = cityRate ? !destination.toLowerCase().includes(cityRate.city_name.toLowerCase()) : false;
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   const multiplier = getCategoryMultiplier(config, category);
-  const price = Math.round(baseFee + distanceKm * perKmRate * multiplier + appliedDropOff);
-  console.log('[Transfer] Formula result:', { distanceKm, price, dropOff: appliedDropOff, cityRate: cityRate?.city_name ?? 'global' });
-  return { origin, destination, category, price, source: 'formula', distance_km: distanceKm, drop_off_fee: appliedDropOff };
+  const distanceCharge = distanceKm * perKmRate;
+  const timeCharge = durationMin * perMinRate;
+  const rawPrice = (baseFee + distanceCharge + timeCharge) * multiplier + appliedDropOff;
+  const effectiveMinFare = minFare * multiplier;
+  const price = Math.round(Math.max(rawPrice, effectiveMinFare));
+
+  console.log('[Transfer] Formula result:', { distanceKm, durationMin, price, dropOff: appliedDropOff });
+
+  return {
+    origin, destination, category, price, source: 'formula',
+    distance_km: distanceKm, duration_min: durationMin, drop_off_fee: appliedDropOff,
+    base_fee: Math.round(baseFee * multiplier),
+    distance_charge: Math.round(distanceCharge * multiplier),
+    time_charge: Math.round(timeCharge * multiplier),
+    minimum_fare: effectiveMinFare,
+  };
 }

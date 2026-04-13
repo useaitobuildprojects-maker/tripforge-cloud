@@ -31,9 +31,11 @@ export interface StorefrontConfig {
   working_hours_weekend?: string;
   // Locations (pickup/drop-off points)
   locations?: { name: string; type: 'station' | 'airport' | 'city'; address?: string }[];
-  // Transfer auto-pricing (Sixt-style: base fee + per-km rate)
+  // Transfer auto-pricing (base fee + per-km rate + per-minute rate)
   transfer_base_fee?: number;
   transfer_per_km_rate?: number;
+  transfer_per_minute_rate?: number;
+  transfer_minimum_fare?: number;
   // Transfer category multipliers (relative to economy base price)
   transfer_multiplier_business?: number;
   transfer_multiplier_first_class?: number;
