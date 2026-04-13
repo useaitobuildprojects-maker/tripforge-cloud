@@ -1,7 +1,7 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Shield, Award, Users, Clock, ArrowRight, Star, MapPin, Heart } from 'lucide-react';
+import { Shield, Award, Users, Clock, ArrowRight } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
 import { Button } from '@/components/ui/button';
@@ -9,20 +9,19 @@ import destTemple from '@/assets/dest-temple.jpg';
 import adventureMountain from '@/assets/adventure-mountain.jpg';
 
 const DEFAULT_VALUES = [
-  { title: 'Trust & Safety', description: 'Every vehicle is thoroughly inspected and insured for your peace of mind.', icon: Shield },
-  { title: 'Premium Quality', description: 'We maintain a curated fleet of top-tier vehicles from leading manufacturers.', icon: Award },
-  { title: 'Customer First', description: 'Our dedicated team is available around the clock to assist you.', icon: Users },
+  { title: 'Safety first', description: 'Every vehicle is inspected and insured for your peace of mind.', icon: Shield },
+  { title: 'Premium quality', description: 'A curated fleet of top-tier vehicles from leading manufacturers.', icon: Award },
+  { title: 'Customer first', description: 'Our team is available around the clock to assist you.', icon: Users },
   { title: 'Flexibility', description: 'Easy booking, free cancellation, and flexible rental periods.', icon: Clock },
 ];
 
 const ICONS = [Shield, Award, Users, Clock];
-const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
 
 const STATS = [
   { value: '10K+', label: 'Happy Travelers' },
   { value: '500+', label: 'Destinations' },
-  { value: '99%', label: 'Satisfaction Rate' },
-  { value: '24/7', label: 'Customer Support' },
+  { value: '99%', label: 'Satisfaction' },
+  { value: '24/7', label: 'Support' },
 ];
 
 const StorefrontAbout = () => {
@@ -43,115 +42,83 @@ const StorefrontAbout = () => {
       />
 
       {/* Hero */}
-      <section className="relative bg-gray-950 overflow-hidden" style={{ minHeight: '340px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '340px' }}>
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-4" style={{ color: buttonColor }}>Our Story</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5" style={serifFont}>
+      <section className="bg-black py-20 lg:py-28">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="max-w-2xl">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight mb-5">
               {cfg.about_title || `About ${agency.name}`}
             </h1>
-            <p className="text-white/40 max-w-xl mx-auto text-base leading-relaxed">
+            <p className="text-white/40 text-base leading-relaxed">
               {cfg.about_subtitle || `Your trusted partner for premium travel services in ${agency.city}, ${agency.country}.`}
             </p>
           </motion.div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" className="w-full"><path d="M0 60V30C360 0 720 0 1080 30C1260 45 1350 52 1440 60H0Z" fill="white"/></svg>
+      </section>
+
+      {/* Stats */}
+      <section className="bg-gray-50 py-12">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06 }}
+                className="text-center py-4"
+              >
+                <p className="text-3xl md:text-4xl font-bold text-black">{stat.value}</p>
+                <p className="text-sm text-gray-400 mt-1">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Stats bar */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-2">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STATS.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }}
-              className="text-center py-6 px-4 rounded-2xl border border-gray-100 bg-white shadow-sm"
-            >
-              <p className="text-2xl md:text-3xl font-bold text-gray-900" style={serifFont}>{stat.value}</p>
-              <p className="text-xs text-gray-400 mt-1 font-medium">{stat.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Story section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      {/* Story */}
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-4" style={{ color: buttonColor }}>Who We Are</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6" style={serifFont}>Our Story</h2>
+          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <h2 className="text-3xl lg:text-4xl font-bold text-black mb-6 tracking-tight">Our story</h2>
             <div className="space-y-5 text-gray-500 leading-relaxed">
               <p>
                 {cfg.about_story_1 || `Founded with a passion for exceptional travel experiences, ${agency.name} has grown into one of the most trusted travel service providers in ${agency.city}. We believe that every journey should be memorable, comfortable, and hassle-free.`}
               </p>
               <p>
-                {cfg.about_story_2 || `Our team of dedicated professionals works tirelessly to ensure that every customer receives personalized attention and the highest quality of service, from the moment you book to the moment you return.`}
+                {cfg.about_story_2 || `Our team of dedicated professionals works tirelessly to ensure that every customer receives personalized attention and the highest quality of service.`}
               </p>
             </div>
             <Link to={`/agency/${slug}/contact`}>
-              <Button className="rounded-full font-semibold gap-2 text-white px-8 h-12 text-sm mt-8" style={{ backgroundColor: buttonColor }}>
-                Get In Touch <ArrowRight className="h-4 w-4" />
+              <Button className="rounded-lg font-semibold gap-2 text-white px-8 h-11 text-sm mt-8 bg-black hover:bg-gray-800">
+                Get in touch <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            <div className="rounded-3xl overflow-hidden shadow-xl">
-              {cfg.about_image_url ? (
-                <img src={cfg.about_image_url} alt={`About ${agency.name}`} className="w-full h-80 lg:h-[420px] object-cover" />
-              ) : (
-                <img src={destTemple} alt="Travel" className="w-full h-80 lg:h-[420px] object-cover" />
-              )}
-            </div>
-            {/* Floating card */}
-            <div className="absolute -bottom-6 -left-4 bg-white rounded-2xl shadow-lg p-5 border border-gray-100">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: `${buttonColor}15` }}>
-                  <Heart className="h-5 w-5" style={{ color: buttonColor }} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-gray-900">Trusted by thousands</p>
-                  <p className="text-xs text-gray-400">Since establishment</p>
-                </div>
-              </div>
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <div className="rounded-2xl overflow-hidden">
+              <img src={cfg.about_image_url || destTemple} alt={`About ${agency.name}`} className="w-full h-80 lg:h-[420px] object-cover" />
             </div>
           </motion.div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="bg-gray-50 py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style={{ color: buttonColor }}>Why Choose Us</p>
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3" style={serifFont}>Our Values</h2>
-            <p className="text-gray-400 max-w-lg mx-auto">The principles that guide everything we do</p>
-          </div>
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-black mb-12 tracking-tight">Why choose us</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((v, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.08 * i, duration: 0.5 }}
-                className="bg-white p-8 rounded-2xl border border-gray-100 text-center hover:shadow-lg transition-shadow duration-300"
+                transition={{ delay: 0.06 * i }}
+                className="bg-white p-8 rounded-2xl"
               >
-                <div className="h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ backgroundColor: `${buttonColor}12` }}>
-                  <v.icon className="h-6 w-6" style={{ color: buttonColor }} />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-2">{v.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{v.description}</p>
+                <v.icon className="h-7 w-7 text-black mb-5" />
+                <h3 className="font-bold text-black mb-2">{v.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{v.description}</p>
               </motion.div>
             ))}
           </div>
@@ -162,15 +129,15 @@ const StorefrontAbout = () => {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img src={adventureMountain} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gray-950/80" />
+          <div className="absolute inset-0 bg-black/80" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4" style={serifFont}>Ready to Explore?</h2>
-            <p className="text-white/40 mb-8 max-w-lg mx-auto">Let us help you plan an unforgettable journey. Premium service, professional team, and memorable experiences await.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">Ready to explore?</h2>
+            <p className="text-white/40 mb-8 max-w-lg mx-auto">Premium service, professional team, and memorable experiences await.</p>
             <Link to={`/agency/${slug}/services`}>
-              <Button className="rounded-full font-semibold gap-2 text-white px-10 h-12 text-sm" style={{ backgroundColor: buttonColor }}>
-                View Our Services <ArrowRight className="h-4 w-4" />
+              <Button className="rounded-lg font-semibold gap-2 bg-white text-black px-10 h-12 text-sm hover:bg-gray-100">
+                View our services <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </motion.div>
