@@ -186,11 +186,11 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 2: Global Pricing Formula */}
+      {/* Step 2: Global Pricing Formula (Uber-style) */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
         <h4 className="text-xs font-semibold text-foreground">Step 2 — Default Pricing Formula</h4>
-        <p className="text-[11px] text-muted-foreground">Price = Base Fee + (Distance × Per-KM Rate × Category Multiplier). This is the fallback for cities without specific rates.</p>
-        <div className="grid grid-cols-2 gap-3">
+        <p className="text-[11px] text-muted-foreground">Price = (Base Fee + Distance×PerKM + Duration×PerMin) × Multiplier. Minimum fare ensures a floor price.</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
             <Input type="number" min={0} step={0.5} placeholder="15"
@@ -203,6 +203,20 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
             <Input type="number" min={0} step={0.1} placeholder="1.20"
               value={storefrontConfig.transfer_per_km_rate ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Per-Minute Rate (€)</Label>
+            <Input type="number" min={0} step={0.1} placeholder="0.50"
+              value={storefrontConfig.transfer_per_minute_rate ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_minute_rate: e.target.value ? Number(e.target.value) : undefined })}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Minimum Fare (€)</Label>
+            <Input type="number" min={0} step={1} placeholder="10"
+              value={storefrontConfig.transfer_minimum_fare ?? ''}
+              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_minimum_fare: e.target.value ? Number(e.target.value) : undefined })}
               className="text-xs font-mono" />
           </div>
         </div>
