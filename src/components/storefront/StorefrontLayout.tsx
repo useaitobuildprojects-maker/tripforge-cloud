@@ -1,8 +1,9 @@
 import { Outlet, useParams, useLocation, Link } from 'react-router-dom';
 import { useAgencyBySlug } from '@/hooks/use-agencies';
 import { useFavicon } from '@/hooks/use-favicon';
-import { Mail, MapPin, Facebook, Twitter, Instagram, Share2, Menu, X, Phone, Globe, ChevronDown } from 'lucide-react';
+import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2, Menu, X, Phone, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { getShareUrl } from '@/lib/share-url';
 import { getTemplateStyles } from '@/lib/template-styles';
 import { toast } from 'sonner';
@@ -47,48 +48,48 @@ const StorefrontLayout = () => {
   }
 
   const ts = getTemplateStyles(agency.storefront_template);
-  const btnColor = agency.button_color ?? '#000000';
+  const btnColor = agency.button_color ?? '#1a3a4a';
   const bgColor = agency.background_color ?? undefined;
   const cfg = agency.storefront_config ?? {};
-  const fontClass = 'font-sans';
+  const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : (ts.bodyStyle ?? {});
 
   const navLinks = [
     { label: 'Home', to: `/agency/${slug}` },
     { label: 'Services', to: `/agency/${slug}/services` },
-    { label: 'About', to: `/agency/${slug}/about` },
-    { label: 'Contact', to: `/agency/${slug}/contact` },
+    { label: 'About Us', to: `/agency/${slug}/about` },
+    { label: 'Contact Us', to: `/agency/${slug}/contact` },
   ];
 
   return (
     <div className={`min-h-screen bg-white ${fontClass}`} style={bodyStyle}>
-      {/* ═══ Uber-style black header ═══ */}
-      <header className="sticky top-0 z-50 bg-black">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[64px]">
+      {/* ═══ Nav — Clean white with pill container ═══ */}
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-[68px]">
             {/* Logo */}
-            <Link to={`/agency/${slug}`} className="flex items-center gap-2 shrink-0">
+            <Link to={`/agency/${slug}`} className="flex items-center gap-2">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-7 w-auto object-contain brightness-0 invert" />
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-9 w-auto object-contain" />
               ) : (
-                <span className="text-xl font-bold tracking-tight text-white">
+                <span className="text-xl font-bold tracking-tight text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
                   {agency.name}
                 </span>
               )}
             </Link>
 
-            {/* Center nav */}
-            <nav className="hidden md:flex items-center gap-1 ml-10">
+            {/* Center nav — pill shape */}
+            <nav className="hidden md:flex items-center gap-1 bg-gray-50 rounded-full px-1.5 py-1">
               {navLinks.map((link) => {
                 const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
                 return (
                   <Link
                     key={link.label}
                     to={link.to}
-                    className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
+                    className={`px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-200 ${
                       isActive
-                        ? 'bg-white/10 text-white'
-                        : 'text-white/60 hover:text-white hover:bg-white/5'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-900'
                     }`}
                   >
                     {link.label}
@@ -97,30 +98,30 @@ const StorefrontLayout = () => {
               })}
             </nav>
 
-            {/* Right actions */}
-            <div className="hidden md:flex items-center gap-2 ml-auto">
-              <button onClick={handleShare} className="h-9 px-4 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-colors text-sm font-medium flex items-center gap-1.5">
-                <Share2 className="h-3.5 w-3.5" /> Share
+            {/* Right */}
+            <div className="hidden md:flex items-center gap-3">
+              <button onClick={handleShare} className="h-9 w-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors" title="Share">
+                <Share2 className="h-4 w-4" />
               </button>
               <Link
                 to={`/agency/${slug}/contact`}
-                className="h-9 px-5 rounded-full bg-white text-black text-sm font-medium flex items-center gap-1.5 hover:bg-gray-100 transition-colors"
+                className="h-9 w-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
               >
-                Contact
+                <Phone className="h-4 w-4" />
               </Link>
             </div>
 
             {/* Mobile */}
-            <button className="md:hidden p-2 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden p-2 text-gray-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden bg-black border-t border-white/10 px-4 py-4 space-y-1">
+          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-1 shadow-lg">
             {navLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="block text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-white/5 text-white/70 hover:text-white" onClick={() => setMobileMenuOpen(false)}>
+              <Link key={link.label} to={link.to} className="block text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-gray-50 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
                 {link.label}
               </Link>
             ))}
@@ -131,51 +132,51 @@ const StorefrontLayout = () => {
       {/* Content */}
       <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
-      {/* ═══ Footer — Uber style ═══ */}
-      <footer className="bg-black text-white">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+      {/* ═══ Footer ═══ */}
+      <footer className="bg-gray-950 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             <div className="md:col-span-4">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt="" className="h-8 w-auto object-contain mb-6 brightness-0 invert" />
+                <img src={agency.logo_url} alt="" className="h-10 w-auto object-contain mb-5 brightness-0 invert" />
               ) : (
-                <h3 className="text-2xl font-bold mb-6">{agency.name}</h3>
+                <h3 className="text-2xl font-bold mb-5" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>{agency.name}</h3>
               )}
               <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
-                {(cfg as any).footer_text || `Your trusted travel partner in ${agency.city}. Premium services, professional team.`}
+                Explore stunning destinations, unique experiences, and unforgettable journeys with {agency.name}.
               </p>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 {[
                   { url: cfg.facebook_url, Icon: Facebook },
                   { url: cfg.twitter_url, Icon: Twitter },
                   { url: cfg.instagram_url, Icon: Instagram },
                 ].map(({ url, Icon }, i) => (
                   url ? (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"><Icon className="h-4 w-4" /></a>
+                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"><Icon className="h-4 w-4" /></a>
                   ) : (
-                    <span key={i} className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-white/15"><Icon className="h-4 w-4" /></span>
+                    <span key={i} className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-white/10"><Icon className="h-4 w-4" /></span>
                   )
                 ))}
               </div>
             </div>
             <div className="md:col-span-2">
-              <h4 className="text-sm font-bold mb-5">Company</h4>
+              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">About</h4>
               <ul className="space-y-3 text-sm text-white/40">
                 <li><Link to={`/agency/${slug}/about`} className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to={`/agency/${slug}/services`} className="hover:text-white transition-colors">Services</Link></li>
-                <li><Link to={`/agency/${slug}/fleet`} className="hover:text-white transition-colors">Our Fleet</Link></li>
+                <li><Link to={`/agency/${slug}/services`} className="hover:text-white transition-colors">Our Services</Link></li>
+                <li><Link to={`/agency/${slug}/contact`} className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
             <div className="md:col-span-3">
-              <h4 className="text-sm font-bold mb-5">Support</h4>
+              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">Support</h4>
               <ul className="space-y-3 text-sm text-white/40">
-                <li><Link to={`/agency/${slug}/contact`} className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms & Privacy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Terms and Conditions</a></li>
               </ul>
             </div>
             <div className="md:col-span-3">
-              <h4 className="text-sm font-bold mb-5">Contact</h4>
+              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">Contact</h4>
               <ul className="space-y-3 text-sm text-white/40">
                 <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 shrink-0" /> {agency.contact_email}</li>
                 <li className="flex items-center gap-2.5"><MapPin className="h-4 w-4 shrink-0" /> {agency.city}, {agency.country}</li>
@@ -183,11 +184,8 @@ const StorefrontLayout = () => {
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/10 mt-14 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs text-white/30">© {new Date().getFullYear()} {agency.name}. All rights reserved.</p>
-            <div className="flex items-center gap-2 text-xs text-white/30">
-              <Globe className="h-3.5 w-3.5" /> {agency.country}
-            </div>
+          <div className="border-t border-white/5 mt-12 pt-6 text-center">
+            <p className="text-[11px] text-white/20">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
