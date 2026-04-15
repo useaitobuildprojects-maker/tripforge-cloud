@@ -84,12 +84,12 @@ export function getFormulaPrice(
   distanceKm: number,
   category: TransferCategory,
   durationMin?: number,
-  seatCount?: number
+  classIndex?: number
 ): number {
   const baseFee = config.transfer_base_fee ?? 0;
   const perMinRate = config.transfer_per_minute_rate ?? 0;
   const minFare = config.transfer_minimum_fare ?? 0;
-  const multiplier = getSeatMultiplier(config, category, seatCount);
+  const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
   const distanceCharge = getTieredDistanceCharge(config, distanceKm);
   const raw = (baseFee + distanceCharge + (durationMin ?? 0) * perMinRate) * multiplier;
   return Math.round(Math.max(raw, minFare * multiplier));
