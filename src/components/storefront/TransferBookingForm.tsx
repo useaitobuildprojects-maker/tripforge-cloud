@@ -7,14 +7,14 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { TRANSFER_CATEGORIES, TransferCategory } from '@/hooks/use-service-pricing';
-import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { TransferCategory } from '@/hooks/use-service-pricing';
+import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/transfer-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
-const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
   economy: Car,
   business: Car,
   first_class: Crown,
@@ -42,11 +42,13 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [destLabel, setDestLabel] = useState('');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
-  const [selectedCategory, setSelectedCategory] = useState<TransferCategory>('economy');
+  const [selectedClassIndex, setSelectedClassIndex] = useState(0);
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
 
   const effectiveOrigin = origin;
   const effectiveDest = destination;
