@@ -95,7 +95,13 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     { category: 'first_class' as const, label: 'First Class', seats: 3, multiplier: 2.4 },
   ];
 
-  const tiers = storefrontConfig.transfer_distance_tiers ?? [];
+  const tiers = storefrontConfig.transfer_distance_tiers ?? [
+    { from_km: 0, to_km: 50, fixed_price: 35 },
+    { from_km: 50, to_km: 100, fixed_price: 60 },
+    { from_km: 100, to_km: 200, fixed_price: 100 },
+    { from_km: 200, to_km: 300, fixed_price: 150 },
+    { from_km: 300, to_km: 500, fixed_price: 220 },
+  ];
 
   const addVehicleClass = () => {
     const seats = Number(newClassSeats);
