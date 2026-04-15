@@ -3,6 +3,18 @@ import { StorefrontConfig } from '@/types/agency';
 import { CityPricing } from '@/hooks/use-city-pricing';
 import POI_DB from '@/data/poi-database';
 
+/** Haversine distance in km between two [lng, lat] points */
+function haversine(a: [number, number], b: [number, number]): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b[1] - a[1]);
+  const dLng = toRad(b[0] - a[0]);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h = sinLat * sinLat + Math.cos(toRad(a[1])) * Math.cos(toRad(b[1])) * sinLng * sinLng;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
 export interface TransferQuote {
   origin: string;
   destination: string;
@@ -309,14 +321,49 @@ export async function calculateTransferPrice(
 
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
 
-  // Split pricing: if both origin and destination have city rates, each covers half the distance
+  // Split pricing: if both origin and destination have city rates,
+  // geocode city centers to find the territorial midpoint and split by actual km
   let distancePrice: number;
   if (originRate && destRate && originRate.id !== destRate.id) {
-    const halfKm = distanceKm / 2;
-    const originCharge = getTieredDistanceCharge(originTiers, halfKm, originPerKm);
-    const destCharge = getTieredDistanceCharge(destTiers, halfKm, destPerKm);
+    // Geocode both city centers to find the boundary
+    const [originCityCoords, destCityCoords] = await Promise.all([
+      geocodePlace(originRate.city_name, originRate.country),
+      geocodePlace(destRate.city_name, destRate.country),
+    ]);
+
+    let originKm: number;
+    let destKm: number;
+
+    if (originCityCoords && destCityCoords) {
+      // Find midpoint between the two city centers
+      const midLng = (originCityCoords[0] + destCityCoords[0]) / 2;
+      const midLat = (originCityCoords[1] + destCityCoords[1]) / 2;
+      // Calculate straight-line distances from origin/dest to this midpoint
+      const originToMid = haversine(originCoords, [midLng, midLat]);
+      const destToMid = haversine(destCoords, [midLng, midLat]);
+      const totalStraight = originToMid + destToMid;
+      // Split driving distance proportionally
+      const originRatio = totalStraight > 0 ? originToMid / totalStraight : 0.5;
+      originKm = distanceKm * originRatio;
+      destKm = distanceKm * (1 - originRatio);
+      console.log('[Transfer] Territory split:', {
+        midpoint: [midLng, midLat],
+        originToMid: Math.round(originToMid),
+        destToMid: Math.round(destToMid),
+        originRatio: originRatio.toFixed(3),
+        originKm: Math.round(originKm),
+        destKm: Math.round(destKm),
+      });
+    } else {
+      // Fallback: 50/50
+      originKm = distanceKm / 2;
+      destKm = distanceKm / 2;
+    }
+
+    const originCharge = getTieredDistanceCharge(originTiers, originKm, originPerKm);
+    const destCharge = getTieredDistanceCharge(destTiers, destKm, destPerKm);
     distancePrice = originCharge + destCharge;
-    console.log('[Transfer] Split pricing:', { halfKm, originCharge, destCharge, total: distancePrice });
+    console.log('[Transfer] Split pricing:', { originKm: Math.round(originKm), destKm: Math.round(destKm), originCharge: originCharge.toFixed(2), destCharge: destCharge.toFixed(2), total: distancePrice.toFixed(2) });
   } else {
     const effectiveTiers = originTiers ?? destTiers;
     const effectivePerKm = originRate ? originPerKm : destPerKm;
