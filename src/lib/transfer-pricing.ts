@@ -44,7 +44,8 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
   return classes[classIndex]?.multiplier ?? 1;
 }
 
-/** Find the fixed price for a distance bracket using prorated tiers. */
+/** Find the fixed price for a distance bracket using prorated tiers.
+ *  Distance beyond the last tier is charged at the last tier's per-km rate. */
 function getTieredDistanceCharge(tiers: { from_km: number; to_km: number; fixed_price: number }[] | undefined, distanceKm: number, perKmFallback: number): number {
   if (!tiers || tiers.length === 0) {
     return distanceKm * perKmFallback;
@@ -53,11 +54,19 @@ function getTieredDistanceCharge(tiers: { from_km: number; to_km: number; fixed_
   let total = 0;
 
   for (const tier of sorted) {
-    if (distanceKm <= tier.from_km) break; // distance doesn't reach this tier
+    if (distanceKm <= tier.from_km) break;
     const tierSpan = tier.to_km - tier.from_km;
     const kmInTier = Math.min(distanceKm, tier.to_km) - tier.from_km;
     const ratio = kmInTier / tierSpan;
     total += tier.fixed_price * ratio;
+  }
+
+  // Extrapolate beyond the last tier at its per-km rate
+  const lastTier = sorted[sorted.length - 1];
+  if (distanceKm > lastTier.to_km) {
+    const extraKm = distanceKm - lastTier.to_km;
+    const lastTierPerKm = lastTier.fixed_price / (lastTier.to_km - lastTier.from_km);
+    total += extraKm * lastTierPerKm;
   }
 
   return total;
