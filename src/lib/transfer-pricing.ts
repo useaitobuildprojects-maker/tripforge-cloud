@@ -233,21 +233,19 @@ export async function geocodePlace(name: string, _country?: string): Promise<[nu
   }
 }
 
-/** Find city rate: origin city first (driver's base), then destination, then null. */
-function findCityRate(
+/** Find city rates for origin and destination separately. */
+function findCityRates(
   cityPricing: CityPricing[],
   origin: string,
   destination: string
-): CityPricing | null {
-  if (!cityPricing.length) return null;
+): { originRate: CityPricing | null; destRate: CityPricing | null } {
+  if (!cityPricing.length) return { originRate: null, destRate: null };
   const normalize = (s: string) => s.toLowerCase().trim();
   const o = normalize(origin);
   const d = normalize(destination);
-  const originMatch = cityPricing.find((cp) => o.includes(normalize(cp.city_name)));
-  if (originMatch) return originMatch;
-  const destMatch = cityPricing.find((cp) => d.includes(normalize(cp.city_name)));
-  if (destMatch) return destMatch;
-  return null;
+  const originRate = cityPricing.find((cp) => o.includes(normalize(cp.city_name))) ?? null;
+  const destRate = cityPricing.find((cp) => d.includes(normalize(cp.city_name))) ?? null;
+  return { originRate, destRate };
 }
 
 /** Calculate transfer price using distance + duration + formula */
