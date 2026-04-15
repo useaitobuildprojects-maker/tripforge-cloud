@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
 const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
