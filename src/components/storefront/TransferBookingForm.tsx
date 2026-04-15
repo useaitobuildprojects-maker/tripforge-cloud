@@ -290,7 +290,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                     </div>
 
                     <p className="text-[10px] text-muted-foreground text-center">
-                      {TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated fare
+                      {vehicleClasses[selectedClassIndex]?.label ?? 'Economy'} · Estimated fare
                     </p>
 
                     {config.whatsapp_number && (
