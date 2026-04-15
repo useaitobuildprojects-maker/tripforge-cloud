@@ -73,7 +73,7 @@ export function getFormulaPrice(
   classIndex?: number
 ): number {
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distanceCharge = getTieredDistanceCharge(config, distanceKm);
+  const distanceCharge = getTieredDistanceCharge(config.transfer_distance_tiers, distanceKm, config.transfer_per_km_rate ?? 0);
   const raw = distanceCharge * multiplier;
   return Math.round(raw);
 }
@@ -298,7 +298,7 @@ export async function calculateTransferPrice(
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distancePrice = getTieredDistanceCharge(config, distanceKm);
+  const distancePrice = getTieredDistanceCharge(effectiveTiers, distanceKm, perKmRate);
   const rawPrice = distancePrice * multiplier + appliedDropOff;
   const price = Math.round(rawPrice);
 
