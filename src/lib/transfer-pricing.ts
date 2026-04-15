@@ -73,10 +73,6 @@ function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): 
   return charge;
 }
 
-/** Get multiplier directly from vehicle class index */
-function getClassMultiplierDirect(config: StorefrontConfig, classIndex: number): number {
-  return getClassMultiplier(config, classIndex);
-}
 
 /** Calculate price using formula: (Base + TieredDistance + Duration×PerMin) × Multiplier, with minimum fare */
 export function getFormulaPrice(
