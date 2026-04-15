@@ -36,13 +36,14 @@ export interface StorefrontConfig {
   transfer_per_km_rate?: number;
   transfer_per_minute_rate?: number;
   transfer_minimum_fare?: number;
-  // Transfer category multipliers (relative to economy base price)
-  transfer_multiplier_business?: number;
-  transfer_multiplier_first_class?: number;
-  // Transfer: seats per category
-  transfer_seats_economy?: number;
-  transfer_seats_business?: number;
-  transfer_seats_first_class?: number;
+  // Transfer vehicle classes: each main category can have multiple sub-classes with seat counts and multipliers
+  // e.g. Economy: [{seats: 3, multiplier: 1}, {seats: 4, multiplier: 1.1}, {seats: 8, multiplier: 1.5}]
+  transfer_vehicle_classes?: {
+    category: 'economy' | 'business' | 'first_class';
+    label?: string;
+    seats: number;
+    multiplier: number;
+  }[];
   // Car rental mileage settings
   car_rental_free_km?: number;
   car_rental_extra_km_rate?: number;
@@ -64,9 +65,6 @@ export interface StorefrontConfig {
 
   // Transfer: tiered distance pricing (per 100km brackets)
   transfer_distance_tiers?: { from_km: number; to_km: number; per_km_rate: number }[];
-  // Transfer: seat-based multiplier (base seats + factor per extra seat)
-  transfer_base_seats?: number; // e.g. 3 (default sedan capacity)
-  transfer_seat_factor?: number; // e.g. 0.1 = +10% per extra seat above base
 
   // Limo: city daily rates (half/full day)
   limo_city_rates?: { city: string; full_day_rate: number; half_day_rate: number }[];

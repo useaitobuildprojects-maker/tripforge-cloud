@@ -82,14 +82,40 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const [newTierTo, setNewTierTo] = useState('');
   const [newTierRate, setNewTierRate] = useState('');
 
-  const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
-  const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
+  // Vehicle classes
+  const [newClassCategory, setNewClassCategory] = useState<'economy' | 'business' | 'first_class'>('economy');
+  const [newClassLabel, setNewClassLabel] = useState('');
+  const [newClassSeats, setNewClassSeats] = useState('');
+  const [newClassMultiplier, setNewClassMultiplier] = useState('');
+
+  const vehicleClasses = storefrontConfig.transfer_vehicle_classes ?? [
+    { category: 'economy' as const, label: 'Economy Sedan', seats: 3, multiplier: 1 },
+    { category: 'economy' as const, label: 'Economy MPV', seats: 4, multiplier: 1.1 },
+    { category: 'business' as const, label: 'Business Sedan', seats: 3, multiplier: 1.6 },
+    { category: 'first_class' as const, label: 'First Class', seats: 3, multiplier: 2.4 },
+  ];
 
   const tiers = storefrontConfig.transfer_distance_tiers ?? [];
 
-  const seatsEconomy = storefrontConfig.transfer_seats_economy ?? 4;
-  const seatsBusiness = storefrontConfig.transfer_seats_business ?? 3;
-  const seatsFirstClass = storefrontConfig.transfer_seats_first_class ?? 3;
+  const addVehicleClass = () => {
+    const seats = Number(newClassSeats);
+    const multiplier = Number(newClassMultiplier);
+    if (!newClassLabel || isNaN(seats) || seats < 1 || isNaN(multiplier) || multiplier <= 0) return;
+    const updated = [...vehicleClasses, { category: newClassCategory, label: newClassLabel, seats, multiplier }];
+    onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated });
+    setNewClassLabel(''); setNewClassSeats(''); setNewClassMultiplier('');
+  };
+
+  const removeVehicleClass = (idx: number) => {
+    const updated = vehicleClasses.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated.length ? updated : undefined });
+  };
+
+  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+    const updated = [...vehicleClasses];
+    updated[idx] = { ...updated[idx], [field]: value };
+    onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated });
+  };
 
   const addTier = () => {
     const from = Number(newTierFrom);
@@ -106,71 +132,100 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     onConfigChange({ ...storefrontConfig, transfer_distance_tiers: updated.length ? updated : undefined });
   };
 
+  // Group by category for display
+  const categoryOrder = ['economy', 'business', 'first_class'] as const;
+  const categoryLabels: Record<string, string> = { economy: 'Economy', business: 'Business', first_class: 'First Class' };
+
   return (
     <div className="space-y-5">
-      {/* Step 1: Categories — Multipliers & Seats */}
+      {/* Step 1: Vehicle Classes */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 1 — Categories (Multiplier & Seats)</h4>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Economy is the base (1.0×). Configure the multiplier and seat count for each category.</p>
+            <h4 className="text-xs font-semibold text-foreground">Step 1 — Vehicle Classes</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Each category can have multiple vehicle classes with different seat counts and price multipliers.</p>
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSettings(!showSettings)}>
             <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSettings ? 'Hide' : 'Edit'}
           </Button>
         </div>
         {showSettings && (
-          <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
-            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
-              <p className="text-[11px] font-semibold text-foreground">Economy</p>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Multiplier</Label>
-                <Input type="number" value={1} disabled className="text-xs font-mono bg-muted/30" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Seats</Label>
-                <Input type="number" min={1} max={50} step={1} value={seatsEconomy}
-                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_economy: Number(e.target.value) || 4 })}
-                  className="text-xs font-mono" />
-              </div>
-            </div>
-            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
-              <p className="text-[11px] font-semibold text-foreground">Business</p>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Multiplier (×)</Label>
-                <Input type="number" min={1} step={0.1} value={multBusiness}
-                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_business: Number(e.target.value) || 1.6 })}
-                  className="text-xs font-mono" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Seats</Label>
-                <Input type="number" min={1} max={50} step={1} value={seatsBusiness}
-                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_business: Number(e.target.value) || 3 })}
-                  className="text-xs font-mono" />
-              </div>
-            </div>
-            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
-              <p className="text-[11px] font-semibold text-foreground">First Class</p>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Multiplier (×)</Label>
-                <Input type="number" min={1} step={0.1} value={multFirstClass}
-                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_first_class: Number(e.target.value) || 2.4 })}
-                  className="text-xs font-mono" />
-              </div>
-              <div className="space-y-1">
-                <Label className="text-[10px]">Seats</Label>
-                <Input type="number" min={1} max={50} step={1} value={seatsFirstClass}
-                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_first_class: Number(e.target.value) || 3 })}
-                  className="text-xs font-mono" />
+          <div className="space-y-4 pt-2 border-t border-border">
+            {/* Existing classes grouped by category */}
+            {categoryOrder.map((cat) => {
+              const catClasses = vehicleClasses.map((vc, origIdx) => ({ ...vc, origIdx })).filter(vc => vc.category === cat);
+              if (catClasses.length === 0) return null;
+              return (
+                <div key={cat} className="space-y-2">
+                  <p className="text-[11px] font-semibold text-foreground">{categoryLabels[cat]}</p>
+                  <div className="space-y-1.5">
+                    {catClasses.map((vc) => (
+                      <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
+                          onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">Seats:</span>
+                          <Input type="number" min={1} max={50} value={vc.seats} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'seats', Number(e.target.value) || 1)} />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">×</span>
+                          <Input type="number" min={0.1} step={0.1} value={vc.multiplier} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'multiplier', Number(e.target.value) || 1)} />
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeVehicleClass(vc.origIdx)}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Add new class */}
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-[11px] font-semibold text-foreground">Add New Vehicle Class</p>
+              <div className="grid grid-cols-5 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Category</Label>
+                  <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
+                    <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="first_class">First Class</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Label</Label>
+                  <Input placeholder="e.g. Minibus" value={newClassLabel} onChange={(e) => setNewClassLabel(e.target.value)} className="text-xs" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Seats</Label>
+                  <Input type="number" min={1} placeholder="8" value={newClassSeats} onChange={(e) => setNewClassSeats(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Multiplier</Label>
+                  <Input type="number" min={0.1} step={0.1} placeholder="1.5" value={newClassMultiplier} onChange={(e) => setNewClassMultiplier(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={addVehicleClass} disabled={!newClassLabel || !newClassSeats || !newClassMultiplier} className="gradient-accent text-accent-foreground w-full h-8">
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
         )}
         {!showSettings && (
-          <div className="flex gap-4 text-[11px] text-muted-foreground">
-            <span>Economy: <strong className="text-foreground">1.0× · {seatsEconomy} seats</strong></span>
-            <span>Business: <strong className="text-foreground">{multBusiness}× · {seatsBusiness} seats</strong></span>
-            <span>First Class: <strong className="text-foreground">{multFirstClass}× · {seatsFirstClass} seats</strong></span>
+          <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+            {vehicleClasses.map((vc, i) => (
+              <span key={i} className="bg-muted/30 px-2 py-0.5 rounded">
+                {vc.label || `${categoryLabels[vc.category]} ${vc.seats}s`}: <strong className="text-foreground">{vc.multiplier}× · {vc.seats} seats</strong>
+              </span>
+            ))}
           </div>
         )}
       </div>
@@ -382,18 +437,13 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         </div>
       </div>
 
-      {/* Category Multipliers — reuse transfer multipliers */}
+      {/* Category Multipliers info */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div>
           <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">City rates above are for the base category. These multipliers scale the price per vehicle type.</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">City rates above are for the base category. Vehicle class multipliers from the Transfer tab scale the price.</p>
         </div>
-        <div className="flex gap-4 text-[11px] text-muted-foreground">
-          <span>Business Sedan: <strong className="text-foreground">1.0×</strong></span>
-          <span>First Class: <strong className="text-foreground">{storefrontConfig.transfer_multiplier_first_class ?? 2.4}×</strong></span>
-          <span>SUV: <strong className="text-foreground">{storefrontConfig.transfer_multiplier_business ?? 1.6}×</strong></span>
-        </div>
-        <p className="text-[10px] text-muted-foreground">Edit multipliers in the Transfer tab — they're shared across services.</p>
+        <p className="text-[10px] text-muted-foreground">Edit vehicle classes in the Transfer tab — multipliers are shared across services.</p>
       </div>
 
       {/* P2P Pricing (kept) */}
