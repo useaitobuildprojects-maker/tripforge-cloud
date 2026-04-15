@@ -67,10 +67,11 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const handleGetQuote = async () => {
     if (!effectiveOrigin || !effectiveDest) return;
     setLoading(true);
+    const vc = vehicleClasses[selectedClassIndex];
     try {
       const result = await calculateTransferPrice(
-        config, effectiveOrigin, effectiveDest, selectedCategory, agency.country, [],
-        originCoords, destCoords
+        config, effectiveOrigin, effectiveDest, vc?.category as TransferCategory ?? 'economy', agency.country, [],
+        originCoords, destCoords, selectedClassIndex
       );
       setQuote(result);
     } catch {
@@ -82,9 +83,10 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!quote || !config.whatsapp_number) return;
+    const vc = vehicleClasses[selectedClassIndex];
     const dateStr = date ? format(date, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${TRANSFER_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -188,28 +190,24 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
 
         {/* Category Selection */}
         <div className="space-y-3">
-          <Label className="text-xs font-medium">Vehicle Category</Label>
-          <div className="grid grid-cols-3 gap-3">
-            {TRANSFER_CATEGORIES.map((cat) => {
-              const Icon = CATEGORY_ICONS[cat.id];
-              const isSelected = selectedCategory === cat.id;
-              const seats = cat.id === 'economy' ? (config.transfer_seats_economy ?? cat.defaultSeats)
-                : cat.id === 'business' ? (config.transfer_seats_business ?? cat.defaultSeats)
-                : (config.transfer_seats_first_class ?? cat.defaultSeats);
+          <Label className="text-xs font-medium">Vehicle Class</Label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {vehicleClasses.map((vc, idx) => {
+              const Icon = CATEGORY_ICONS[vc.category] ?? Car;
+              const isSelected = selectedClassIndex === idx;
 
               return (
                 <button
-                  key={cat.id}
-                  onClick={() => { setSelectedCategory(cat.id); setQuote(null); }}
+                  key={idx}
+                  onClick={() => { setSelectedClassIndex(idx); setQuote(null); }}
                   className={`relative p-4 rounded-xl border-2 text-left transition-all ${
                     isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
                   }`}
                   style={isSelected ? { borderColor: buttonColor } : undefined}
                 >
                   <Icon className="h-6 w-6 mb-2 opacity-60" />
-                  <p className="text-sm font-bold">{cat.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{seats} seats</p>
+                  <p className="text-sm font-bold">{vc.label || `${vc.category} ${vc.seats}s`}</p>
+                  <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
                 </button>
               );
             })}
