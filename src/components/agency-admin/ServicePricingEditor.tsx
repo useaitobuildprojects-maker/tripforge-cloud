@@ -77,10 +77,34 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 // ── Transfer Tab ──
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const [showSettings, setShowSettings] = useState(false);
+  const [showTiers, setShowTiers] = useState(false);
+  const [showSeats, setShowSeats] = useState(false);
+  const [newTierFrom, setNewTierFrom] = useState('');
+  const [newTierTo, setNewTierTo] = useState('');
+  const [newTierRate, setNewTierRate] = useState('');
 
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
   const multVan = storefrontConfig.transfer_multiplier_van ?? 1.8;
+
+  const tiers = storefrontConfig.transfer_distance_tiers ?? [];
+  const baseSeats = storefrontConfig.transfer_base_seats ?? 3;
+  const seatFactor = storefrontConfig.transfer_seat_factor ?? 0;
+
+  const addTier = () => {
+    const from = Number(newTierFrom);
+    const to = Number(newTierTo);
+    const rate = Number(newTierRate);
+    if (isNaN(from) || isNaN(to) || isNaN(rate) || to <= from) return;
+    const updated = [...tiers, { from_km: from, to_km: to, per_km_rate: rate }].sort((a, b) => a.from_km - b.from_km);
+    onConfigChange({ ...storefrontConfig, transfer_distance_tiers: updated });
+    setNewTierFrom(''); setNewTierTo(''); setNewTierRate('');
+  };
+
+  const removeTier = (idx: number) => {
+    const updated = tiers.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, transfer_distance_tiers: updated.length ? updated : undefined });
+  };
 
   return (
     <div className="space-y-5">
@@ -127,10 +151,112 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 2: Global Pricing Formula (Uber-style) */}
+      {/* Step 2: Seat-Based Multiplier */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">Step 2 — Seat Factor</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Final multiplier = Category × (1 + seat_factor × extra_seats). Extra seats = max(0, vehicle_seats − base).</p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSeats(!showSeats)}>
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSeats ? 'Hide' : 'Edit'}
+          </Button>
+        </div>
+        {showSeats && (
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Base Seats (default capacity)</Label>
+              <Input type="number" min={1} max={50} step={1} value={baseSeats}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_base_seats: Number(e.target.value) || 3 })}
+                className="text-xs font-mono" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[11px]">Factor per Extra Seat</Label>
+              <Input type="number" min={0} max={1} step={0.05} value={seatFactor}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seat_factor: Number(e.target.value) || 0 })}
+                className="text-xs font-mono" />
+            </div>
+          </div>
+        )}
+        {!showSeats && (
+          <div className="text-[11px] text-muted-foreground">
+            Base: <strong className="text-foreground">{baseSeats} seats</strong> · Factor: <strong className="text-foreground">+{(seatFactor * 100).toFixed(0)}%</strong> per extra seat
+          </div>
+        )}
+      </div>
+
+      {/* Step 3: Distance Tiers */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">Step 3 — Distance Tiers (per 100km)</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              {tiers.length > 0
+                ? 'Tiered per-km rates active. Beyond the last tier, the last rate applies.'
+                : 'No tiers defined — using flat per-km rate from Step 4.'}
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowTiers(!showTiers)}>
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showTiers ? 'Hide' : 'Edit'} Tiers
+          </Button>
+        </div>
+        {showTiers && (
+          <div className="space-y-3 pt-2 border-t border-border">
+            {tiers.length > 0 && (
+              <div className="border border-border rounded-lg overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead className="bg-secondary/50">
+                    <tr>
+                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Rate (€/km)</th>
+                      <th className="px-3 py-1.5 w-10" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tiers.map((t, i) => (
+                      <tr key={i} className="border-t border-border">
+                        <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
+                        <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
+                        <td className="px-3 py-1.5 text-right font-mono">€{t.per_km_rate}</td>
+                        <td className="px-3 py-1.5">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeTier(i)}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <div className="grid grid-cols-4 gap-2">
+              <div className="space-y-1">
+                <Label className="text-[11px]">From (km)</Label>
+                <Input type="number" min={0} step={50} placeholder="0" value={newTierFrom} onChange={(e) => setNewTierFrom(e.target.value)} className="text-xs font-mono" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[11px]">To (km)</Label>
+                <Input type="number" min={0} step={50} placeholder="100" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[11px]">Rate (€/km)</Label>
+                <Input type="number" min={0} step={0.1} placeholder="1.50" value={newTierRate} onChange={(e) => setNewTierRate(e.target.value)} className="text-xs font-mono" />
+              </div>
+              <div className="flex items-end">
+                <Button size="sm" onClick={addTier} disabled={!newTierFrom || !newTierTo || !newTierRate} className="gradient-accent text-accent-foreground w-full">
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Tier
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Step 4: Base Formula (fallback + base fee / per-min) */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 2 — Default Pricing Formula</h4>
-        <p className="text-[11px] text-muted-foreground">Price = (Base Fee + Distance×PerKM + Duration×PerMin) × Multiplier. Minimum fare ensures a floor price.</p>
+        <h4 className="text-xs font-semibold text-foreground">Step 4 — Base Formula</h4>
+        <p className="text-[11px] text-muted-foreground">Base Fee + {tiers.length > 0 ? 'Tiered Distance' : 'Distance×PerKM'} + Duration×PerMin. Minimum fare ensures a floor price.</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="space-y-1">
             <Label className="text-[11px]">Base Fee (€)</Label>
@@ -140,11 +266,12 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
               className="text-xs font-mono" />
           </div>
           <div className="space-y-1">
-            <Label className="text-[11px]">Per-KM Rate (€)</Label>
+            <Label className="text-[11px]">Flat Per-KM (€){tiers.length > 0 ? ' (unused)' : ''}</Label>
             <Input type="number" min={0} step={0.1} placeholder="1.20"
               value={storefrontConfig.transfer_per_km_rate ?? ''}
               onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
+              className="text-xs font-mono"
+              disabled={tiers.length > 0} />
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">Per-Minute Rate (€)</Label>
