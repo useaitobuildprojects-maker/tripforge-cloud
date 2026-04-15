@@ -22,20 +22,15 @@ const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
 };
 
 // Map limo categories to transfer multipliers (business sedan = base 1x)
-const LIMO_TO_MULTIPLIER: Record<LimoCategory, number | undefined> = {
-  business: undefined, // 1x base
-  first_class: undefined, // uses transfer_multiplier_first_class
-  van: undefined,
-  suv: undefined,
+const LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
+  business: 1,
+  first_class: 2.4,
+  van: 1.6,
+  suv: 1.6,
 };
 
-function getLimoCategoryMultiplier(config: StorefrontConfig, cat: LimoCategory): number {
-  switch (cat) {
-    case 'business': return 1;
-    case 'first_class': return config.transfer_multiplier_first_class ?? 2.4;
-    case 'van': return config.transfer_multiplier_business ?? 1.6;
-    case 'suv': return config.transfer_multiplier_business ?? 1.6;
-  }
+function getLimoCategoryMultiplier(_config: StorefrontConfig, cat: LimoCategory): number {
+  return LIMO_MULTIPLIERS[cat] ?? 1;
 }
 
 type DayType = 'full' | 'half';

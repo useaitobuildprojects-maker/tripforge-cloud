@@ -267,9 +267,10 @@ export async function calculateTransferPrice(
   country?: string,
   cityPricing: CityPricing[] = [],
   preOriginCoords?: [number, number],
-  preDestCoords?: [number, number]
+  preDestCoords?: [number, number],
+  classIndex?: number
 ): Promise<TransferQuote> {
-  console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, country });
+  console.log('[Transfer] calculateTransferPrice:', { origin, destination, category, classIndex, country });
 
   const emptyQuote = (error: TransferQuote['error']): TransferQuote => ({
     origin, destination, category, price: 0, source: 'formula',
@@ -315,7 +316,7 @@ export async function calculateTransferPrice(
   const isIntercity = cityRate ? !destination.toLowerCase().includes(cityRate.city_name.toLowerCase()) : false;
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
-  const multiplier = getSeatMultiplier(config, category);
+  const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
   const distanceCharge = getTieredDistanceCharge(config, distanceKm);
   const timeCharge = durationMin * perMinRate;
   const rawPrice = (baseFee + distanceCharge + timeCharge) * multiplier + appliedDropOff;
