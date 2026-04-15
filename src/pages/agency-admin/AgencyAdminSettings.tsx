@@ -19,6 +19,13 @@ import { getCitiesForCountry } from '@/data/city-database';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
+const DEFAULT_TRANSFER_DISTANCE_TIERS = [
+  { from_km: 0, to_km: 50, fixed_price: 35 },
+  { from_km: 50, to_km: 100, fixed_price: 60 },
+  { from_km: 100, to_km: 200, fixed_price: 100 },
+  { from_km: 200, to_km: 300, fixed_price: 150 },
+  { from_km: 300, to_km: 500, fixed_price: 220 },
+];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
 
@@ -130,6 +137,15 @@ const AgencyAdminSettings = () => {
       }
     }
 
+    const normalizedStorefrontConfig: StorefrontConfig =
+      form.services.includes('transfer') && !storefrontConfig.transfer_distance_tiers?.length
+        ? { ...storefrontConfig, transfer_distance_tiers: DEFAULT_TRANSFER_DISTANCE_TIERS }
+        : storefrontConfig;
+
+    if (normalizedStorefrontConfig !== storefrontConfig) {
+      setStorefrontConfig(normalizedStorefrontConfig);
+    }
+
     await updateAgency.mutateAsync({
       id: agency.id,
       name: form.name,
@@ -147,7 +163,7 @@ const AgencyAdminSettings = () => {
       storefront_template: selectedTemplate,
       button_color: buttonColor,
       background_color: bgColor,
-      storefront_config: storefrontConfig,
+      storefront_config: normalizedStorefrontConfig,
       commission_rate: commissionRate,
       one_way_fee: oneWayFee,
     });
