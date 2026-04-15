@@ -48,23 +48,20 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
 function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): number {
   const tiers = config.transfer_distance_tiers;
   if (!tiers || tiers.length === 0) {
-    // Flat rate fallback
     return distanceKm * (config.transfer_per_km_rate ?? 0);
   }
-  // Sort tiers by from_km
   const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
+  let total = 0;
 
-  // Find the bracket that contains this distance
-  const match = sorted.find(t => distanceKm >= t.from_km && distanceKm < t.to_km);
-  if (match) return match.fixed_price;
-
-  // If distance exceeds all tiers, use the last tier's price
-  if (distanceKm >= sorted[sorted.length - 1].to_km) {
-    return sorted[sorted.length - 1].fixed_price;
+  for (const tier of sorted) {
+    if (distanceKm <= tier.from_km) break; // distance doesn't reach this tier
+    const tierSpan = tier.to_km - tier.from_km;
+    const kmInTier = Math.min(distanceKm, tier.to_km) - tier.from_km;
+    const ratio = kmInTier / tierSpan;
+    total += tier.fixed_price * ratio;
   }
 
-  // Below the first tier — use flat rate fallback
-  return distanceKm * (config.transfer_per_km_rate ?? 0);
+  return total;
 }
 
 
