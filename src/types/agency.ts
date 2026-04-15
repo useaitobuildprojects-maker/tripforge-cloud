@@ -63,8 +63,8 @@ export interface StorefrontConfig {
   limo_p2p_base_fee?: number;
   limo_p2p_per_km_rate?: number;
 
-  // Transfer: tiered distance pricing (per 100km brackets)
-  transfer_distance_tiers?: { from_km: number; to_km: number; per_km_rate: number }[];
+  // Transfer: tiered distance pricing (fixed price per bracket)
+  transfer_distance_tiers?: { from_km: number; to_km: number; fixed_price: number }[];
 
   // Limo: city daily rates (half/full day)
   limo_city_rates?: { city: string; full_day_rate: number; half_day_rate: number }[];

@@ -44,7 +44,7 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
   return classes[classIndex]?.multiplier ?? 1;
 }
 
-/** Calculate tiered distance charge: each 100km bracket can have its own per-km rate */
+/** Find the fixed price for a distance bracket. Returns the matching tier's fixed_price, or falls back to flat per-km. */
 function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): number {
   const tiers = config.transfer_distance_tiers;
   if (!tiers || tiers.length === 0) {
@@ -53,24 +53,18 @@ function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): 
   }
   // Sort tiers by from_km
   const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
-  let charge = 0;
-  let remaining = distanceKm;
 
-  for (const tier of sorted) {
-    if (remaining <= 0) break;
-    const bracketSize = tier.to_km - tier.from_km;
-    const kmInThisBracket = Math.min(remaining, bracketSize);
-    if (distanceKm > tier.from_km) {
-      const usable = Math.min(kmInThisBracket, distanceKm - tier.from_km);
-      charge += usable * tier.per_km_rate;
-      remaining -= usable;
-    }
+  // Find the bracket that contains this distance
+  const match = sorted.find(t => distanceKm >= t.from_km && distanceKm < t.to_km);
+  if (match) return match.fixed_price;
+
+  // If distance exceeds all tiers, use the last tier's price
+  if (distanceKm >= sorted[sorted.length - 1].to_km) {
+    return sorted[sorted.length - 1].fixed_price;
   }
-  // If distance exceeds all defined tiers, use the last tier's rate for the rest
-  if (remaining > 0 && sorted.length > 0) {
-    charge += remaining * sorted[sorted.length - 1].per_km_rate;
-  }
-  return charge;
+
+  // Below the first tier — use flat rate fallback
+  return distanceKm * (config.transfer_per_km_rate ?? 0);
 }
 
 

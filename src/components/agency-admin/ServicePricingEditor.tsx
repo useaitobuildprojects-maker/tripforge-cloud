@@ -120,9 +120,9 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const addTier = () => {
     const from = Number(newTierFrom);
     const to = Number(newTierTo);
-    const rate = Number(newTierRate);
-    if (isNaN(from) || isNaN(to) || isNaN(rate) || to <= from) return;
-    const updated = [...tiers, { from_km: from, to_km: to, per_km_rate: rate }].sort((a, b) => a.from_km - b.from_km);
+    const price = Number(newTierRate);
+    if (isNaN(from) || isNaN(to) || isNaN(price) || to <= from) return;
+    const updated = [...tiers, { from_km: from, to_km: to, fixed_price: price }].sort((a, b) => a.from_km - b.from_km);
     onConfigChange({ ...storefrontConfig, transfer_distance_tiers: updated });
     setNewTierFrom(''); setNewTierTo(''); setNewTierRate('');
   };
@@ -234,10 +234,10 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 2 — Distance Tiers (per 100km)</h4>
+            <h4 className="text-xs font-semibold text-foreground">Step 2 — Distance Tiers</h4>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {tiers.length > 0
-                ? 'Tiered per-km rates active. Beyond the last tier, the last rate applies.'
+                ? 'Fixed price per distance bracket. Beyond the last tier, the last price applies.'
                 : 'No tiers defined — using flat per-km rate from Step 3.'}
             </p>
           </div>
@@ -254,7 +254,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                     <tr>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
-                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Price (€/km)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Price (€)</th>
                       <th className="px-3 py-1.5 w-10" />
                     </tr>
                   </thead>
@@ -263,7 +263,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                       <tr key={i} className="border-t border-border">
                         <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
                         <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
-                        <td className="px-3 py-1.5 text-right font-mono">€{t.per_km_rate}</td>
+                        <td className="px-3 py-1.5 text-right font-mono">€{t.fixed_price}</td>
                         <td className="px-3 py-1.5">
                           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeTier(i)}>
                             <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -285,7 +285,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                 <Input type="number" min={0} step={50} placeholder="100" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[11px]">Price (€/km)</Label>
+                <Label className="text-[11px]">Price (€)</Label>
                 <Input type="number" min={0} step={0.1} placeholder="1.50" value={newTierRate} onChange={(e) => setNewTierRate(e.target.value)} className="text-xs font-mono" />
               </div>
               <div className="flex items-end">
