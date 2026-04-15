@@ -102,10 +102,10 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     if (hasItalian) { setSeeded(true); return; }
     setSeeded(true);
     const dummyCities = [
-      { city: 'Rome', tiers: [{ from_km: 0, to_km: 50, fixed_price: 40 }, { from_km: 50, to_km: 100, fixed_price: 65 }, { from_km: 100, to_km: 200, fixed_price: 110 }] },
-      { city: 'Milan', tiers: [{ from_km: 0, to_km: 50, fixed_price: 45 }, { from_km: 50, to_km: 100, fixed_price: 70 }, { from_km: 100, to_km: 200, fixed_price: 120 }] },
-      { city: 'Naples', tiers: [{ from_km: 0, to_km: 50, fixed_price: 35 }, { from_km: 50, to_km: 100, fixed_price: 55 }, { from_km: 100, to_km: 200, fixed_price: 95 }] },
-      { city: 'Florence', tiers: [{ from_km: 0, to_km: 50, fixed_price: 38 }, { from_km: 50, to_km: 100, fixed_price: 60 }, { from_km: 100, to_km: 200, fixed_price: 100 }] },
+      { city: 'Rome', tiers: [{ from_km: 0, to_km: 50, fixed_price: 40 }, { from_km: 50, to_km: 100, fixed_price: 65 }, { from_km: 100, to_km: 200, fixed_price: 110 }, { from_km: 200, to_km: 400, fixed_price: 180 }, { from_km: 400, to_km: 600, fixed_price: 250 }] },
+      { city: 'Milan', tiers: [{ from_km: 0, to_km: 50, fixed_price: 45 }, { from_km: 50, to_km: 100, fixed_price: 70 }, { from_km: 100, to_km: 200, fixed_price: 120 }, { from_km: 200, to_km: 400, fixed_price: 200 }, { from_km: 400, to_km: 600, fixed_price: 270 }] },
+      { city: 'Naples', tiers: [{ from_km: 0, to_km: 50, fixed_price: 35 }, { from_km: 50, to_km: 100, fixed_price: 55 }, { from_km: 100, to_km: 200, fixed_price: 95 }, { from_km: 200, to_km: 400, fixed_price: 160 }, { from_km: 400, to_km: 600, fixed_price: 220 }] },
+      { city: 'Florence', tiers: [{ from_km: 0, to_km: 50, fixed_price: 38 }, { from_km: 50, to_km: 100, fixed_price: 60 }, { from_km: 100, to_km: 200, fixed_price: 100 }, { from_km: 200, to_km: 400, fixed_price: 170 }, { from_km: 400, to_km: 600, fixed_price: 230 }] },
     ];
     dummyCities.forEach((d) => {
       addCity.mutate({
