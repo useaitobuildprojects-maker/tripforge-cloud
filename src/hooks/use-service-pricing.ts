@@ -3,14 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 // ── Types ──
-export type TransferCategory = 'economy' | 'business' | 'first_class' | 'van';
+export type TransferCategory = 'economy' | 'business' | 'first_class';
 export type LimoCategory = 'business' | 'first_class' | 'van' | 'suv';
 
-export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string }[] = [
-  { id: 'economy', label: 'Economy', description: 'Skoda Octavia, Toyota Corolla (1-3 pax)' },
-  { id: 'business', label: 'Comfort', description: 'VW Passat, Toyota Camry (1-3 pax)' },
-  { id: 'first_class', label: 'Business', description: 'Mercedes E-Class, BMW 5 (1-3 pax)' },
-  { id: 'van', label: 'Van', description: 'VW Caravelle, Mercedes Vito (4-7 pax)' },
+export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string; defaultSeats: number }[] = [
+  { id: 'economy', label: 'Economy', description: 'Skoda Octavia, Toyota Corolla', defaultSeats: 4 },
+  { id: 'business', label: 'Business', description: 'Mercedes E-Class, BMW 5', defaultSeats: 3 },
+  { id: 'first_class', label: 'First Class', description: 'Mercedes S-Class, BMW 7', defaultSeats: 3 },
 ];
 
 export const LIMO_CATEGORIES: { id: LimoCategory; label: string; description: string }[] = [

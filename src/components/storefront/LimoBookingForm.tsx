@@ -33,7 +33,7 @@ function getLimoCategoryMultiplier(config: StorefrontConfig, cat: LimoCategory):
   switch (cat) {
     case 'business': return 1;
     case 'first_class': return config.transfer_multiplier_first_class ?? 2.4;
-    case 'van': return config.transfer_multiplier_van ?? 1.8;
+    case 'van': return config.transfer_multiplier_business ?? 1.6;
     case 'suv': return config.transfer_multiplier_business ?? 1.6;
   }
 }
@@ -144,7 +144,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
         transfer_base_fee: config.limo_p2p_base_fee ?? config.transfer_base_fee,
         transfer_per_km_rate: config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate,
       };
-      const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
+      const transferCategory = (selectedCategory === 'suv' || selectedCategory === 'van') ? 'first_class' as const : selectedCategory as 'economy' | 'business' | 'first_class';
       const result = await calculateTransferPrice(
         limoConfig, origin, destination, transferCategory, agency.country, [],
         originCoords, destCoords

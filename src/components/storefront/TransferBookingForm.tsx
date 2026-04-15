@@ -17,8 +17,7 @@ import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/c
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
   business: Car,
-  first_class: Car,
-  van: Truck,
+  first_class: Crown,
 };
 
 interface Props {
@@ -188,10 +187,13 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
         {/* Category Selection */}
         <div className="space-y-3">
           <Label className="text-xs font-medium">Vehicle Category</Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {TRANSFER_CATEGORIES.map((cat) => {
               const Icon = CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
+              const seats = cat.id === 'economy' ? (config.transfer_seats_economy ?? cat.defaultSeats)
+                : cat.id === 'business' ? (config.transfer_seats_business ?? cat.defaultSeats)
+                : (config.transfer_seats_first_class ?? cat.defaultSeats);
 
               return (
                 <button
@@ -205,6 +207,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
                   <Icon className="h-6 w-6 mb-2 opacity-60" />
                   <p className="text-sm font-bold">{cat.label}</p>
                   <p className="text-[10px] text-muted-foreground">{cat.description}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{seats} seats</p>
                 </button>
               );
             })}

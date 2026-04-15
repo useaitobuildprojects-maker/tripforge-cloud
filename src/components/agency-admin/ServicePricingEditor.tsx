@@ -78,18 +78,18 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, country }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void; country?: string }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showTiers, setShowTiers] = useState(false);
-  const [showSeats, setShowSeats] = useState(false);
   const [newTierFrom, setNewTierFrom] = useState('');
   const [newTierTo, setNewTierTo] = useState('');
   const [newTierRate, setNewTierRate] = useState('');
 
   const multBusiness = storefrontConfig.transfer_multiplier_business ?? 1.6;
   const multFirstClass = storefrontConfig.transfer_multiplier_first_class ?? 2.4;
-  const multVan = storefrontConfig.transfer_multiplier_van ?? 1.8;
 
   const tiers = storefrontConfig.transfer_distance_tiers ?? [];
-  const baseSeats = storefrontConfig.transfer_base_seats ?? 3;
-  const seatFactor = storefrontConfig.transfer_seat_factor ?? 0;
+
+  const seatsEconomy = storefrontConfig.transfer_seats_economy ?? 4;
+  const seatsBusiness = storefrontConfig.transfer_seats_business ?? 3;
+  const seatsFirstClass = storefrontConfig.transfer_seats_first_class ?? 3;
 
   const addTier = () => {
     const from = Number(newTierFrom);
@@ -108,92 +108,82 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 
   return (
     <div className="space-y-5">
-      {/* Step 1: Category Multipliers */}
+      {/* Step 1: Categories — Multipliers & Seats */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 1 — Category Multipliers</h4>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Economy is the base (1.0×). Other categories are multiplied automatically.</p>
+            <h4 className="text-xs font-semibold text-foreground">Step 1 — Categories (Multiplier & Seats)</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Economy is the base (1.0×). Configure the multiplier and seat count for each category.</p>
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSettings(!showSettings)}>
-            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSettings ? 'Hide' : 'Edit'} Multipliers
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSettings ? 'Hide' : 'Edit'}
           </Button>
         </div>
         {showSettings && (
           <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
-            <div className="space-y-1">
-              <Label className="text-[11px]">Comfort (×)</Label>
-              <Input type="number" min={1} step={0.1} value={multBusiness}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_business: Number(e.target.value) || 1.6 })}
-                className="text-xs font-mono" />
+            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
+              <p className="text-[11px] font-semibold text-foreground">Economy</p>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Multiplier</Label>
+                <Input type="number" value={1} disabled className="text-xs font-mono bg-muted/30" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Seats</Label>
+                <Input type="number" min={1} max={50} step={1} value={seatsEconomy}
+                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_economy: Number(e.target.value) || 4 })}
+                  className="text-xs font-mono" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-[11px]">Business (×)</Label>
-              <Input type="number" min={1} step={0.1} value={multFirstClass}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_first_class: Number(e.target.value) || 2.4 })}
-                className="text-xs font-mono" />
+            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
+              <p className="text-[11px] font-semibold text-foreground">Business</p>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Multiplier (×)</Label>
+                <Input type="number" min={1} step={0.1} value={multBusiness}
+                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_business: Number(e.target.value) || 1.6 })}
+                  className="text-xs font-mono" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Seats</Label>
+                <Input type="number" min={1} max={50} step={1} value={seatsBusiness}
+                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_business: Number(e.target.value) || 3 })}
+                  className="text-xs font-mono" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <Label className="text-[11px]">Van (×)</Label>
-              <Input type="number" min={1} step={0.1} value={multVan}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_van: Number(e.target.value) || 1.8 })}
-                className="text-xs font-mono" />
+            <div className="space-y-2 p-2 rounded-lg bg-muted/20">
+              <p className="text-[11px] font-semibold text-foreground">First Class</p>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Multiplier (×)</Label>
+                <Input type="number" min={1} step={0.1} value={multFirstClass}
+                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_multiplier_first_class: Number(e.target.value) || 2.4 })}
+                  className="text-xs font-mono" />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px]">Seats</Label>
+                <Input type="number" min={1} max={50} step={1} value={seatsFirstClass}
+                  onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seats_first_class: Number(e.target.value) || 3 })}
+                  className="text-xs font-mono" />
+              </div>
             </div>
           </div>
         )}
         {!showSettings && (
           <div className="flex gap-4 text-[11px] text-muted-foreground">
-            <span>Economy: <strong className="text-foreground">1.0×</strong></span>
-            <span>Business: <strong className="text-foreground">{multBusiness}×</strong></span>
-            <span>First Class: <strong className="text-foreground">{multFirstClass}×</strong></span>
-            <span>VAN: <strong className="text-foreground">{multVan}×</strong></span>
+            <span>Economy: <strong className="text-foreground">1.0× · {seatsEconomy} seats</strong></span>
+            <span>Business: <strong className="text-foreground">{multBusiness}× · {seatsBusiness} seats</strong></span>
+            <span>First Class: <strong className="text-foreground">{multFirstClass}× · {seatsFirstClass} seats</strong></span>
           </div>
         )}
       </div>
 
-      {/* Step 2: Seat-Based Multiplier */}
+      {/* Step 2: Distance Tiers */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 2 — Seat Factor</h4>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Final multiplier = Category × (1 + seat_factor × extra_seats). Extra seats = max(0, vehicle_seats − base).</p>
-          </div>
-          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowSeats(!showSeats)}>
-            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showSeats ? 'Hide' : 'Edit'}
-          </Button>
-        </div>
-        {showSeats && (
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-            <div className="space-y-1">
-              <Label className="text-[11px]">Base Seats (default capacity)</Label>
-              <Input type="number" min={1} max={50} step={1} value={baseSeats}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_base_seats: Number(e.target.value) || 3 })}
-                className="text-xs font-mono" />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[11px]">Factor per Extra Seat</Label>
-              <Input type="number" min={0} max={1} step={0.05} value={seatFactor}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_seat_factor: Number(e.target.value) || 0 })}
-                className="text-xs font-mono" />
-            </div>
-          </div>
-        )}
-        {!showSeats && (
-          <div className="text-[11px] text-muted-foreground">
-            Base: <strong className="text-foreground">{baseSeats} seats</strong> · Factor: <strong className="text-foreground">+{(seatFactor * 100).toFixed(0)}%</strong> per extra seat
-          </div>
-        )}
-      </div>
-
-      {/* Step 3: Distance Tiers */}
-      <div className="rounded-lg border border-border p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="text-xs font-semibold text-foreground">Step 3 — Distance Tiers (per 100km)</h4>
+            <h4 className="text-xs font-semibold text-foreground">Step 2 — Distance Tiers (per 100km)</h4>
             <p className="text-[11px] text-muted-foreground mt-0.5">
               {tiers.length > 0
                 ? 'Tiered per-km rates active. Beyond the last tier, the last rate applies.'
-                : 'No tiers defined — using flat per-km rate from Step 4.'}
+                : 'No tiers defined — using flat per-km rate from Step 3.'}
             </p>
           </div>
           <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowTiers(!showTiers)}>
@@ -253,9 +243,9 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 4: Base Formula (fallback + base fee / per-min) */}
+      {/* Step 3: Base Formula */}
       <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 4 — Base Formula</h4>
+        <h4 className="text-xs font-semibold text-foreground">Step 3 — Base Formula</h4>
         <p className="text-[11px] text-muted-foreground">Base Fee + {tiers.length > 0 ? 'Tiered Distance' : 'Distance×PerKM'} + Duration×PerMin. Minimum fare ensures a floor price.</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="space-y-1">
@@ -293,6 +283,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     </div>
   );
 };
+
 // ── Limo Service Tab (city daily rates + itinerary pricing) ──
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCity, setNewCity] = useState('');
@@ -400,7 +391,6 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         <div className="flex gap-4 text-[11px] text-muted-foreground">
           <span>Business Sedan: <strong className="text-foreground">1.0×</strong></span>
           <span>First Class: <strong className="text-foreground">{storefrontConfig.transfer_multiplier_first_class ?? 2.4}×</strong></span>
-          <span>Van: <strong className="text-foreground">{storefrontConfig.transfer_multiplier_van ?? 1.8}×</strong></span>
           <span>SUV: <strong className="text-foreground">{storefrontConfig.transfer_multiplier_business ?? 1.6}×</strong></span>
         </div>
         <p className="text-[10px] text-muted-foreground">Edit multipliers in the Transfer tab — they're shared across services.</p>
