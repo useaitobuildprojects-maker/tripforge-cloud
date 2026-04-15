@@ -44,11 +44,10 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
   return classes[classIndex]?.multiplier ?? 1;
 }
 
-/** Find the fixed price for a distance bracket. Returns the matching tier's fixed_price, or falls back to flat per-km. */
-function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): number {
-  const tiers = config.transfer_distance_tiers;
+/** Find the fixed price for a distance bracket using prorated tiers. */
+function getTieredDistanceCharge(tiers: { from_km: number; to_km: number; fixed_price: number }[] | undefined, distanceKm: number, perKmFallback: number): number {
   if (!tiers || tiers.length === 0) {
-    return distanceKm * (config.transfer_per_km_rate ?? 0);
+    return distanceKm * perKmFallback;
   }
   const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
   let total = 0;
