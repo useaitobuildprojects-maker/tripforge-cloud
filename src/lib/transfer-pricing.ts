@@ -35,19 +35,59 @@ function getCategoryMultiplier(config: StorefrontConfig, category: TransferCateg
   }
 }
 
-/** Calculate price using formula: (Base + Distance×PerKM + Duration×PerMin) × Multiplier, with minimum fare */
+/** Calculate tiered distance charge: each 100km bracket can have its own per-km rate */
+function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): number {
+  const tiers = config.transfer_distance_tiers;
+  if (!tiers || tiers.length === 0) {
+    // Flat rate fallback
+    return distanceKm * (config.transfer_per_km_rate ?? 0);
+  }
+  // Sort tiers by from_km
+  const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
+  let charge = 0;
+  let remaining = distanceKm;
+
+  for (const tier of sorted) {
+    if (remaining <= 0) break;
+    const bracketSize = tier.to_km - tier.from_km;
+    const kmInThisBracket = Math.min(remaining, bracketSize);
+    if (distanceKm > tier.from_km) {
+      const usable = Math.min(kmInThisBracket, distanceKm - tier.from_km);
+      charge += usable * tier.per_km_rate;
+      remaining -= usable;
+    }
+  }
+  // If distance exceeds all defined tiers, use the last tier's rate for the rest
+  if (remaining > 0 && sorted.length > 0) {
+    charge += remaining * sorted[sorted.length - 1].per_km_rate;
+  }
+  return charge;
+}
+
+/** Get seat-based multiplier: category_multiplier × (1 + seat_factor × max(0, seats - base_seats)) */
+function getSeatMultiplier(config: StorefrontConfig, category: TransferCategory, seatCount?: number): number {
+  const catMult = getCategoryMultiplier(config, category);
+  if (!seatCount) return catMult;
+  const baseSeats = config.transfer_base_seats ?? 3;
+  const seatFactor = config.transfer_seat_factor ?? 0;
+  const extraSeats = Math.max(0, seatCount - baseSeats);
+  return catMult * (1 + seatFactor * extraSeats);
+}
+
+/** Calculate price using formula: (Base + TieredDistance + Duration×PerMin) × Multiplier, with minimum fare */
 export function getFormulaPrice(
   config: StorefrontConfig,
   distanceKm: number,
   category: TransferCategory,
-  durationMin?: number
+  durationMin?: number,
+  seatCount?: number
 ): number {
   const baseFee = config.transfer_base_fee ?? 0;
-  const perKmRate = config.transfer_per_km_rate ?? 0;
   const perMinRate = config.transfer_per_minute_rate ?? 0;
   const minFare = config.transfer_minimum_fare ?? 0;
-  const multiplier = getCategoryMultiplier(config, category);
-  const raw = (baseFee + distanceKm * perKmRate + (durationMin ?? 0) * perMinRate) * multiplier;
+  const multiplier = getSeatMultiplier(config, category, seatCount);
+  const distanceCharge = getTieredDistanceCharge(config, distanceKm);
+  const raw = (baseFee + distanceCharge + (durationMin ?? 0) * perMinRate) * multiplier;
   return Math.round(Math.max(raw, minFare * multiplier));
 }
 
@@ -271,8 +311,8 @@ export async function calculateTransferPrice(
   const isIntercity = cityRate ? !destination.toLowerCase().includes(cityRate.city_name.toLowerCase()) : false;
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
-  const multiplier = getCategoryMultiplier(config, category);
-  const distanceCharge = distanceKm * perKmRate;
+  const multiplier = getSeatMultiplier(config, category);
+  const distanceCharge = getTieredDistanceCharge(config, distanceKm);
   const timeCharge = durationMin * perMinRate;
   const rawPrice = (baseFee + distanceCharge + timeCharge) * multiplier + appliedDropOff;
   const effectiveMinFare = minFare * multiplier;
