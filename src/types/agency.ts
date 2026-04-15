@@ -65,9 +65,6 @@ export interface StorefrontConfig {
 
   // Transfer: tiered distance pricing (per 100km brackets)
   transfer_distance_tiers?: { from_km: number; to_km: number; per_km_rate: number }[];
-  // Transfer: seat-based multiplier (base seats + factor per extra seat)
-  transfer_base_seats?: number; // e.g. 3 (default sedan capacity)
-  transfer_seat_factor?: number; // e.g. 0.1 = +10% per extra seat above base
 
   // Limo: city daily rates (half/full day)
   limo_city_rates?: { city: string; full_day_rate: number; half_day_rate: number }[];
