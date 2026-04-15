@@ -50,6 +50,7 @@ interface Props {
 }
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+  const { data: cityPricing = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -142,7 +143,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = (selectedCategory === 'suv' || selectedCategory === 'van') ? 'first_class' as const : selectedCategory as 'economy' | 'business' | 'first_class';
       const result = await calculateTransferPrice(
-        limoConfig, origin, destination, transferCategory, agency.country, [],
+        limoConfig, origin, destination, transferCategory, agency.country, cityPricing,
         originCoords, destCoords
       );
       setQuote(result);
