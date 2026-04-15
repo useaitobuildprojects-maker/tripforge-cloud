@@ -17,8 +17,7 @@ import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/c
 const CATEGORY_ICONS: Record<TransferCategory, React.ElementType> = {
   economy: Car,
   business: Car,
-  first_class: Car,
-  van: Truck,
+  first_class: Crown,
 };
 
 interface Props {

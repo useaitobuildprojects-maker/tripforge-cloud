@@ -39,7 +39,10 @@ export interface StorefrontConfig {
   // Transfer category multipliers (relative to economy base price)
   transfer_multiplier_business?: number;
   transfer_multiplier_first_class?: number;
-  transfer_multiplier_van?: number;
+  // Transfer: seats per category
+  transfer_seats_economy?: number;
+  transfer_seats_business?: number;
+  transfer_seats_first_class?: number;
   // Car rental mileage settings
   car_rental_free_km?: number;
   car_rental_extra_km_rate?: number;

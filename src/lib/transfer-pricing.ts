@@ -31,7 +31,6 @@ function getCategoryMultiplier(config: StorefrontConfig, category: TransferCateg
     case 'economy': return 1;
     case 'business': return config.transfer_multiplier_business ?? 1.6;
     case 'first_class': return config.transfer_multiplier_first_class ?? 2.4;
-    case 'van': return config.transfer_multiplier_van ?? 1.8;
   }
 }
 
