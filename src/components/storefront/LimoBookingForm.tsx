@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { useCityPricing } from '@/hooks/use-city-pricing';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield, Plus, Trash2, Sun, SunMedium } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -22,8 +21,31 @@ const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   suv: Shield,
 };
 
-type LimoMode = 'package' | 'p2p';
-type LimoPackage = '8h' | '10h';
+// Map limo categories to transfer multipliers (business sedan = base 1x)
+const LIMO_TO_MULTIPLIER: Record<LimoCategory, number | undefined> = {
+  business: undefined, // 1x base
+  first_class: undefined, // uses transfer_multiplier_first_class
+  van: undefined,
+  suv: undefined,
+};
+
+function getLimoCategoryMultiplier(config: StorefrontConfig, cat: LimoCategory): number {
+  switch (cat) {
+    case 'business': return 1;
+    case 'first_class': return config.transfer_multiplier_first_class ?? 2.4;
+    case 'van': return config.transfer_multiplier_van ?? 1.8;
+    case 'suv': return config.transfer_multiplier_business ?? 1.6;
+  }
+}
+
+type DayType = 'full' | 'half';
+
+interface ItineraryDay {
+  city: string;
+  dayType: DayType;
+}
+
+type LimoMode = 'itinerary' | 'p2p';
 
 interface Props {
   agency: Agency;
@@ -32,7 +54,6 @@ interface Props {
 }
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
-  const { data: cityPricingData = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -41,17 +62,23 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return getAgencyLocations(agency.city, agency.country);
   }, [config.locations, agency.city, agency.country]);
 
-  const [mode, setMode] = useState<LimoMode>('package');
+  const cityRates = config.limo_city_rates ?? [];
+  const multiDayDiscount = config.limo_multi_day_discount ?? 0;
+  const hasItineraryPricing = cityRates.length > 0;
+
+  const [mode, setMode] = useState<LimoMode>(hasItineraryPricing ? 'itinerary' : 'p2p');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
-  const [selectedPackage, setSelectedPackage] = useState<LimoPackage>('8h');
-  const [date, setDate] = useState<Date>();
+  const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Itinerary planner
+  const [itinerary, setItinerary] = useState<ItineraryDay[]>([{ city: cityRates[0]?.city ?? '', dayType: 'full' }]);
 
   const maxKm = config.limo_max_km ?? 35;
 
@@ -65,25 +92,48 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return slots;
   }, []);
 
-  const getPackagePrice = (cat: LimoCategory, pkg: LimoPackage): number => {
-    if (pkg === '8h') {
-      switch (cat) {
-        case 'business': return config.limo_price_8h_business ?? 0;
-        case 'first_class': return config.limo_price_8h_first_class ?? 0;
-        case 'van': return config.limo_price_8h_van ?? 0;
-        case 'suv': return config.limo_price_8h_suv ?? 0;
-      }
-    } else {
-      switch (cat) {
-        case 'business': return config.limo_price_10h_business ?? 0;
-        case 'first_class': return config.limo_price_10h_first_class ?? 0;
-        case 'van': return config.limo_price_10h_van ?? 0;
-        case 'suv': return config.limo_price_10h_suv ?? 0;
-      }
-    }
+  const availableCities = cityRates.map(cr => cr.city);
+
+  const addDay = () => {
+    setItinerary(prev => [...prev, { city: availableCities[0] ?? '', dayType: 'full' }]);
   };
 
-  const packagePrice = getPackagePrice(selectedCategory, selectedPackage);
+  const removeDay = (idx: number) => {
+    if (itinerary.length <= 1) return;
+    setItinerary(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const updateDay = (idx: number, updates: Partial<ItineraryDay>) => {
+    setItinerary(prev => prev.map((d, i) => i === idx ? { ...d, ...updates } : d));
+  };
+
+  // Calculate itinerary price
+  const itineraryPrice = useMemo(() => {
+    if (!hasItineraryPricing || itinerary.length === 0) return null;
+
+    const catMultiplier = getLimoCategoryMultiplier(config, selectedCategory);
+    let total = 0;
+
+    for (const day of itinerary) {
+      const rate = cityRates.find(cr => cr.city === day.city);
+      if (!rate) continue;
+      const dayPrice = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
+      total += dayPrice * catMultiplier;
+    }
+
+    // Multi-day discount: if days > unique cities, apply discount to extra days
+    const uniqueCities = new Set(itinerary.map(d => d.city)).size;
+    const totalDays = itinerary.length;
+    if (multiDayDiscount > 0 && totalDays > uniqueCities) {
+      const extraDays = totalDays - uniqueCities;
+      const discountAmount = (total / totalDays) * extraDays * (multiDayDiscount / 100);
+      total -= discountAmount;
+    }
+
+    return Math.round(total);
+  }, [itinerary, selectedCategory, cityRates, config, multiDayDiscount, hasItineraryPricing]);
+
+  const hasDiscount = multiDayDiscount > 0 && itinerary.length > new Set(itinerary.map(d => d.city)).size;
 
   const handleGetP2PQuote = async () => {
     if (!origin || !destination) return;
@@ -96,7 +146,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = selectedCategory === 'suv' ? 'first_class' as const : selectedCategory;
       const result = await calculateTransferPrice(
-        limoConfig, origin, destination, transferCategory, agency.country, cityPricingData,
+        limoConfig, origin, destination, transferCategory, agency.country, [],
         originCoords, destCoords
       );
       setQuote(result);
@@ -109,12 +159,13 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
-    const dateStr = date ? format(date, 'PPP') : 'Not specified';
+    const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    
+
     let msg: string;
-    if (mode === 'package') {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (${selectedPackage} Package):\n📍 Pickup: ${origin || 'To be confirmed'}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${packagePrice}\n\nPlease confirm availability.`;
+    if (mode === 'itinerary') {
+      const plan = itinerary.map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? 'Full Day' : 'Half Day'})`).join('\n');
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n\n📋 Itinerary:\n${plan}\n\n💰 Estimated: €${itineraryPrice ?? 'TBD'}${hasDiscount ? ` (${multiDayDiscount}% multi-day discount applied)` : ''}\n\nPlease confirm availability.`;
     } else {
       msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
     }
@@ -122,8 +173,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     window.open(url, '_blank');
   };
 
-  const hasPackagePricing = getPackagePrice('business', '8h') > 0 || getPackagePrice('first_class', '8h') > 0 || getPackagePrice('van', '8h') > 0 || getPackagePrice('suv', '8h') > 0
-    || getPackagePrice('business', '10h') > 0 || getPackagePrice('first_class', '10h') > 0 || getPackagePrice('van', '10h') > 0 || getPackagePrice('suv', '10h') > 0;
   const hasP2PPricing = (config.limo_p2p_base_fee ?? config.transfer_base_fee ?? 0) > 0 || (config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate ?? 0) > 0;
 
   return (
@@ -140,15 +189,17 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
         {/* Mode Toggle */}
         <div className="flex gap-2 p-1 rounded-xl bg-muted/50">
-          <button
-            onClick={() => { setMode('package'); setQuote(null); }}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all",
-              mode === 'package' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Timer className="h-4 w-4" /> Package (8h / 10h)
-          </button>
+          {hasItineraryPricing && (
+            <button
+              onClick={() => { setMode('itinerary'); setQuote(null); }}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                mode === 'itinerary' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Timer className="h-4 w-4" /> Multi-Day Tour
+            </button>
+          )}
           <button
             onClick={() => { setMode('p2p'); setQuote(null); }}
             className={cn(
@@ -160,111 +211,131 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           </button>
         </div>
 
-        {/* Pickup Location */}
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Location
-          </Label>
-          <LocationAutocomplete
-            value={origin}
-            onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }}
-            placeholder="Airport, hotel, or address"
-            locations={agencyLocations}
-            agencyCity={agency.city}
-            agencyCountry={agency.country}
-          />
-        </div>
+        {/* Itinerary Mode — Day-by-Day Builder */}
+        {mode === 'itinerary' && (
+          <div className="space-y-4">
+            {/* Start date & time */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Start Date
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !startDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Time
+                </Label>
+                <Select value={time} onValueChange={setTime}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Select time" /></SelectTrigger>
+                  <SelectContent>{timeSlots.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
 
-        {/* Drop-off (P2P only) */}
-        {mode === 'p2p' && (
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off Location
-            </Label>
-            <LocationAutocomplete
-              value={destination}
-              onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }}
-              placeholder="Destination address"
-              locations={agencyLocations}
-              agencyCity={agency.city}
-              agencyCountry={agency.country}
-            />
+            {/* Day-by-day plan */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Day-by-Day Itinerary</Label>
+              {itinerary.map((day, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
+                  <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Day {idx + 1}</span>
+                  <Select value={day.city} onValueChange={(v) => updateDay(idx, { city: v })}>
+                    <SelectTrigger className="h-9 text-xs flex-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {availableCities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => updateDay(idx, { dayType: 'full' })}
+                      className={cn(
+                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                        day.dayType === 'full' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                      )}
+                      style={day.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                    >
+                      <Sun className="h-3 w-3" /> Full
+                    </button>
+                    <button
+                      onClick={() => updateDay(idx, { dayType: 'half' })}
+                      className={cn(
+                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                        day.dayType === 'half' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                      )}
+                      style={day.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                    >
+                      <SunMedium className="h-3 w-3" /> Half
+                    </button>
+                  </div>
+                  {itinerary.length > 1 && (
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeDay(idx)}>
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <Button variant="outline" size="sm" className="text-xs w-full" onClick={addDay}>
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
+              </Button>
+            </div>
           </div>
         )}
 
-        {/* Date, Time & Package */}
-        <div className={cn("grid gap-3", mode === 'package' ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2')}>
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium flex items-center gap-1.5">
-              <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Date
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn("w-full justify-start text-left font-normal h-10", !date && "text-muted-foreground")}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Time
-            </Label>
-            <Select value={time} onValueChange={setTime}>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Select time" />
-              </SelectTrigger>
-              <SelectContent>
-                {timeSlots.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {mode === 'package' && (
+        {/* P2P Mode — Locations */}
+        {mode === 'p2p' && (
+          <>
             <div className="space-y-1.5">
               <Label className="text-xs font-medium flex items-center gap-1.5">
-                <Timer className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Package
+                <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Location
               </Label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedPackage('8h')}
-                  className={cn(
-                    "flex-1 h-10 rounded-lg border-2 text-sm font-semibold transition-all",
-                    selectedPackage === '8h' ? 'shadow-sm text-foreground' : 'border-border text-muted-foreground hover:border-muted-foreground/30'
-                  )}
-                  style={selectedPackage === '8h' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                >
-                  8 Hours
-                </button>
-                <button
-                  onClick={() => setSelectedPackage('10h')}
-                  className={cn(
-                    "flex-1 h-10 rounded-lg border-2 text-sm font-semibold transition-all",
-                    selectedPackage === '10h' ? 'shadow-sm text-foreground' : 'border-border text-muted-foreground hover:border-muted-foreground/30'
-                  )}
-                  style={selectedPackage === '10h' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                >
-                  10 Hours
-                </button>
+              <LocationAutocomplete value={origin} onChange={(v, sel?: LocationSelection) => { setOrigin(v); setOriginCoords(sel?.coords); setQuote(null); }} placeholder="Airport, hotel, or address" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off Location
+              </Label>
+              <LocationAutocomplete value={destination} onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }} placeholder="Destination address" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} />
+            </div>
+            {/* Date & Time for P2P */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Date
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !startDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Time
+                </Label>
+                <Select value={time} onValueChange={setTime}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Select time" /></SelectTrigger>
+                  <SelectContent>{timeSlots.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
               </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
 
         <Separator />
 
@@ -275,7 +346,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             {LIMO_CATEGORIES.map((cat) => {
               const Icon = LIMO_CATEGORY_ICONS[cat.id];
               const isSelected = selectedCategory === cat.id;
-              const price = mode === 'package' ? getPackagePrice(cat.id, selectedPackage) : 0;
 
               return (
                 <button
@@ -289,17 +359,14 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   <Icon className="h-6 w-6 mb-2 opacity-60" />
                   <p className="text-sm font-bold">{cat.label}</p>
                   <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                  {mode === 'package' && price > 0 && (
-                    <p className="text-xs font-semibold mt-1" style={{ color: buttonColor }}>€{price}</p>
-                  )}
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Package Mode — Instant Price */}
-        {mode === 'package' && hasPackagePricing && packagePrice > 0 && origin && (
+        {/* Itinerary Mode — Price Summary */}
+        {mode === 'itinerary' && hasItineraryPricing && itineraryPrice !== null && itineraryPrice > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -307,10 +374,15 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             style={{ backgroundColor: `${buttonColor}10` }}
           >
             <p className="text-sm text-muted-foreground">
-              {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {selectedPackage === '8h' ? '8' : '10'} hours
+              {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
             </p>
-            <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{packagePrice}</p>
-            <p className="text-xs text-muted-foreground">Fixed package price</p>
+            <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{itineraryPrice}</p>
+            {hasDiscount && (
+              <p className="text-xs font-medium" style={{ color: buttonColor }}>
+                {multiDayDiscount}% multi-day discount applied!
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground">Estimated price · Different vehicle per day possible</p>
 
             {config.whatsapp_number && (
               <Button
@@ -324,10 +396,10 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           </motion.div>
         )}
 
-        {mode === 'package' && !hasPackagePricing && (
+        {mode === 'itinerary' && !hasItineraryPricing && (
           <div className="rounded-xl border border-muted bg-muted/10 p-4 text-center">
             <AlertCircle className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm font-medium">Package pricing not configured</p>
+            <p className="text-sm font-medium">City pricing not configured</p>
             <p className="text-xs text-muted-foreground mt-1">Please contact us directly for a quote.</p>
             {config.whatsapp_number && (
               <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={handleWhatsApp}>
@@ -364,7 +436,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 <AlertCircle className="h-5 w-5 mx-auto text-destructive" />
                 <p className="text-sm font-medium">Route too long for Limo Service</p>
                 <p className="text-xs text-muted-foreground">
-                  This route is ~{quote.distance_km} km, but Limo P2P is limited to {maxKm} km. Please use our <strong>Transfer</strong> service instead, or contact us directly.
+                  This route is ~{quote.distance_km} km, but Limo P2P is limited to {maxKm} km. Please use our <strong>Transfer</strong> service instead.
                 </p>
                 {config.whatsapp_number && (
                   <Button variant="outline" size="sm" className="mt-2 gap-1" onClick={handleWhatsApp}>
