@@ -254,7 +254,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                     <tr>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
-                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Rate (€/km)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Price (€/km)</th>
                       <th className="px-3 py-1.5 w-10" />
                     </tr>
                   </thead>
@@ -285,7 +285,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                 <Input type="number" min={0} step={50} placeholder="100" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
               </div>
               <div className="space-y-1">
-                <Label className="text-[11px]">Rate (€/km)</Label>
+                <Label className="text-[11px]">Price (€/km)</Label>
                 <Input type="number" min={0} step={0.1} placeholder="1.50" value={newTierRate} onChange={(e) => setNewTierRate(e.target.value)} className="text-xs font-mono" />
               </div>
               <div className="flex items-end">
