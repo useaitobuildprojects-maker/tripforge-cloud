@@ -94,10 +94,12 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   const [newTierTo, setNewTierTo] = useState('');
   const [newTierPrice, setNewTierPrice] = useState('');
 
-  // Seed dummy Italian cities when empty
+  // Seed dummy Italian cities if none exist for Italy
   const [seeded, setSeeded] = useState(false);
   useEffect(() => {
-    if (!isSuccess || cities.length > 0 || seeded) return;
+    if (!isSuccess || seeded) return;
+    const hasItalian = cities.some(c => c.country === 'Italy');
+    if (hasItalian) { setSeeded(true); return; }
     setSeeded(true);
     const dummyCities = [
       { city: 'Rome', tiers: [{ from_km: 0, to_km: 50, fixed_price: 40 }, { from_km: 50, to_km: 100, fixed_price: 65 }, { from_km: 100, to_km: 200, fixed_price: 110 }] },
@@ -116,7 +118,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
         distance_tiers: d.tiers,
       });
     });
-  }, [isSuccess, cities.length, seeded, agencyId, addCity]);
+  }, [isSuccess, cities, seeded, agencyId, addCity]);
 
   const handleAddCity = () => {
     if (!newCityName.trim()) return;
