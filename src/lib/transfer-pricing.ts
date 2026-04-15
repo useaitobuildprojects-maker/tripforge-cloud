@@ -264,9 +264,14 @@ export async function calculateTransferPrice(
   });
 
   const cityRate = findCityRate(cityPricing, origin, destination);
+
+  // Use city-specific distance tiers if available, else fall back to global tiers
+  const cityTiers = cityRate?.distance_tiers;
+  const globalTiers = config.transfer_distance_tiers;
+  const effectiveTiers = cityTiers && cityTiers.length > 0 ? cityTiers : globalTiers;
+
   const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
-  const tiers = config.transfer_distance_tiers;
-  const hasPricing = (tiers && tiers.length > 0) || perKmRate > 0;
+  const hasPricing = (effectiveTiers && effectiveTiers.length > 0) || perKmRate > 0;
 
   if (!hasPricing) {
     console.warn('[Transfer] No pricing configured');
