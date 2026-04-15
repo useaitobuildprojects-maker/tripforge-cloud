@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useCityPricing, useAddCityPricing, useUpdateCityPricing, useDeleteCityPricing, DistanceTier } from '@/hooks/use-city-pricing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -304,10 +305,13 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 3: Flat per-km fallback (only when no tiers) */}
+      {/* Step 3: City-Specific Pricing */}
+      <CityPricingSection agencyId={agencyId} globalTiers={tiers} country={country} />
+
+      {/* Step 4: Flat per-km fallback (only when no tiers) */}
       {tiers.length === 0 && (
         <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-          <h4 className="text-xs font-semibold text-foreground">Step 3 — Flat Per-KM Fallback</h4>
+          <h4 className="text-xs font-semibold text-foreground">Step 4 — Flat Per-KM Fallback</h4>
           <p className="text-[11px] text-muted-foreground">Used only when no distance tiers are defined above.</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
