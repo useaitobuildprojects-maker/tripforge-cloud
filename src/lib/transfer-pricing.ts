@@ -3,6 +3,18 @@ import { StorefrontConfig } from '@/types/agency';
 import { CityPricing } from '@/hooks/use-city-pricing';
 import POI_DB from '@/data/poi-database';
 
+/** Haversine distance in km between two [lng, lat] points */
+function haversine(a: [number, number], b: [number, number]): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(b[1] - a[1]);
+  const dLng = toRad(b[0] - a[0]);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLng = Math.sin(dLng / 2);
+  const h = sinLat * sinLat + Math.cos(toRad(a[1])) * Math.cos(toRad(b[1])) * sinLng * sinLng;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
 export interface TransferQuote {
   origin: string;
   destination: string;
