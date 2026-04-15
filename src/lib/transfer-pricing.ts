@@ -25,13 +25,23 @@ export interface RouteInfo {
   duration_min: number;
 }
 
-/** Get multiplier for a category from config */
-function getCategoryMultiplier(config: StorefrontConfig, category: TransferCategory): number {
-  switch (category) {
-    case 'economy': return 1;
-    case 'business': return config.transfer_multiplier_business ?? 1.6;
-    case 'first_class': return config.transfer_multiplier_first_class ?? 2.4;
-  }
+/** Get the vehicle classes for a category */
+export function getVehicleClasses(config: StorefrontConfig) {
+  const defaults = [
+    { category: 'economy' as const, label: 'Economy (3 seats)', seats: 3, multiplier: 1 },
+    { category: 'economy' as const, label: 'Economy (4 seats)', seats: 4, multiplier: 1.1 },
+    { category: 'business' as const, label: 'Business (3 seats)', seats: 3, multiplier: 1.6 },
+    { category: 'first_class' as const, label: 'First Class (3 seats)', seats: 3, multiplier: 2.4 },
+  ];
+  return config.transfer_vehicle_classes && config.transfer_vehicle_classes.length > 0
+    ? config.transfer_vehicle_classes
+    : defaults;
+}
+
+/** Get multiplier for a specific vehicle class by index */
+function getClassMultiplier(config: StorefrontConfig, classIndex: number): number {
+  const classes = getVehicleClasses(config);
+  return classes[classIndex]?.multiplier ?? 1;
 }
 
 /** Calculate tiered distance charge: each 100km bracket can have its own per-km rate */
@@ -63,14 +73,9 @@ function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): 
   return charge;
 }
 
-/** Get seat-based multiplier: category_multiplier × (1 + seat_factor × max(0, seats - base_seats)) */
-function getSeatMultiplier(config: StorefrontConfig, category: TransferCategory, seatCount?: number): number {
-  const catMult = getCategoryMultiplier(config, category);
-  if (!seatCount) return catMult;
-  const baseSeats = config.transfer_base_seats ?? 3;
-  const seatFactor = config.transfer_seat_factor ?? 0;
-  const extraSeats = Math.max(0, seatCount - baseSeats);
-  return catMult * (1 + seatFactor * extraSeats);
+/** Get multiplier directly from vehicle class index */
+function getClassMultiplierDirect(config: StorefrontConfig, classIndex: number): number {
+  return getClassMultiplier(config, classIndex);
 }
 
 /** Calculate price using formula: (Base + TieredDistance + Duration×PerMin) × Multiplier, with minimum fare */
