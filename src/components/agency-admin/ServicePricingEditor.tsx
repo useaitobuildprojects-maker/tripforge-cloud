@@ -77,30 +77,55 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 
 // ── City Pricing Section ──
 const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: string; globalTiers: { from_km: number; to_km: number; fixed_price: number }[]; country?: string }) => {
-  const { data: cities = [] } = useCityPricing(agencyId);
+  const { data: cities = [], isSuccess } = useCityPricing(agencyId);
   const addCity = useAddCityPricing();
   const updateCity = useUpdateCityPricing();
   const deleteCity = useDeleteCityPricing();
 
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [newCityCountry, setNewCityCountry] = useState(country || 'Italy');
   const [newCityName, setNewCityName] = useState('');
-  const [newCityCountry, setNewCityCountry] = useState(country || '');
+  const availableCities = useMemo(() => getCitiesForCountry(newCityCountry), [newCityCountry]);
 
   // Tier editing state per city
   const [newTierFrom, setNewTierFrom] = useState('');
   const [newTierTo, setNewTierTo] = useState('');
   const [newTierPrice, setNewTierPrice] = useState('');
 
+  // Seed dummy Italian cities when empty
+  const [seeded, setSeeded] = useState(false);
+  useEffect(() => {
+    if (!isSuccess || cities.length > 0 || seeded) return;
+    setSeeded(true);
+    const dummyCities = [
+      { city: 'Rome', tiers: [{ from_km: 0, to_km: 50, fixed_price: 40 }, { from_km: 50, to_km: 100, fixed_price: 65 }, { from_km: 100, to_km: 200, fixed_price: 110 }] },
+      { city: 'Milan', tiers: [{ from_km: 0, to_km: 50, fixed_price: 45 }, { from_km: 50, to_km: 100, fixed_price: 70 }, { from_km: 100, to_km: 200, fixed_price: 120 }] },
+      { city: 'Naples', tiers: [{ from_km: 0, to_km: 50, fixed_price: 35 }, { from_km: 50, to_km: 100, fixed_price: 55 }, { from_km: 100, to_km: 200, fixed_price: 95 }] },
+      { city: 'Florence', tiers: [{ from_km: 0, to_km: 50, fixed_price: 38 }, { from_km: 50, to_km: 100, fixed_price: 60 }, { from_km: 100, to_km: 200, fixed_price: 100 }] },
+    ];
+    dummyCities.forEach((d) => {
+      addCity.mutate({
+        agency_id: agencyId,
+        city_name: d.city,
+        country: 'Italy',
+        transfer_base_fee: 0,
+        transfer_per_km_rate: 0,
+        drop_off_fee: 0,
+        distance_tiers: d.tiers,
+      });
+    });
+  }, [isSuccess, cities.length, seeded, agencyId, addCity]);
+
   const handleAddCity = () => {
     if (!newCityName.trim()) return;
     addCity.mutate({
       agency_id: agencyId,
       city_name: newCityName.trim(),
-      country: newCityCountry || country || '',
+      country: newCityCountry,
       transfer_base_fee: 0,
       transfer_per_km_rate: 0,
       drop_off_fee: 0,
-      distance_tiers: [...globalTiers], // copy global tiers as default
+      distance_tiers: [...globalTiers],
     });
     setNewCityName('');
   };
@@ -226,13 +251,27 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
 
       {/* Add new city */}
       <div className="flex items-end gap-2 pt-2 border-t border-border">
-        <div className="space-y-1 flex-1">
-          <Label className="text-[10px]">City Name</Label>
-          <Input placeholder="e.g. Paris" value={newCityName} onChange={(e) => setNewCityName(e.target.value)} className="text-xs" />
-        </div>
-        <div className="space-y-1 w-32">
+        <div className="space-y-1 w-36">
           <Label className="text-[10px]">Country</Label>
-          <Input placeholder="France" value={newCityCountry} onChange={(e) => setNewCityCountry(e.target.value)} className="text-xs" />
+          <Select value={newCityCountry} onValueChange={(v) => { setNewCityCountry(v); setNewCityName(''); }}>
+            <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {COUNTRY_LIST.map((c) => (
+                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1 flex-1">
+          <Label className="text-[10px]">City</Label>
+          <Select value={newCityName} onValueChange={setNewCityName}>
+            <SelectTrigger className="text-xs h-8"><SelectValue placeholder="Select city…" /></SelectTrigger>
+            <SelectContent>
+              {availableCities.map((c) => (
+                <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button size="sm" onClick={handleAddCity} disabled={!newCityName.trim() || addCity.isPending} className="gradient-accent text-accent-foreground h-8">
           <Plus className="h-3.5 w-3.5 mr-1" /> Add City
