@@ -269,15 +269,18 @@ export async function calculateTransferPrice(
     error,
   });
 
-  const cityRate = findCityRate(cityPricing, origin, destination);
+  const { originRate, destRate } = findCityRates(cityPricing, origin, destination);
+  const cityRate = originRate ?? destRate; // for drop-off fee logic
 
-  // Use city-specific distance tiers if available, else fall back to global tiers
-  const cityTiers = cityRate?.distance_tiers;
+  // Resolve tiers for origin and destination
   const globalTiers = config.transfer_distance_tiers;
-  const effectiveTiers = cityTiers && cityTiers.length > 0 ? cityTiers : globalTiers;
+  const globalPerKm = config.transfer_per_km_rate ?? 0;
+  const originTiers = originRate?.distance_tiers?.length ? originRate.distance_tiers : globalTiers;
+  const destTiers = destRate?.distance_tiers?.length ? destRate.distance_tiers : globalTiers;
+  const originPerKm = originRate?.transfer_per_km_rate ?? globalPerKm;
+  const destPerKm = destRate?.transfer_per_km_rate ?? globalPerKm;
 
-  const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
-  const hasPricing = (effectiveTiers && effectiveTiers.length > 0) || perKmRate > 0;
+  const hasPricing = (originTiers && originTiers.length > 0) || originPerKm > 0 || (destTiers && destTiers.length > 0) || destPerKm > 0;
 
   if (!hasPricing) {
     console.warn('[Transfer] No pricing configured');
@@ -305,7 +308,21 @@ export async function calculateTransferPrice(
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distancePrice = getTieredDistanceCharge(effectiveTiers, distanceKm, perKmRate);
+
+  // Split pricing: if both origin and destination have city rates, each covers half the distance
+  let distancePrice: number;
+  if (originRate && destRate && originRate.id !== destRate.id) {
+    const halfKm = distanceKm / 2;
+    const originCharge = getTieredDistanceCharge(originTiers, halfKm, originPerKm);
+    const destCharge = getTieredDistanceCharge(destTiers, halfKm, destPerKm);
+    distancePrice = originCharge + destCharge;
+    console.log('[Transfer] Split pricing:', { halfKm, originCharge, destCharge, total: distancePrice });
+  } else {
+    const effectiveTiers = originTiers ?? destTiers;
+    const effectivePerKm = originRate ? originPerKm : destPerKm;
+    distancePrice = getTieredDistanceCharge(effectiveTiers, distanceKm, effectivePerKm);
+  }
+
   const rawPrice = distancePrice * multiplier + appliedDropOff;
   const price = Math.round(rawPrice);
 
