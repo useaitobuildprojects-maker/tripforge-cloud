@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TransferCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/transfer-pricing';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -27,7 +28,8 @@ interface Props {
 }
 
 const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
-  
+  const { data: cityPricing = [] } = useCityPricing(agency.id);
+
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -70,7 +72,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     const vc = vehicleClasses[selectedClassIndex];
     try {
       const result = await calculateTransferPrice(
-        config, effectiveOrigin, effectiveDest, vc?.category as TransferCategory ?? 'economy', agency.country, [],
+        config, effectiveOrigin, effectiveDest, vc?.category as TransferCategory ?? 'economy', agency.country, cityPricing,
         originCoords, destCoords, selectedClassIndex
       );
       setQuote(result);

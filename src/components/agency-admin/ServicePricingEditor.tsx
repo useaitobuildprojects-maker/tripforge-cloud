@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useCityPricing, useAddCityPricing, useUpdateCityPricing, useDeleteCityPricing, DistanceTier } from '@/hooks/use-city-pricing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,6 +72,173 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
     </motion.div>
+  );
+};
+
+// ── City Pricing Section ──
+const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: string; globalTiers: { from_km: number; to_km: number; fixed_price: number }[]; country?: string }) => {
+  const { data: cities = [] } = useCityPricing(agencyId);
+  const addCity = useAddCityPricing();
+  const updateCity = useUpdateCityPricing();
+  const deleteCity = useDeleteCityPricing();
+
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [newCityName, setNewCityName] = useState('');
+  const [newCityCountry, setNewCityCountry] = useState(country || '');
+
+  // Tier editing state per city
+  const [newTierFrom, setNewTierFrom] = useState('');
+  const [newTierTo, setNewTierTo] = useState('');
+  const [newTierPrice, setNewTierPrice] = useState('');
+
+  const handleAddCity = () => {
+    if (!newCityName.trim()) return;
+    addCity.mutate({
+      agency_id: agencyId,
+      city_name: newCityName.trim(),
+      country: newCityCountry || country || '',
+      transfer_base_fee: 0,
+      transfer_per_km_rate: 0,
+      drop_off_fee: 0,
+      distance_tiers: [...globalTiers], // copy global tiers as default
+    });
+    setNewCityName('');
+  };
+
+  const handleAddTier = (cityId: string) => {
+    const from = Number(newTierFrom);
+    const to = Number(newTierTo);
+    const price = Number(newTierPrice);
+    if (isNaN(from) || isNaN(to) || isNaN(price) || to <= from) return;
+    const city = cities.find(c => c.id === cityId);
+    if (!city) return;
+    const updated = [...(city.distance_tiers || []), { from_km: from, to_km: to, fixed_price: price }].sort((a, b) => a.from_km - b.from_km);
+    updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
+    setNewTierFrom(''); setNewTierTo(''); setNewTierPrice('');
+  };
+
+  const handleRemoveTier = (cityId: string, tierIdx: number) => {
+    const city = cities.find(c => c.id === cityId);
+    if (!city) return;
+    const updated = city.distance_tiers.filter((_, i) => i !== tierIdx);
+    updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
+  };
+
+  const handleUpdateDropOff = (cityId: string, value: number) => {
+    updateCity.mutate({ id: cityId, agencyId, drop_off_fee: value });
+  };
+
+  return (
+    <div className="rounded-lg border border-border p-4 space-y-3">
+      <div>
+        <h4 className="text-xs font-semibold text-foreground">Step 3 — City-Specific Pricing</h4>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
+          Override distance tiers per city. Trips originating from a city use that city's tiers instead of global ones.
+        </p>
+      </div>
+
+      {/* Existing cities */}
+      {cities.map((city) => (
+        <div key={city.id} className="border border-border rounded-lg overflow-hidden">
+          <div
+            className="flex items-center justify-between px-3 py-2 bg-secondary/30 cursor-pointer"
+            onClick={() => setExpanded(expanded === city.id ? null : city.id)}
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-foreground">{city.city_name}</span>
+              <span className="text-[10px] text-muted-foreground">{city.country}</span>
+              <span className="text-[10px] text-muted-foreground">·</span>
+              <span className="text-[10px] text-muted-foreground">{city.distance_tiers.length} tiers</span>
+              {city.drop_off_fee > 0 && (
+                <span className="text-[10px] text-muted-foreground">· Drop-off: €{city.drop_off_fee}</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); deleteCity.mutate({ id: city.id, agencyId }); }}>
+                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+              </Button>
+            </div>
+          </div>
+
+          {expanded === city.id && (
+            <div className="p-3 space-y-3">
+              {/* Drop-off fee */}
+              <div className="flex items-center gap-2">
+                <Label className="text-[10px] whitespace-nowrap">Drop-off fee (€)</Label>
+                <Input type="number" min={0} step={1} value={city.drop_off_fee}
+                  onChange={(e) => handleUpdateDropOff(city.id, Number(e.target.value) || 0)}
+                  className="text-xs font-mono w-24" />
+                <span className="text-[10px] text-muted-foreground">Applied for intercity trips</span>
+              </div>
+
+              {/* Tiers table */}
+              {city.distance_tiers.length > 0 && (
+                <table className="w-full text-xs border border-border rounded-lg overflow-hidden">
+                  <thead className="bg-secondary/50">
+                    <tr>
+                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
+                      <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Price (€)</th>
+                      <th className="px-3 py-1.5 w-10" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {city.distance_tiers.map((t, i) => (
+                      <tr key={i} className="border-t border-border">
+                        <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
+                        <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
+                        <td className="px-3 py-1.5 text-right font-mono">€{t.fixed_price}</td>
+                        <td className="px-3 py-1.5">
+                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveTier(city.id, i)}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Add tier */}
+              <div className="grid grid-cols-4 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">From (km)</Label>
+                  <Input type="number" min={0} placeholder="0" value={newTierFrom} onChange={(e) => setNewTierFrom(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">To (km)</Label>
+                  <Input type="number" min={0} placeholder="50" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Price (€)</Label>
+                  <Input type="number" min={0} placeholder="35" value={newTierPrice} onChange={(e) => setNewTierPrice(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={() => handleAddTier(city.id)} disabled={!newTierFrom || !newTierTo || !newTierPrice} className="gradient-accent text-accent-foreground w-full h-8">
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
+
+      {/* Add new city */}
+      <div className="flex items-end gap-2 pt-2 border-t border-border">
+        <div className="space-y-1 flex-1">
+          <Label className="text-[10px]">City Name</Label>
+          <Input placeholder="e.g. Paris" value={newCityName} onChange={(e) => setNewCityName(e.target.value)} className="text-xs" />
+        </div>
+        <div className="space-y-1 w-32">
+          <Label className="text-[10px]">Country</Label>
+          <Input placeholder="France" value={newCityCountry} onChange={(e) => setNewCityCountry(e.target.value)} className="text-xs" />
+        </div>
+        <Button size="sm" onClick={handleAddCity} disabled={!newCityName.trim() || addCity.isPending} className="gradient-accent text-accent-foreground h-8">
+          <Plus className="h-3.5 w-3.5 mr-1" /> Add City
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -304,10 +472,13 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 3: Flat per-km fallback (only when no tiers) */}
+      {/* Step 3: City-Specific Pricing */}
+      <CityPricingSection agencyId={agencyId} globalTiers={tiers} country={country} />
+
+      {/* Step 4: Flat per-km fallback (only when no tiers) */}
       {tiers.length === 0 && (
         <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-          <h4 className="text-xs font-semibold text-foreground">Step 3 — Flat Per-KM Fallback</h4>
+          <h4 className="text-xs font-semibold text-foreground">Step 4 — Flat Per-KM Fallback</h4>
           <p className="text-[11px] text-muted-foreground">Used only when no distance tiers are defined above.</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">

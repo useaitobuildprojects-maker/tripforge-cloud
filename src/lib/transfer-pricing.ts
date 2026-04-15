@@ -44,11 +44,10 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
   return classes[classIndex]?.multiplier ?? 1;
 }
 
-/** Find the fixed price for a distance bracket. Returns the matching tier's fixed_price, or falls back to flat per-km. */
-function getTieredDistanceCharge(config: StorefrontConfig, distanceKm: number): number {
-  const tiers = config.transfer_distance_tiers;
+/** Find the fixed price for a distance bracket using prorated tiers. */
+function getTieredDistanceCharge(tiers: { from_km: number; to_km: number; fixed_price: number }[] | undefined, distanceKm: number, perKmFallback: number): number {
   if (!tiers || tiers.length === 0) {
-    return distanceKm * (config.transfer_per_km_rate ?? 0);
+    return distanceKm * perKmFallback;
   }
   const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
   let total = 0;
@@ -74,7 +73,7 @@ export function getFormulaPrice(
   classIndex?: number
 ): number {
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distanceCharge = getTieredDistanceCharge(config, distanceKm);
+  const distanceCharge = getTieredDistanceCharge(config.transfer_distance_tiers, distanceKm, config.transfer_per_km_rate ?? 0);
   const raw = distanceCharge * multiplier;
   return Math.round(raw);
 }
@@ -264,9 +263,14 @@ export async function calculateTransferPrice(
   });
 
   const cityRate = findCityRate(cityPricing, origin, destination);
+
+  // Use city-specific distance tiers if available, else fall back to global tiers
+  const cityTiers = cityRate?.distance_tiers;
+  const globalTiers = config.transfer_distance_tiers;
+  const effectiveTiers = cityTiers && cityTiers.length > 0 ? cityTiers : globalTiers;
+
   const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
-  const tiers = config.transfer_distance_tiers;
-  const hasPricing = (tiers && tiers.length > 0) || perKmRate > 0;
+  const hasPricing = (effectiveTiers && effectiveTiers.length > 0) || perKmRate > 0;
 
   if (!hasPricing) {
     console.warn('[Transfer] No pricing configured');
@@ -294,7 +298,7 @@ export async function calculateTransferPrice(
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distancePrice = getTieredDistanceCharge(config, distanceKm);
+  const distancePrice = getTieredDistanceCharge(effectiveTiers, distanceKm, perKmRate);
   const rawPrice = distancePrice * multiplier + appliedDropOff;
   const price = Math.round(rawPrice);
 

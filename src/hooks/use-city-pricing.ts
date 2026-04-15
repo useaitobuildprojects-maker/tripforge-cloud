@@ -2,6 +2,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export interface DistanceTier {
+  from_km: number;
+  to_km: number;
+  fixed_price: number;
+}
+
 export interface CityPricing {
   id: string;
   agency_id: string;
@@ -10,6 +16,7 @@ export interface CityPricing {
   transfer_base_fee: number;
   transfer_per_km_rate: number;
   drop_off_fee: number;
+  distance_tiers: DistanceTier[];
   created_at: string;
 }
 
@@ -26,6 +33,7 @@ export const useCityPricing = (agencyId: string | undefined) =>
       return (data ?? []).map((row: any) => ({
         ...row,
         drop_off_fee: row.drop_off_fee ?? 0,
+        distance_tiers: row.distance_tiers ?? [],
       })) as CityPricing[];
     },
     enabled: !!agencyId,
@@ -50,7 +58,7 @@ export const useAddCityPricing = () => {
 export const useUpdateCityPricing = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, agencyId, ...updates }: { id: string; agencyId: string } & Partial<Pick<CityPricing, 'city_name' | 'country' | 'transfer_base_fee' | 'transfer_per_km_rate' | 'drop_off_fee'>>) => {
+    mutationFn: async ({ id, agencyId, ...updates }: { id: string; agencyId: string } & Partial<Pick<CityPricing, 'city_name' | 'country' | 'transfer_base_fee' | 'transfer_per_km_rate' | 'drop_off_fee' | 'distance_tiers'>>) => {
       const { error } = await supabase.from('city_pricing').update(updates as any).eq('id', id);
       if (error) throw error;
     },

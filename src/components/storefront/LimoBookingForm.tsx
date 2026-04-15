@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote } from '@/lib/transfer-pricing';
+import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 
 const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
@@ -49,6 +50,7 @@ interface Props {
 }
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+  const { data: cityPricing = [] } = useCityPricing(agency.id);
   const agencyLocations = useMemo(() => {
     const configLocs = config.locations;
     if (configLocs && configLocs.length > 0) {
@@ -141,7 +143,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       };
       const transferCategory = (selectedCategory === 'suv' || selectedCategory === 'van') ? 'first_class' as const : selectedCategory as 'economy' | 'business' | 'first_class';
       const result = await calculateTransferPrice(
-        limoConfig, origin, destination, transferCategory, agency.country, [],
+        limoConfig, origin, destination, transferCategory, agency.country, cityPricing,
         originCoords, destCoords
       );
       setQuote(result);
