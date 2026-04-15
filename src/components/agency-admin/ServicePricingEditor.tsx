@@ -298,42 +298,22 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
         )}
       </div>
 
-      {/* Step 3: Base Formula */}
-      <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Step 3 — Base Formula</h4>
-        <p className="text-[11px] text-muted-foreground">Base Fee + {tiers.length > 0 ? 'Tiered Distance' : 'Distance×PerKM'} + Duration×PerMin. Minimum fare ensures a floor price.</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Base Fee (€)</Label>
-            <Input type="number" min={0} step={0.5} placeholder="15"
-              value={storefrontConfig.transfer_base_fee ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_base_fee: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Flat Per-KM (€){tiers.length > 0 ? ' (unused)' : ''}</Label>
-            <Input type="number" min={0} step={0.1} placeholder="1.20"
-              value={storefrontConfig.transfer_per_km_rate ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono"
-              disabled={tiers.length > 0} />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Per-Minute Rate (€)</Label>
-            <Input type="number" min={0} step={0.1} placeholder="0.50"
-              value={storefrontConfig.transfer_per_minute_rate ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_minute_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Minimum Fare (€)</Label>
-            <Input type="number" min={0} step={1} placeholder="10"
-              value={storefrontConfig.transfer_minimum_fare ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_minimum_fare: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
+      {/* Step 3: Flat per-km fallback (only when no tiers) */}
+      {tiers.length === 0 && (
+        <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
+          <h4 className="text-xs font-semibold text-foreground">Step 3 — Flat Per-KM Fallback</h4>
+          <p className="text-[11px] text-muted-foreground">Used only when no distance tiers are defined above.</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-[11px]">Per-KM Price (€)</Label>
+              <Input type="number" min={0} step={0.1} placeholder="1.20"
+                value={storefrontConfig.transfer_per_km_rate ?? ''}
+                onChange={(e) => onConfigChange({ ...storefrontConfig, transfer_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
+                className="text-xs font-mono" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
     </div>
   );

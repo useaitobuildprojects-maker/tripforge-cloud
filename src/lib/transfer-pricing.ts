@@ -76,13 +76,10 @@ export function getFormulaPrice(
   durationMin?: number,
   classIndex?: number
 ): number {
-  const baseFee = config.transfer_base_fee ?? 0;
-  const perMinRate = config.transfer_per_minute_rate ?? 0;
-  const minFare = config.transfer_minimum_fare ?? 0;
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
   const distanceCharge = getTieredDistanceCharge(config, distanceKm);
-  const raw = (baseFee + distanceCharge + (durationMin ?? 0) * perMinRate) * multiplier;
-  return Math.round(Math.max(raw, minFare * multiplier));
+  const raw = distanceCharge * multiplier;
+  return Math.round(raw);
 }
 
 /** Fetch driving distance and duration using Google Routes API (primary) or OSRM (fallback) */
@@ -270,19 +267,12 @@ export async function calculateTransferPrice(
   });
 
   const cityRate = findCityRate(cityPricing, origin, destination);
-  const baseFee = cityRate?.transfer_base_fee ?? config.transfer_base_fee ?? 0;
   const perKmRate = cityRate?.transfer_per_km_rate ?? config.transfer_per_km_rate ?? 0;
-  const perMinRate = config.transfer_per_minute_rate ?? 0;
-  const minFare = config.transfer_minimum_fare ?? 0;
+  const tiers = config.transfer_distance_tiers;
+  const hasPricing = (tiers && tiers.length > 0) || perKmRate > 0;
 
-  if (cityRate) {
-    console.log('[Transfer] Using city-specific rate for:', cityRate.city_name, { baseFee, perKmRate });
-  } else {
-    console.log('[Transfer] Using global rate:', { baseFee, perKmRate, perMinRate });
-  }
-
-  if (baseFee === 0 && perKmRate === 0 && perMinRate === 0) {
-    console.warn('[Transfer] No formula configured');
+  if (!hasPricing) {
+    console.warn('[Transfer] No pricing configured');
     return emptyQuote('no_formula');
   }
 
@@ -307,20 +297,18 @@ export async function calculateTransferPrice(
   const appliedDropOff = isIntercity ? dropOffFee : 0;
 
   const multiplier = classIndex != null ? getClassMultiplier(config, classIndex) : 1;
-  const distanceCharge = getTieredDistanceCharge(config, distanceKm);
-  const timeCharge = durationMin * perMinRate;
-  const rawPrice = (baseFee + distanceCharge + timeCharge) * multiplier + appliedDropOff;
-  const effectiveMinFare = minFare * multiplier;
-  const price = Math.round(Math.max(rawPrice, effectiveMinFare));
+  const distancePrice = getTieredDistanceCharge(config, distanceKm);
+  const rawPrice = distancePrice * multiplier + appliedDropOff;
+  const price = Math.round(rawPrice);
 
-  console.log('[Transfer] Formula result:', { distanceKm, durationMin, price, dropOff: appliedDropOff });
+  console.log('[Transfer] Price result:', { distanceKm, durationMin, distancePrice, multiplier, price, dropOff: appliedDropOff });
 
   return {
     origin, destination, category, price, source: 'formula',
     distance_km: distanceKm, duration_min: durationMin, drop_off_fee: appliedDropOff,
-    base_fee: Math.round(baseFee * multiplier),
-    distance_charge: Math.round(distanceCharge * multiplier),
-    time_charge: Math.round(timeCharge * multiplier),
-    minimum_fare: effectiveMinFare,
+    base_fee: 0,
+    distance_charge: Math.round(distancePrice * multiplier),
+    time_charge: 0,
+    minimum_fare: 0,
   };
 }
