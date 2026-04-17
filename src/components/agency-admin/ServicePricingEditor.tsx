@@ -641,9 +641,23 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
       {/* City Daily Rates */}
       <div className="rounded-lg border border-border p-4 space-y-3">
-        <div>
-          <h4 className="text-xs font-semibold text-foreground">City Rates</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Set the 8h and 10h chauffeur rate for each city you serve.</p>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">City Rates</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Set the 8h and 10h chauffeur rate for each city you serve.</p>
+          </div>
+          <div className="flex gap-1.5 shrink-0">
+            <Button size="sm" variant="outline" onClick={downloadTemplate} className="h-7 text-[11px]">
+              <Download className="h-3 w-3 mr-1" /> Template
+            </Button>
+            <Button size="sm" variant="outline" onClick={exportRates} className="h-7 text-[11px]">
+              <Download className="h-3 w-3 mr-1" /> Export
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} className="h-7 text-[11px]">
+              <Upload className="h-3 w-3 mr-1" /> Import
+            </Button>
+            <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleUpload} />
+          </div>
         </div>
 
         {cityRates.length > 0 && (
