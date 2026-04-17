@@ -586,9 +586,9 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const downloadTemplate = () => {
     const data = [
-      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
-      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
-      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
+      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240, 'Max Days': 4 },
+      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210, 'Max Days': 3 },
+      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230, 'Max Days': 5 },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -603,6 +603,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
       City: cr.city,
       '10h Rate (€)': cr.full_day_rate,
       '8h Rate (€)': cr.half_day_rate,
+      'Max Days': cr.max_days ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
