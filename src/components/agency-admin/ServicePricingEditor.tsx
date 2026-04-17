@@ -556,6 +556,15 @@ const LIMO_CATEGORY_LABELS: Record<string, string> = {
   suv: 'SUV',
 };
 
+const DEFAULT_LIMO_CITY_RATES: NonNullable<StorefrontConfig['limo_city_rates']> = [
+  { city: 'Rome', country: 'Italy', full_day_rate: 380, half_day_rate: 230 },
+  { city: 'Milan', country: 'Italy', full_day_rate: 400, half_day_rate: 240 },
+  { city: 'Florence', country: 'Italy', full_day_rate: 350, half_day_rate: 210 },
+  { city: 'Paris', country: 'France', full_day_rate: 450, half_day_rate: 270 },
+  { city: 'Barcelona', country: 'Spain', full_day_rate: 380, half_day_rate: 230 },
+  { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190 },
+];
+
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCountry, setNewCountry] = useState('');
   const [newCity, setNewCity] = useState('');
@@ -683,7 +692,20 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <h4 className="text-xs font-semibold text-foreground">City Rates</h4>
             <p className="text-[11px] text-muted-foreground mt-0.5">Set the 8h and 10h chauffeur rate for each city you serve.</p>
           </div>
-          <div className="flex gap-1.5 shrink-0">
+          <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
+            <Button size="sm" variant="outline" onClick={() => {
+              const merged = [...cityRates];
+              let added = 0;
+              for (const sample of DEFAULT_LIMO_CITY_RATES) {
+                if (!merged.some((c) => c.city.toLowerCase() === sample.city.toLowerCase())) {
+                  merged.push(sample); added++;
+                }
+              }
+              onConfigChange({ ...storefrontConfig, limo_city_rates: merged });
+              toast.success(added ? `Added ${added} sample cities` : 'Sample cities already present');
+            }} className="h-7 text-[11px]">
+              <Plus className="h-3 w-3 mr-1" /> Load Sample
+            </Button>
             <Button size="sm" variant="outline" onClick={downloadTemplate} className="h-7 text-[11px]">
               <Download className="h-3 w-3 mr-1" /> Template
             </Button>
