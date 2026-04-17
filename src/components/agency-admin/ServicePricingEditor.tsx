@@ -542,14 +542,36 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 // ── Limo Service Tab (city daily rates + itinerary pricing) ──
 const DEFAULT_LIMO_MULTIPLIERS = { business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
 
+const DEFAULT_LIMO_VEHICLE_CLASSES: NonNullable<StorefrontConfig['limo_vehicle_classes']> = [
+  { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1 },
+  { category: 'first_class', label: 'First Class', seats: 3, multiplier: 2.4 },
+  { category: 'van', label: 'Business Van', seats: 7, multiplier: 1.6 },
+  { category: 'suv', label: 'Luxury SUV', seats: 5, multiplier: 1.6 },
+];
+
+const LIMO_CATEGORY_ORDER = ['business', 'first_class', 'van', 'suv'] as const;
+const LIMO_CATEGORY_LABELS: Record<string, string> = {
+  business: 'Business',
+  first_class: 'First Class',
+  van: 'Van',
+  suv: 'SUV',
+};
+
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [showClasses, setShowClasses] = useState(false);
+
+  // Vehicle class form state
+  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'van' | 'suv'>('business');
+  const [newClassLabel, setNewClassLabel] = useState('');
+  const [newClassSeats, setNewClassSeats] = useState('');
+  const [newClassMultiplier, setNewClassMultiplier] = useState('');
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
-  const multipliers = storefrontConfig.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+  const vehicleClasses = storefrontConfig.limo_vehicle_classes ?? DEFAULT_LIMO_VEHICLE_CLASSES;
 
   const downloadTemplate = () => {
     const data = [
@@ -605,12 +627,24 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
     }
   };
 
-  const updateMultiplier = (key: keyof typeof DEFAULT_LIMO_MULTIPLIERS, val: string) => {
-    const num = val ? Number(val) : 0;
-    onConfigChange({
-      ...storefrontConfig,
-      limo_category_multipliers: { ...multipliers, [key]: num },
-    });
+  const addVehicleClass = () => {
+    const seats = Number(newClassSeats);
+    const multiplier = Number(newClassMultiplier);
+    if (!newClassLabel || isNaN(seats) || seats < 1 || isNaN(multiplier) || multiplier <= 0) return;
+    const updated = [...vehicleClasses, { category: newClassCategory, label: newClassLabel, seats, multiplier }];
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
+    setNewClassLabel(''); setNewClassSeats(''); setNewClassMultiplier('');
+  };
+
+  const removeVehicleClass = (idx: number) => {
+    const updated = vehicleClasses.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated.length ? updated : undefined });
+  };
+
+  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+    const updated = [...vehicleClasses];
+    updated[idx] = { ...updated[idx], [field]: value };
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
   };
 
   const addCityRate = () => {
@@ -711,41 +745,99 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         <p className="text-[10px] text-muted-foreground">If 8h is left blank, it defaults to 60% of the 10h rate.</p>
       </div>
 
-      {/* Vehicle Category Multipliers (editable) */}
+      {/* Vehicle Classes (Transfer-style: multiple sub-classes per category) */}
       <div className="rounded-lg border border-border p-4 space-y-3">
-        <div>
-          <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            City rates are for <strong>Business Sedan</strong> (base 1×). Other categories scale the price by these multipliers.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">Vehicle Classes</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Each category can have multiple vehicle classes with different seat counts and price multipliers. City rates are for the base 1× class.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowClasses(!showClasses)}>
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showClasses ? 'Hide' : 'Edit'}
+          </Button>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Business Sedan</Label>
-            <Input type="number" min={0} step={0.1} value={multipliers.business}
-              onChange={(e) => updateMultiplier('business', e.target.value)}
-              className="text-xs font-mono" />
+
+        {showClasses && (
+          <div className="space-y-4 pt-2 border-t border-border">
+            {LIMO_CATEGORY_ORDER.map((cat) => {
+              const catClasses = vehicleClasses.map((vc, origIdx) => ({ ...vc, origIdx })).filter(vc => vc.category === cat);
+              if (catClasses.length === 0) return null;
+              return (
+                <div key={cat} className="space-y-2">
+                  <p className="text-[11px] font-semibold text-foreground">{LIMO_CATEGORY_LABELS[cat]}</p>
+                  <div className="space-y-1.5">
+                    {catClasses.map((vc) => (
+                      <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
+                          onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">Seats:</span>
+                          <Input type="number" min={1} max={50} value={vc.seats} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'seats', Number(e.target.value) || 1)} />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">×</span>
+                          <Input type="number" min={0.1} step={0.1} value={vc.multiplier} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'multiplier', Number(e.target.value) || 1)} />
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeVehicleClass(vc.origIdx)}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-[11px] font-semibold text-foreground">Add New Vehicle Class</p>
+              <div className="grid grid-cols-5 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Category</Label>
+                  <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
+                    <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="first_class">First Class</SelectItem>
+                      <SelectItem value="van">Van</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Label</Label>
+                  <Input placeholder="e.g. Premium Van" value={newClassLabel} onChange={(e) => setNewClassLabel(e.target.value)} className="text-xs" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Seats</Label>
+                  <Input type="number" min={1} placeholder="7" value={newClassSeats} onChange={(e) => setNewClassSeats(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Multiplier</Label>
+                  <Input type="number" min={0.1} step={0.1} placeholder="1.5" value={newClassMultiplier} onChange={(e) => setNewClassMultiplier(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={addVehicleClass} disabled={!newClassLabel || !newClassSeats || !newClassMultiplier} className="gradient-accent text-accent-foreground w-full h-8">
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">First Class</Label>
-            <Input type="number" min={0} step={0.1} value={multipliers.first_class}
-              onChange={(e) => updateMultiplier('first_class', e.target.value)}
-              className="text-xs font-mono" />
+        )}
+
+        {!showClasses && (
+          <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+            {vehicleClasses.map((vc, i) => (
+              <span key={i} className="bg-muted/30 px-2 py-0.5 rounded">
+                {vc.label || `${LIMO_CATEGORY_LABELS[vc.category]} ${vc.seats}s`}: <strong className="text-foreground">{vc.multiplier}× · {vc.seats} seats</strong>
+              </span>
+            ))}
           </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Business Van</Label>
-            <Input type="number" min={0} step={0.1} value={multipliers.van}
-              onChange={(e) => updateMultiplier('van', e.target.value)}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Luxury SUV</Label>
-            <Input type="number" min={0} step={0.1} value={multipliers.suv}
-              onChange={(e) => updateMultiplier('suv', e.target.value)}
-              className="text-xs font-mono" />
-          </div>
-        </div>
-        <p className="text-[10px] text-muted-foreground">Defaults: 1 / 2.4 / 1.6 / 1.6</p>
+        )}
       </div>
     </div>
   );

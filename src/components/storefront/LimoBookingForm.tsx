@@ -41,11 +41,29 @@ interface Props {
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
-  const multipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+  const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+
+  // Build effective vehicle classes: prefer new limo_vehicle_classes, fall back to legacy single-per-category
+  const vehicleClasses = useMemo(() => {
+    if (config.limo_vehicle_classes && config.limo_vehicle_classes.length > 0) {
+      return config.limo_vehicle_classes;
+    }
+    return [
+      { category: 'business' as const, label: 'Business Sedan', seats: 3, multiplier: legacyMultipliers.business ?? 1 },
+      { category: 'first_class' as const, label: 'First Class', seats: 3, multiplier: legacyMultipliers.first_class ?? 2.4 },
+      { category: 'van' as const, label: 'Business Van', seats: 7, multiplier: legacyMultipliers.van ?? 1.6 },
+      { category: 'suv' as const, label: 'Luxury SUV', seats: 5, multiplier: legacyMultipliers.suv ?? 1.6 },
+    ];
+  }, [config.limo_vehicle_classes, legacyMultipliers]);
+
   const hasItineraryPricing = cityRates.length > 0;
   const availableCities = cityRates.map(cr => cr.city);
 
-  const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
+  // Selected class index within vehicleClasses
+  const [selectedClassIdx, setSelectedClassIdx] = useState(0);
+  const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
+  const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
+
   const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([
@@ -63,16 +81,16 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const updateDay = (idx: number, updates: Partial<ItineraryDay>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-day price breakdown
+  // Per-day price breakdown using selected vehicle class multiplier
   const breakdown = useMemo(() => {
-    const catMult = multipliers[selectedCategory] ?? 1;
+    const catMult = selectedClass?.multiplier ?? 1;
     return itinerary.map(day => {
       const rate = cityRates.find(cr => cr.city === day.city);
       if (!rate) return { city: day.city, dayType: day.dayType, price: 0 };
       const base = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
       return { city: day.city, dayType: day.dayType, price: Math.round(base * catMult) };
     });
-  }, [itinerary, selectedCategory, cityRates, multipliers]);
+  }, [itinerary, selectedClass, cityRates]);
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
 
@@ -80,7 +98,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     if (!config.whatsapp_number) return;
     const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const catLabel = LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
+    const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
       .map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? '10h' : '8h'}) — €${d.price}`)
       .join('\n');
@@ -191,29 +209,42 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
             <Separator />
 
-            {/* Vehicle Category */}
+            {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium">Vehicle Category</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {LIMO_CATEGORIES.map((cat) => {
-                  const Icon = LIMO_CATEGORY_ICONS[cat.id];
-                  const isSelected = selectedCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`relative p-4 rounded-xl border-2 text-left transition-all ${
-                        isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
-                      }`}
-                      style={isSelected ? { borderColor: buttonColor } : undefined}
-                    >
-                      <Icon className="h-6 w-6 mb-2 opacity-60" />
-                      <p className="text-sm font-bold">{cat.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                    </button>
-                  );
-                })}
-              </div>
+              <Label className="text-xs font-medium">Vehicle Class</Label>
+              {(['business', 'first_class', 'van', 'suv'] as LimoCategory[]).map((cat) => {
+                const classesInCat = vehicleClasses
+                  .map((vc, idx) => ({ ...vc, idx }))
+                  .filter(vc => vc.category === cat);
+                if (classesInCat.length === 0) return null;
+                const catMeta = LIMO_CATEGORIES.find(c => c.id === cat);
+                const Icon = LIMO_CATEGORY_ICONS[cat];
+                return (
+                  <div key={cat} className="space-y-1.5">
+                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                      <Icon className="h-3 w-3" /> {catMeta?.label ?? cat}
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {classesInCat.map((vc) => {
+                        const isSelected = selectedClassIdx === vc.idx;
+                        return (
+                          <button
+                            key={vc.idx}
+                            onClick={() => setSelectedClassIdx(vc.idx)}
+                            className={`p-3 rounded-xl border-2 text-left transition-all ${
+                              isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
+                            }`}
+                            style={isSelected ? { borderColor: buttonColor } : undefined}
+                          >
+                            <p className="text-sm font-bold">{vc.label || `${catMeta?.label} ${vc.seats}p`}</p>
+                            <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Price Summary with breakdown */}
@@ -225,7 +256,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 style={{ backgroundColor: `${buttonColor}10` }}
               >
                 <p className="text-sm text-muted-foreground text-center">
-                  {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
+                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
                 </p>
 
                 <div className="space-y-1.5 text-sm">
