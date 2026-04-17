@@ -652,7 +652,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const addCityRate = () => {
     if (!newCity || !newFullDay) return;
-    const updated = [...cityRates, { city: newCity, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
+    const updated = [...cityRates, { city: newCity, country: newCountry || undefined, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
     onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
     setNewCity(''); setNewFullDay(''); setNewHalfDay('');
   };
