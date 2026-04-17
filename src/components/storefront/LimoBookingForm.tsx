@@ -94,6 +94,19 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
 
+  // Per-city day counts and any cities exceeding their max_days cap
+  const cityDayCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + 1;
+    return counts;
+  }, [itinerary]);
+
+  const exceededCities = useMemo(() => {
+    return cityRates
+      .filter(cr => cr.max_days && (cityDayCounts[cr.city] ?? 0) > cr.max_days)
+      .map(cr => ({ city: cr.city, used: cityDayCounts[cr.city] ?? 0, max: cr.max_days! }));
+  }, [cityRates, cityDayCounts]);
+
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
     const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
