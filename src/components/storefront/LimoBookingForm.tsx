@@ -315,6 +315,18 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   ))}
                 </div>
 
+                <div className="flex justify-between items-center pt-2 border-t border-border text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium tabular-nums">€{subtotal}</span>
+                </div>
+                {catMult !== 1 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">
+                      {selectedClass?.label} multiplier
+                    </span>
+                    <span className="font-medium tabular-nums">× {catMult}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center pt-2 border-t border-border">
                   <span className="text-sm font-semibold">Total</span>
                   <span className="text-3xl font-bold" style={{ color: buttonColor }}>€{total}</span>
