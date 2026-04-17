@@ -557,6 +557,7 @@ const LIMO_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+  const [newCountry, setNewCountry] = useState('');
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
@@ -571,12 +572,13 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
   const vehicleClasses = storefrontConfig.limo_vehicle_classes ?? DEFAULT_LIMO_VEHICLE_CLASSES;
+  const newCityOptions = newCountry ? getCitiesForCountry(newCountry) : [];
 
   const downloadTemplate = () => {
     const data = [
-      { City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
-      { City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
-      { City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
+      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
+      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
+      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -587,6 +589,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const exportRates = () => {
     if (cityRates.length === 0) { toast.error('No city rates to export'); return; }
     const data = cityRates.map((cr) => ({
+      Country: cr.country ?? '',
       City: cr.city,
       '10h Rate (€)': cr.full_day_rate,
       '8h Rate (€)': cr.half_day_rate,
@@ -608,13 +611,14 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
       const merged = [...cityRates];
       let added = 0; let updated = 0;
       for (const row of rows) {
+        const country = String(row['Country'] ?? '').trim();
         const city = String(row['City'] ?? '').trim();
         const full = Number(row['10h Rate (€)'] ?? row['10h Rate'] ?? 0);
         const half = Number(row['8h Rate (€)'] ?? row['8h Rate'] ?? 0) || Math.round(full * 0.6);
         if (!city || !full) continue;
         const existing = merged.findIndex((c) => c.city.toLowerCase() === city.toLowerCase());
-        if (existing >= 0) { merged[existing] = { city, full_day_rate: full, half_day_rate: half }; updated++; }
-        else { merged.push({ city, full_day_rate: full, half_day_rate: half }); added++; }
+        if (existing >= 0) { merged[existing] = { city, country: country || merged[existing].country, full_day_rate: full, half_day_rate: half }; updated++; }
+        else { merged.push({ city, country: country || undefined, full_day_rate: full, half_day_rate: half }); added++; }
       }
       onConfigChange({ ...storefrontConfig, limo_city_rates: merged });
       toast.success(`Imported: ${added} added, ${updated} updated`);
@@ -648,7 +652,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const addCityRate = () => {
     if (!newCity || !newFullDay) return;
-    const updated = [...cityRates, { city: newCity, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
+    const updated = [...cityRates, { city: newCity, country: newCountry || undefined, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
     onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
     setNewCity(''); setNewFullDay(''); setNewHalfDay('');
   };
@@ -698,6 +702,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <table className="w-full text-xs">
               <thead className="bg-secondary/50">
                 <tr>
+                  <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">Country</th>
                   <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">10h Rate (€)</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">8h Rate (€)</th>
@@ -707,6 +712,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               <tbody>
                 {cityRates.map((cr, i) => (
                   <tr key={i} className="border-t border-border hover:bg-secondary/20">
+                    <td className="px-3 py-1.5 text-muted-foreground">{cr.country ?? '—'}</td>
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
@@ -722,10 +728,24 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           <div className="space-y-1">
-            <Label className="text-[11px]">City Name</Label>
-            <Input placeholder="Istanbul" value={newCity} onChange={(e) => setNewCity(e.target.value)} className="text-xs" />
+            <Label className="text-[11px]">Country</Label>
+            <Select value={newCountry} onValueChange={(v) => { setNewCountry(v); setNewCity(''); }}>
+              <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select country" /></SelectTrigger>
+              <SelectContent>
+                {COUNTRY_LIST.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">City</Label>
+            <Select value={newCity} onValueChange={setNewCity} disabled={!newCountry}>
+              <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={newCountry ? 'Select city' : 'Pick country first'} /></SelectTrigger>
+              <SelectContent>
+                {newCityOptions.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">10h Rate (€)</Label>
@@ -737,7 +757,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
           <div className="flex items-end">
             <Button size="sm" onClick={addCityRate} disabled={!newCity || !newFullDay} className="gradient-accent text-accent-foreground w-full">
-              <Plus className="h-3.5 w-3.5 mr-1" /> Add City
+              <Plus className="h-3.5 w-3.5 mr-1" /> Add
             </Button>
           </div>
         </div>
