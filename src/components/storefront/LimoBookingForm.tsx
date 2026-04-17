@@ -209,29 +209,42 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
             <Separator />
 
-            {/* Vehicle Category */}
+            {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium">Vehicle Category</Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {LIMO_CATEGORIES.map((cat) => {
-                  const Icon = LIMO_CATEGORY_ICONS[cat.id];
-                  const isSelected = selectedCategory === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`relative p-4 rounded-xl border-2 text-left transition-all ${
-                        isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
-                      }`}
-                      style={isSelected ? { borderColor: buttonColor } : undefined}
-                    >
-                      <Icon className="h-6 w-6 mb-2 opacity-60" />
-                      <p className="text-sm font-bold">{cat.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{cat.description}</p>
-                    </button>
-                  );
-                })}
-              </div>
+              <Label className="text-xs font-medium">Vehicle Class</Label>
+              {(['business', 'first_class', 'van', 'suv'] as LimoCategory[]).map((cat) => {
+                const classesInCat = vehicleClasses
+                  .map((vc, idx) => ({ ...vc, idx }))
+                  .filter(vc => vc.category === cat);
+                if (classesInCat.length === 0) return null;
+                const catMeta = LIMO_CATEGORIES.find(c => c.id === cat);
+                const Icon = LIMO_CATEGORY_ICONS[cat];
+                return (
+                  <div key={cat} className="space-y-1.5">
+                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+                      <Icon className="h-3 w-3" /> {catMeta?.label ?? cat}
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {classesInCat.map((vc) => {
+                        const isSelected = selectedClassIdx === vc.idx;
+                        return (
+                          <button
+                            key={vc.idx}
+                            onClick={() => setSelectedClassIdx(vc.idx)}
+                            className={`p-3 rounded-xl border-2 text-left transition-all ${
+                              isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
+                            }`}
+                            style={isSelected ? { borderColor: buttonColor } : undefined}
+                          >
+                            <p className="text-sm font-bold">{vc.label || `${catMeta?.label} ${vc.seats}p`}</p>
+                            <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Price Summary with breakdown */}
@@ -243,7 +256,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 style={{ backgroundColor: `${buttonColor}10` }}
               >
                 <p className="text-sm text-muted-foreground text-center">
-                  {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
+                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
                 </p>
 
                 <div className="space-y-1.5 text-sm">
