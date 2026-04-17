@@ -626,10 +626,12 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         const city = String(row['City'] ?? '').trim();
         const full = Number(row['10h Rate (€)'] ?? row['10h Rate'] ?? 0);
         const half = Number(row['8h Rate (€)'] ?? row['8h Rate'] ?? 0) || Math.round(full * 0.6);
+        const maxDaysRaw = Number(row['Max Days'] ?? row['MaxDays'] ?? 0);
+        const max_days = maxDaysRaw > 0 ? maxDaysRaw : undefined;
         if (!city || !full) continue;
         const existing = merged.findIndex((c) => c.city.toLowerCase() === city.toLowerCase());
-        if (existing >= 0) { merged[existing] = { city, country: country || merged[existing].country, full_day_rate: full, half_day_rate: half }; updated++; }
-        else { merged.push({ city, country: country || undefined, full_day_rate: full, half_day_rate: half }); added++; }
+        if (existing >= 0) { merged[existing] = { city, country: country || merged[existing].country, full_day_rate: full, half_day_rate: half, max_days: max_days ?? merged[existing].max_days }; updated++; }
+        else { merged.push({ city, country: country || undefined, full_day_rate: full, half_day_rate: half, max_days }); added++; }
       }
       onConfigChange({ ...storefrontConfig, limo_city_rates: merged });
       toast.success(`Imported: ${added} added, ${updated} updated`);
