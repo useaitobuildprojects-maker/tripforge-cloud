@@ -745,6 +745,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                   <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">10h Rate (€)</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">8h Rate (€)</th>
+                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Max Days</th>
                   <th className="px-3 py-1.5 w-10" />
                 </tr>
               </thead>
@@ -755,6 +756,20 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
+                    <td className="px-3 py-1.5">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={cr.max_days ?? ''}
+                        placeholder="∞"
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          updateCityRate(i, 'max_days', v > 0 ? v : undefined);
+                        }}
+                        className="text-xs font-mono h-7 w-16 ml-auto text-right"
+                      />
+                    </td>
                     <td className="px-3 py-1.5">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeCityRate(i)}>
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -767,7 +782,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
         )}
 
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-6 gap-2">
           <div className="space-y-1">
             <Label className="text-[11px]">Country</Label>
             <Select value={newCountry} onValueChange={(v) => { setNewCountry(v); setNewCity(''); }}>
@@ -794,13 +809,17 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <Label className="text-[11px]">8h Rate (€)</Label>
             <Input type="number" min={0} placeholder="180" value={newHalfDay} onChange={(e) => setNewHalfDay(e.target.value)} className="text-xs font-mono" />
           </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Days</Label>
+            <Input type="number" min={1} max={30} placeholder="5" value={newMaxDays} onChange={(e) => setNewMaxDays(e.target.value)} className="text-xs font-mono" />
+          </div>
           <div className="flex items-end">
             <Button size="sm" onClick={addCityRate} disabled={!newCity || !newFullDay} className="gradient-accent text-accent-foreground w-full">
               <Plus className="h-3.5 w-3.5 mr-1" /> Add
             </Button>
           </div>
         </div>
-        <p className="text-[10px] text-muted-foreground">If 8h is left blank, it defaults to 60% of the 10h rate.</p>
+        <p className="text-[10px] text-muted-foreground">If 8h is blank, defaults to 60% of 10h. Max Days caps how many days a customer can stay in this city (blank = unlimited).</p>
       </div>
 
       {/* Vehicle Classes (Transfer-style: multiple sub-classes per category) */}
