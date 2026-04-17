@@ -69,7 +69,15 @@ export interface StorefrontConfig {
   // Limo: city daily rates (half/full day)
   limo_city_rates?: { city: string; full_day_rate: number; half_day_rate: number }[];
   // Limo: per-category multipliers applied on top of city rate (base = business 1×)
+  // Legacy single-multiplier-per-category model (kept for backwards compatibility)
   limo_category_multipliers?: { business: number; first_class: number; van: number; suv: number };
+  // New: each category can have multiple vehicle classes with different seat counts and price multipliers
+  limo_vehicle_classes?: {
+    category: 'business' | 'first_class' | 'van' | 'suv';
+    label?: string;
+    seats: number;
+    multiplier: number;
+  }[];
 
   // ── Page Content (editable from admin) ──
   // Home
