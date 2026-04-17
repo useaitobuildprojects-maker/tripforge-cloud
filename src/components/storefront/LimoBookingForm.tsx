@@ -28,8 +28,9 @@ const DEFAULT_LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
 
 type DayType = 'full' | 'half'; // full = 10h, half = 8h
 
-interface ItineraryDay {
+interface ItineraryStop {
   city: string;
+  days: number;
   dayType: DayType;
 }
 
@@ -66,8 +67,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
-  const [itinerary, setItinerary] = useState<ItineraryDay[]>([
-    { city: cityRates[0]?.city ?? '', dayType: 'full' },
+  const [itinerary, setItinerary] = useState<ItineraryStop[]>([
+    { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
   ]);
 
   const timeSlots = useMemo(() => {
@@ -76,28 +77,30 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return slots;
   }, []);
 
-  const addDay = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', dayType: 'full' }]);
-  const removeDay = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
-  const updateDay = (idx: number, updates: Partial<ItineraryDay>) =>
+  const addStop = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full' }]);
+  const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
+  const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-day price breakdown using selected vehicle class multiplier
+  // Per-stop price breakdown using selected vehicle class multiplier
   const breakdown = useMemo(() => {
     const catMult = selectedClass?.multiplier ?? 1;
-    return itinerary.map(day => {
-      const rate = cityRates.find(cr => cr.city === day.city);
-      if (!rate) return { city: day.city, dayType: day.dayType, price: 0 };
-      const base = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
-      return { city: day.city, dayType: day.dayType, price: Math.round(base * catMult) };
+    return itinerary.map(stop => {
+      const rate = cityRates.find(cr => cr.city === stop.city);
+      if (!rate) return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay: 0, price: 0 };
+      const base = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
+      const perDay = Math.round(base * catMult);
+      return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay, price: perDay * stop.days };
     });
   }, [itinerary, selectedClass, cityRates]);
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
+  const totalDays = itinerary.reduce((s, d) => s + d.days, 0);
 
   // Per-city day counts and any cities exceeding their max_days cap
   const cityDayCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + 1;
+    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + d.days;
     return counts;
   }, [itinerary]);
 
@@ -113,9 +116,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     const timeStr = time || 'Not specified';
     const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
-      .map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? '10h' : '8h'}) — €${d.price}`)
+      .map((d, i) => `  Stop ${i + 1}: ${d.city} — ${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'} (€${d.perDay}/day) = €${d.price}`)
       .join('\n');
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary:\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -174,53 +177,66 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               </div>
             </div>
 
-            {/* Day-by-day plan */}
+            {/* City stops with day count */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Day-by-Day Itinerary</Label>
-              {itinerary.map((day, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
-                  <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Day {idx + 1}</span>
-                  <Select value={day.city} onValueChange={(v) => updateDay(idx, { city: v })}>
-                    <SelectTrigger className="h-9 text-xs flex-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {cityRates.map(cr => (
-                        <SelectItem key={cr.city} value={cr.city}>
-                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => updateDay(idx, { dayType: 'half' })}
-                      className={cn(
-                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
-                        day.dayType === 'half' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
-                      )}
-                      style={day.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                    >
-                      <Clock4 className="h-3 w-3" /> 8h
-                    </button>
-                    <button
-                      onClick={() => updateDay(idx, { dayType: 'full' })}
-                      className={cn(
-                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
-                        day.dayType === 'full' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
-                      )}
-                      style={day.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                    >
-                      <Clock8 className="h-3 w-3" /> 10h
-                    </button>
+              <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
+              {itinerary.map((stop, idx) => {
+                const rate = cityRates.find(cr => cr.city === stop.city);
+                const maxDays = rate?.max_days ?? 30;
+                const dayOptions = Array.from({ length: maxDays }, (_, i) => i + 1);
+                return (
+                  <div key={idx} className="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
+                    <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Stop {idx + 1}</span>
+                    <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
+                      <SelectTrigger className="h-9 text-xs flex-1 min-w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {cityRates.map(cr => (
+                          <SelectItem key={cr.city} value={cr.city}>
+                            {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
+                      <SelectTrigger className="h-9 text-xs w-[90px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {dayOptions.map(n => (
+                          <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => updateStop(idx, { dayType: 'half' })}
+                        className={cn(
+                          "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                          stop.dayType === 'half' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                        )}
+                        style={stop.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                      >
+                        <Clock4 className="h-3 w-3" /> 8h
+                      </button>
+                      <button
+                        onClick={() => updateStop(idx, { dayType: 'full' })}
+                        className={cn(
+                          "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                          stop.dayType === 'full' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                        )}
+                        style={stop.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                      >
+                        <Clock8 className="h-3 w-3" /> 10h
+                      </button>
+                    </div>
+                    {itinerary.length > 1 && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeStop(idx)}>
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    )}
                   </div>
-                  {itinerary.length > 1 && (
-                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeDay(idx)}>
-                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="outline" size="sm" className="text-xs w-full" onClick={addDay}>
-                <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
+                );
+              })}
+              <Button variant="outline" size="sm" className="text-xs w-full" onClick={addStop}>
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add City
               </Button>
               {exceededCities.length > 0 && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
@@ -285,14 +301,14 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 style={{ backgroundColor: `${buttonColor}10` }}
               >
                 <p className="text-sm text-muted-foreground text-center">
-                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
+                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {totalDays} day{totalDays !== 1 ? 's' : ''}
                 </p>
 
                 <div className="space-y-1.5 text-sm">
                   {breakdown.map((b, i) => (
                     <div key={i} className="flex justify-between items-center">
                       <span className="text-muted-foreground">
-                        Day {i + 1}: {b.city} ({b.dayType === 'full' ? '10h' : '8h'})
+                        {b.city}: {b.days} × {b.dayType === 'full' ? '10h' : '8h'} (€{b.perDay}/day)
                       </span>
                       <span className="font-medium tabular-nums">€{b.price}</span>
                     </div>
