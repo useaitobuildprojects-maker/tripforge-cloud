@@ -68,8 +68,8 @@ export interface StorefrontConfig {
 
   // Limo: city daily rates (half/full day)
   limo_city_rates?: { city: string; full_day_rate: number; half_day_rate: number }[];
-  // Limo: multi-day discount (% off when days >= cities)
-  limo_multi_day_discount?: number;
+  // Limo: per-category multipliers applied on top of city rate (base = business 1×)
+  limo_category_multipliers?: { business: number; first_class: number; van: number; suv: number };
 
   // ── Page Content (editable from admin) ──
   // Home
