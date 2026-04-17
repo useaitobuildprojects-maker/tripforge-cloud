@@ -576,9 +576,9 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const downloadTemplate = () => {
     const data = [
-      { City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
-      { City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
-      { City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
+      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
+      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
+      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -589,6 +589,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const exportRates = () => {
     if (cityRates.length === 0) { toast.error('No city rates to export'); return; }
     const data = cityRates.map((cr) => ({
+      Country: cr.country ?? '',
       City: cr.city,
       '10h Rate (€)': cr.full_day_rate,
       '8h Rate (€)': cr.half_day_rate,
