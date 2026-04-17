@@ -562,11 +562,23 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   return (
     <div className="space-y-5">
+      {/* How it works */}
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
+        <h4 className="text-xs font-semibold text-foreground">How Limo pricing works</h4>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          Customers build a day-by-day itinerary. For each day they pick a <strong>city</strong> and choose <strong>8h</strong> or <strong>10h</strong> service.
+          Total = sum of (city rate × days), then the multi-day discount is applied if any.
+        </p>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
+          <strong>Example:</strong> Milan 10h €400 × 3 + Florence 10h €350 × 2 + Rome 10h €380 × 4 = €1,200 + €700 + €1,520 = <strong>€3,420</strong>.
+        </p>
+      </div>
+
       {/* City Daily Rates */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <div>
-          <h4 className="text-xs font-semibold text-foreground">City Daily Rates</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Set half-day and full-day chauffeur rates per city. Users build a day-by-day itinerary.</p>
+          <h4 className="text-xs font-semibold text-foreground">City Rates</h4>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Set the 8h and 10h chauffeur rate for each city you serve.</p>
         </div>
 
         {cityRates.length > 0 && (
@@ -575,8 +587,8 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               <thead className="bg-secondary/50">
                 <tr>
                   <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">City</th>
-                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Full Day (€)</th>
-                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Half Day (€)</th>
+                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">10h Rate (€)</th>
+                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">8h Rate (€)</th>
                   <th className="px-3 py-1.5 w-10" />
                 </tr>
               </thead>
@@ -604,11 +616,11 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <Input placeholder="Istanbul" value={newCity} onChange={(e) => setNewCity(e.target.value)} className="text-xs" />
           </div>
           <div className="space-y-1">
-            <Label className="text-[11px]">Full Day (€)</Label>
+            <Label className="text-[11px]">10h Rate (€)</Label>
             <Input type="number" min={0} placeholder="300" value={newFullDay} onChange={(e) => setNewFullDay(e.target.value)} className="text-xs font-mono" />
           </div>
           <div className="space-y-1">
-            <Label className="text-[11px]">Half Day (€)</Label>
+            <Label className="text-[11px]">8h Rate (€)</Label>
             <Input type="number" min={0} placeholder="180" value={newHalfDay} onChange={(e) => setNewHalfDay(e.target.value)} className="text-xs font-mono" />
           </div>
           <div className="flex items-end">
@@ -617,6 +629,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             </Button>
           </div>
         </div>
+        <p className="text-[10px] text-muted-foreground">If 8h is left blank, it defaults to 60% of the 10h rate.</p>
       </div>
 
       {/* Multi-Day Discount */}
@@ -624,7 +637,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         <div>
           <h4 className="text-xs font-semibold text-foreground">Multi-Day Discount</h4>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            When the customer books more days than cities visited, a discount is applied to encourage longer stays.
+            Applied when the customer books more days than cities visited (e.g. 5 days across 3 cities).
           </p>
         </div>
         <div className="w-48 space-y-1">
@@ -633,48 +646,17 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             value={multiDayDiscount || ''}
             onChange={(e) => onConfigChange({ ...storefrontConfig, limo_multi_day_discount: e.target.value ? Number(e.target.value) : undefined })}
             className="text-xs font-mono" />
-          <p className="text-[10px] text-muted-foreground">e.g. 10% off when 3 cities booked for 5 days</p>
+          <p className="text-[10px] text-muted-foreground">Leave empty for no discount.</p>
         </div>
       </div>
 
       {/* Category Multipliers info */}
-      <div className="rounded-lg border border-border p-4 space-y-3">
-        <div>
-          <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">City rates above are for the base category. Vehicle class multipliers from the Transfer tab scale the price.</p>
-        </div>
-        <p className="text-[10px] text-muted-foreground">Edit vehicle classes in the Transfer tab — multipliers are shared across services.</p>
-      </div>
-
-      {/* P2P Pricing (kept) */}
-      <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
-        <div>
-          <h4 className="text-xs font-semibold text-foreground">Point-to-Point Pricing (optional)</h4>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Set separate base fee & per-km rate for limo P2P rides. If empty, falls back to your Transfer pricing formula.</p>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Base Fee (€)</Label>
-            <Input type="number" min={0} step={0.5} placeholder="Same as Transfer"
-              value={storefrontConfig.limo_p2p_base_fee ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_p2p_base_fee: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Per-KM Rate (€)</Label>
-            <Input type="number" min={0} step={0.1} placeholder="Same as Transfer"
-              value={storefrontConfig.limo_p2p_per_km_rate ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_p2p_per_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Max P2P Distance (km)</Label>
-            <Input type="number" min={1} max={500} step={1} placeholder="35"
-              value={storefrontConfig.limo_max_km ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, limo_max_km: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-        </div>
+      <div className="rounded-lg border border-border p-4 space-y-2">
+        <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
+        <p className="text-[11px] text-muted-foreground">
+          City rates above are for <strong>Business Sedan</strong> (base 1×). Other categories scale automatically:
+          First Class 2.4×, Business Van 1.6×, Luxury SUV 1.6×.
+        </p>
       </div>
     </div>
   );
