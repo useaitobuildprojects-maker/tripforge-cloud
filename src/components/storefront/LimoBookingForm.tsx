@@ -185,7 +185,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                     <SelectContent>
                       {cityRates.map(cr => (
                         <SelectItem key={cr.city} value={cr.city}>
-                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}
+                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
