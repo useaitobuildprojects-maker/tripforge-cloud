@@ -41,11 +41,29 @@ interface Props {
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
-  const multipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+  const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+
+  // Build effective vehicle classes: prefer new limo_vehicle_classes, fall back to legacy single-per-category
+  const vehicleClasses = useMemo(() => {
+    if (config.limo_vehicle_classes && config.limo_vehicle_classes.length > 0) {
+      return config.limo_vehicle_classes;
+    }
+    return [
+      { category: 'business' as const, label: 'Business Sedan', seats: 3, multiplier: legacyMultipliers.business ?? 1 },
+      { category: 'first_class' as const, label: 'First Class', seats: 3, multiplier: legacyMultipliers.first_class ?? 2.4 },
+      { category: 'van' as const, label: 'Business Van', seats: 7, multiplier: legacyMultipliers.van ?? 1.6 },
+      { category: 'suv' as const, label: 'Luxury SUV', seats: 5, multiplier: legacyMultipliers.suv ?? 1.6 },
+    ];
+  }, [config.limo_vehicle_classes, legacyMultipliers]);
+
   const hasItineraryPricing = cityRates.length > 0;
   const availableCities = cityRates.map(cr => cr.city);
 
-  const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
+  // Selected class index within vehicleClasses
+  const [selectedClassIdx, setSelectedClassIdx] = useState(0);
+  const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
+  const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
+
   const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([
@@ -63,16 +81,16 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const updateDay = (idx: number, updates: Partial<ItineraryDay>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-day price breakdown
+  // Per-day price breakdown using selected vehicle class multiplier
   const breakdown = useMemo(() => {
-    const catMult = multipliers[selectedCategory] ?? 1;
+    const catMult = selectedClass?.multiplier ?? 1;
     return itinerary.map(day => {
       const rate = cityRates.find(cr => cr.city === day.city);
       if (!rate) return { city: day.city, dayType: day.dayType, price: 0 };
       const base = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
       return { city: day.city, dayType: day.dayType, price: Math.round(base * catMult) };
     });
-  }, [itinerary, selectedCategory, cityRates, multipliers]);
+  }, [itinerary, selectedClass, cityRates]);
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
 
