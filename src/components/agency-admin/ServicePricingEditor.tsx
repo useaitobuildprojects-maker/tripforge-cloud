@@ -557,6 +557,7 @@ const LIMO_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+  const [newCountry, setNewCountry] = useState('');
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
@@ -571,6 +572,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
   const vehicleClasses = storefrontConfig.limo_vehicle_classes ?? DEFAULT_LIMO_VEHICLE_CLASSES;
+  const newCityOptions = newCountry ? getCitiesForCountry(newCountry) : [];
 
   const downloadTemplate = () => {
     const data = [
