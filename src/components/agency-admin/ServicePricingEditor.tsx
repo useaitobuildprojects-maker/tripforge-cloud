@@ -540,13 +540,23 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 };
 
 // ── Limo Service Tab (city daily rates + itinerary pricing) ──
+const DEFAULT_LIMO_MULTIPLIERS = { business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
+
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
-  const multiDayDiscount = storefrontConfig.limo_multi_day_discount ?? 0;
+  const multipliers = storefrontConfig.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+
+  const updateMultiplier = (key: keyof typeof DEFAULT_LIMO_MULTIPLIERS, val: string) => {
+    const num = val ? Number(val) : 0;
+    onConfigChange({
+      ...storefrontConfig,
+      limo_category_multipliers: { ...multipliers, [key]: num },
+    });
+  };
 
   const addCityRate = () => {
     if (!newCity || !newFullDay) return;
@@ -567,10 +577,10 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         <h4 className="text-xs font-semibold text-foreground">How Limo pricing works</h4>
         <p className="text-[11px] text-muted-foreground leading-relaxed">
           Customers build a day-by-day itinerary. For each day they pick a <strong>city</strong> and choose <strong>8h</strong> or <strong>10h</strong> service.
-          Total = sum of (city rate × days), then the multi-day discount is applied if any.
+          Total = sum of (city rate × days) × vehicle multiplier.
         </p>
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          <strong>Example:</strong> Milan 10h €400 × 3 + Florence 10h €350 × 2 + Rome 10h €380 × 4 = €1,200 + €700 + €1,520 = <strong>€3,420</strong>.
+          <strong>Example:</strong> Milan 10h €400 × 3 + Florence 10h €350 × 2 + Rome 10h €380 × 4 = €1,200 + €700 + €1,520 = <strong>€3,420</strong> (Business Sedan).
         </p>
       </div>
 
