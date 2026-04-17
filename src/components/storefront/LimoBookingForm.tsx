@@ -212,7 +212,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
               <Label className="text-xs font-medium">Vehicle Class</Label>
-              {(['business', 'first_class', 'van', 'suv'] as LimoCategory[]).map((cat) => {
+              {(['business', 'first_class', 'suv'] as LimoCategory[]).map((cat) => {
                 const classesInCat = vehicleClasses
                   .map((vc, idx) => ({ ...vc, idx }))
                   .filter(vc => vc.category === cat);
