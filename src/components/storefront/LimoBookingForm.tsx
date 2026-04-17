@@ -237,16 +237,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                       <span className="font-medium tabular-nums">€{b.price}</span>
                     </div>
                   ))}
-                  {hasDiscount && (
-                    <div className="flex justify-between items-center pt-1 border-t border-border/50">
-                      <span className="text-xs" style={{ color: buttonColor }}>
-                        Multi-day discount ({multiDayDiscount}%)
-                      </span>
-                      <span className="text-xs font-medium tabular-nums" style={{ color: buttonColor }}>
-                        −€{discountAmount}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t border-border">
