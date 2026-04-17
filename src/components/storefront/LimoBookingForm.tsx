@@ -222,6 +222,18 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               <Button variant="outline" size="sm" className="text-xs w-full" onClick={addDay}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
               </Button>
+              {exceededCities.length > 0 && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="text-[11px] text-destructive">
+                    {exceededCities.map(e => (
+                      <p key={e.city}>
+                        <strong>{e.city}</strong>: {e.used} days selected, max allowed is {e.max}.
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator />
