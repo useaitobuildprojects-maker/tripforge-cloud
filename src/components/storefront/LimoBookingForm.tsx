@@ -177,53 +177,66 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               </div>
             </div>
 
-            {/* Day-by-day plan */}
+            {/* City stops with day count */}
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Day-by-Day Itinerary</Label>
-              {itinerary.map((day, idx) => (
-                <div key={idx} className="flex items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
-                  <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Day {idx + 1}</span>
-                  <Select value={day.city} onValueChange={(v) => updateDay(idx, { city: v })}>
-                    <SelectTrigger className="h-9 text-xs flex-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {cityRates.map(cr => (
-                        <SelectItem key={cr.city} value={cr.city}>
-                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => updateDay(idx, { dayType: 'half' })}
-                      className={cn(
-                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
-                        day.dayType === 'half' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
-                      )}
-                      style={day.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                    >
-                      <Clock4 className="h-3 w-3" /> 8h
-                    </button>
-                    <button
-                      onClick={() => updateDay(idx, { dayType: 'full' })}
-                      className={cn(
-                        "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
-                        day.dayType === 'full' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
-                      )}
-                      style={day.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}
-                    >
-                      <Clock8 className="h-3 w-3" /> 10h
-                    </button>
+              <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
+              {itinerary.map((stop, idx) => {
+                const rate = cityRates.find(cr => cr.city === stop.city);
+                const maxDays = rate?.max_days ?? 30;
+                const dayOptions = Array.from({ length: maxDays }, (_, i) => i + 1);
+                return (
+                  <div key={idx} className="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
+                    <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Stop {idx + 1}</span>
+                    <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
+                      <SelectTrigger className="h-9 text-xs flex-1 min-w-[140px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {cityRates.map(cr => (
+                          <SelectItem key={cr.city} value={cr.city}>
+                            {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
+                      <SelectTrigger className="h-9 text-xs w-[90px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {dayOptions.map(n => (
+                          <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => updateStop(idx, { dayType: 'half' })}
+                        className={cn(
+                          "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                          stop.dayType === 'half' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                        )}
+                        style={stop.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                      >
+                        <Clock4 className="h-3 w-3" /> 8h
+                      </button>
+                      <button
+                        onClick={() => updateStop(idx, { dayType: 'full' })}
+                        className={cn(
+                          "flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all border",
+                          stop.dayType === 'full' ? 'shadow-sm text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'
+                        )}
+                        style={stop.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}
+                      >
+                        <Clock8 className="h-3 w-3" /> 10h
+                      </button>
+                    </div>
+                    {itinerary.length > 1 && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeStop(idx)}>
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    )}
                   </div>
-                  {itinerary.length > 1 && (
-                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeDay(idx)}>
-                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-              <Button variant="outline" size="sm" className="text-xs w-full" onClick={addDay}>
-                <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
+                );
+              })}
+              <Button variant="outline" size="sm" className="text-xs w-full" onClick={addStop}>
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add City
               </Button>
               {exceededCities.length > 0 && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
