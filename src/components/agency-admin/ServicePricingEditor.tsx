@@ -702,6 +702,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <table className="w-full text-xs">
               <thead className="bg-secondary/50">
                 <tr>
+                  <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">Country</th>
                   <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">10h Rate (€)</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">8h Rate (€)</th>
@@ -711,6 +712,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               <tbody>
                 {cityRates.map((cr, i) => (
                   <tr key={i} className="border-t border-border hover:bg-secondary/20">
+                    <td className="px-3 py-1.5 text-muted-foreground">{cr.country ?? '—'}</td>
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
@@ -726,10 +728,24 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-5 gap-2">
           <div className="space-y-1">
-            <Label className="text-[11px]">City Name</Label>
-            <Input placeholder="Istanbul" value={newCity} onChange={(e) => setNewCity(e.target.value)} className="text-xs" />
+            <Label className="text-[11px]">Country</Label>
+            <Select value={newCountry} onValueChange={(v) => { setNewCountry(v); setNewCity(''); }}>
+              <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Select country" /></SelectTrigger>
+              <SelectContent>
+                {COUNTRY_LIST.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">City</Label>
+            <Select value={newCity} onValueChange={setNewCity} disabled={!newCountry}>
+              <SelectTrigger className="h-9 text-xs"><SelectValue placeholder={newCountry ? 'Select city' : 'Pick country first'} /></SelectTrigger>
+              <SelectContent>
+                {newCityOptions.map((c) => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1">
             <Label className="text-[11px]">10h Rate (€)</Label>
@@ -741,7 +757,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
           <div className="flex items-end">
             <Button size="sm" onClick={addCityRate} disabled={!newCity || !newFullDay} className="gradient-accent text-accent-foreground w-full">
-              <Plus className="h-3.5 w-3.5 mr-1" /> Add City
+              <Plus className="h-3.5 w-3.5 mr-1" /> Add
             </Button>
           </div>
         </div>
