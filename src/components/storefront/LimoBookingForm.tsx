@@ -98,7 +98,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     if (!config.whatsapp_number) return;
     const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const catLabel = LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
+    const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
       .map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? '10h' : '8h'}) — €${d.price}`)
       .join('\n');
