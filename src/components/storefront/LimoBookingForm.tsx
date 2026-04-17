@@ -301,14 +301,14 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 style={{ backgroundColor: `${buttonColor}10` }}
               >
                 <p className="text-sm text-muted-foreground text-center">
-                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {itinerary.length} day{itinerary.length !== 1 ? 's' : ''}
+                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {totalDays} day{totalDays !== 1 ? 's' : ''}
                 </p>
 
                 <div className="space-y-1.5 text-sm">
                   {breakdown.map((b, i) => (
                     <div key={i} className="flex justify-between items-center">
                       <span className="text-muted-foreground">
-                        Day {i + 1}: {b.city} ({b.dayType === 'full' ? '10h' : '8h'})
+                        {b.city}: {b.days} × {b.dayType === 'full' ? '10h' : '8h'} (€{b.perDay}/day)
                       </span>
                       <span className="font-medium tabular-nums">€{b.price}</span>
                     </div>
