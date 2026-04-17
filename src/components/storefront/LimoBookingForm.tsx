@@ -170,7 +170,11 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   <Select value={day.city} onValueChange={(v) => updateDay(idx, { city: v })}>
                     <SelectTrigger className="h-9 text-xs flex-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {availableCities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {cityRates.map(cr => (
+                        <SelectItem key={cr.city} value={cr.city}>
+                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <div className="flex gap-1">
