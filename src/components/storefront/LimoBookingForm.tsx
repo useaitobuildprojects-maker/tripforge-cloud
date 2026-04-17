@@ -94,6 +94,19 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
 
+  // Per-city day counts and any cities exceeding their max_days cap
+  const cityDayCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + 1;
+    return counts;
+  }, [itinerary]);
+
+  const exceededCities = useMemo(() => {
+    return cityRates
+      .filter(cr => cr.max_days && (cityDayCounts[cr.city] ?? 0) > cr.max_days)
+      .map(cr => ({ city: cr.city, used: cityDayCounts[cr.city] ?? 0, max: cr.max_days! }));
+  }, [cityRates, cityDayCounts]);
+
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
     const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
@@ -172,7 +185,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                     <SelectContent>
                       {cityRates.map(cr => (
                         <SelectItem key={cr.city} value={cr.city}>
-                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}
+                          {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -209,6 +222,18 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               <Button variant="outline" size="sm" className="text-xs w-full" onClick={addDay}>
                 <Plus className="h-3.5 w-3.5 mr-1" /> Add Day
               </Button>
+              {exceededCities.length > 0 && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="text-[11px] text-destructive">
+                    {exceededCities.map(e => (
+                      <p key={e.city}>
+                        <strong>{e.city}</strong>: {e.used} days selected, max allowed is {e.max}.
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator />
@@ -283,8 +308,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 {config.whatsapp_number && (
                   <Button
                     className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
-                    style={{ backgroundColor: '#25D366' }}
+                    style={{ backgroundColor: '#25D366', opacity: exceededCities.length > 0 ? 0.5 : 1 }}
                     onClick={handleWhatsApp}
+                    disabled={exceededCities.length > 0}
                   >
                     <MessageCircle className="h-5 w-5" /> Book via WhatsApp
                   </Button>

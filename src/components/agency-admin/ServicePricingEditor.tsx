@@ -557,12 +557,12 @@ const LIMO_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const DEFAULT_LIMO_CITY_RATES: NonNullable<StorefrontConfig['limo_city_rates']> = [
-  { city: 'Rome', country: 'Italy', full_day_rate: 380, half_day_rate: 230 },
-  { city: 'Milan', country: 'Italy', full_day_rate: 400, half_day_rate: 240 },
-  { city: 'Florence', country: 'Italy', full_day_rate: 350, half_day_rate: 210 },
-  { city: 'Paris', country: 'France', full_day_rate: 450, half_day_rate: 270 },
-  { city: 'Barcelona', country: 'Spain', full_day_rate: 380, half_day_rate: 230 },
-  { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190 },
+  { city: 'Rome', country: 'Italy', full_day_rate: 380, half_day_rate: 230, max_days: 5 },
+  { city: 'Milan', country: 'Italy', full_day_rate: 400, half_day_rate: 240, max_days: 4 },
+  { city: 'Florence', country: 'Italy', full_day_rate: 350, half_day_rate: 210, max_days: 3 },
+  { city: 'Paris', country: 'France', full_day_rate: 450, half_day_rate: 270, max_days: 5 },
+  { city: 'Barcelona', country: 'Spain', full_day_rate: 380, half_day_rate: 230, max_days: 4 },
+  { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190, max_days: 5 },
 ];
 
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
@@ -570,6 +570,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
+  const [newMaxDays, setNewMaxDays] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [showClasses, setShowClasses] = useState(false);
 
@@ -585,9 +586,9 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const downloadTemplate = () => {
     const data = [
-      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
-      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
-      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
+      { Country: 'Italy', City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240, 'Max Days': 4 },
+      { Country: 'Italy', City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210, 'Max Days': 3 },
+      { Country: 'Italy', City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230, 'Max Days': 5 },
     ];
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -602,6 +603,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
       City: cr.city,
       '10h Rate (€)': cr.full_day_rate,
       '8h Rate (€)': cr.half_day_rate,
+      'Max Days': cr.max_days ?? '',
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -624,10 +626,12 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         const city = String(row['City'] ?? '').trim();
         const full = Number(row['10h Rate (€)'] ?? row['10h Rate'] ?? 0);
         const half = Number(row['8h Rate (€)'] ?? row['8h Rate'] ?? 0) || Math.round(full * 0.6);
+        const maxDaysRaw = Number(row['Max Days'] ?? row['MaxDays'] ?? 0);
+        const max_days = maxDaysRaw > 0 ? maxDaysRaw : undefined;
         if (!city || !full) continue;
         const existing = merged.findIndex((c) => c.city.toLowerCase() === city.toLowerCase());
-        if (existing >= 0) { merged[existing] = { city, country: country || merged[existing].country, full_day_rate: full, half_day_rate: half }; updated++; }
-        else { merged.push({ city, country: country || undefined, full_day_rate: full, half_day_rate: half }); added++; }
+        if (existing >= 0) { merged[existing] = { city, country: country || merged[existing].country, full_day_rate: full, half_day_rate: half, max_days: max_days ?? merged[existing].max_days }; updated++; }
+        else { merged.push({ city, country: country || undefined, full_day_rate: full, half_day_rate: half, max_days }); added++; }
       }
       onConfigChange({ ...storefrontConfig, limo_city_rates: merged });
       toast.success(`Imported: ${added} added, ${updated} updated`);
@@ -661,9 +665,22 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const addCityRate = () => {
     if (!newCity || !newFullDay) return;
-    const updated = [...cityRates, { city: newCity, country: newCountry || undefined, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
+    const max_days = Number(newMaxDays);
+    const updated = [...cityRates, {
+      city: newCity,
+      country: newCountry || undefined,
+      full_day_rate: Number(newFullDay),
+      half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6),
+      max_days: max_days > 0 ? max_days : undefined,
+    }];
     onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
-    setNewCity(''); setNewFullDay(''); setNewHalfDay('');
+    setNewCity(''); setNewFullDay(''); setNewHalfDay(''); setNewMaxDays('');
+  };
+
+  const updateCityRate = (idx: number, field: 'max_days' | 'full_day_rate' | 'half_day_rate', value: number | undefined) => {
+    const updated = [...cityRates];
+    updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
+    onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
   };
 
   const removeCityRate = (idx: number) => {
@@ -728,6 +745,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                   <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">City</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">10h Rate (€)</th>
                   <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">8h Rate (€)</th>
+                  <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Max Days</th>
                   <th className="px-3 py-1.5 w-10" />
                 </tr>
               </thead>
@@ -738,6 +756,20 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
                     <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
+                    <td className="px-3 py-1.5">
+                      <Input
+                        type="number"
+                        min={1}
+                        max={30}
+                        value={cr.max_days ?? ''}
+                        placeholder="∞"
+                        onChange={(e) => {
+                          const v = Number(e.target.value);
+                          updateCityRate(i, 'max_days', v > 0 ? v : undefined);
+                        }}
+                        className="text-xs font-mono h-7 w-16 ml-auto text-right"
+                      />
+                    </td>
                     <td className="px-3 py-1.5">
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeCityRate(i)}>
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -750,7 +782,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
           </div>
         )}
 
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-6 gap-2">
           <div className="space-y-1">
             <Label className="text-[11px]">Country</Label>
             <Select value={newCountry} onValueChange={(v) => { setNewCountry(v); setNewCity(''); }}>
@@ -777,13 +809,17 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
             <Label className="text-[11px]">8h Rate (€)</Label>
             <Input type="number" min={0} placeholder="180" value={newHalfDay} onChange={(e) => setNewHalfDay(e.target.value)} className="text-xs font-mono" />
           </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Max Days</Label>
+            <Input type="number" min={1} max={30} placeholder="5" value={newMaxDays} onChange={(e) => setNewMaxDays(e.target.value)} className="text-xs font-mono" />
+          </div>
           <div className="flex items-end">
             <Button size="sm" onClick={addCityRate} disabled={!newCity || !newFullDay} className="gradient-accent text-accent-foreground w-full">
               <Plus className="h-3.5 w-3.5 mr-1" /> Add
             </Button>
           </div>
         </div>
-        <p className="text-[10px] text-muted-foreground">If 8h is left blank, it defaults to 60% of the 10h rate.</p>
+        <p className="text-[10px] text-muted-foreground">If 8h is blank, defaults to 60% of 10h. Max Days caps how many days a customer can stay in this city (blank = unlimited).</p>
       </div>
 
       {/* Vehicle Classes (Transfer-style: multiple sub-classes per category) */}

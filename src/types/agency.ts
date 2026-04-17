@@ -66,8 +66,8 @@ export interface StorefrontConfig {
   // Transfer: tiered distance pricing (fixed price per bracket)
   transfer_distance_tiers?: { from_km: number; to_km: number; fixed_price: number }[];
 
-  // Limo: city daily rates (half/full day) — country added for grouping/scope
-  limo_city_rates?: { city: string; country?: string; full_day_rate: number; half_day_rate: number }[];
+  // Limo: city daily rates (half/full day) — country added for grouping/scope, max_days caps stay length
+  limo_city_rates?: { city: string; country?: string; full_day_rate: number; half_day_rate: number; max_days?: number }[];
   // Limo: per-category multipliers applied on top of city rate (base = business 1×)
   // Legacy single-multiplier-per-category model (kept for backwards compatibility)
   limo_category_multipliers?: { business: number; first_class: number; van: number; suv: number };
