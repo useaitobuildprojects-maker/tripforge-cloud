@@ -82,19 +82,19 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-stop price breakdown using selected vehicle class multiplier
+  // Per-stop base price (no multiplier); multiplier applied to subtotal → total
+  const catMult = selectedClass?.multiplier ?? 1;
   const breakdown = useMemo(() => {
-    const catMult = selectedClass?.multiplier ?? 1;
     return itinerary.map(stop => {
       const rate = cityRates.find(cr => cr.city === stop.city);
       if (!rate) return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay: 0, price: 0 };
-      const base = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
-      const perDay = Math.round(base * catMult);
+      const perDay = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
       return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay, price: perDay * stop.days };
     });
-  }, [itinerary, selectedClass, cityRates]);
+  }, [itinerary, cityRates]);
 
-  const total = breakdown.reduce((s, b) => s + b.price, 0);
+  const subtotal = breakdown.reduce((s, b) => s + b.price, 0);
+  const total = Math.round(subtotal * catMult);
   const totalDays = itinerary.reduce((s, d) => s + d.days, 0);
 
   // Per-city day counts and any cities exceeding their max_days cap
@@ -118,7 +118,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     const plan = breakdown
       .map((d, i) => `  Stop ${i + 1}: ${d.city} — ${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'} (€${d.perDay}/day) = €${d.price}`)
       .join('\n');
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const multLine = catMult !== 1 ? `\n✖️ ${catLabel} multiplier: × ${catMult}` : '';
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -315,6 +316,18 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   ))}
                 </div>
 
+                <div className="flex justify-between items-center pt-2 border-t border-border text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="font-medium tabular-nums">€{subtotal}</span>
+                </div>
+                {catMult !== 1 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">
+                      {selectedClass?.label} multiplier
+                    </span>
+                    <span className="font-medium tabular-nums">× {catMult}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center pt-2 border-t border-border">
                   <span className="text-sm font-semibold">Total</span>
                   <span className="text-3xl font-bold" style={{ color: buttonColor }}>€{total}</span>
