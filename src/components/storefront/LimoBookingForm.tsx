@@ -308,8 +308,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 {config.whatsapp_number && (
                   <Button
                     className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
-                    style={{ backgroundColor: '#25D366' }}
+                    style={{ backgroundColor: '#25D366', opacity: exceededCities.length > 0 ? 0.5 : 1 }}
                     onClick={handleWhatsApp}
+                    disabled={exceededCities.length > 0}
                   >
                     <MessageCircle className="h-5 w-5" /> Book via WhatsApp
                   </Button>
