@@ -564,7 +564,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
-  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'van' | 'suv'>('business');
+  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'suv'>('business');
   const [newClassLabel, setNewClassLabel] = useState('');
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
