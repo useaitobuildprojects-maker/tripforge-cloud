@@ -19,7 +19,7 @@ const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   suv: Shield,
 };
 
-const LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
+const DEFAULT_LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
   business: 1,
   first_class: 2.4,
   van: 1.6,
@@ -41,7 +41,7 @@ interface Props {
 
 const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
-  const multiDayDiscount = config.limo_multi_day_discount ?? 0;
+  const multipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
   const hasItineraryPricing = cityRates.length > 0;
   const availableCities = cityRates.map(cr => cr.city);
 
@@ -65,22 +65,16 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   // Per-day price breakdown
   const breakdown = useMemo(() => {
-    const catMult = LIMO_MULTIPLIERS[selectedCategory] ?? 1;
+    const catMult = multipliers[selectedCategory] ?? 1;
     return itinerary.map(day => {
       const rate = cityRates.find(cr => cr.city === day.city);
       if (!rate) return { city: day.city, dayType: day.dayType, price: 0 };
       const base = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
       return { city: day.city, dayType: day.dayType, price: Math.round(base * catMult) };
     });
-  }, [itinerary, selectedCategory, cityRates]);
+  }, [itinerary, selectedCategory, cityRates, multipliers]);
 
-  const subtotal = breakdown.reduce((s, b) => s + b.price, 0);
-  const uniqueCities = new Set(itinerary.map(d => d.city)).size;
-  const hasDiscount = multiDayDiscount > 0 && itinerary.length > uniqueCities;
-  const discountAmount = hasDiscount
-    ? Math.round((subtotal / itinerary.length) * (itinerary.length - uniqueCities) * (multiDayDiscount / 100))
-    : 0;
-  const total = subtotal - discountAmount;
+  const total = breakdown.reduce((s, b) => s + b.price, 0);
 
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
@@ -90,7 +84,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     const plan = breakdown
       .map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? '10h' : '8h'}) — €${d.price}`)
       .join('\n');
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary:\n${plan}\n\n💰 Total: €${total}${hasDiscount ? ` (${multiDayDiscount}% multi-day discount applied)` : ''}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary:\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -243,16 +237,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                       <span className="font-medium tabular-nums">€{b.price}</span>
                     </div>
                   ))}
-                  {hasDiscount && (
-                    <div className="flex justify-between items-center pt-1 border-t border-border/50">
-                      <span className="text-xs" style={{ color: buttonColor }}>
-                        Multi-day discount ({multiDayDiscount}%)
-                      </span>
-                      <span className="text-xs font-medium tabular-nums" style={{ color: buttonColor }}>
-                        −€{discountAmount}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="flex justify-between items-center pt-2 border-t border-border">
