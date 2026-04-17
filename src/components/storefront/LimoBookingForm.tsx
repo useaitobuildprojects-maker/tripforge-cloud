@@ -82,19 +82,19 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-stop price breakdown using selected vehicle class multiplier
+  // Per-stop base price (no multiplier); multiplier applied to subtotal → total
+  const catMult = selectedClass?.multiplier ?? 1;
   const breakdown = useMemo(() => {
-    const catMult = selectedClass?.multiplier ?? 1;
     return itinerary.map(stop => {
       const rate = cityRates.find(cr => cr.city === stop.city);
       if (!rate) return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay: 0, price: 0 };
-      const base = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
-      const perDay = Math.round(base * catMult);
+      const perDay = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
       return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay, price: perDay * stop.days };
     });
-  }, [itinerary, selectedClass, cityRates]);
+  }, [itinerary, cityRates]);
 
-  const total = breakdown.reduce((s, b) => s + b.price, 0);
+  const subtotal = breakdown.reduce((s, b) => s + b.price, 0);
+  const total = Math.round(subtotal * catMult);
   const totalDays = itinerary.reduce((s, d) => s + d.days, 0);
 
   // Per-city day counts and any cities exceeding their max_days cap
