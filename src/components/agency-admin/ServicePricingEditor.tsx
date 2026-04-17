@@ -544,16 +544,15 @@ const DEFAULT_LIMO_MULTIPLIERS = { business: 1, first_class: 2.4, van: 1.6, suv:
 
 const DEFAULT_LIMO_VEHICLE_CLASSES: NonNullable<StorefrontConfig['limo_vehicle_classes']> = [
   { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1 },
-  { category: 'first_class', label: 'First Class', seats: 3, multiplier: 2.4 },
-  { category: 'van', label: 'Business Van', seats: 7, multiplier: 1.6 },
+  { category: 'business', label: 'Business Van', seats: 7, multiplier: 1.6 },
+  { category: 'first_class', label: 'First Class Sedan', seats: 3, multiplier: 2.4 },
   { category: 'suv', label: 'Luxury SUV', seats: 5, multiplier: 1.6 },
 ];
 
-const LIMO_CATEGORY_ORDER = ['business', 'first_class', 'van', 'suv'] as const;
+const LIMO_CATEGORY_ORDER = ['business', 'first_class', 'suv'] as const;
 const LIMO_CATEGORY_LABELS: Record<string, string> = {
   business: 'Business',
   first_class: 'First Class',
-  van: 'Van',
   suv: 'SUV',
 };
 
@@ -565,7 +564,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
-  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'van' | 'suv'>('business');
+  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'suv'>('business');
   const [newClassLabel, setNewClassLabel] = useState('');
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
