@@ -28,8 +28,9 @@ const DEFAULT_LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
 
 type DayType = 'full' | 'half'; // full = 10h, half = 8h
 
-interface ItineraryDay {
+interface ItineraryStop {
   city: string;
+  days: number;
   dayType: DayType;
 }
 
