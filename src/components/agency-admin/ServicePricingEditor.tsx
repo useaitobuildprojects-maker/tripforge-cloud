@@ -642,31 +642,41 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
         <p className="text-[10px] text-muted-foreground">If 8h is left blank, it defaults to 60% of the 10h rate.</p>
       </div>
 
-      {/* Multi-Day Discount */}
-      <div className="rounded-lg border border-border bg-muted/5 p-4 space-y-3">
+      {/* Vehicle Category Multipliers (editable) */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
         <div>
-          <h4 className="text-xs font-semibold text-foreground">Multi-Day Discount</h4>
+          <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
           <p className="text-[11px] text-muted-foreground mt-0.5">
-            Applied when the customer books more days than cities visited (e.g. 5 days across 3 cities).
+            City rates are for <strong>Business Sedan</strong> (base 1×). Other categories scale the price by these multipliers.
           </p>
         </div>
-        <div className="w-48 space-y-1">
-          <Label className="text-[11px]">Discount (%)</Label>
-          <Input type="number" min={0} max={50} step={1} placeholder="10"
-            value={multiDayDiscount || ''}
-            onChange={(e) => onConfigChange({ ...storefrontConfig, limo_multi_day_discount: e.target.value ? Number(e.target.value) : undefined })}
-            className="text-xs font-mono" />
-          <p className="text-[10px] text-muted-foreground">Leave empty for no discount.</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Business Sedan</Label>
+            <Input type="number" min={0} step={0.1} value={multipliers.business}
+              onChange={(e) => updateMultiplier('business', e.target.value)}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">First Class</Label>
+            <Input type="number" min={0} step={0.1} value={multipliers.first_class}
+              onChange={(e) => updateMultiplier('first_class', e.target.value)}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Business Van</Label>
+            <Input type="number" min={0} step={0.1} value={multipliers.van}
+              onChange={(e) => updateMultiplier('van', e.target.value)}
+              className="text-xs font-mono" />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[11px]">Luxury SUV</Label>
+            <Input type="number" min={0} step={0.1} value={multipliers.suv}
+              onChange={(e) => updateMultiplier('suv', e.target.value)}
+              className="text-xs font-mono" />
+          </div>
         </div>
-      </div>
-
-      {/* Category Multipliers info */}
-      <div className="rounded-lg border border-border p-4 space-y-2">
-        <h4 className="text-xs font-semibold text-foreground">Vehicle Category Multipliers</h4>
-        <p className="text-[11px] text-muted-foreground">
-          City rates above are for <strong>Business Sedan</strong> (base 1×). Other categories scale automatically:
-          First Class 2.4×, Business Van 1.6×, Luxury SUV 1.6×.
-        </p>
+        <p className="text-[10px] text-muted-foreground">Defaults: 1 / 2.4 / 1.6 / 1.6</p>
       </div>
     </div>
   );
