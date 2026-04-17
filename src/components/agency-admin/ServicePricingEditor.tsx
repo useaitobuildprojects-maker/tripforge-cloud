@@ -546,9 +546,64 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
   const multipliers = storefrontConfig.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+
+  const downloadTemplate = () => {
+    const data = [
+      { City: 'Milan', '10h Rate (€)': 400, '8h Rate (€)': 240 },
+      { City: 'Florence', '10h Rate (€)': 350, '8h Rate (€)': 210 },
+      { City: 'Rome', '10h Rate (€)': 380, '8h Rate (€)': 230 },
+    ];
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Limo City Rates');
+    XLSX.writeFile(wb, 'limo_city_rates_template.xlsx');
+  };
+
+  const exportRates = () => {
+    if (cityRates.length === 0) { toast.error('No city rates to export'); return; }
+    const data = cityRates.map((cr) => ({
+      City: cr.city,
+      '10h Rate (€)': cr.full_day_rate,
+      '8h Rate (€)': cr.half_day_rate,
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Limo City Rates');
+    XLSX.writeFile(wb, 'limo_city_rates_export.xlsx');
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows: any[] = XLSX.utils.sheet_to_json(ws);
+      const merged = [...cityRates];
+      let added = 0; let updated = 0;
+      for (const row of rows) {
+        const city = String(row['City'] ?? '').trim();
+        const full = Number(row['10h Rate (€)'] ?? row['10h Rate'] ?? 0);
+        const half = Number(row['8h Rate (€)'] ?? row['8h Rate'] ?? 0) || Math.round(full * 0.6);
+        if (!city || !full) continue;
+        const existing = merged.findIndex((c) => c.city.toLowerCase() === city.toLowerCase());
+        if (existing >= 0) { merged[existing] = { city, full_day_rate: full, half_day_rate: half }; updated++; }
+        else { merged.push({ city, full_day_rate: full, half_day_rate: half }); added++; }
+      }
+      onConfigChange({ ...storefrontConfig, limo_city_rates: merged });
+      toast.success(`Imported: ${added} added, ${updated} updated`);
+    } catch (err) {
+      toast.error('Failed to import Excel file');
+      console.error(err);
+    } finally {
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
 
   const updateMultiplier = (key: keyof typeof DEFAULT_LIMO_MULTIPLIERS, val: string) => {
     const num = val ? Number(val) : 0;
