@@ -562,9 +562,16 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const [showClasses, setShowClasses] = useState(false);
+
+  // Vehicle class form state
+  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'van' | 'suv'>('business');
+  const [newClassLabel, setNewClassLabel] = useState('');
+  const [newClassSeats, setNewClassSeats] = useState('');
+  const [newClassMultiplier, setNewClassMultiplier] = useState('');
 
   const cityRates = storefrontConfig.limo_city_rates ?? [];
-  const multipliers = storefrontConfig.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
+  const vehicleClasses = storefrontConfig.limo_vehicle_classes ?? DEFAULT_LIMO_VEHICLE_CLASSES;
 
   const downloadTemplate = () => {
     const data = [
