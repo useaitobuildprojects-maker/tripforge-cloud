@@ -116,9 +116,9 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     const timeStr = time || 'Not specified';
     const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
-      .map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? '10h' : '8h'}) — €${d.price}`)
+      .map((d, i) => `  Stop ${i + 1}: ${d.city} — ${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'} (€${d.perDay}/day) = €${d.price}`)
       .join('\n');
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary:\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
