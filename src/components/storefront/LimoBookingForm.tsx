@@ -19,7 +19,7 @@ const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   suv: Shield,
 };
 
-const LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
+const DEFAULT_LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
   business: 1,
   first_class: 2.4,
   van: 1.6,
