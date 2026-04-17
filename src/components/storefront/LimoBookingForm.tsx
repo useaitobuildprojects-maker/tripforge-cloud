@@ -3,11 +3,12 @@ import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield, Plus, Trash2, Sun, SunMedium } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Truck, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Timer, Route, Shield, Plus, Trash2, Sun, SunMedium, Plane, Clock4, Clock8 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -41,7 +42,7 @@ interface ItineraryDay {
   dayType: DayType;
 }
 
-type LimoMode = 'itinerary' | 'p2p';
+type LimoMode = 'p2p' | 'package_8h' | 'package_10h' | 'itinerary';
 
 interface Props {
   agency: Agency;
@@ -63,16 +64,21 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const multiDayDiscount = config.limo_multi_day_discount ?? 0;
   const hasItineraryPricing = cityRates.length > 0;
 
-  const [mode, setMode] = useState<LimoMode>(hasItineraryPricing ? 'itinerary' : 'p2p');
+  // Default mode: P2P (Transfer-style) — most familiar / always available
+  const [mode, setMode] = useState<LimoMode>('p2p');
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
+  const [flightNumber, setFlightNumber] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<LimoCategory>('business');
   const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Single-city package selection (for 8h/10h)
+  const [packageCity, setPackageCity] = useState<string>(cityRates[0]?.city ?? '');
 
   // Itinerary planner
   const [itinerary, setItinerary] = useState<ItineraryDay[]>([{ city: cityRates[0]?.city ?? '', dayType: 'full' }]);
@@ -103,6 +109,16 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const updateDay = (idx: number, updates: Partial<ItineraryDay>) => {
     setItinerary(prev => prev.map((d, i) => i === idx ? { ...d, ...updates } : d));
   };
+
+  // Calculate single-package price (8h = half_day_rate, 10h = full_day_rate)
+  const packagePrice = useMemo(() => {
+    if (mode !== 'package_8h' && mode !== 'package_10h') return null;
+    const rate = cityRates.find(cr => cr.city === packageCity);
+    if (!rate) return null;
+    const catMultiplier = getLimoCategoryMultiplier(config, selectedCategory);
+    const base = mode === 'package_10h' ? rate.full_day_rate : rate.half_day_rate;
+    return Math.round(base * catMultiplier);
+  }, [mode, packageCity, cityRates, selectedCategory, config]);
 
   // Calculate itinerary price
   const itineraryPrice = useMemo(() => {
@@ -158,19 +174,24 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     if (!config.whatsapp_number) return;
     const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
+    const catLabel = LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
 
     let msg: string;
     if (mode === 'itinerary') {
       const plan = itinerary.map((d, i) => `  Day ${i + 1}: ${d.city} (${d.dayType === 'full' ? 'Full Day' : 'Half Day'})`).join('\n');
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n\n📋 Itinerary:\n${plan}\n\n💰 Estimated: €${itineraryPrice ?? 'TBD'}${hasDiscount ? ` (${multiDayDiscount}% multi-day discount applied)` : ''}\n\nPlease confirm availability.`;
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary:\n${plan}\n\n💰 Estimated: €${itineraryPrice ?? 'TBD'}${hasDiscount ? ` (${multiDayDiscount}% multi-day discount applied)` : ''}\n\nPlease confirm availability.`;
+    } else if (mode === 'package_8h' || mode === 'package_10h') {
+      const hrs = mode === 'package_10h' ? '10h' : '8h';
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (${hrs} Package):\n🏙️ City: ${packageCity}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n💰 Estimated: €${packagePrice ?? 'TBD'}\n\nPlease confirm availability.`;
     } else {
-      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
+      const flightLine = flightNumber ? `\n✈️ Flight: ${flightNumber}` : '';
+      msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service (Point-to-Point):\n📍 ${origin} → ${destination}${flightLine}\n📅 ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n💰 Price: €${quote?.price ?? 'TBD'}\n\nPlease confirm availability.`;
     }
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
 
-  const hasP2PPricing = (config.limo_p2p_base_fee ?? config.transfer_base_fee ?? 0) > 0 || (config.limo_p2p_per_km_rate ?? config.transfer_per_km_rate ?? 0) > 0;
+  const isPackageMode = mode === 'package_8h' || mode === 'package_10h';
 
   return (
     <div className="w-full">
@@ -184,27 +205,49 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           <p className="text-sm text-muted-foreground mt-1">Premium vehicles with professional drivers</p>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 rounded-xl bg-muted/50">
-          {hasItineraryPricing && (
-            <button
-              onClick={() => { setMode('itinerary'); setQuote(null); }}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                mode === 'itinerary' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <Timer className="h-4 w-4" /> Multi-Day Tour
-            </button>
-          )}
+        {/* Mode Tabs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-1 rounded-xl bg-muted/50">
           <button
             onClick={() => { setMode('p2p'); setQuote(null); }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all",
+              "flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all",
               mode === 'p2p' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            <Route className="h-4 w-4" /> Point-to-Point
+            <Route className="h-3.5 w-3.5 md:h-4 md:w-4" /> Point-to-Point
+          </button>
+          <button
+            onClick={() => { setMode('package_8h'); setQuote(null); }}
+            disabled={!hasItineraryPricing}
+            className={cn(
+              "flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all",
+              mode === 'package_8h' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground',
+              !hasItineraryPricing && 'opacity-40 cursor-not-allowed'
+            )}
+          >
+            <Clock4 className="h-3.5 w-3.5 md:h-4 md:w-4" /> 8h Package
+          </button>
+          <button
+            onClick={() => { setMode('package_10h'); setQuote(null); }}
+            disabled={!hasItineraryPricing}
+            className={cn(
+              "flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all",
+              mode === 'package_10h' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground',
+              !hasItineraryPricing && 'opacity-40 cursor-not-allowed'
+            )}
+          >
+            <Clock8 className="h-3.5 w-3.5 md:h-4 md:w-4" /> 10h Package
+          </button>
+          <button
+            onClick={() => { setMode('itinerary'); setQuote(null); }}
+            disabled={!hasItineraryPricing}
+            className={cn(
+              "flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg text-xs md:text-sm font-semibold transition-all",
+              mode === 'itinerary' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground',
+              !hasItineraryPricing && 'opacity-40 cursor-not-allowed'
+            )}
+          >
+            <Timer className="h-3.5 w-3.5 md:h-4 md:w-4" /> Multi-Day
           </button>
         </div>
 
@@ -288,7 +331,51 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           </div>
         )}
 
-        {/* P2P Mode — Locations */}
+        {/* Package Mode (8h / 10h) — Single City + Date */}
+        {isPackageMode && (
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> City
+              </Label>
+              <Select value={packageCity} onValueChange={setPackageCity}>
+                <SelectTrigger className="h-10"><SelectValue placeholder="Select city" /></SelectTrigger>
+                <SelectContent>
+                  {availableCities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Date
+                </Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !startDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Time
+                </Label>
+                <Select value={time} onValueChange={setTime}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Select time" /></SelectTrigger>
+                  <SelectContent>{timeSlots.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* P2P Mode — Locations + Flight + Date/Time */}
         {mode === 'p2p' && (
           <>
             <div className="space-y-1.5">
@@ -302,6 +389,18 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off Location
               </Label>
               <LocationAutocomplete value={destination} onChange={(v, sel?: LocationSelection) => { setDestination(v); setDestCoords(sel?.coords); setQuote(null); }} placeholder="Destination address" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} />
+            </div>
+            {/* Flight number (optional, shown when pickup looks like an airport) */}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium flex items-center gap-1.5">
+                <Plane className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Flight Number <span className="text-muted-foreground font-normal">(optional)</span>
+              </Label>
+              <Input
+                value={flightNumber}
+                onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
+                placeholder="e.g. AF1234 — for airport pickups"
+                className="h-10"
+              />
             </div>
             {/* Date & Time for P2P */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -361,6 +460,45 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             })}
           </div>
         </div>
+
+        {/* Package Mode — Price Summary */}
+        {isPackageMode && hasItineraryPricing && packagePrice !== null && packagePrice > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl p-5 text-center space-y-3"
+            style={{ backgroundColor: `${buttonColor}10` }}
+          >
+            <p className="text-sm text-muted-foreground">
+              {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {mode === 'package_10h' ? '10-hour' : '8-hour'} package · {packageCity}
+            </p>
+            <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{packagePrice}</p>
+            <p className="text-xs text-muted-foreground">Estimated price · Includes professional chauffeur</p>
+
+            {config.whatsapp_number && (
+              <Button
+                className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
+                style={{ backgroundColor: '#25D366' }}
+                onClick={handleWhatsApp}
+              >
+                <MessageCircle className="h-5 w-5" /> Book via WhatsApp
+              </Button>
+            )}
+          </motion.div>
+        )}
+
+        {isPackageMode && !hasItineraryPricing && (
+          <div className="rounded-xl border border-muted bg-muted/10 p-4 text-center">
+            <AlertCircle className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm font-medium">Package pricing not configured</p>
+            <p className="text-xs text-muted-foreground mt-1">Please contact us directly for a quote.</p>
+            {config.whatsapp_number && (
+              <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={handleWhatsApp}>
+                <MessageCircle className="h-3.5 w-3.5" /> Contact Us
+              </Button>
+            )}
+          </div>
+        )}
 
         {/* Itinerary Mode — Price Summary */}
         {mode === 'itinerary' && hasItineraryPricing && itineraryPrice !== null && itineraryPrice > 0 && (
@@ -452,6 +590,11 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   {origin} → {destination}
                   {quote.distance_km && ` · ~${quote.distance_km} km`}
                 </p>
+                {flightNumber && (
+                  <p className="text-xs flex items-center justify-center gap-1 text-muted-foreground">
+                    <Plane className="h-3 w-3" /> Flight {flightNumber} · We'll track your arrival
+                  </p>
+                )}
                 <p className="text-3xl font-bold" style={{ color: buttonColor }}>€{quote.price}</p>
                 <p className="text-xs text-muted-foreground">
                   {LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · Estimated price
