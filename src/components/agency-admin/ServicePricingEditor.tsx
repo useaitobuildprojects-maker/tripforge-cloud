@@ -627,12 +627,24 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
     }
   };
 
-  const updateMultiplier = (key: keyof typeof DEFAULT_LIMO_MULTIPLIERS, val: string) => {
-    const num = val ? Number(val) : 0;
-    onConfigChange({
-      ...storefrontConfig,
-      limo_category_multipliers: { ...multipliers, [key]: num },
-    });
+  const addVehicleClass = () => {
+    const seats = Number(newClassSeats);
+    const multiplier = Number(newClassMultiplier);
+    if (!newClassLabel || isNaN(seats) || seats < 1 || isNaN(multiplier) || multiplier <= 0) return;
+    const updated = [...vehicleClasses, { category: newClassCategory, label: newClassLabel, seats, multiplier }];
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
+    setNewClassLabel(''); setNewClassSeats(''); setNewClassMultiplier('');
+  };
+
+  const removeVehicleClass = (idx: number) => {
+    const updated = vehicleClasses.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated.length ? updated : undefined });
+  };
+
+  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+    const updated = [...vehicleClasses];
+    updated[idx] = { ...updated[idx], [field]: value };
+    onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
   };
 
   const addCityRate = () => {
