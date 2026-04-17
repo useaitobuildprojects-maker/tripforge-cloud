@@ -557,12 +557,12 @@ const LIMO_CATEGORY_LABELS: Record<string, string> = {
 };
 
 const DEFAULT_LIMO_CITY_RATES: NonNullable<StorefrontConfig['limo_city_rates']> = [
-  { city: 'Rome', country: 'Italy', full_day_rate: 380, half_day_rate: 230 },
-  { city: 'Milan', country: 'Italy', full_day_rate: 400, half_day_rate: 240 },
-  { city: 'Florence', country: 'Italy', full_day_rate: 350, half_day_rate: 210 },
-  { city: 'Paris', country: 'France', full_day_rate: 450, half_day_rate: 270 },
-  { city: 'Barcelona', country: 'Spain', full_day_rate: 380, half_day_rate: 230 },
-  { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190 },
+  { city: 'Rome', country: 'Italy', full_day_rate: 380, half_day_rate: 230, max_days: 5 },
+  { city: 'Milan', country: 'Italy', full_day_rate: 400, half_day_rate: 240, max_days: 4 },
+  { city: 'Florence', country: 'Italy', full_day_rate: 350, half_day_rate: 210, max_days: 3 },
+  { city: 'Paris', country: 'France', full_day_rate: 450, half_day_rate: 270, max_days: 5 },
+  { city: 'Barcelona', country: 'Spain', full_day_rate: 380, half_day_rate: 230, max_days: 4 },
+  { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190, max_days: 5 },
 ];
 
 const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
