@@ -665,9 +665,22 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 
   const addCityRate = () => {
     if (!newCity || !newFullDay) return;
-    const updated = [...cityRates, { city: newCity, country: newCountry || undefined, full_day_rate: Number(newFullDay), half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6) }];
+    const max_days = Number(newMaxDays);
+    const updated = [...cityRates, {
+      city: newCity,
+      country: newCountry || undefined,
+      full_day_rate: Number(newFullDay),
+      half_day_rate: Number(newHalfDay) || Math.round(Number(newFullDay) * 0.6),
+      max_days: max_days > 0 ? max_days : undefined,
+    }];
     onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
-    setNewCity(''); setNewFullDay(''); setNewHalfDay('');
+    setNewCity(''); setNewFullDay(''); setNewHalfDay(''); setNewMaxDays('');
+  };
+
+  const updateCityRate = (idx: number, field: 'max_days' | 'full_day_rate' | 'half_day_rate', value: number | undefined) => {
+    const updated = [...cityRates];
+    updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
+    onConfigChange({ ...storefrontConfig, limo_city_rates: updated });
   };
 
   const removeCityRate = (idx: number) => {
