@@ -47,6 +47,8 @@ export interface CityTourPrice {
   id: string;
   agency_id: string;
   tour_name: string;
+  country: string | null;
+  city: string | null;
   daily_rate: number;
   duration_hours: number | null;
   half_day_rate: number | null;
