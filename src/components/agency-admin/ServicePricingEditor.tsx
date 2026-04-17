@@ -570,6 +570,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
   const [newHalfDay, setNewHalfDay] = useState('');
+  const [newMaxDays, setNewMaxDays] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
   const [showClasses, setShowClasses] = useState(false);
 
