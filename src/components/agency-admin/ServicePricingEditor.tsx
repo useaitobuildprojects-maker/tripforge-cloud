@@ -927,29 +927,69 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
   const deleteTour = useDeleteCityTourPrice();
   const [name, setName] = useState('');
   const [rate, setRate] = useState('');
-  const [hours, setHours] = useState('4');
+  const [hours, setHours] = useState('8');
+  const [halfRate, setHalfRate] = useState('');
+  const [halfHours, setHalfHours] = useState('4');
   const [desc, setDesc] = useState('');
 
   const handleAdd = () => {
     if (!name || !rate) return;
-    addTour.mutate({ agency_id: agencyId, tour_name: name, daily_rate: Number(rate), duration_hours: Number(hours) || 4, description: desc || null });
-    setName(''); setRate(''); setHours('4'); setDesc('');
+    const fullRate = Number(rate);
+    const hRate = halfRate ? Number(halfRate) : Math.round(fullRate * 0.6);
+    addTour.mutate({
+      agency_id: agencyId,
+      tour_name: name,
+      daily_rate: fullRate,
+      duration_hours: Number(hours) || 8,
+      half_day_rate: hRate,
+      half_day_hours: Number(halfHours) || 4,
+      description: desc || null,
+    });
+    setName(''); setRate(''); setHours('8'); setHalfRate(''); setHalfHours('4'); setDesc('');
   };
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-2">
-        <div className="space-y-1"><Label className="text-[11px]">Tour Name</Label><Input placeholder="Downtown Tour" value={name} onChange={(e) => setName(e.target.value)} className="text-xs" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Price (€/day)</Label><Input type="number" min={0} placeholder="120" value={rate} onChange={(e) => setRate(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="space-y-1"><Label className="text-[11px]">Duration (hrs)</Label><Input type="number" min={1} placeholder="4" value={hours} onChange={(e) => setHours(e.target.value)} className="text-xs font-mono" /></div>
-        <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addTour.isPending || !name || !rate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
+      <div>
+        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Full Day</p>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-1"><Label className="text-[11px]">Tour Name</Label><Input placeholder="Rome Highlights" value={name} onChange={(e) => setName(e.target.value)} className="text-xs" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Full-Day Price (€)</Label><Input type="number" min={0} placeholder="450" value={rate} onChange={(e) => setRate(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Full-Day Hours</Label><Input type="number" min={1} placeholder="8" value={hours} onChange={(e) => setHours(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addTour.isPending || !name || !rate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
+        </div>
+      </div>
+      <div>
+        <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Half Day (optional — defaults to 60% of full-day)</p>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="space-y-1 col-span-2"><Label className="text-[11px]">Half-Day Price (€)</Label><Input type="number" min={0} placeholder="auto = 60%" value={halfRate} onChange={(e) => setHalfRate(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Half-Day Hours</Label><Input type="number" min={1} placeholder="4" value={halfHours} onChange={(e) => setHalfHours(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
       </div>
       <div className="space-y-1"><Label className="text-[11px]">Description (optional)</Label><Input placeholder="Guided city tour with historical landmarks..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
       {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : tours.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No city tours configured yet</p> : (
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full text-xs">
-            <thead className="bg-secondary/50"><tr><th className="px-3 py-2 text-left font-medium text-muted-foreground">Tour Name</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Price/Day</th><th className="px-3 py-2 text-right font-medium text-muted-foreground">Duration</th><th className="px-3 py-2 text-left font-medium text-muted-foreground">Description</th><th className="px-3 py-2 w-10" /></tr></thead>
-            <tbody>{tours.map((t) => (<tr key={t.id} className="border-t border-border hover:bg-secondary/20"><td className="px-3 py-2 text-foreground font-medium">{t.tour_name}</td><td className="px-3 py-2 text-right font-mono text-foreground">€{t.daily_rate}</td><td className="px-3 py-2 text-right text-muted-foreground">{t.duration_hours ?? 4}h</td><td className="px-3 py-2 text-muted-foreground max-w-[200px] truncate">{t.description || '—'}</td><td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTour.mutate({ id: t.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td></tr>))}</tbody>
+            <thead className="bg-secondary/50"><tr>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tour Name</th>
+              <th className="px-3 py-2 text-right font-medium text-muted-foreground">Full Day</th>
+              <th className="px-3 py-2 text-right font-medium text-muted-foreground">Half Day</th>
+              <th className="px-3 py-2 text-left font-medium text-muted-foreground">Description</th>
+              <th className="px-3 py-2 w-10" />
+            </tr></thead>
+            <tbody>{tours.map((t) => {
+              const halfR = t.half_day_rate ?? Math.round(t.daily_rate * 0.6);
+              const halfH = t.half_day_hours ?? Math.max(2, Math.floor((t.duration_hours ?? 8) / 2));
+              return (
+                <tr key={t.id} className="border-t border-border hover:bg-secondary/20">
+                  <td className="px-3 py-2 text-foreground font-medium">{t.tour_name}</td>
+                  <td className="px-3 py-2 text-right font-mono text-foreground">€{t.daily_rate} <span className="text-muted-foreground">/ {t.duration_hours ?? 8}h</span></td>
+                  <td className="px-3 py-2 text-right font-mono text-foreground">€{halfR} <span className="text-muted-foreground">/ {halfH}h</span></td>
+                  <td className="px-3 py-2 text-muted-foreground max-w-[200px] truncate">{t.description || '—'}</td>
+                  <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTour.mutate({ id: t.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
+                </tr>
+              );
+            })}</tbody>
           </table>
         </div>
       )}
