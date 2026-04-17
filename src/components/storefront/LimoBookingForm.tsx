@@ -67,8 +67,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const [startDate, setStartDate] = useState<Date>();
   const [time, setTime] = useState('');
-  const [itinerary, setItinerary] = useState<ItineraryDay[]>([
-    { city: cityRates[0]?.city ?? '', dayType: 'full' },
+  const [itinerary, setItinerary] = useState<ItineraryStop[]>([
+    { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
   ]);
 
   const timeSlots = useMemo(() => {
@@ -77,28 +77,30 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     return slots;
   }, []);
 
-  const addDay = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', dayType: 'full' }]);
-  const removeDay = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
-  const updateDay = (idx: number, updates: Partial<ItineraryDay>) =>
+  const addStop = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full' }]);
+  const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
+  const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
     setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
 
-  // Per-day price breakdown using selected vehicle class multiplier
+  // Per-stop price breakdown using selected vehicle class multiplier
   const breakdown = useMemo(() => {
     const catMult = selectedClass?.multiplier ?? 1;
-    return itinerary.map(day => {
-      const rate = cityRates.find(cr => cr.city === day.city);
-      if (!rate) return { city: day.city, dayType: day.dayType, price: 0 };
-      const base = day.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
-      return { city: day.city, dayType: day.dayType, price: Math.round(base * catMult) };
+    return itinerary.map(stop => {
+      const rate = cityRates.find(cr => cr.city === stop.city);
+      if (!rate) return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay: 0, price: 0 };
+      const base = stop.dayType === 'full' ? rate.full_day_rate : rate.half_day_rate;
+      const perDay = Math.round(base * catMult);
+      return { city: stop.city, days: stop.days, dayType: stop.dayType, perDay, price: perDay * stop.days };
     });
   }, [itinerary, selectedClass, cityRates]);
 
   const total = breakdown.reduce((s, b) => s + b.price, 0);
+  const totalDays = itinerary.reduce((s, d) => s + d.days, 0);
 
   // Per-city day counts and any cities exceeding their max_days cap
   const cityDayCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + 1;
+    for (const d of itinerary) counts[d.city] = (counts[d.city] ?? 0) + d.days;
     return counts;
   }, [itinerary]);
 
