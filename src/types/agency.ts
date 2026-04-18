@@ -104,6 +104,14 @@ export interface StorefrontConfig {
   services_subtitle?: string;
   service_descriptions?: Partial<Record<ServiceType, string>>;
 
+  // City Tour: per-category vehicle classes (seats + multiplier on top of tour daily rate)
+  city_tour_vehicle_classes?: {
+    category: 'economy' | 'business' | 'first_class' | 'van' | 'suv';
+    label?: string;
+    seats: number;
+    multiplier: number;
+  }[];
+
   // Blog
   blog_title?: string;
   blog_subtitle?: string;
