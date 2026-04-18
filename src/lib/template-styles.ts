@@ -177,6 +177,38 @@ const coastalStyles: TemplateStyles = {
   subHeroClass: 'bg-sky-50',
 };
 
+const blacklaneStyles: TemplateStyles = {
+  headerClass: 'border-b',
+  headerStyle: { backgroundColor: '#0a0a0a', borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#000000', borderColor: 'rgba(255,255,255,0.06)', color: '#ffffff' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#0a0a0a', color: '#ffffff' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#000000' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.85) 100%)' },
+  heroTitleClass: 'font-serif italic tracking-tight',
+  heroTitleStyle: { color: '#ffffff' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: 'rgba(255,255,255,0.75)' },
+  cardClass: 'rounded-2xl',
+  cardStyle: { backgroundColor: '#141414', borderWidth: '1px', borderColor: 'rgba(255,255,255,0.08)', color: '#ffffff' },
+  cardHoverClass: 'hover:border-white/20',
+  sectionAltClass: '',
+  sectionAltStyle: { backgroundColor: '#111111' },
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'rounded-2xl',
+  testimonialHighlightStyle: { backgroundColor: '#0066ff', color: '#ffffff', borderColor: '#0066ff' },
+  testimonialNormalClass: 'rounded-2xl',
+  testimonialNormalStyle: { backgroundColor: '#141414', borderColor: 'rgba(255,255,255,0.08)', color: '#ffffff' },
+  searchBarClass: 'rounded-2xl shadow-2xl',
+  searchBarStyle: { backgroundColor: 'rgba(20,20,20,0.92)', borderWidth: '1px', borderColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' },
+  iconBgClass: '',
+  iconBgStyle: { backgroundColor: 'rgba(0,102,255,0.12)', color: '#3b82f6' },
+  subHeroClass: '',
+};
+
 const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
   classic: classicStyles,
   minimal: minimalStyles,
@@ -184,6 +216,7 @@ const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
   corporate: corporateStyles,
   fresh: freshStyles,
   coastal: coastalStyles,
+  blacklane: blacklaneStyles,
 };
 
 export const getTemplateStyles = (template: StorefrontTemplate): TemplateStyles => {

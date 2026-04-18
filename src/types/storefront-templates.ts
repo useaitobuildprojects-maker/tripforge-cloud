@@ -1,4 +1,4 @@
-export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant' | 'corporate' | 'fresh' | 'coastal';
+export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant' | 'corporate' | 'fresh' | 'coastal' | 'blacklane';
 
 export interface TemplateConfig {
   id: StorefrontTemplate;
@@ -91,6 +91,19 @@ export const STOREFRONT_TEMPLATES: TemplateConfig[] = [
       cardBg: '#f0f9ff',
       accent: '#0ea5e9',
       bodyBg: '#f0f9ff',
+    },
+  },
+  {
+    id: 'blacklane',
+    name: 'Blacklane',
+    description: 'Cinematic all-black luxury chauffeur aesthetic with serif italic headlines and electric blue accents',
+    preview: {
+      headerBg: '#0a0a0a',
+      heroBg: '#000000',
+      heroText: '#ffffff',
+      cardBg: '#141414',
+      accent: '#0066ff',
+      bodyBg: '#0a0a0a',
     },
   },
 ];
