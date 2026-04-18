@@ -70,7 +70,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
 
         {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} country={country} /></TabsContent>}
         {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
-        {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} /></TabsContent>}
+        {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
     </motion.div>
@@ -921,7 +921,20 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 };
 
 // ── City Tour Tab ──
-const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
+const DEFAULT_CITY_TOUR_VEHICLE_CLASSES: NonNullable<StorefrontConfig['city_tour_vehicle_classes']> = [
+  { category: 'economy', label: 'Economy Sedan', seats: 4, multiplier: 1 },
+  { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1.3 },
+  { category: 'first_class', label: 'First Class Sedan', seats: 3, multiplier: 1.8 },
+  { category: 'van', label: 'Business Van', seats: 7, multiplier: 1.5 },
+  { category: 'suv', label: 'Luxury SUV', seats: 4, multiplier: 1.7 },
+];
+
+const CITY_TOUR_CATEGORY_ORDER: Array<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category']> = ['economy', 'business', 'first_class', 'van', 'suv'];
+const CITY_TOUR_CATEGORY_LABELS: Record<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category'], string> = {
+  economy: 'Economy', business: 'Business', first_class: 'First Class', van: 'Van', suv: 'SUV',
+};
+
+const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: tours = [], isLoading } = useCityTourPricing(agencyId);
   const addTour = useAddCityTourPrice();
   const deleteTour = useDeleteCityTourPrice();
@@ -933,6 +946,30 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
   const [halfRate, setHalfRate] = useState('');
   const [halfHours, setHalfHours] = useState('4');
   const [desc, setDesc] = useState('');
+
+  const vehicleClasses = storefrontConfig.city_tour_vehicle_classes ?? DEFAULT_CITY_TOUR_VEHICLE_CLASSES;
+  const [showClasses, setShowClasses] = useState(false);
+  const [newClassCategory, setNewClassCategory] = useState<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category']>('business');
+  const [newClassLabel, setNewClassLabel] = useState('');
+  const [newClassSeats, setNewClassSeats] = useState('');
+  const [newClassMultiplier, setNewClassMultiplier] = useState('');
+
+  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier', value: string | number) => {
+    const updated = [...vehicleClasses];
+    updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated });
+  };
+  const removeVehicleClass = (idx: number) => {
+    const updated = vehicleClasses.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated.length ? updated : undefined });
+  };
+  const addVehicleClass = () => {
+    const seats = Number(newClassSeats);
+    const multiplier = Number(newClassMultiplier);
+    if (!newClassLabel || isNaN(seats) || seats < 1 || isNaN(multiplier) || multiplier <= 0) return;
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: [...vehicleClasses, { category: newClassCategory, label: newClassLabel, seats, multiplier }] });
+    setNewClassLabel(''); setNewClassSeats(''); setNewClassMultiplier('');
+  };
 
   const cityOptions = country ? getCitiesForCountry(country) : [];
 
@@ -1036,6 +1073,102 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
           </table>
         </div>
       )}
+
+      {/* Vehicle Classes — multipliers applied on top of each tour's daily rate */}
+      <div className="rounded-lg border border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-semibold text-foreground">Vehicle Classes</h4>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Each category can have multiple vehicle classes with different seat counts and price multipliers. Tour prices above are for the base 1× class.
+            </p>
+          </div>
+          <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setShowClasses(!showClasses)}>
+            <Settings2 className="h-3.5 w-3.5 mr-1" /> {showClasses ? 'Hide' : 'Edit'}
+          </Button>
+        </div>
+
+        {showClasses && (
+          <div className="space-y-4 pt-2 border-t border-border">
+            {CITY_TOUR_CATEGORY_ORDER.map((cat) => {
+              const catClasses = vehicleClasses.map((vc, origIdx) => ({ ...vc, origIdx })).filter(vc => vc.category === cat);
+              if (catClasses.length === 0) return null;
+              return (
+                <div key={cat} className="space-y-2">
+                  <p className="text-[11px] font-semibold text-foreground">{CITY_TOUR_CATEGORY_LABELS[cat]}</p>
+                  <div className="space-y-1.5">
+                    {catClasses.map((vc) => (
+                      <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
+                          onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">Seats:</span>
+                          <Input type="number" min={1} max={50} value={vc.seats} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'seats', Number(e.target.value) || 1)} />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] text-muted-foreground">×</span>
+                          <Input type="number" min={0.1} step={0.1} value={vc.multiplier} className="text-xs font-mono w-16"
+                            onChange={(e) => updateVehicleClass(vc.origIdx, 'multiplier', Number(e.target.value) || 1)} />
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeVehicleClass(vc.origIdx)}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-[11px] font-semibold text-foreground">Add New Vehicle Class</p>
+              <div className="grid grid-cols-5 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Category</Label>
+                  <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
+                    <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="first_class">First Class</SelectItem>
+                      <SelectItem value="van">Van</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Label</Label>
+                  <Input placeholder="e.g. Premium Sedan" value={newClassLabel} onChange={(e) => setNewClassLabel(e.target.value)} className="text-xs" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Seats</Label>
+                  <Input type="number" min={1} placeholder="4" value={newClassSeats} onChange={(e) => setNewClassSeats(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Multiplier</Label>
+                  <Input type="number" min={0.1} step={0.1} placeholder="1.5" value={newClassMultiplier} onChange={(e) => setNewClassMultiplier(e.target.value)} className="text-xs font-mono" />
+                </div>
+                <div className="flex items-end">
+                  <Button size="sm" onClick={addVehicleClass} disabled={!newClassLabel || !newClassSeats || !newClassMultiplier} className="gradient-accent text-accent-foreground w-full h-8">
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!showClasses && (
+          <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+            {vehicleClasses.map((vc, i) => (
+              <span key={i} className="bg-muted/30 px-2 py-0.5 rounded">
+                {vc.label || `${CITY_TOUR_CATEGORY_LABELS[vc.category]} ${vc.seats}s`}: <strong className="text-foreground">{vc.multiplier}× · {vc.seats} seats</strong>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
