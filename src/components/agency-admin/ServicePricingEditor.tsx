@@ -954,8 +954,24 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
     setName(''); setCountry(''); setCity(''); setRate(''); setHours('8'); setHalfRate(''); setHalfHours('4'); setDesc('');
   };
 
+  const loadDemo = () => {
+    const demos: Array<Omit<Parameters<typeof addTour.mutate>[0], 'agency_id'>> = [
+      { tour_name: 'Rome Highlights', country: 'Italy', city: 'Rome', daily_rate: 450, duration_hours: 8, half_day_rate: 270, half_day_hours: 4, description: 'Colosseum, Vatican, Trevi Fountain — guided tour with luxury sedan.' },
+      { tour_name: 'Paris Romantic Day', country: 'France', city: 'Paris', daily_rate: 520, duration_hours: 8, half_day_rate: 320, half_day_hours: 4, description: 'Eiffel Tower, Louvre, Champs-Élysées with English-speaking driver.' },
+      { tour_name: 'Istanbul Old City', country: 'Turkey', city: 'Istanbul', daily_rate: 380, duration_hours: 8, half_day_rate: 230, half_day_hours: 4, description: 'Hagia Sophia, Blue Mosque, Grand Bazaar — half or full day options.' },
+      { tour_name: 'Barcelona Gaudí Tour', country: 'Spain', city: 'Barcelona', daily_rate: 420, duration_hours: 8, half_day_rate: 250, half_day_hours: 4, description: 'Sagrada Família, Park Güell, Casa Batlló with private chauffeur.' },
+    ];
+    demos.forEach(d => addTour.mutate({ agency_id: agencyId, ...d }));
+    toast.success('Loading 4 demo city tours...');
+  };
+
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button size="sm" variant="outline" onClick={loadDemo} disabled={addTour.isPending}>
+          <Plus className="h-3.5 w-3.5 mr-1" /> Load demo tours
+        </Button>
+      </div>
       <div>
         <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Location & Tour</p>
         <div className="grid grid-cols-3 gap-2">
