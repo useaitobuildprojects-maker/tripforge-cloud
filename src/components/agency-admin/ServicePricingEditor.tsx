@@ -921,7 +921,20 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
 };
 
 // ── City Tour Tab ──
-const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
+const DEFAULT_CITY_TOUR_VEHICLE_CLASSES: NonNullable<StorefrontConfig['city_tour_vehicle_classes']> = [
+  { category: 'economy', label: 'Economy Sedan', seats: 4, multiplier: 1 },
+  { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1.3 },
+  { category: 'first_class', label: 'First Class Sedan', seats: 3, multiplier: 1.8 },
+  { category: 'van', label: 'Business Van', seats: 7, multiplier: 1.5 },
+  { category: 'suv', label: 'Luxury SUV', seats: 4, multiplier: 1.7 },
+];
+
+const CITY_TOUR_CATEGORY_ORDER: Array<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category']> = ['economy', 'business', 'first_class', 'van', 'suv'];
+const CITY_TOUR_CATEGORY_LABELS: Record<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category'], string> = {
+  economy: 'Economy', business: 'Business', first_class: 'First Class', van: 'Van', suv: 'SUV',
+};
+
+const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: tours = [], isLoading } = useCityTourPricing(agencyId);
   const addTour = useAddCityTourPrice();
   const deleteTour = useDeleteCityTourPrice();
@@ -933,6 +946,30 @@ const CityTourPricingTab = ({ agencyId }: { agencyId: string }) => {
   const [halfRate, setHalfRate] = useState('');
   const [halfHours, setHalfHours] = useState('4');
   const [desc, setDesc] = useState('');
+
+  const vehicleClasses = storefrontConfig.city_tour_vehicle_classes ?? DEFAULT_CITY_TOUR_VEHICLE_CLASSES;
+  const [showClasses, setShowClasses] = useState(false);
+  const [newClassCategory, setNewClassCategory] = useState<NonNullable<StorefrontConfig['city_tour_vehicle_classes']>[number]['category']>('business');
+  const [newClassLabel, setNewClassLabel] = useState('');
+  const [newClassSeats, setNewClassSeats] = useState('');
+  const [newClassMultiplier, setNewClassMultiplier] = useState('');
+
+  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier', value: string | number) => {
+    const updated = [...vehicleClasses];
+    updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated });
+  };
+  const removeVehicleClass = (idx: number) => {
+    const updated = vehicleClasses.filter((_, i) => i !== idx);
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated.length ? updated : undefined });
+  };
+  const addVehicleClass = () => {
+    const seats = Number(newClassSeats);
+    const multiplier = Number(newClassMultiplier);
+    if (!newClassLabel || isNaN(seats) || seats < 1 || isNaN(multiplier) || multiplier <= 0) return;
+    onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: [...vehicleClasses, { category: newClassCategory, label: newClassLabel, seats, multiplier }] });
+    setNewClassLabel(''); setNewClassSeats(''); setNewClassMultiplier('');
+  };
 
   const cityOptions = country ? getCitiesForCountry(country) : [];
 
