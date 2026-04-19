@@ -147,69 +147,113 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO ═══════════════ */}
-      <section style={tk.surface}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-0">
-          <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 max-w-xl">
-              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] tracking-tight" style={{ ...serifFont, ...tk.textPrimary }}>
-                {cfg.hero_title || (<>Your Next<br />Adventure Awaits</>)}
-              </h1>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="flex-1 max-w-sm pt-2">
-              <p className="text-sm leading-relaxed mb-5" style={tk.textBody}>
-                {cfg.hero_subtitle || `Explore stunning destinations, unique experiences, and unforgettable journeys with ${agency.name}.`}
-              </p>
-              <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90" style={{ backgroundColor: buttonColor }}>
-                Booking
-              </button>
-            </motion.div>
-          </div>
+      {/* ═══════════════ HERO (Service Co. style) ═══════════════ */}
+      <section style={tk.surfaceAlt}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 text-center">
+          <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+            className="text-xs font-semibold tracking-[0.3em] uppercase mb-5" style={tk.textMuted}>
+            {(cfg as any).hero_eyebrow || 'Ready Take-Off'}
+          </motion.p>
+          <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }}
+            className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight max-w-4xl mx-auto"
+            style={tk.textPrimary}>
+            {cfg.hero_title || (<>Convenient Online<br />Travel Booking Services</>)}
+          </motion.h1>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }} className="relative rounded-3xl overflow-hidden" style={{ height: '420px' }}>
-            <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="w-full h-full object-cover" width={1920} height={1080} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          {cfg.hero_subtitle && (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
+              className="mt-6 text-base max-w-xl mx-auto leading-relaxed" style={tk.textBody}>
+              {cfg.hero_subtitle}
+            </motion.p>
+          )}
+
+          {/* Floating hero image */}
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, duration: 0.7 }}
+            className="relative mt-10 mx-auto max-w-4xl">
+            <img
+              src={cfg.home_hero_image || defaultHeroImage}
+              alt=""
+              className="w-full h-[280px] md:h-[340px] object-contain mx-auto"
+              style={{ filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.18))' }}
+              width={1920}
+              height={1080}
+            />
           </motion.div>
+        </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="relative z-10 -mt-10 mx-4 md:mx-10">
-            <div className="rounded-2xl shadow-xl border p-4 md:p-5 flex flex-wrap items-center gap-4" style={{ ...tk.surface, ...tk.border }}>
-              <div className="flex items-center gap-2.5 flex-1 min-w-[150px]">
-                <MapPin className="h-4 w-4 shrink-0" style={tk.textMuted} />
-                <div>
-                  <p className="text-[10px] font-medium" style={tk.textMuted}>Location</p>
-                  <div className="text-sm" style={tk.textPrimary}>
-                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} />
-                  </div>
+        {/* Search bar — pill style, overlapping */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-16 relative z-10">
+          {enabledServices.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+              className="flex justify-center mb-4">
+              <div className="inline-flex items-center gap-1 p-1 rounded-full" style={{ backgroundColor: ts.isDark ? 'rgba(255,255,255,0.06)' : '#ffffff', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+                {enabledServices.map((service) => {
+                  const Icon = SERVICE_ICONS[service] ?? Car;
+                  const isActive = activeService === service;
+                  return (
+                    <button
+                      key={service}
+                      onClick={() => setActiveService(service)}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-full transition-all"
+                      style={isActive
+                        ? { backgroundColor: '#dbeafe', color: '#1e3a8a' }
+                        : { ...tk.textBody, backgroundColor: 'transparent' }}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      <span className={isActive ? 'underline underline-offset-4' : ''}>{SERVICE_LABELS[service] ?? service}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+            className="rounded-full shadow-xl border px-3 py-3 flex flex-wrap items-center gap-3"
+            style={{ ...tk.surface, ...tk.border }}>
+            <div className="flex items-center gap-2.5 flex-1 min-w-[150px] px-3">
+              <MapPin className="h-4 w-4 shrink-0" style={tk.textMuted} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-wide" style={tk.textMuted}>From</p>
+                <div className="text-sm" style={tk.textPrimary}>
+                  <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} />
                 </div>
               </div>
-              <div className="w-px h-8 hidden md:block" style={tk.divider} />
-              <div className="flex items-center gap-2.5 flex-1 min-w-[140px]">
-                <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
-                <div>
-                  <p className="text-[10px] font-medium" style={tk.textMuted}>Check In</p>
-                  <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
-                </div>
-              </div>
-              <div className="w-px h-8 hidden md:block" style={tk.divider} />
-              <div className="flex items-center gap-2.5 flex-1 min-w-[140px]">
-                <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
-                <div>
-                  <p className="text-[10px] font-medium" style={tk.textMuted}>Check Out</p>
-                  <input type="date" value={dropoffDate} min={minReturnDate} onChange={(e) => handleDropoffDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
-                </div>
-              </div>
-              <div className="w-px h-8 hidden md:block" style={tk.divider} />
-              <div className="flex items-center gap-2.5 flex-1 min-w-[120px]">
-                <Users className="h-4 w-4 shrink-0" style={tk.textMuted} />
-                <div>
-                  <p className="text-[10px] font-medium" style={tk.textMuted}>People</p>
-                  <p className="text-sm" style={tk.textPrimary}>2 Adults</p>
-                </div>
-              </div>
-              <button className="h-11 w-11 rounded-full flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity shadow-lg" style={{ backgroundColor: buttonColor }} onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}>
-                <Search className="h-5 w-5" />
-              </button>
             </div>
+            <div className="w-px h-9 hidden md:block" style={tk.divider} />
+            <div className="flex items-center gap-2.5 flex-1 min-w-[140px] px-3">
+              <MapPin className="h-4 w-4 shrink-0" style={tk.textMuted} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-wide" style={tk.textMuted}>To</p>
+                <div className="text-sm" style={tk.textPrimary}>
+                  <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Destination" locations={agencyLocations} agencyCity={agency.city} />
+                </div>
+              </div>
+            </div>
+            <div className="w-px h-9 hidden md:block" style={tk.divider} />
+            <div className="flex items-center gap-2.5 flex-1 min-w-[140px] px-3">
+              <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-wide" style={tk.textMuted}>Departure</p>
+                <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
+              </div>
+            </div>
+            <div className="w-px h-9 hidden md:block" style={tk.divider} />
+            <div className="flex items-center gap-2.5 flex-1 min-w-[140px] px-3">
+              <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-medium uppercase tracking-wide" style={tk.textMuted}>Return</p>
+                <input type="date" value={dropoffDate} min={minReturnDate} onChange={(e) => handleDropoffDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
+              </div>
+            </div>
+            <button
+              className="h-12 w-12 rounded-full flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity shadow-lg"
+              style={{ backgroundColor: buttonColor }}
+              onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+              aria-label="Search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
           </motion.div>
         </div>
       </section>
