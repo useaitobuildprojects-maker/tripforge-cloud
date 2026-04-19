@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 
 const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
 
@@ -14,6 +14,10 @@ const StorefrontContact = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
+  const EXP = expediaPalette;
+  const accent = ts.isDark ? buttonColor : EXP.brand;
+  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
+  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
 
   const contactItems = [
     { icon: Mail, title: 'Email Us', value: agency.contact_email, subtitle: 'We reply within 24 hours' },
