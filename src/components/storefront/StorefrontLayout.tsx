@@ -5,7 +5,7 @@ import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2, Menu
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getShareUrl } from '@/lib/share-url';
-import { getTemplateStyles } from '@/lib/template-styles';
+import { getTemplateStyles, expediaPalette } from '@/lib/template-styles';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
