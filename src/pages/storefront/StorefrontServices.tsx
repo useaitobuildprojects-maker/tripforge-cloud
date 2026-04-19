@@ -44,7 +44,7 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Expert local guides', 'Half-day & full-day', 'Popular landmarks', 'Flexible schedules'],
 };
 
-const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
+const serifFont = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em' };
 
 const StorefrontServices = () => {
   const { slug } = useParams();
