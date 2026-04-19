@@ -1,9 +1,9 @@
 import { useOutletContext, Link, useParams } from 'react-router-dom';
 import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Shield, Award, Users, Clock, ArrowRight, Star, MapPin, Heart } from 'lucide-react';
+import { Shield, Award, Users, Clock, ArrowRight, Heart } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 import { Button } from '@/components/ui/button';
 import destTemple from '@/assets/dest-temple.jpg';
 import adventureMountain from '@/assets/adventure-mountain.jpg';
