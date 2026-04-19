@@ -128,60 +128,61 @@ const StorefrontLayout = () => {
       {/* Content */}
       <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
-      {/* ═══ Footer (always dark for editorial contrast) ═══ */}
-      <footer className="text-white" style={{ backgroundColor: '#0a0a0a' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+      {/* ═══ Footer — Expedia clean light ═══ */}
+      <footer className="border-t" style={{ ...tk.surfaceAlt, ...tk.border }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
             <div className="md:col-span-4">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt="" className="h-10 w-auto object-contain mb-5 brightness-0 invert" />
+                <img src={agency.logo_url} alt="" className="h-9 w-auto object-contain mb-4" />
               ) : (
-                <h3 className="text-2xl font-bold mb-5" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>{agency.name}</h3>
+                <h3 className="text-xl mb-4" style={logoTextStyle}>{agency.name}</h3>
               )}
-              <p className="text-sm text-white/40 leading-relaxed mb-6 max-w-xs">
-                Explore stunning destinations, unique experiences, and unforgettable journeys with {agency.name}.
+              <p className="text-sm leading-relaxed mb-5 max-w-xs" style={tk.textMuted}>
+                Book vehicles, transfers and experiences in {agency.city} with confidence.
               </p>
               <div className="flex items-center gap-2">
                 {[
                   { url: cfg.facebook_url, Icon: Facebook },
                   { url: cfg.twitter_url, Icon: Twitter },
                   { url: cfg.instagram_url, Icon: Instagram },
-                ].map(({ url, Icon }, i) => (
-                  url ? (
-                    <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"><Icon className="h-4 w-4" /></a>
-                  ) : (
-                    <span key={i} className="h-9 w-9 rounded-full bg-white/5 flex items-center justify-center text-white/10"><Icon className="h-4 w-4" /></span>
-                  )
+                ].filter(s => s.url).map(({ url, Icon }, i) => (
+                  <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                    className="h-9 w-9 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
+                    style={{ backgroundColor: iconBtnBg, color: accent }}>
+                    <Icon className="h-4 w-4" />
+                  </a>
                 ))}
               </div>
             </div>
             <div className="md:col-span-2">
-              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">About</h4>
-              <ul className="space-y-3 text-sm text-white/40">
-                <li><Link to={`/agency/${slug}/about`} className="hover:text-white transition-colors">About Us</Link></li>
-                <li><Link to={`/agency/${slug}/services`} className="hover:text-white transition-colors">Our Services</Link></li>
-                <li><Link to={`/agency/${slug}/contact`} className="hover:text-white transition-colors">Contact</Link></li>
+              <h4 className="text-xs font-bold uppercase tracking-wider mb-4" style={tk.textPrimary}>Company</h4>
+              <ul className="space-y-2.5 text-sm" style={tk.textBody}>
+                <li><Link to={`/agency/${slug}/about`} className="hover:underline">About Us</Link></li>
+                <li><Link to={`/agency/${slug}/services`} className="hover:underline">Services</Link></li>
+                <li><Link to={`/agency/${slug}/fleet`} className="hover:underline">Fleet</Link></li>
+                <li><Link to={`/agency/${slug}/contact`} className="hover:underline">Contact</Link></li>
               </ul>
             </div>
             <div className="md:col-span-3">
-              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">Support</h4>
-              <ul className="space-y-3 text-sm text-white/40">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms and Conditions</a></li>
+              <h4 className="text-xs font-bold uppercase tracking-wider mb-4" style={tk.textPrimary}>Support</h4>
+              <ul className="space-y-2.5 text-sm" style={tk.textBody}>
+                <li>Help Center</li>
+                <li>Privacy Policy</li>
+                <li>Terms & Conditions</li>
               </ul>
             </div>
             <div className="md:col-span-3">
-              <h4 className="text-xs font-bold uppercase tracking-[0.15em] mb-5 text-white/50">Contact</h4>
-              <ul className="space-y-3 text-sm text-white/40">
-                <li className="flex items-center gap-2.5"><Mail className="h-4 w-4 shrink-0" /> {agency.contact_email}</li>
-                <li className="flex items-center gap-2.5"><MapPin className="h-4 w-4 shrink-0" /> {agency.city}, {agency.country}</li>
-                {cfg.phone && <li className="flex items-center gap-2.5"><Phone className="h-4 w-4 shrink-0" /> {cfg.phone}</li>}
+              <h4 className="text-xs font-bold uppercase tracking-wider mb-4" style={tk.textPrimary}>Contact</h4>
+              <ul className="space-y-2.5 text-sm" style={tk.textBody}>
+                <li className="flex items-center gap-2"><Mail className="h-4 w-4 shrink-0" style={{ color: accent }} /> {agency.contact_email}</li>
+                <li className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} /> {agency.city}, {agency.country}</li>
+                {cfg.phone && <li className="flex items-center gap-2"><Phone className="h-4 w-4 shrink-0" style={{ color: accent }} /> {cfg.phone}</li>}
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/5 mt-12 pt-6 text-center">
-            <p className="text-[11px] text-white/20">© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
+          <div className="border-t mt-10 pt-5 flex flex-wrap items-center justify-between gap-3" style={tk.border}>
+            <p className="text-xs" style={tk.textMuted}>© {new Date().getFullYear()} {agency.name}. All Rights Reserved.</p>
           </div>
         </div>
       </footer>
