@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 
-const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
+const serifFont = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em' };
 
 const StorefrontContact = () => {
   const { slug } = useParams();

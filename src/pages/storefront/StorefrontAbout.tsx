@@ -16,7 +16,7 @@ const DEFAULT_VALUES = [
 ];
 
 const ICONS = [Shield, Award, Users, Clock];
-const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
+const serifFont = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em' };
 
 const STATS = [
   { value: '10K+', label: 'Happy Travelers' },
