@@ -20,6 +20,16 @@ export interface SurfaceTokens {
   inputBorder: React.CSSProperties;
 }
 
+/** Expedia-inspired accent palette — bright blue brand + yellow CTA. */
+export const expediaPalette = {
+  brand: '#1668E3',          // Expedia blue (links, accents, badges)
+  brandDeep: '#0E47A1',      // deeper for hovers / borders
+  brandSoftBg: '#E8F1FE',    // very light blue tint for chip backgrounds
+  cta: '#FFC94A',            // yellow CTA
+  ctaHover: '#F0B82E',
+  ctaText: '#1A1A1A',        // dark text on yellow
+} as const;
+
 export interface TemplateStyles {
   headerClass: string;
   headerStyle?: React.CSSProperties;

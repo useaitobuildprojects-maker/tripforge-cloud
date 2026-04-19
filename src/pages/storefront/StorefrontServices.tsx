@@ -3,7 +3,7 @@ import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/a
 import { motion } from 'framer-motion';
 import { Car, UserCheck, Crown, Building, Star, ChevronRight, Check, ArrowRight, Globe } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 import { Button } from '@/components/ui/button';
 
 import serviceTransfer from '@/assets/service-transfer.jpg';
@@ -51,6 +51,10 @@ const StorefrontServices = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const enabledServices = agency.services ?? [];
+  const EXP = expediaPalette;
+  const accent = ts.isDark ? buttonColor : EXP.brand;
+  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
+  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
 
   return (
     <div style={tk.surface}>
@@ -66,7 +70,7 @@ const StorefrontServices = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '340px' }}>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-4" style={{ color: buttonColor }}>What We Offer</p>
+            <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-4" style={{ color: accent }}>What We Offer</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-5" style={{ ...serifFont, ...tk.textOnDeep }}>
               {cfg.services_title || 'Our Services'}
             </h1>
@@ -92,8 +96,8 @@ const StorefrontServices = () => {
                   initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                   className="group flex flex-col items-center gap-3 p-5 rounded-2xl border hover:shadow-lg transition-all duration-300 text-center"
                   style={{ ...tk.surface, ...tk.border }}>
-                  <div className="h-12 w-12 rounded-xl flex items-center justify-center transition-colors duration-300" style={{ backgroundColor: `${buttonColor}12` }}>
-                    <Icon className="h-5 w-5 transition-colors duration-300" style={{ color: buttonColor }} />
+                  <div className="h-12 w-12 rounded-xl flex items-center justify-center transition-colors duration-300" style={{ backgroundColor: `${accent}12` }}>
+                    <Icon className="h-5 w-5 transition-colors duration-300" style={{ color: accent }} />
                   </div>
                   <span className="text-sm font-semibold" style={tk.textPrimary}>{label}</span>
                 </motion.a>
@@ -134,7 +138,7 @@ const StorefrontServices = () => {
                   </div>
 
                   <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                    <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style={{ color: buttonColor }}>
+                    <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style={{ color: accent }}>
                       {`0${i + 1}.`}
                     </p>
                     <h2 className="text-2xl lg:text-3xl font-bold mb-4" style={{ ...serifFont, ...tk.textPrimary }}>{label}</h2>
@@ -143,7 +147,7 @@ const StorefrontServices = () => {
                     <div className="grid grid-cols-2 gap-3 mb-8">
                       {features.map((feat, fi) => (
                         <div key={fi} className="flex items-center gap-2.5 text-sm" style={tk.textBody}>
-                          <span className="h-5 w-5 rounded-full flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: buttonColor }}>
+                          <span className="h-5 w-5 rounded-full flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: accent }}>
                             <Check className="h-3 w-3" />
                           </span>
                           {feat}
@@ -152,7 +156,7 @@ const StorefrontServices = () => {
                     </div>
 
                     <Link to={`/agency/${slug}/services/${service}`}>
-                      <Button className="rounded-full font-semibold gap-2 text-white px-8 h-12 text-sm" style={{ backgroundColor: buttonColor }}>
+                      <Button className="rounded-xl font-bold gap-2 px-8 h-12 text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
                         Explore {label} <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
@@ -171,7 +175,7 @@ const StorefrontServices = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ ...serifFont, ...tk.textOnDeep }}>Ready to Start Your Journey?</h2>
             <p className="mb-8 max-w-lg mx-auto" style={tk.textOnDeepMuted}>Book any of our services with confidence. Professional support, premium vehicles, and unforgettable experiences await.</p>
             <Link to={`/agency/${slug}/contact`}>
-              <Button className="rounded-full font-semibold gap-2 text-white px-10 h-12 text-sm" style={{ backgroundColor: buttonColor }}>
+              <Button className="rounded-xl font-bold gap-2 px-10 h-12 text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
                 Contact Us <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
