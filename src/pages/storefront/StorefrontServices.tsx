@@ -3,7 +3,7 @@ import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/a
 import { motion } from 'framer-motion';
 import { Car, UserCheck, Crown, Building, Star, ChevronRight, Check, ArrowRight, Globe } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 import { Button } from '@/components/ui/button';
 
 import serviceTransfer from '@/assets/service-transfer.jpg';
