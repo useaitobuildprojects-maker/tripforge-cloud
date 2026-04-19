@@ -75,18 +75,18 @@ export interface TemplateStyles {
 // ─────────────────────────────────────────────────────────────────
 const lightTokens: SurfaceTokens = {
   surface: { backgroundColor: '#ffffff' },
-  surfaceAlt: { backgroundColor: '#f9fafb' },
-  surfaceDeep: { backgroundColor: '#0a0a0a', color: '#ffffff' },
+  surfaceAlt: { backgroundColor: '#f7f9fc' },
+  surfaceDeep: { backgroundColor: expediaPalette.brandDeep, color: '#ffffff' },
   textPrimary: { color: '#111827' },
-  textBody: { color: '#6b7280' },
-  textMuted: { color: '#9ca3af' },
+  textBody: { color: '#4b5563' },
+  textMuted: { color: '#6b7280' },
   textFaint: { color: '#d1d5db' },
   textOnDeep: { color: '#ffffff' },
-  textOnDeepMuted: { color: 'rgba(255,255,255,0.4)' },
-  border: { borderColor: '#f3f4f6' },
+  textOnDeepMuted: { color: 'rgba(255,255,255,0.75)' },
+  border: { borderColor: '#e5e7eb' },
   divider: { backgroundColor: '#e5e7eb' },
   inputSurface: { backgroundColor: '#ffffff' },
-  inputBorder: { borderColor: '#e5e7eb' },
+  inputBorder: { borderColor: '#d1d5db' },
 };
 
 // ─────────────────────────────────────────────────────────────────
