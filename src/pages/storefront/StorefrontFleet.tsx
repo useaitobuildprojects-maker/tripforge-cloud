@@ -4,11 +4,15 @@ import { motion } from 'framer-motion';
 import { Car, Users, Fuel, Settings2, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 
 const StorefrontFleet = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
+  const EXP = expediaPalette;
+  const accent = ts.isDark ? buttonColor : EXP.brand;
+  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
+  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
 
   const sampleCars = [
     { name: 'Hyundai Tucson', year: 2021, type: 'SUV', price: 150, rating: 4.5, reviews: 450, seats: 5, transmission: 'Manual', fuel: '90L' },
@@ -65,9 +69,12 @@ const StorefrontFleet = () => {
                   <span className="flex items-center gap-1"><Settings2 className="h-3.5 w-3.5" />{car.transmission}</span>
                   <span className="flex items-center gap-1"><Fuel className="h-3.5 w-3.5" />{car.fuel}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-lg font-bold" style={tk.textPrimary}>${car.price}<span className="text-xs font-normal" style={tk.textMuted}>/day</span></p>
-                  <Button size="sm" className="rounded-lg text-white" style={{ backgroundColor: buttonColor }}>Book Now</Button>
+                <div className="flex items-center justify-between pt-3 border-t" style={tk.border}>
+                  <div>
+                    <p className="text-[10px]" style={tk.textMuted}>From</p>
+                    <p className="text-lg font-extrabold" style={tk.textPrimary}>${car.price}<span className="text-xs font-normal" style={tk.textMuted}>/day</span></p>
+                  </div>
+                  <Button size="sm" className="rounded-lg font-bold hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>Reserve</Button>
                 </div>
               </div>
             </motion.div>
