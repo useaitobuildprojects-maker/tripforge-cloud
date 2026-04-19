@@ -50,7 +50,8 @@ const StorefrontLayout = () => {
   const ts = getTemplateStyles(agency.storefront_template);
   const tk = ts.tokens;
   const btnColor = agency.button_color ?? '#1a3a4a';
-  const bgColor = agency.background_color ?? undefined;
+  // For dark templates (e.g. blacklane), ignore any legacy light background_color so the theme actually applies.
+  const bgColor = ts.isDark ? undefined : (agency.background_color ?? undefined);
   const cfg = agency.storefront_config ?? {};
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
