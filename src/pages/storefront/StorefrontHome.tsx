@@ -68,6 +68,7 @@ const serifFont = { fontFamily: "'Georgia', 'Times New Roman', serif" };
 const StorefrontHome = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
+  const tk = ts.tokens;
 
   const enabledServices = agency.services ?? [];
   const { data: vehicles = [], isLoading: vehiclesLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
@@ -146,89 +147,66 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO — Split layout like WayFarer ═══════════════ */}
-      <section className="bg-white">
+      {/* ═══════════════ HERO ═══════════════ */}
+      <section style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-0">
-          {/* Top: heading + description */}
           <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="flex-1 max-w-xl">
-              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] text-gray-900 tracking-tight" style={serifFont}>
-                {cfg.hero_title || (
-                  <>Your Next<br />Adventure Awaits</>
-                )}
+              <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.1] tracking-tight" style={{ ...serifFont, ...tk.textPrimary }}>
+                {cfg.hero_title || (<>Your Next<br />Adventure Awaits</>)}
               </h1>
             </motion.div>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="flex-1 max-w-sm pt-2">
-              <p className="text-sm text-gray-500 leading-relaxed mb-5">
+              <p className="text-sm leading-relaxed mb-5" style={tk.textBody}>
                 {cfg.hero_subtitle || `Explore stunning destinations, unique experiences, and unforgettable journeys with ${agency.name}.`}
               </p>
-              <button
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90"
-                style={{ backgroundColor: buttonColor }}
-              >
+              <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all hover:opacity-90" style={{ backgroundColor: buttonColor }}>
                 Booking
               </button>
             </motion.div>
           </div>
 
-          {/* Hero image — wide landscape with rounded corners */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
-            className="relative rounded-3xl overflow-hidden"
-            style={{ height: '420px' }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }} className="relative rounded-3xl overflow-hidden" style={{ height: '420px' }}>
             <img src={cfg.home_hero_image || defaultHeroImage} alt="" className="w-full h-full object-cover" width={1920} height={1080} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           </motion.div>
 
-          {/* Booking bar — overlapping hero bottom */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="relative z-10 -mt-10 mx-4 md:mx-10"
-          >
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 md:p-5 flex flex-wrap items-center gap-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.5 }} className="relative z-10 -mt-10 mx-4 md:mx-10">
+            <div className="rounded-2xl shadow-xl border p-4 md:p-5 flex flex-wrap items-center gap-4" style={{ ...tk.surface, ...tk.border }}>
               <div className="flex items-center gap-2.5 flex-1 min-w-[150px]">
-                <MapPin className="h-4 w-4 text-gray-400 shrink-0" />
+                <MapPin className="h-4 w-4 shrink-0" style={tk.textMuted} />
                 <div>
-                  <p className="text-[10px] text-gray-400 font-medium">Location</p>
-                  <div className="text-sm text-gray-900">
+                  <p className="text-[10px] font-medium" style={tk.textMuted}>Location</p>
+                  <div className="text-sm" style={tk.textPrimary}>
                     <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} />
                   </div>
                 </div>
               </div>
-              <div className="w-px h-8 bg-gray-200 hidden md:block" />
+              <div className="w-px h-8 hidden md:block" style={tk.divider} />
               <div className="flex items-center gap-2.5 flex-1 min-w-[140px]">
-                <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
                 <div>
-                  <p className="text-[10px] text-gray-400 font-medium">Check In</p>
-                  <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="text-sm text-gray-900 bg-transparent focus:outline-none w-full" />
+                  <p className="text-[10px] font-medium" style={tk.textMuted}>Check In</p>
+                  <input type="date" value={pickupDate} min={todayStr} onChange={(e) => handlePickupDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
                 </div>
               </div>
-              <div className="w-px h-8 bg-gray-200 hidden md:block" />
+              <div className="w-px h-8 hidden md:block" style={tk.divider} />
               <div className="flex items-center gap-2.5 flex-1 min-w-[140px]">
-                <Calendar className="h-4 w-4 text-gray-400 shrink-0" />
+                <Calendar className="h-4 w-4 shrink-0" style={tk.textMuted} />
                 <div>
-                  <p className="text-[10px] text-gray-400 font-medium">Check Out</p>
-                  <input type="date" value={dropoffDate} min={minReturnDate} onChange={(e) => handleDropoffDateChange(e.target.value)} className="text-sm text-gray-900 bg-transparent focus:outline-none w-full" />
+                  <p className="text-[10px] font-medium" style={tk.textMuted}>Check Out</p>
+                  <input type="date" value={dropoffDate} min={minReturnDate} onChange={(e) => handleDropoffDateChange(e.target.value)} className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
                 </div>
               </div>
-              <div className="w-px h-8 bg-gray-200 hidden md:block" />
+              <div className="w-px h-8 hidden md:block" style={tk.divider} />
               <div className="flex items-center gap-2.5 flex-1 min-w-[120px]">
-                <Users className="h-4 w-4 text-gray-400 shrink-0" />
+                <Users className="h-4 w-4 shrink-0" style={tk.textMuted} />
                 <div>
-                  <p className="text-[10px] text-gray-400 font-medium">People</p>
-                  <p className="text-sm text-gray-900">2 Adults</p>
+                  <p className="text-[10px] font-medium" style={tk.textMuted}>People</p>
+                  <p className="text-sm" style={tk.textPrimary}>2 Adults</p>
                 </div>
               </div>
-              <button
-                className="h-11 w-11 rounded-full flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity shadow-lg"
-                style={{ backgroundColor: buttonColor }}
-                onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
-              >
+              <button className="h-11 w-11 rounded-full flex items-center justify-center text-white shrink-0 hover:opacity-90 transition-opacity shadow-lg" style={{ backgroundColor: buttonColor }} onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}>
                 <Search className="h-5 w-5" />
               </button>
             </div>
@@ -237,37 +215,30 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ TOUR PACKAGES ═══════════════ */}
-      <section className="py-24 bg-white">
+      <section className="py-24" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-xs text-gray-400 font-medium mb-1">Tour Packages</p>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight" style={serifFont}>
+              <p className="text-xs font-medium mb-1" style={tk.textMuted}>Tour Packages</p>
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight" style={{ ...serifFont, ...tk.textPrimary }}>
                 Explore Our Exclusive<br />Tour Packages
               </h2>
             </div>
-            <p className="text-sm text-gray-400 max-w-xs leading-relaxed">
+            <p className="text-sm max-w-xs leading-relaxed" style={tk.textMuted}>
               Find your perfect getaway with our curated tour packages. Adventure, relaxation or culture — it's all here for you!
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {DESTINATIONS.map((dest, i) => (
-              <motion.div
-                key={dest.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
-                className={`group rounded-3xl overflow-hidden bg-white border border-gray-100 ${i === 0 ? 'shadow-xl ring-1 ring-gray-100' : 'hover:shadow-xl transition-shadow'}`}
+              <motion.div key={dest.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }}
+                className={`group rounded-3xl overflow-hidden border ${i === 0 ? 'shadow-xl' : 'hover:shadow-xl transition-shadow'}`}
+                style={{ ...tk.surface, ...tk.border }}
               >
-                {/* Image */}
                 <div className="relative h-56 overflow-hidden">
                   <img src={dest.image} alt={dest.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" width={800} height={1024} />
                   <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-bold text-gray-900 shadow-sm"
-                      style={{ color: buttonColor }}
-                    >
+                    <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-bold shadow-sm" style={{ color: buttonColor }}>
                       {dest.location.split(',')[0]}
                     </span>
                   </div>
@@ -279,32 +250,26 @@ const StorefrontHome = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Content */}
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-base font-bold text-gray-900">{dest.name}</h3>
+                    <h3 className="text-base font-bold" style={tk.textPrimary}>{dest.name}</h3>
                     <div className="flex items-center gap-1">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                      <span className="text-sm font-bold text-gray-900">{dest.rating}</span>
+                      <span className="text-sm font-bold" style={tk.textPrimary}>{dest.rating}</span>
                     </div>
                   </div>
                   <p className="text-lg font-bold mb-3" style={{ color: buttonColor }}>${dest.price.toFixed(2)}</p>
-
                   {i === 0 && (
                     <>
                       <div className="space-y-1.5 mb-4">
                         {dest.features.map((feat, j) => (
-                          <div key={j} className="flex items-center gap-2 text-xs text-gray-500">
+                          <div key={j} className="flex items-center gap-2 text-xs" style={tk.textBody}>
                             <Check className="h-3 w-3 shrink-0" style={{ color: buttonColor }} />
                             {feat}
                           </div>
                         ))}
                       </div>
-                      <button
-                        className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                        style={{ backgroundColor: buttonColor }}
-                      >
+                      <button className="w-full py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90" style={{ backgroundColor: buttonColor }}>
                         Booking
                       </button>
                     </>
@@ -317,19 +282,18 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ EVERY STEP + TRANSPORT ═══════════════ */}
-      <section className="py-24 bg-gray-50/70">
+      <section className="py-24" style={tk.surfaceAlt}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Left — Every Step of the Way */}
             <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <div className="rounded-3xl overflow-hidden bg-white border border-gray-100 shadow-sm p-6">
+              <div className="rounded-3xl overflow-hidden border shadow-sm p-6" style={{ ...tk.surface, ...tk.border }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900" style={serifFont}>Every Step of the Way</h3>
+                  <h3 className="text-xl font-bold" style={{ ...serifFont, ...tk.textPrimary }}>Every Step of the Way</h3>
                   <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: buttonColor }}>
                     <ArrowRight className="h-4 w-4 text-white -rotate-45" />
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 leading-relaxed mb-5">
+                <p className="text-sm leading-relaxed mb-5" style={tk.textBody}>
                   Travel with ease and comfort. From private transfers to group tours, we ensure seamless transportation throughout your journey.
                 </p>
                 <div className="rounded-2xl overflow-hidden h-56">
@@ -338,10 +302,9 @@ const StorefrontHome = () => {
               </div>
             </motion.div>
 
-            {/* Right — Effortless Travel (Transport modes) */}
             <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-              <p className="text-xs text-gray-400 font-medium mb-1">Transport</p>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8" style={serifFont}>Effortless Travel</h3>
+              <p className="text-xs font-medium mb-1" style={tk.textMuted}>Transport</p>
+              <h3 className="text-2xl md:text-3xl font-bold mb-8" style={{ ...serifFont, ...tk.textPrimary }}>Effortless Travel</h3>
 
               <div className="space-y-5">
                 {enabledServices.length > 0 ? enabledServices.map((service, i) => {
@@ -350,15 +313,13 @@ const StorefrontHome = () => {
                   const desc = SERVICE_SHORT_DESC[service];
                   return (
                     <Link to={`/agency/${slug}/services/${service}`} key={service} className="flex items-start gap-4 group">
-                      <div
-                        className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-all ${i === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}`}
-                        style={i === 0 ? { backgroundColor: buttonColor } : undefined}
-                      >
+                      <div className="h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-all"
+                        style={i === 0 ? { backgroundColor: buttonColor, color: '#fff' } : { backgroundColor: ts.isDark ? 'rgba(255,255,255,0.06)' : '#f3f4f6', ...tk.textBody }}>
                         <Icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900 mb-0.5">{label}</h4>
-                        <p className="text-xs text-gray-400 leading-relaxed">{desc}</p>
+                        <h4 className="text-sm font-bold mb-0.5" style={tk.textPrimary}>{label}</h4>
+                        <p className="text-xs leading-relaxed" style={tk.textMuted}>{desc}</p>
                       </div>
                     </Link>
                   );
@@ -370,15 +331,13 @@ const StorefrontHome = () => {
                     { icon: Navigation, label: 'Local Transportation', desc: 'We provide local vehicle trips with schedules according to the application or can be customized.' },
                   ].map((item, i) => (
                     <div key={item.label} className="flex items-start gap-4">
-                      <div
-                        className={`h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 ${i === 0 ? 'text-white shadow-lg' : 'bg-gray-100 text-gray-500'}`}
-                        style={i === 0 ? { backgroundColor: buttonColor } : undefined}
-                      >
+                      <div className="h-12 w-12 rounded-2xl flex items-center justify-center shrink-0"
+                        style={i === 0 ? { backgroundColor: buttonColor, color: '#fff' } : { backgroundColor: ts.isDark ? 'rgba(255,255,255,0.06)' : '#f3f4f6', ...tk.textBody }}>
                         <item.icon className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-gray-900 mb-0.5">{item.label}</h4>
-                        <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+                        <h4 className="text-sm font-bold mb-0.5" style={tk.textPrimary}>{item.label}</h4>
+                        <p className="text-xs leading-relaxed" style={tk.textMuted}>{item.desc}</p>
                       </div>
                     </div>
                   ))
@@ -393,20 +352,20 @@ const StorefrontHome = () => {
       {showVehicles && (
         <section ref={vehiclesRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 scroll-mt-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-3 rounded-xl border border-gray-200 bg-gray-50 flex flex-wrap items-center gap-4 text-sm">
-              <MapPin className="h-4 w-4 text-gray-400" />
-              <span><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
-              <span className="text-gray-300">→</span>
-              <span><strong>Return:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
-              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium text-gray-500 hover:text-gray-800 underline">Clear</button>
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-3 rounded-xl border flex flex-wrap items-center gap-4 text-sm" style={{ ...tk.surfaceAlt, ...tk.border }}>
+              <MapPin className="h-4 w-4" style={tk.textMuted} />
+              <span style={tk.textPrimary}><strong>Pickup:</strong> {pickupLocation || 'Any'}{pickupDate ? ` · ${pickupDate}` : ''}{pickupTime ? ` ${pickupTime}` : ''}</span>
+              <span style={tk.textFaint}>→</span>
+              <span style={tk.textPrimary}><strong>Return:</strong> {dropoffLocation || 'Any'}{dropoffDate ? ` · ${dropoffDate}` : ''}{dropoffTime ? ` ${dropoffTime}` : ''}</span>
+              <button onClick={() => { setSearchActive(false); setPickupLocation(''); setPickupDate(''); setPickupTime(''); setDropoffLocation(''); setDropoffDate(''); setDropoffTime(''); }} className="ml-auto text-xs font-medium underline" style={tk.textBody}>Clear</button>
             </motion.div>
           )}
 
           <div className="flex items-center justify-between mb-10">
             <div>
-              <p className="text-xs text-gray-400 font-medium mb-1">Our Fleet</p>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900" style={{ ...serifFont, ...(cfg.heading_color ? { color: cfg.heading_color } : {}) }}>Best Deals & Offers</h2>
-              <p className="text-sm text-gray-400 mt-1.5">Find the perfect vehicle for your journey.</p>
+              <p className="text-xs font-medium mb-1" style={tk.textMuted}>Our Fleet</p>
+              <h2 className="text-2xl md:text-3xl font-bold" style={{ ...serifFont, ...(cfg.heading_color ? { color: cfg.heading_color } : tk.textPrimary) }}>Best Deals & Offers</h2>
+              <p className="text-sm mt-1.5" style={tk.textMuted}>Find the perfect vehicle for your journey.</p>
             </div>
             <Button variant="outline" size="sm" className="lg:hidden gap-2 rounded-full" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
               <SlidersHorizontal className="h-4 w-4" /> Filter
@@ -424,10 +383,10 @@ const StorefrontHome = () => {
             {mobileFiltersOpen && (
               <div className="fixed inset-0 z-50 lg:hidden">
                 <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
-                <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-white p-6 overflow-y-auto shadow-xl">
+                <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] p-6 overflow-y-auto shadow-xl" style={tk.surface}>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="font-bold text-lg">Filters</span>
-                    <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
+                    <span className="font-bold text-lg" style={tk.textPrimary}>Filters</span>
+                    <button onClick={() => setMobileFiltersOpen(false)} style={tk.textPrimary}><X className="h-5 w-5" /></button>
                   </div>
                   <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
                 </div>
@@ -438,14 +397,14 @@ const StorefrontHome = () => {
               {vehiclesLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="rounded-2xl border border-gray-100 overflow-hidden">
+                    <div key={i} className="rounded-2xl border overflow-hidden" style={tk.border}>
                       <Skeleton className="h-48 w-full" />
                       <div className="p-5 space-y-2"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-4 w-1/2" /><Skeleton className="h-10 w-full mt-3" /></div>
                     </div>
                   ))}
                 </div>
               ) : filteredVehicles.length === 0 ? (
-                <div className="text-center py-20 text-gray-400">
+                <div className="text-center py-20" style={tk.textMuted}>
                   <Car className="h-12 w-12 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">{hasAnyFilter(filters) ? 'No vehicles match your filters.' : 'No vehicles available at the moment.'}</p>
                   {hasAnyFilter(filters) && (
@@ -454,13 +413,14 @@ const StorefrontHome = () => {
                 </div>
               ) : (
                 <>
-                  <p className="text-sm text-gray-400 mb-5">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
+                  <p className="text-sm mb-5" style={tk.textMuted}>{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {filteredVehicles.map((vehicle, i) => {
                       const mv = vehicle as MarketplaceVehicle;
                       return (
                         <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                          className="rounded-2xl border border-gray-100 bg-white overflow-hidden hover:shadow-xl transition-all duration-300 group relative">
+                          className="rounded-2xl border overflow-hidden hover:shadow-xl transition-all duration-300 group relative"
+                          style={{ ...tk.surface, ...tk.border }}>
                           {mv.agency_name && !mv.is_own && (
                             <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold">
                               {mv.agency_logo_url ? <img src={mv.agency_logo_url} alt="" className="h-4 w-4 rounded-full object-cover" /> : <Briefcase className="h-3 w-3" />}
@@ -470,26 +430,26 @@ const StorefrontHome = () => {
                           {vehicle.photo_url ? (
                             <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                           ) : (
-                            <div className="h-48 flex items-center justify-center bg-gray-50"><Car className="h-12 w-12 text-gray-200" /></div>
+                            <div className="h-48 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
                           )}
                           <div className="p-5">
-                            <h4 className="font-bold text-sm text-gray-900">{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
-                            <div className="flex items-center gap-3 mt-2.5 text-[11px] text-gray-400">
+                            <h4 className="font-bold text-sm" style={tk.textPrimary}>{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
+                            <div className="flex items-center gap-3 mt-2.5 text-[11px]" style={tk.textMuted}>
                               <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
                               <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
                               <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
                             </div>
                             <div className="flex items-center gap-1 mt-2.5">
                               {[...Array(5)].map((_, j) => <Star key={j} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
-                              <span className="text-[10px] text-gray-400 ml-1">(450+)</span>
+                              <span className="text-[10px] ml-1" style={tk.textMuted}>(450+)</span>
                             </div>
-                            <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                            <div className="flex items-center justify-between mt-4 pt-4 border-t" style={tk.border}>
                               {vehicle.display_price_per_km ? (
-                                <p className="text-lg font-bold" style={{ color: buttonColor }}>{vehicle.display_price_per_km} €<span className="text-xs font-normal text-gray-400"> /km</span></p>
+                                <p className="text-lg font-bold" style={{ color: buttonColor }}>{vehicle.display_price_per_km} €<span className="text-xs font-normal" style={tk.textMuted}> /km</span></p>
                               ) : vehicle.daily_rate ? (
-                                <p className="text-lg font-bold" style={{ color: buttonColor }}>{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal text-gray-400"> /day</span></p>
+                                <p className="text-lg font-bold" style={{ color: buttonColor }}>{vehicle.daily_rate.toLocaleString()} €<span className="text-xs font-normal" style={tk.textMuted}> /day</span></p>
                               ) : (
-                                <p className="text-sm text-gray-400">Contact</p>
+                                <p className="text-sm" style={tk.textMuted}>Contact</p>
                               )}
                               <Button size="sm" className="rounded-xl text-xs font-bold text-white h-9 px-5" style={{ backgroundColor: buttonColor }}
                                 onClick={() => setBookingVehicle(mv)}>
@@ -514,16 +474,16 @@ const StorefrontHome = () => {
       )}
 
       {/* ═══════════════ TESTIMONIALS ═══════════════ */}
-      <section className="py-24 bg-gray-50/70">
+      <section className="py-24" style={tk.surfaceAlt}>
         <div className="max-w-5xl mx-auto px-4">
-          <p className="text-xs text-gray-400 font-medium text-center mb-1">Testimonials</p>
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-14 text-gray-900" style={serifFont}>
+          <p className="text-xs font-medium text-center mb-1" style={tk.textMuted}>Testimonials</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-14" style={{ ...serifFont, ...tk.textPrimary }}>
             {cfg.reviews_title || 'What Our Customers Say'}
           </h2>
 
           <div className="relative">
             <div className="flex items-center gap-4 justify-center">
-              <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-white transition-colors shrink-0" style={{ color: buttonColor }}>
+              <button onClick={() => setReviewIndex(Math.max(0, reviewIndex - 1))} className="h-10 w-10 rounded-full border flex items-center justify-center transition-colors shrink-0" style={{ ...tk.border, color: buttonColor }}>
                 <ChevronLeft className="h-4 w-4" />
               </button>
 
@@ -531,33 +491,31 @@ const StorefrontHome = () => {
                 {testimonials.map((t, i) => {
                   const isCenter = i === reviewIndex;
                   return (
-                    <motion.div
-                      key={i}
-                      layout
-                      className={`p-6 rounded-2xl border transition-all duration-300 min-w-[240px] flex-1 ${
-                        isCenter ? 'bg-white text-gray-900 border-gray-200 shadow-lg' : 'bg-white/50 text-gray-700 border-gray-100'
-                      }`}
-                    >
+                    <motion.div key={i} layout className="p-6 rounded-2xl border transition-all duration-300 min-w-[240px] flex-1"
+                      style={{
+                        ...tk.surface,
+                        ...tk.border,
+                        opacity: isCenter ? 1 : 0.7,
+                        boxShadow: isCenter ? (ts.isDark ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 25px rgba(0,0,0,0.08)') : undefined,
+                      }}>
                       <div className="flex items-center gap-3 mb-4">
                         <div className="h-11 w-11 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: buttonColor }}>
                           {t.name.split(' ').map(n => n[0]).join('')}
                         </div>
                         <div>
-                          <p className="font-semibold text-sm text-gray-900">{t.name}</p>
+                          <p className="font-semibold text-sm" style={tk.textPrimary}>{t.name}</p>
                           <div className="flex gap-0.5 mt-0.5">
-                            {[...Array(t.rating)].map((_, j) => (
-                              <Star key={j} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            ))}
+                            {[...Array(t.rating)].map((_, j) => <Star key={j} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
                           </div>
                         </div>
                       </div>
-                      <p className="text-xs leading-relaxed text-gray-500">"{t.text}"</p>
+                      <p className="text-xs leading-relaxed" style={tk.textBody}>"{t.text}"</p>
                     </motion.div>
                   );
                 })}
               </div>
 
-              <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-white transition-colors shrink-0" style={{ color: buttonColor }}>
+              <button onClick={() => setReviewIndex(Math.min(testimonials.length - 1, reviewIndex + 1))} className="h-10 w-10 rounded-full border flex items-center justify-center transition-colors shrink-0" style={{ ...tk.border, color: buttonColor }}>
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
@@ -566,7 +524,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ CTA ═══════════════ */}
-      <section className="py-20 bg-white">
+      <section className="py-20" style={tk.surface}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="rounded-3xl p-12 md:p-16 text-white relative overflow-hidden" style={{ backgroundColor: buttonColor }}>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 30% 50%, white 1px, transparent 1px), radial-gradient(circle at 70% 50%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -583,7 +541,6 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* Booking Quote Dialog */}
       {bookingVehicle && (
         <BookingQuoteDialog
           vehicle={bookingVehicle}
