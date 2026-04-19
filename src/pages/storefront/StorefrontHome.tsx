@@ -424,13 +424,10 @@ const StorefrontHome = () => {
           open={!!bookingVehicle}
           onOpenChange={(open) => !open && setBookingVehicle(null)}
           vehicle={bookingVehicle}
-          agencySlug={slug ?? ''}
           buttonColor={accent}
           oneWayFee={agency.one_way_fee}
           isOneWay={false}
           numDays={1}
-          freeKm={cfg.car_rental_free_km}
-          extraKmRate={cfg.car_rental_extra_km_rate}
         />
       )}
     </div>
