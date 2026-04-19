@@ -56,8 +56,9 @@ const StorefrontLayout = () => {
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
 
-  // Logo styles depend on dark template
-  const logoTextStyle: React.CSSProperties = { fontFamily: "'Georgia', 'Times New Roman', serif", ...tk.textPrimary };
+  // Logo: Expedia-style bold sans (no serif), brand-colored on light templates
+  const accent = ts.isDark ? btnColor : expediaPalette.brand;
+  const logoTextStyle: React.CSSProperties = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em', color: ts.isDark ? (tk.textPrimary.color as string) : accent };
   const navPillBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
   const navPillActiveBg = ts.isDark ? 'rgba(255,255,255,0.12)' : '#ffffff';
   const navInactive: React.CSSProperties = tk.textBody;
