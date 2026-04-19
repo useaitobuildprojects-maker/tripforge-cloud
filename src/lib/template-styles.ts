@@ -1,5 +1,25 @@
 import { StorefrontTemplate } from '@/types/agency';
 
+export interface SurfaceTokens {
+  // Page surfaces
+  surface: React.CSSProperties;          // primary card / "white" surface
+  surfaceAlt: React.CSSProperties;       // alternate section bg ("gray-50")
+  surfaceDeep: React.CSSProperties;      // deepest contrast section ("gray-950" CTA bands)
+  // Text
+  textPrimary: React.CSSProperties;      // headings ("gray-900")
+  textBody: React.CSSProperties;         // body ("gray-600/500")
+  textMuted: React.CSSProperties;        // labels ("gray-400")
+  textFaint: React.CSSProperties;        // hints ("gray-300")
+  textOnDeep: React.CSSProperties;       // text on surfaceDeep
+  textOnDeepMuted: React.CSSProperties;  // muted text on surfaceDeep
+  // Lines & overlays
+  border: React.CSSProperties;           // ("border-gray-100/200")
+  divider: React.CSSProperties;          // background:color (for w-px dividers)
+  // Form input
+  inputSurface: React.CSSProperties;
+  inputBorder: React.CSSProperties;
+}
+
 export interface TemplateStyles {
   headerClass: string;
   headerStyle?: React.CSSProperties;
@@ -30,7 +50,53 @@ export interface TemplateStyles {
   iconBgClass: string;
   iconBgStyle?: React.CSSProperties;
   subHeroClass: string;
+  /** Whether template renders on a dark canvas (controls SVG curve fill etc.) */
+  isDark: boolean;
+  /** Solid color matching `surface` background — used by SVG <path fill> joints. */
+  surfaceFill: string;
+  /** Solid color matching `surfaceDeep` — used for hero/CTA band backgrounds. */
+  surfaceDeepFill: string;
+  /** Token-based surfaces for page content. */
+  tokens: SurfaceTokens;
 }
+
+// ─────────────────────────────────────────────────────────────────
+// LIGHT defaults (classic / minimal / fresh / coastal / corporate / elegant)
+// ─────────────────────────────────────────────────────────────────
+const lightTokens: SurfaceTokens = {
+  surface: { backgroundColor: '#ffffff' },
+  surfaceAlt: { backgroundColor: '#f9fafb' },
+  surfaceDeep: { backgroundColor: '#0a0a0a', color: '#ffffff' },
+  textPrimary: { color: '#111827' },
+  textBody: { color: '#6b7280' },
+  textMuted: { color: '#9ca3af' },
+  textFaint: { color: '#d1d5db' },
+  textOnDeep: { color: '#ffffff' },
+  textOnDeepMuted: { color: 'rgba(255,255,255,0.4)' },
+  border: { borderColor: '#f3f4f6' },
+  divider: { backgroundColor: '#e5e7eb' },
+  inputSurface: { backgroundColor: '#ffffff' },
+  inputBorder: { borderColor: '#e5e7eb' },
+};
+
+// ─────────────────────────────────────────────────────────────────
+// DARK tokens (blacklane)
+// ─────────────────────────────────────────────────────────────────
+const darkTokens: SurfaceTokens = {
+  surface: { backgroundColor: '#0a0a0a', color: '#ffffff' },
+  surfaceAlt: { backgroundColor: '#111111', color: '#ffffff' },
+  surfaceDeep: { backgroundColor: '#000000', color: '#ffffff' },
+  textPrimary: { color: '#ffffff' },
+  textBody: { color: 'rgba(255,255,255,0.7)' },
+  textMuted: { color: 'rgba(255,255,255,0.45)' },
+  textFaint: { color: 'rgba(255,255,255,0.25)' },
+  textOnDeep: { color: '#ffffff' },
+  textOnDeepMuted: { color: 'rgba(255,255,255,0.5)' },
+  border: { borderColor: 'rgba(255,255,255,0.08)' },
+  divider: { backgroundColor: 'rgba(255,255,255,0.1)' },
+  inputSurface: { backgroundColor: '#1a1a1a', color: '#ffffff' },
+  inputBorder: { borderColor: 'rgba(255,255,255,0.12)' },
+};
 
 const classicStyles: TemplateStyles = {
   headerClass: 'bg-white border-b border-gray-200 shadow-sm',
@@ -49,6 +115,10 @@ const classicStyles: TemplateStyles = {
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-100',
   iconBgClass: 'bg-primary/5 text-primary',
   subHeroClass: 'bg-primary/5',
+  isDark: false,
+  surfaceFill: '#ffffff',
+  surfaceDeepFill: '#0a0a0a',
+  tokens: lightTokens,
 };
 
 const minimalStyles: TemplateStyles = {
@@ -68,6 +138,10 @@ const minimalStyles: TemplateStyles = {
   searchBarClass: 'bg-white rounded-2xl shadow-lg border border-gray-100',
   iconBgClass: 'bg-slate-100 text-slate-700',
   subHeroClass: 'bg-slate-50',
+  isDark: false,
+  surfaceFill: '#ffffff',
+  surfaceDeepFill: '#0a0a0a',
+  tokens: lightTokens,
 };
 
 const elegantStyles: TemplateStyles = {
@@ -100,6 +174,20 @@ const elegantStyles: TemplateStyles = {
   iconBgClass: '',
   iconBgStyle: { backgroundColor: 'rgba(200, 169, 81, 0.15)', color: '#b8860b' },
   subHeroClass: '',
+  isDark: false,
+  surfaceFill: '#faf8f5',
+  surfaceDeepFill: '#2c1810',
+  tokens: {
+    ...lightTokens,
+    surface: { backgroundColor: '#faf8f5' },
+    surfaceAlt: { backgroundColor: '#efe6d8' },
+    surfaceDeep: { backgroundColor: '#2c1810', color: '#faf8f5' },
+    textPrimary: { color: '#2c1810' },
+    textBody: { color: '#6b5a48' },
+    textMuted: { color: '#a08c75' },
+    border: { borderColor: '#e0d3c3' },
+    divider: { backgroundColor: '#e0d3c3' },
+  },
 };
 
 const corporateStyles: TemplateStyles = {
@@ -128,6 +216,10 @@ const corporateStyles: TemplateStyles = {
   iconBgClass: 'bg-blue-50',
   iconBgStyle: { color: '#1e3a5f' },
   subHeroClass: 'bg-blue-50/50',
+  isDark: false,
+  surfaceFill: '#ffffff',
+  surfaceDeepFill: '#1e3a5f',
+  tokens: lightTokens,
 };
 
 const freshStyles: TemplateStyles = {
@@ -148,6 +240,10 @@ const freshStyles: TemplateStyles = {
   searchBarClass: 'bg-white rounded-2xl shadow-lg border border-green-100',
   iconBgClass: 'bg-green-50 text-green-700',
   subHeroClass: 'bg-green-50/60',
+  isDark: false,
+  surfaceFill: '#ffffff',
+  surfaceDeepFill: '#14532d',
+  tokens: lightTokens,
 };
 
 const coastalStyles: TemplateStyles = {
@@ -175,6 +271,10 @@ const coastalStyles: TemplateStyles = {
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-sky-100',
   iconBgClass: 'bg-sky-50 text-sky-700',
   subHeroClass: 'bg-sky-50',
+  isDark: false,
+  surfaceFill: '#ffffff',
+  surfaceDeepFill: '#0c4a6e',
+  tokens: lightTokens,
 };
 
 const blacklaneStyles: TemplateStyles = {
@@ -207,6 +307,10 @@ const blacklaneStyles: TemplateStyles = {
   iconBgClass: '',
   iconBgStyle: { backgroundColor: 'rgba(0,102,255,0.12)', color: '#3b82f6' },
   subHeroClass: '',
+  isDark: true,
+  surfaceFill: '#0a0a0a',
+  surfaceDeepFill: '#000000',
+  tokens: darkTokens,
 };
 
 const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {

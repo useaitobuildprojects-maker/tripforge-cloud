@@ -48,11 +48,20 @@ const StorefrontLayout = () => {
   }
 
   const ts = getTemplateStyles(agency.storefront_template);
+  const tk = ts.tokens;
   const btnColor = agency.button_color ?? '#1a3a4a';
   const bgColor = agency.background_color ?? undefined;
   const cfg = agency.storefront_config ?? {};
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
-  const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : (ts.bodyStyle ?? {});
+  const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
+
+  // Logo styles depend on dark template
+  const logoTextStyle: React.CSSProperties = { fontFamily: "'Georgia', 'Times New Roman', serif", ...tk.textPrimary };
+  const navPillBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
+  const navPillActiveBg = ts.isDark ? 'rgba(255,255,255,0.12)' : '#ffffff';
+  const navInactive: React.CSSProperties = tk.textBody;
+  const navActive: React.CSSProperties = tk.textPrimary;
+  const iconBtnBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
 
   const navLinks = [
     { label: 'Home', to: `/agency/${slug}` },
@@ -62,66 +71,51 @@ const StorefrontLayout = () => {
   ];
 
   return (
-    <div className={`min-h-screen bg-white ${fontClass}`} style={bodyStyle}>
-      {/* ═══ Nav — Clean white with pill container ═══ */}
-      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div className={`min-h-screen ${fontClass}`} style={bodyStyle}>
+      {/* ═══ Nav ═══ */}
+      <header className="sticky top-0 z-50 border-b" style={{ ...tk.surface, ...tk.border }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-[68px]">
-            {/* Logo */}
             <Link to={`/agency/${slug}`} className="flex items-center gap-2">
               {agency.logo_url ? (
                 <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-9 w-auto object-contain" />
               ) : (
-                <span className="text-xl font-bold tracking-tight text-gray-900" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
-                  {agency.name}
-                </span>
+                <span className="text-xl font-bold tracking-tight" style={logoTextStyle}>{agency.name}</span>
               )}
             </Link>
 
-            {/* Center nav — pill shape */}
-            <nav className="hidden md:flex items-center gap-1 bg-gray-50 rounded-full px-1.5 py-1">
+            <nav className="hidden md:flex items-center gap-1 rounded-full px-1.5 py-1" style={{ backgroundColor: navPillBg }}>
               {navLinks.map((link) => {
                 const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
                 return (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className={`px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-200 ${
-                      isActive
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-900'
-                    }`}
-                  >
+                  <Link key={link.label} to={link.to}
+                    className="px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-200"
+                    style={isActive ? { backgroundColor: navPillActiveBg, ...navActive, boxShadow: ts.isDark ? '0 1px 2px rgba(0,0,0,0.4)' : '0 1px 2px rgba(0,0,0,0.05)' } : navInactive}>
                     {link.label}
                   </Link>
                 );
               })}
             </nav>
 
-            {/* Right */}
             <div className="hidden md:flex items-center gap-3">
-              <button onClick={handleShare} className="h-9 w-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors" title="Share">
+              <button onClick={handleShare} className="h-9 w-9 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: iconBtnBg, ...tk.textBody }} title="Share">
                 <Share2 className="h-4 w-4" />
               </button>
-              <Link
-                to={`/agency/${slug}/contact`}
-                className="h-9 w-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
-              >
+              <Link to={`/agency/${slug}/contact`} className="h-9 w-9 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: iconBtnBg, ...tk.textBody }}>
                 <Phone className="h-4 w-4" />
               </Link>
             </div>
 
-            {/* Mobile */}
-            <button className="md:hidden p-2 text-gray-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={tk.textPrimary}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-1 shadow-lg">
+          <div className="md:hidden border-t px-4 py-4 space-y-1 shadow-lg" style={{ ...tk.surface, ...tk.border }}>
             {navLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="block text-sm font-medium py-2.5 px-3 rounded-lg hover:bg-gray-50 text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+              <Link key={link.label} to={link.to} className="block text-sm font-medium py-2.5 px-3 rounded-lg" style={tk.textBody} onClick={() => setMobileMenuOpen(false)}>
                 {link.label}
               </Link>
             ))}
@@ -132,8 +126,8 @@ const StorefrontLayout = () => {
       {/* Content */}
       <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
 
-      {/* ═══ Footer ═══ */}
-      <footer className="bg-gray-950 text-white">
+      {/* ═══ Footer (always dark for editorial contrast) ═══ */}
+      <footer className="text-white" style={{ backgroundColor: '#0a0a0a' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             <div className="md:col-span-4">
