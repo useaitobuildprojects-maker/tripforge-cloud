@@ -51,6 +51,10 @@ const StorefrontServices = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const enabledServices = agency.services ?? [];
+  const EXP = expediaPalette;
+  const accent = ts.isDark ? buttonColor : EXP.brand;
+  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
+  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
 
   return (
     <div style={tk.surface}>
