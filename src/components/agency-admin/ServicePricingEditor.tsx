@@ -106,6 +106,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   const [newTierFrom, setNewTierFrom] = useState('');
   const [newTierTo, setNewTierTo] = useState('');
   const [newTierMultiplier, setNewTierMultiplier] = useState('');
+  const [newCityBasePerKm, setNewCityBasePerKm] = useState('');
 
   // Seed dummy Italian cities if none exist for Italy
   const [seeded, setSeeded] = useState(false);
@@ -135,16 +136,19 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
 
   const handleAddCity = () => {
     if (!newCityName.trim()) return;
+    const basePerKm = Number(newCityBasePerKm);
+    if (isNaN(basePerKm) || basePerKm <= 0) return;
     addCity.mutate({
       agency_id: agencyId,
       city_name: newCityName.trim(),
       country: newCityCountry,
       transfer_base_fee: 0,
-      transfer_per_km_rate: 1,
+      transfer_per_km_rate: basePerKm,
       drop_off_fee: 0,
       distance_tiers: [...globalTiers],
     });
     setNewCityName('');
+    setNewCityBasePerKm('');
   };
 
   const handleAddTier = (cityId: string) => {
@@ -329,7 +333,24 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
             </SelectContent>
           </Select>
         </div>
-        <Button size="sm" onClick={handleAddCity} disabled={!newCityName.trim() || addCity.isPending} className="gradient-accent text-accent-foreground h-8">
+        <div className="space-y-1 w-32">
+          <Label className="text-[10px]">Base €/km</Label>
+          <Input
+            type="number"
+            min={0.05}
+            step={0.05}
+            placeholder="1.20"
+            value={newCityBasePerKm}
+            onChange={(e) => setNewCityBasePerKm(e.target.value)}
+            className="text-xs font-mono h-8"
+          />
+        </div>
+        <Button
+          size="sm"
+          onClick={handleAddCity}
+          disabled={!newCityName.trim() || !newCityBasePerKm || Number(newCityBasePerKm) <= 0 || addCity.isPending}
+          className="gradient-accent text-accent-foreground h-8"
+        >
           <Plus className="h-3.5 w-3.5 mr-1" /> Add City
         </Button>
       </div>
