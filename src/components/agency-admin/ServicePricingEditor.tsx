@@ -248,6 +248,18 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
   };
 
+  const handleUpdateTierRange = (cityId: string, tierIdx: number, field: 'from_km' | 'to_km', value: number) => {
+    const city = cities.find(c => c.id === cityId);
+    if (!city) return;
+    const updated = city.distance_tiers.map((t, i) => {
+      if (i !== tierIdx) return t;
+      const base = city.transfer_per_km_rate ?? 0;
+      const mult = tierEffectiveMultiplier(t, base);
+      return { from_km: field === 'from_km' ? value : t.from_km, to_km: field === 'to_km' ? value : t.to_km, multiplier: mult };
+    });
+    updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
+  };
+
   return (
     <div className="rounded-lg border border-border p-4 space-y-3">
       <div>
@@ -354,8 +366,32 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                       const eff = tierEffectiveMultiplier(t, base);
                       return (
                         <tr key={i} className="border-t border-border">
-                          <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
-                          <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
+                          <td className="px-3 py-1.5 font-mono">
+                            <Input
+                              type="number"
+                              min={0}
+                              step={1}
+                              defaultValue={t.from_km}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value);
+                                if (!isNaN(v) && v !== t.from_km) handleUpdateTierRange(city.id, i, 'from_km', v);
+                              }}
+                              className="text-xs font-mono w-20"
+                            />
+                          </td>
+                          <td className="px-3 py-1.5 font-mono">
+                            <Input
+                              type="number"
+                              min={0}
+                              step={1}
+                              defaultValue={t.to_km}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value);
+                                if (!isNaN(v) && v !== t.to_km) handleUpdateTierRange(city.id, i, 'to_km', v);
+                              }}
+                              className="text-xs font-mono w-20"
+                            />
+                          </td>
                           <td className="px-3 py-1.5 text-right font-mono">
                             <Input
                               type="number"
