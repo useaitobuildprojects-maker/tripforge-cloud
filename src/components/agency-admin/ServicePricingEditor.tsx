@@ -231,6 +231,14 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     updateCity.mutate({ id: cityId, agencyId, transfer_per_km_rate: value });
   };
 
+  const handleUpdateCityName = (cityId: string, value: string) => {
+    updateCity.mutate({ id: cityId, agencyId, city_name: value });
+  };
+
+  const handleUpdateCityCountry = (cityId: string, value: string) => {
+    updateCity.mutate({ id: cityId, agencyId, country: value });
+  };
+
   const handleUpdateTierMultiplier = (cityId: string, tierIdx: number, value: number) => {
     const city = cities.find(c => c.id === cityId);
     if (!city) return;
@@ -274,6 +282,33 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
 
           {expanded === city.id && (
             <div className="p-3 space-y-3">
+              {/* City name + country (editable) */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">City name</Label>
+                  <Input
+                    type="text"
+                    defaultValue={city.city_name}
+                    onBlur={(e) => {
+                      const v = e.target.value.trim();
+                      if (v && v !== city.city_name) handleUpdateCityName(city.id, v);
+                    }}
+                    className="text-xs w-full"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Country</Label>
+                  <Select value={city.country} onValueChange={(v) => handleUpdateCityCountry(city.id, v)}>
+                    <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {COUNTRY_LIST.map((c) => (
+                        <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {/* Base per-km + Drop-off fee */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
