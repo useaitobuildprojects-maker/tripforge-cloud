@@ -805,7 +805,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
-  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'suv'>('business');
+  const [newClassCategory, setNewClassCategory] = useState<'economy' | 'business' | 'first_class' | 'suv'>('economy');
   const [newClassLabel, setNewClassLabel] = useState('');
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
@@ -1104,15 +1104,16 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               <div className="grid grid-cols-5 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[10px]">Category</Label>
-                  <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
-                    <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="first_class">First Class</SelectItem>
-                      <SelectItem value="van">Van</SelectItem>
-                      <SelectItem value="suv">SUV</SelectItem>
-                    </SelectContent>
-                  </Select>
+                   <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
+                     <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="economy">Economy</SelectItem>
+                       <SelectItem value="business">Business</SelectItem>
+                       <SelectItem value="first_class">First Class</SelectItem>
+                       <SelectItem value="van">Van</SelectItem>
+                       <SelectItem value="suv">SUV</SelectItem>
+                     </SelectContent>
+                   </Select>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px]">Label</Label>
