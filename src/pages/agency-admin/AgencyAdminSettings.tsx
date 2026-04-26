@@ -20,11 +20,11 @@ import { getCitiesForCountry } from '@/data/city-database';
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
 const DEFAULT_TRANSFER_DISTANCE_TIERS = [
-  { from_km: 0, to_km: 50, fixed_price: 35 },
-  { from_km: 50, to_km: 100, fixed_price: 60 },
-  { from_km: 100, to_km: 200, fixed_price: 100 },
-  { from_km: 200, to_km: 300, fixed_price: 150 },
-  { from_km: 300, to_km: 500, fixed_price: 220 },
+  { from_km: 0, to_km: 50, multiplier: 1.0 },
+  { from_km: 50, to_km: 100, multiplier: 0.9 },
+  { from_km: 100, to_km: 200, multiplier: 0.8 },
+  { from_km: 200, to_km: 300, multiplier: 0.75 },
+  { from_km: 300, to_km: 500, multiplier: 0.7 },
 ];
 
 const emptyPageSeo = (): PageSeoEntry => ({ meta_title: '', meta_description: '', og_image: '' });
