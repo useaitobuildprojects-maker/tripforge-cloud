@@ -159,9 +159,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             <div className="space-y-2">
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
               {itinerary.map((stop, idx) => {
-                const rate = cityRates.find(cr => cr.city === stop.city);
-                const maxDays = rate?.max_days ?? 30;
-                const dayOptions = Array.from({ length: maxDays }, (_, i) => i + 1);
                 return (
                   <div key={idx} className="p-3 rounded-lg border border-border bg-muted/20 space-y-2">
                     <div className="flex items-center gap-2">
@@ -207,15 +204,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                       </Popover>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
-                        <SelectTrigger className="h-9 text-xs w-[100px]"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {dayOptions.map(n => (
-                            <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-1">
+                      <span className="text-xs text-muted-foreground">
+                        {stop.pickupDate && stop.dropoffDate
+                          ? `${stop.days} day${stop.days !== 1 ? 's' : ''}`
+                          : 'Select dates'}
+                      </span>
+                      <div className="flex gap-1 ml-auto">
                       <button
                         onClick={() => updateStop(idx, { dayType: 'half' })}
                         className={cn(
