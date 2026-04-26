@@ -159,9 +159,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             <div className="space-y-2">
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
               {itinerary.map((stop, idx) => {
-                const rate = cityRates.find(cr => cr.city === stop.city);
-                const maxDays = rate?.max_days ?? 30;
-                const dayOptions = Array.from({ length: maxDays }, (_, i) => i + 1);
                 return (
                   <div key={idx} className="p-3 rounded-lg border border-border bg-muted/20 space-y-2">
                     <div className="flex items-center gap-2">
