@@ -148,6 +148,45 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     });
   }, [isSuccess, cities, seeded, agencyId, addCity, country]);
 
+  // One-time migration: backfill legacy rows (zero base + fixed_price tiers) to multiplier model
+  const [migrated, setMigrated] = useState(false);
+  useEffect(() => {
+    if (!isSuccess || migrated) return;
+    const baseByCity: Record<string, number> = {
+      Rome: 1.40, Milan: 1.50, Naples: 1.20, Florence: 1.30,
+      Marrakech: 0.80, Casablanca: 0.90, Fes: 0.75, Agadir: 0.85,
+      Tunis: 0.70, Sousse: 0.65, Djerba: 0.75, Hammamet: 0.70,
+      Paris: 1.80, Nice: 1.60, Lyon: 1.50, Marseille: 1.50,
+      Madrid: 1.40, Barcelona: 1.50, Seville: 1.20, Valencia: 1.20,
+      Lisbon: 1.30, Porto: 1.20, Faro: 1.10,
+      Athens: 1.20, Thessaloniki: 1.10, Heraklion: 1.20,
+      Istanbul: 0.90, Antalya: 0.80, Izmir: 0.80, Bodrum: 0.85,
+      Berlin: 1.70, Munich: 1.80, Frankfurt: 1.70, Hamburg: 1.60,
+    };
+    const standardTiers = [
+      { from_km: 0, to_km: 50, multiplier: 1.0 },
+      { from_km: 50, to_km: 100, multiplier: 0.9 },
+      { from_km: 100, to_km: 200, multiplier: 0.8 },
+      { from_km: 200, to_km: 400, multiplier: 0.7 },
+      { from_km: 400, to_km: 600, multiplier: 0.65 },
+    ];
+    const legacyRows = cities.filter(
+      (c) =>
+        (!c.transfer_per_km_rate || c.transfer_per_km_rate === 0) &&
+        (!c.distance_tiers || c.distance_tiers.every((t: any) => typeof t.multiplier !== 'number'))
+    );
+    if (legacyRows.length === 0) { setMigrated(true); return; }
+    setMigrated(true);
+    legacyRows.forEach((row) => {
+      updateCity.mutate({
+        id: row.id,
+        agencyId,
+        transfer_per_km_rate: baseByCity[row.city_name] ?? 1.20,
+        distance_tiers: standardTiers,
+      });
+    });
+  }, [isSuccess, cities, migrated, agencyId, updateCity]);
+
   const handleAddCity = () => {
     if (!newCityName.trim()) return;
     const basePerKm = Number(newCityBasePerKm);
