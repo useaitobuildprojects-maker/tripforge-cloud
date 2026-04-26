@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo } from 'react';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
 import LimoBookingForm from '@/components/storefront/LimoBookingForm';
+import CityTourBookingForm from '@/components/storefront/CityTourBookingForm';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
@@ -51,6 +52,7 @@ const StorefrontServiceDetail = () => {
 
   const isTransfer = service === 'transfer';
   const isLimo = service === 'limo_tour';
+  const isCityTour = service === 'city_tour';
 
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -117,6 +119,10 @@ const StorefrontServiceDetail = () => {
       ) : isLimo ? (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+        </section>
+      ) : isCityTour ? (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : (
         /* Vehicle/Package Listings with Filter Sidebar */
