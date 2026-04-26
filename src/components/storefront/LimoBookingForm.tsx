@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Clock, Shield, Plus, Trash2, Clock4, Clock8 } from 'lucide-react';
+import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -66,16 +66,17 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
 
   const [startDate, setStartDate] = useState<Date>();
-  const [time, setTime] = useState('');
+  const [endDate, setEndDate] = useState<Date>();
   const [itinerary, setItinerary] = useState<ItineraryStop[]>([
     { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
   ]);
 
-  const timeSlots = useMemo(() => {
-    const slots: string[] = [];
-    for (let h = 0; h < 24; h++) for (const m of [0, 30]) slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-    return slots;
-  }, []);
+  const tripDays = useMemo(() => {
+    if (!startDate || !endDate) return 0;
+    const ms = endDate.getTime() - startDate.getTime();
+    if (ms < 0) return 0;
+    return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+  }, [startDate, endDate]);
 
   const addStop = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full' }]);
   const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
@@ -112,14 +113,14 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
-    const dateStr = startDate ? format(startDate, 'PPP') : 'Not specified';
-    const timeStr = time || 'Not specified';
+    const pickupStr = startDate ? format(startDate, 'PPP') : 'Not specified';
+    const dropoffStr = endDate ? format(endDate, 'PPP') : 'Not specified';
     const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
       .map((d, i) => `  Stop ${i + 1}: ${d.city} — ${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'} (€${d.perDay}/day) = €${d.price}`)
       .join('\n');
     const multLine = catMult !== 1 ? `\n✖️ ${catLabel} multiplier: × ${catMult}` : '';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Starting: ${dateStr} at ${timeStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Pickup: ${pickupStr}\n📅 Drop-off: ${dropoffStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -149,11 +150,11 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           </div>
         ) : (
           <>
-            {/* Start date & time */}
+            {/* Pickup & drop-off dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium flex items-center gap-1.5">
-                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Start Date
+                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Date
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -169,14 +170,24 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Time
+                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off Date
                 </Label>
-                <Select value={time} onValueChange={setTime}>
-                  <SelectTrigger className="h-10"><SelectValue placeholder="Select time" /></SelectTrigger>
-                  <SelectContent>{timeSlots.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !endDate && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={endDate} onSelect={setEndDate} disabled={(d) => d < (startDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
+            {tripDays > 0 && (
+              <p className="text-[11px] text-muted-foreground -mt-2">Trip duration: {tripDays} day{tripDays !== 1 ? 's' : ''}</p>
+            )}
 
             {/* City stops with day count */}
             <div className="space-y-2">
