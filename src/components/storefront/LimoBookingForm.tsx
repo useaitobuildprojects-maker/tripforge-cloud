@@ -32,6 +32,8 @@ interface ItineraryStop {
   city: string;
   days: number;
   dayType: DayType;
+  pickupDate?: Date;
+  dropoffDate?: Date;
 }
 
 interface Props {
@@ -65,23 +67,23 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
   const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
 
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
   const [itinerary, setItinerary] = useState<ItineraryStop[]>([
     { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
   ]);
 
-  const tripDays = useMemo(() => {
-    if (!startDate || !endDate) return 0;
-    const ms = endDate.getTime() - startDate.getTime();
-    if (ms < 0) return 0;
-    return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
-  }, [startDate, endDate]);
-
   const addStop = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full' }]);
   const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
   const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
-    setItinerary(p => p.map((d, i) => i === idx ? { ...d, ...updates } : d));
+    setItinerary(p => p.map((d, i) => {
+      if (i !== idx) return d;
+      const next = { ...d, ...updates };
+      // Auto-compute days from dates if both present
+      if (next.pickupDate && next.dropoffDate) {
+        const ms = next.dropoffDate.getTime() - next.pickupDate.getTime();
+        if (ms >= 0) next.days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+      }
+      return next;
+    }));
 
   // Per-stop base price (no multiplier); multiplier applied to subtotal → total
   const catMult = selectedClass?.multiplier ?? 1;
@@ -113,14 +115,17 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const handleWhatsApp = () => {
     if (!config.whatsapp_number) return;
-    const pickupStr = startDate ? format(startDate, 'PPP') : 'Not specified';
-    const dropoffStr = endDate ? format(endDate, 'PPP') : 'Not specified';
     const catLabel = selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label;
     const plan = breakdown
-      .map((d, i) => `  Stop ${i + 1}: ${d.city} — ${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'} (€${d.perDay}/day) = €${d.price}`)
+      .map((d, i) => {
+        const stop = itinerary[i];
+        const pu = stop.pickupDate ? format(stop.pickupDate, 'PPP') : 'TBD';
+        const dr = stop.dropoffDate ? format(stop.dropoffDate, 'PPP') : 'TBD';
+        return `  Stop ${i + 1}: ${d.city} — ${pu} → ${dr} (${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'}, €${d.perDay}/day) = €${d.price}`;
+      })
       .join('\n');
     const multLine = catMult !== 1 ? `\n✖️ ${catLabel} multiplier: × ${catMult}` : '';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n📅 Pickup: ${pickupStr}\n📅 Drop-off: ${dropoffStr}\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -150,45 +155,6 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
           </div>
         ) : (
           <>
-            {/* Pickup & drop-off dates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium flex items-center gap-1.5">
-                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Pickup Date
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !startDate && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={startDate} onSelect={setStartDate} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium flex items-center gap-1.5">
-                  <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Drop-off Date
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-10", !endDate && "text-muted-foreground")}>
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar mode="single" selected={endDate} onSelect={setEndDate} disabled={(d) => d < (startDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-            {tripDays > 0 && (
-              <p className="text-[11px] text-muted-foreground -mt-2">Trip duration: {tripDays} day{tripDays !== 1 ? 's' : ''}</p>
-            )}
-
             {/* City stops with day count */}
             <div className="space-y-2">
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
@@ -197,27 +163,59 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                 const maxDays = rate?.max_days ?? 30;
                 const dayOptions = Array.from({ length: maxDays }, (_, i) => i + 1);
                 return (
-                  <div key={idx} className="flex flex-wrap items-center gap-2 p-3 rounded-lg border border-border bg-muted/20">
-                    <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Stop {idx + 1}</span>
-                    <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
-                      <SelectTrigger className="h-9 text-xs flex-1 min-w-[140px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {cityRates.map(cr => (
-                          <SelectItem key={cr.city} value={cr.city}>
-                            {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
-                      <SelectTrigger className="h-9 text-xs w-[90px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {dayOptions.map(n => (
-                          <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex gap-1">
+                  <div key={idx} className="p-3 rounded-lg border border-border bg-muted/20 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Stop {idx + 1}</span>
+                      <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
+                        <SelectTrigger className="h-9 text-xs flex-1 min-w-[140px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {cityRates.map(cr => (
+                            <SelectItem key={cr.city} value={cr.city}>
+                              {cr.city}{cr.country ? ` · ${cr.country}` : ''}{cr.max_days ? ` (max ${cr.max_days}d)` : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {itinerary.length > 1 && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeStop(idx)}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-9 text-xs", !stop.pickupDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                            {stop.pickupDate ? format(stop.pickupDate, "MMM d, yyyy") : <span>Pickup date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-9 text-xs", !stop.dropoffDate && "text-muted-foreground")}>
+                            <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                            {stop.dropoffDate ? format(stop.dropoffDate, "MMM d, yyyy") : <span>Drop-off date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
+                        <SelectTrigger className="h-9 text-xs w-[100px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {dayOptions.map(n => (
+                            <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-1">
                       <button
                         onClick={() => updateStop(idx, { dayType: 'half' })}
                         className={cn(
@@ -238,12 +236,8 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                       >
                         <Clock8 className="h-3 w-3" /> 10h
                       </button>
+                      </div>
                     </div>
-                    {itinerary.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeStop(idx)}>
-                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                      </Button>
-                    )}
                   </div>
                 );
               })}
