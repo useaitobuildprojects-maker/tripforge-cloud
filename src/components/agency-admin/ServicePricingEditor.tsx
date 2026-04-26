@@ -274,6 +274,15 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
               )}
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={(e) => { e.stopPropagation(); setExpanded(expanded === city.id ? null : city.id); }}
+                title="Edit"
+              >
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </Button>
               <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); deleteCity.mutate({ id: city.id, agencyId }); }}>
                 <Trash2 className="h-3.5 w-3.5 text-destructive" />
               </Button>
