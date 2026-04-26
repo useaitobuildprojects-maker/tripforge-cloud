@@ -307,15 +307,21 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-[10px]">City name</Label>
-                  <Input
-                    type="text"
-                    defaultValue={city.city_name}
-                    onBlur={(e) => {
-                      const v = e.target.value.trim();
-                      if (v && v !== city.city_name) handleUpdateCityName(city.id, v);
-                    }}
-                    className="text-xs w-full"
-                  />
+                  <Select
+                    value={city.city_name}
+                    onValueChange={(v) => { if (v && v !== city.city_name) handleUpdateCityName(city.id, v); }}
+                  >
+                    <SelectTrigger className="text-xs h-9"><SelectValue placeholder="Select a city" /></SelectTrigger>
+                    <SelectContent>
+                      {(() => {
+                        const opts = getCitiesForCountry(city.country);
+                        const list = opts.includes(city.city_name) ? opts : [city.city_name, ...opts];
+                        return list.map((name) => (
+                          <SelectItem key={name} value={name} className="text-xs">{name}</SelectItem>
+                        ));
+                      })()}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px]">Country</Label>
