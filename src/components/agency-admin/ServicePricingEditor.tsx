@@ -366,8 +366,32 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                       const eff = tierEffectiveMultiplier(t, base);
                       return (
                         <tr key={i} className="border-t border-border">
-                          <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
-                          <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
+                          <td className="px-3 py-1.5 font-mono">
+                            <Input
+                              type="number"
+                              min={0}
+                              step={1}
+                              defaultValue={t.from_km}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value);
+                                if (!isNaN(v) && v !== t.from_km) handleUpdateTierRange(city.id, i, 'from_km', v);
+                              }}
+                              className="text-xs font-mono w-20"
+                            />
+                          </td>
+                          <td className="px-3 py-1.5 font-mono">
+                            <Input
+                              type="number"
+                              min={0}
+                              step={1}
+                              defaultValue={t.to_km}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value);
+                                if (!isNaN(v) && v !== t.to_km) handleUpdateTierRange(city.id, i, 'to_km', v);
+                              }}
+                              className="text-xs font-mono w-20"
+                            />
+                          </td>
                           <td className="px-3 py-1.5 text-right font-mono">
                             <Input
                               type="number"
