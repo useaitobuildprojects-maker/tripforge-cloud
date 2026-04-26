@@ -203,9 +203,13 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                     <div className="grid grid-cols-2 gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-9 text-xs", !stop.pickupDate && "text-muted-foreground")}>
+                          <Button
+                            variant="outline"
+                            disabled={idx > 0}
+                            className={cn("w-full justify-start text-left font-normal h-9 text-xs", !stop.pickupDate && "text-muted-foreground")}
+                          >
                             <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
-                            {stop.pickupDate ? format(stop.pickupDate, "MMM d, yyyy") : <span>Pickup date</span>}
+                            {stop.pickupDate ? format(stop.pickupDate, "MMM d, yyyy") : <span>{idx > 0 ? 'Auto from prev' : 'Pickup date'}</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
