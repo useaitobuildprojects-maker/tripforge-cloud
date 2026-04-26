@@ -768,17 +768,19 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 };
 
 // ── Limo Service Tab (city daily rates + itinerary pricing) ──
-const DEFAULT_LIMO_MULTIPLIERS = { business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
+const DEFAULT_LIMO_MULTIPLIERS = { economy: 0.7, business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
 
 const DEFAULT_LIMO_VEHICLE_CLASSES: NonNullable<StorefrontConfig['limo_vehicle_classes']> = [
+  { category: 'economy', label: 'Economy', seats: 3, multiplier: 0.7 },
   { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1 },
   { category: 'business', label: 'Business Van', seats: 7, multiplier: 1.6 },
   { category: 'first_class', label: 'First Class Sedan', seats: 3, multiplier: 2.4 },
   { category: 'suv', label: 'Luxury SUV', seats: 5, multiplier: 1.6 },
 ];
 
-const LIMO_CATEGORY_ORDER = ['business', 'first_class', 'suv'] as const;
+const LIMO_CATEGORY_ORDER = ['economy', 'business', 'first_class', 'suv'] as const;
 const LIMO_CATEGORY_LABELS: Record<string, string> = {
+  economy: 'Economy',
   business: 'Business',
   first_class: 'First Class',
   suv: 'SUV',
