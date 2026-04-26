@@ -5,7 +5,10 @@ import { toast } from 'sonner';
 export interface DistanceTier {
   from_km: number;
   to_km: number;
-  fixed_price: number;
+  /** Legacy fixed total price for this bracket (kept for backwards compatibility). */
+  fixed_price?: number;
+  /** New: multiplier applied on top of the city base per-km rate for km in this range. */
+  multiplier?: number;
 }
 
 export interface CityPricing {
