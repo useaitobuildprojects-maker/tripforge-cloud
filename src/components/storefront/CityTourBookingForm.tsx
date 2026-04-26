@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -61,10 +61,12 @@ const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
 
   const selectedTour = useMemo(() => tours.find(t => t.id === selectedTourId), [tours, selectedTourId]);
 
-  // Auto-select first tour
-  if (!selectedTourId && tours.length > 0) {
-    setSelectedTourId(tours[0].id);
-  }
+  // Auto-select first tour once data arrives
+  useEffect(() => {
+    if (!selectedTourId && tours.length > 0) {
+      setSelectedTourId(tours[0].id);
+    }
+  }, [tours, selectedTourId]);
 
   const hasHalfDay = !!selectedTour?.half_day_rate;
   const effectiveDurationType: DurationType = hasHalfDay ? durationType : 'full';
