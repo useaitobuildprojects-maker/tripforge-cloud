@@ -207,15 +207,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                       </Popover>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Select value={String(stop.days)} onValueChange={(v) => updateStop(idx, { days: parseInt(v, 10) })}>
-                        <SelectTrigger className="h-9 text-xs w-[100px]"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {dayOptions.map(n => (
-                            <SelectItem key={n} value={String(n)}>{n} day{n !== 1 ? 's' : ''}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="flex gap-1">
+                      <span className="text-xs text-muted-foreground">
+                        {stop.pickupDate && stop.dropoffDate
+                          ? `${stop.days} day${stop.days !== 1 ? 's' : ''}`
+                          : 'Select dates'}
+                      </span>
+                      <div className="flex gap-1 ml-auto">
                       <button
                         onClick={() => updateStop(idx, { dayType: 'half' })}
                         className={cn(
