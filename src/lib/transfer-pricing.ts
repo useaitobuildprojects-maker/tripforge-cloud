@@ -56,29 +56,50 @@ function getClassMultiplier(config: StorefrontConfig, classIndex: number): numbe
   return classes[classIndex]?.multiplier ?? 1;
 }
 
-/** Find the fixed price for a distance bracket using prorated tiers.
- *  Distance beyond the last tier is charged at the last tier's per-km rate. */
-function getTieredDistanceCharge(tiers: { from_km: number; to_km: number; fixed_price: number }[] | undefined, distanceKm: number, perKmFallback: number): number {
+/** Resolve a tier's effective multiplier.
+ *  - If `multiplier` is set, use it directly.
+ *  - Else if legacy `fixed_price` is set and we have a base per-km rate, derive
+ *    multiplier = fixed_price / (base_per_km × span).
+ *  - Else fall back to 1. */
+function resolveTierMultiplier(
+  tier: { from_km: number; to_km: number; fixed_price?: number; multiplier?: number },
+  basePerKm: number
+): number {
+  if (typeof tier.multiplier === 'number' && tier.multiplier > 0) return tier.multiplier;
+  if (typeof tier.fixed_price === 'number' && tier.fixed_price > 0 && basePerKm > 0) {
+    const span = tier.to_km - tier.from_km;
+    if (span > 0) return tier.fixed_price / (basePerKm * span);
+  }
+  return 1;
+}
+
+/** Charge for a distance using tier multipliers on top of a base per-km rate.
+ *  Each km within a tier costs `base_per_km × tier.multiplier`. Distance beyond
+ *  the last tier reuses the last tier's multiplier. */
+function getTieredDistanceCharge(
+  tiers: { from_km: number; to_km: number; fixed_price?: number; multiplier?: number }[] | undefined,
+  distanceKm: number,
+  basePerKm: number
+): number {
   if (!tiers || tiers.length === 0) {
-    return distanceKm * perKmFallback;
+    return distanceKm * basePerKm;
   }
   const sorted = [...tiers].sort((a, b) => a.from_km - b.from_km);
   let total = 0;
 
   for (const tier of sorted) {
     if (distanceKm <= tier.from_km) break;
-    const tierSpan = tier.to_km - tier.from_km;
     const kmInTier = Math.min(distanceKm, tier.to_km) - tier.from_km;
-    const ratio = kmInTier / tierSpan;
-    total += tier.fixed_price * ratio;
+    const mult = resolveTierMultiplier(tier, basePerKm);
+    total += basePerKm * kmInTier * mult;
   }
 
-  // Extrapolate beyond the last tier at its per-km rate
+  // Extrapolate beyond the last tier with its multiplier
   const lastTier = sorted[sorted.length - 1];
   if (distanceKm > lastTier.to_km) {
     const extraKm = distanceKm - lastTier.to_km;
-    const lastTierPerKm = lastTier.fixed_price / (lastTier.to_km - lastTier.from_km);
-    total += extraKm * lastTierPerKm;
+    const mult = resolveTierMultiplier(lastTier, basePerKm);
+    total += basePerKm * extraKm * mult;
   }
 
   return total;
