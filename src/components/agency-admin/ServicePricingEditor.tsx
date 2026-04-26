@@ -248,6 +248,18 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
   };
 
+  const handleUpdateTierRange = (cityId: string, tierIdx: number, field: 'from_km' | 'to_km', value: number) => {
+    const city = cities.find(c => c.id === cityId);
+    if (!city) return;
+    const updated = city.distance_tiers.map((t, i) => {
+      if (i !== tierIdx) return t;
+      const base = city.transfer_per_km_rate ?? 0;
+      const mult = tierEffectiveMultiplier(t, base);
+      return { from_km: field === 'from_km' ? value : t.from_km, to_km: field === 'to_km' ? value : t.to_km, multiplier: mult };
+    });
+    updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
+  };
+
   return (
     <div className="rounded-lg border border-border p-4 space-y-3">
       <div>
