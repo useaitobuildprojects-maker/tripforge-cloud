@@ -13,6 +13,7 @@ import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
 
 const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
+  economy: Car,
   business: Car,
   first_class: Crown,
   van: Truck,
@@ -20,6 +21,7 @@ const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
 };
 
 const DEFAULT_LIMO_MULTIPLIERS: Record<LimoCategory, number> = {
+  economy: 0.7,
   business: 1,
   first_class: 2.4,
   van: 1.6,
@@ -52,6 +54,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       return config.limo_vehicle_classes;
     }
     return [
+      { category: 'economy' as const, label: 'Economy', seats: 3, multiplier: legacyMultipliers.economy ?? 0.7 },
       { category: 'business' as const, label: 'Business Sedan', seats: 3, multiplier: legacyMultipliers.business ?? 1 },
       { category: 'first_class' as const, label: 'First Class', seats: 3, multiplier: legacyMultipliers.first_class ?? 2.4 },
       { category: 'van' as const, label: 'Business Van', seats: 7, multiplier: legacyMultipliers.van ?? 1.6 },
@@ -282,7 +285,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
               <Label className="text-xs font-medium">Vehicle Class</Label>
-              {(['business', 'first_class', 'suv'] as LimoCategory[]).map((cat) => {
+              {(['economy', 'business', 'first_class', 'suv'] as LimoCategory[]).map((cat) => {
                 const classesInCat = vehicleClasses
                   .map((vc, idx) => ({ ...vc, idx }))
                   .filter(vc => vc.category === cat);

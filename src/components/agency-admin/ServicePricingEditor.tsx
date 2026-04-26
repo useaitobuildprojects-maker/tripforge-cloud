@@ -768,17 +768,19 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
 };
 
 // ── Limo Service Tab (city daily rates + itinerary pricing) ──
-const DEFAULT_LIMO_MULTIPLIERS = { business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
+const DEFAULT_LIMO_MULTIPLIERS = { economy: 0.7, business: 1, first_class: 2.4, van: 1.6, suv: 1.6 };
 
 const DEFAULT_LIMO_VEHICLE_CLASSES: NonNullable<StorefrontConfig['limo_vehicle_classes']> = [
+  { category: 'economy', label: 'Economy', seats: 3, multiplier: 0.7 },
   { category: 'business', label: 'Business Sedan', seats: 3, multiplier: 1 },
   { category: 'business', label: 'Business Van', seats: 7, multiplier: 1.6 },
   { category: 'first_class', label: 'First Class Sedan', seats: 3, multiplier: 2.4 },
   { category: 'suv', label: 'Luxury SUV', seats: 5, multiplier: 1.6 },
 ];
 
-const LIMO_CATEGORY_ORDER = ['business', 'first_class', 'suv'] as const;
+const LIMO_CATEGORY_ORDER = ['economy', 'business', 'first_class', 'suv'] as const;
 const LIMO_CATEGORY_LABELS: Record<string, string> = {
+  economy: 'Economy',
   business: 'Business',
   first_class: 'First Class',
   suv: 'SUV',
@@ -803,7 +805,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
-  const [newClassCategory, setNewClassCategory] = useState<'business' | 'first_class' | 'suv'>('business');
+  const [newClassCategory, setNewClassCategory] = useState<'economy' | 'business' | 'first_class' | 'suv'>('economy');
   const [newClassLabel, setNewClassLabel] = useState('');
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
@@ -1102,15 +1104,16 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
               <div className="grid grid-cols-5 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[10px]">Category</Label>
-                  <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
-                    <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="first_class">First Class</SelectItem>
-                      <SelectItem value="van">Van</SelectItem>
-                      <SelectItem value="suv">SUV</SelectItem>
-                    </SelectContent>
-                  </Select>
+                   <Select value={newClassCategory} onValueChange={(v) => setNewClassCategory(v as any)}>
+                     <SelectTrigger className="text-xs h-8"><SelectValue /></SelectTrigger>
+                     <SelectContent>
+                       <SelectItem value="economy">Economy</SelectItem>
+                       <SelectItem value="business">Business</SelectItem>
+                       <SelectItem value="first_class">First Class</SelectItem>
+                       <SelectItem value="van">Van</SelectItem>
+                       <SelectItem value="suv">SUV</SelectItem>
+                     </SelectContent>
+                   </Select>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px]">Label</Label>
