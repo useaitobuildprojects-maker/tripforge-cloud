@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Car, Crown, Truck, Shield, AlertCircle, MessageCircle, CalendarIcon, MapPin, Users, Clock4, Clock8 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
-import { useCityTourPricing } from '@/hooks/use-service-pricing';
+import { CityTourPrice, useCityTourPricing } from '@/hooks/use-service-pricing';
 
 type TourCategory = 'economy' | 'business' | 'first_class' | 'van' | 'suv';
 
@@ -47,7 +47,26 @@ interface Props {
 }
 
 const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
-  const { data: tours = [], isLoading } = useCityTourPricing(agency.id);
+  const { data: configuredTours = [], isLoading } = useCityTourPricing(agency.id);
+
+  const fallbackTours = useMemo<CityTourPrice[]>(() => {
+    if (configuredTours.length > 0) return [];
+    return (config.limo_city_rates ?? []).map((rate, index) => ({
+      id: `city-tour-fallback-${index}`,
+      agency_id: agency.id,
+      tour_name: `${rate.city} City Tour`,
+      country: rate.country ?? null,
+      city: rate.city,
+      daily_rate: rate.full_day_rate,
+      duration_hours: 8,
+      half_day_rate: rate.half_day_rate,
+      half_day_hours: 4,
+      description: `Private guided city tour in ${rate.city}.`,
+      created_at: '',
+    }));
+  }, [agency.id, config.limo_city_rates, configuredTours.length]);
+
+  const tours = configuredTours.length > 0 ? configuredTours : fallbackTours;
 
   const vehicleClasses = config.city_tour_vehicle_classes && config.city_tour_vehicle_classes.length > 0
     ? config.city_tour_vehicle_classes
