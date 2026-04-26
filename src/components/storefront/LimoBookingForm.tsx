@@ -71,19 +71,40 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
   ]);
 
-  const addStop = () => setItinerary(p => [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full' }]);
+  const addStop = () => setItinerary(p => {
+    const last = p[p.length - 1];
+    return [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full', pickupDate: last?.dropoffDate }];
+  });
   const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
   const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
-    setItinerary(p => p.map((d, i) => {
-      if (i !== idx) return d;
-      const next = { ...d, ...updates };
-      // Auto-compute days from dates if both present
-      if (next.pickupDate && next.dropoffDate) {
-        const ms = next.dropoffDate.getTime() - next.pickupDate.getTime();
-        if (ms >= 0) next.days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+    setItinerary(p => {
+      const arr = p.map((d, i) => {
+        if (i !== idx) return d;
+        const next = { ...d, ...updates };
+        if (next.pickupDate && next.dropoffDate) {
+          const ms = next.dropoffDate.getTime() - next.pickupDate.getTime();
+          if (ms >= 0) next.days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+          if (next.dropoffDate < next.pickupDate) next.dropoffDate = undefined;
+        }
+        return next;
+      });
+      // Cascade: each subsequent stop's pickup = previous stop's dropoff
+      for (let i = idx; i < arr.length - 1; i++) {
+        const prev = arr[i];
+        const curr = arr[i + 1];
+        if (prev.dropoffDate) {
+          const newPickup = prev.dropoffDate;
+          const newDropoff = curr.dropoffDate && curr.dropoffDate >= newPickup ? curr.dropoffDate : undefined;
+          let newDays = curr.days;
+          if (newDropoff) {
+            const ms = newDropoff.getTime() - newPickup.getTime();
+            newDays = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+          }
+          arr[i + 1] = { ...curr, pickupDate: newPickup, dropoffDate: newDropoff, days: newDays };
+        }
       }
-      return next;
-    }));
+      return arr;
+    });
 
   // Per-stop base price (no multiplier); multiplier applied to subtotal → total
   const catMult = selectedClass?.multiplier ?? 1;
