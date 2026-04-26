@@ -77,8 +77,21 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
   );
 };
 
+// ── Tier helpers (multiplier model) ──
+const tierEffectiveMultiplier = (
+  t: { from_km: number; to_km: number; fixed_price?: number; multiplier?: number },
+  basePerKm: number
+): number => {
+  if (typeof t.multiplier === 'number' && t.multiplier > 0) return t.multiplier;
+  if (typeof t.fixed_price === 'number' && t.fixed_price > 0 && basePerKm > 0) {
+    const span = t.to_km - t.from_km;
+    if (span > 0) return +(t.fixed_price / (basePerKm * span)).toFixed(2);
+  }
+  return 1;
+};
+
 // ── City Pricing Section ──
-const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: string; globalTiers: { from_km: number; to_km: number; fixed_price: number }[]; country?: string }) => {
+const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: string; globalTiers: { from_km: number; to_km: number; fixed_price?: number; multiplier?: number }[]; country?: string }) => {
   const { data: cities = [], isSuccess } = useCityPricing(agencyId);
   const addCity = useAddCityPricing();
   const updateCity = useUpdateCityPricing();
@@ -92,7 +105,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   // Tier editing state per city
   const [newTierFrom, setNewTierFrom] = useState('');
   const [newTierTo, setNewTierTo] = useState('');
-  const [newTierPrice, setNewTierPrice] = useState('');
+  const [newTierMultiplier, setNewTierMultiplier] = useState('');
 
   // Seed dummy Italian cities if none exist for Italy
   const [seeded, setSeeded] = useState(false);
@@ -102,10 +115,10 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     if (hasItalian) { setSeeded(true); return; }
     setSeeded(true);
     const dummyCities = [
-      { city: 'Rome', tiers: [{ from_km: 0, to_km: 50, fixed_price: 40 }, { from_km: 50, to_km: 100, fixed_price: 65 }, { from_km: 100, to_km: 200, fixed_price: 110 }, { from_km: 200, to_km: 400, fixed_price: 180 }, { from_km: 400, to_km: 600, fixed_price: 250 }] },
-      { city: 'Milan', tiers: [{ from_km: 0, to_km: 50, fixed_price: 45 }, { from_km: 50, to_km: 100, fixed_price: 70 }, { from_km: 100, to_km: 200, fixed_price: 120 }, { from_km: 200, to_km: 400, fixed_price: 200 }, { from_km: 400, to_km: 600, fixed_price: 270 }] },
-      { city: 'Naples', tiers: [{ from_km: 0, to_km: 50, fixed_price: 35 }, { from_km: 50, to_km: 100, fixed_price: 55 }, { from_km: 100, to_km: 200, fixed_price: 95 }, { from_km: 200, to_km: 400, fixed_price: 160 }, { from_km: 400, to_km: 600, fixed_price: 220 }] },
-      { city: 'Florence', tiers: [{ from_km: 0, to_km: 50, fixed_price: 38 }, { from_km: 50, to_km: 100, fixed_price: 60 }, { from_km: 100, to_km: 200, fixed_price: 100 }, { from_km: 200, to_km: 400, fixed_price: 170 }, { from_km: 400, to_km: 600, fixed_price: 230 }] },
+      { city: 'Rome',     base: 1.40, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
+      { city: 'Milan',    base: 1.50, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
+      { city: 'Naples',   base: 1.20, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
+      { city: 'Florence', base: 1.30, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
     ];
     dummyCities.forEach((d) => {
       addCity.mutate({
@@ -113,7 +126,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
         city_name: d.city,
         country: 'Italy',
         transfer_base_fee: 0,
-        transfer_per_km_rate: 0,
+        transfer_per_km_rate: d.base,
         drop_off_fee: 0,
         distance_tiers: d.tiers,
       });
@@ -127,7 +140,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
       city_name: newCityName.trim(),
       country: newCityCountry,
       transfer_base_fee: 0,
-      transfer_per_km_rate: 0,
+      transfer_per_km_rate: 1,
       drop_off_fee: 0,
       distance_tiers: [...globalTiers],
     });
@@ -137,13 +150,13 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   const handleAddTier = (cityId: string) => {
     const from = Number(newTierFrom);
     const to = Number(newTierTo);
-    const price = Number(newTierPrice);
-    if (isNaN(from) || isNaN(to) || isNaN(price) || to <= from) return;
+    const mult = Number(newTierMultiplier);
+    if (isNaN(from) || isNaN(to) || isNaN(mult) || to <= from || mult <= 0) return;
     const city = cities.find(c => c.id === cityId);
     if (!city) return;
-    const updated = [...(city.distance_tiers || []), { from_km: from, to_km: to, fixed_price: price }].sort((a, b) => a.from_km - b.from_km);
+    const updated = [...(city.distance_tiers || []), { from_km: from, to_km: to, multiplier: mult }].sort((a, b) => a.from_km - b.from_km);
     updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
-    setNewTierFrom(''); setNewTierTo(''); setNewTierPrice('');
+    setNewTierFrom(''); setNewTierTo(''); setNewTierMultiplier('');
   };
 
   const handleRemoveTier = (cityId: string, tierIdx: number) => {
@@ -155,6 +168,19 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
 
   const handleUpdateDropOff = (cityId: string, value: number) => {
     updateCity.mutate({ id: cityId, agencyId, drop_off_fee: value });
+  };
+
+  const handleUpdateBasePerKm = (cityId: string, value: number) => {
+    updateCity.mutate({ id: cityId, agencyId, transfer_per_km_rate: value });
+  };
+
+  const handleUpdateTierMultiplier = (cityId: string, tierIdx: number, value: number) => {
+    const city = cities.find(c => c.id === cityId);
+    if (!city) return;
+    const updated = city.distance_tiers.map((t, i) =>
+      i === tierIdx ? { from_km: t.from_km, to_km: t.to_km, multiplier: value } : t
+    );
+    updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
   };
 
   return (
@@ -191,13 +217,22 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
 
           {expanded === city.id && (
             <div className="p-3 space-y-3">
-              {/* Drop-off fee */}
-              <div className="flex items-center gap-2">
-                <Label className="text-[10px] whitespace-nowrap">Drop-off fee (€)</Label>
-                <Input type="number" min={0} step={1} value={city.drop_off_fee}
-                  onChange={(e) => handleUpdateDropOff(city.id, Number(e.target.value) || 0)}
-                  className="text-xs font-mono w-24" />
-                <span className="text-[10px] text-muted-foreground">Applied for intercity trips</span>
+              {/* Base per-km + Drop-off fee */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px] whitespace-nowrap">Base price per km (€)</Label>
+                  <Input type="number" min={0} step={0.05} value={city.transfer_per_km_rate ?? 0}
+                    onChange={(e) => handleUpdateBasePerKm(city.id, Number(e.target.value) || 0)}
+                    className="text-xs font-mono w-full" />
+                  <p className="text-[10px] text-muted-foreground">Each tier multiplier scales this base.</p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] whitespace-nowrap">Drop-off fee (€)</Label>
+                  <Input type="number" min={0} step={1} value={city.drop_off_fee}
+                    onChange={(e) => handleUpdateDropOff(city.id, Number(e.target.value) || 0)}
+                    className="text-xs font-mono w-full" />
+                  <p className="text-[10px] text-muted-foreground">Applied for intercity trips.</p>
+                </div>
               </div>
 
               {/* Tiers table */}
@@ -207,23 +242,40 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                     <tr>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
-                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Price (€)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Multiplier (×)</th>
+                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">€/km</th>
                       <th className="px-3 py-1.5 w-10" />
                     </tr>
                   </thead>
                   <tbody>
-                    {city.distance_tiers.map((t, i) => (
-                      <tr key={i} className="border-t border-border">
-                        <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
-                        <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
-                        <td className="px-3 py-1.5 text-right font-mono">€{t.fixed_price}</td>
-                        <td className="px-3 py-1.5">
-                          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveTier(city.id, i)}>
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {city.distance_tiers.map((t, i) => {
+                      const base = city.transfer_per_km_rate ?? 0;
+                      const eff = tierEffectiveMultiplier(t, base);
+                      return (
+                        <tr key={i} className="border-t border-border">
+                          <td className="px-3 py-1.5 font-mono">{t.from_km}</td>
+                          <td className="px-3 py-1.5 font-mono">{t.to_km}</td>
+                          <td className="px-3 py-1.5 text-right font-mono">
+                            <Input
+                              type="number"
+                              min={0.1}
+                              step={0.05}
+                              value={eff}
+                              onChange={(e) => handleUpdateTierMultiplier(city.id, i, Number(e.target.value) || 0)}
+                              className="text-xs font-mono w-20 ml-auto"
+                            />
+                          </td>
+                          <td className="px-3 py-1.5 text-right font-mono text-muted-foreground">
+                            €{(base * eff).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-1.5">
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveTier(city.id, i)}>
+                              <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
@@ -239,11 +291,11 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                   <Input type="number" min={0} placeholder="50" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px]">Price (€)</Label>
-                  <Input type="number" min={0} placeholder="35" value={newTierPrice} onChange={(e) => setNewTierPrice(e.target.value)} className="text-xs font-mono" />
+                  <Label className="text-[10px]">Multiplier (×)</Label>
+                  <Input type="number" min={0.1} step={0.05} placeholder="1.0" value={newTierMultiplier} onChange={(e) => setNewTierMultiplier(e.target.value)} className="text-xs font-mono" />
                 </div>
                 <div className="flex items-end">
-                  <Button size="sm" onClick={() => handleAddTier(city.id)} disabled={!newTierFrom || !newTierTo || !newTierPrice} className="gradient-accent text-accent-foreground w-full h-8">
+                  <Button size="sm" onClick={() => handleAddTier(city.id)} disabled={!newTierFrom || !newTierTo || !newTierMultiplier} className="gradient-accent text-accent-foreground w-full h-8">
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add
                   </Button>
                 </div>
