@@ -108,31 +108,45 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   const [newTierMultiplier, setNewTierMultiplier] = useState('');
   const [newCityBasePerKm, setNewCityBasePerKm] = useState('');
 
-  // Seed dummy Italian cities if none exist for Italy
+  // Seed dummy cities based on agency country if none exist for that country yet
   const [seeded, setSeeded] = useState(false);
   useEffect(() => {
     if (!isSuccess || seeded) return;
-    const hasItalian = cities.some(c => c.country === 'Italy');
-    if (hasItalian) { setSeeded(true); return; }
-    setSeeded(true);
-    const dummyCities = [
-      { city: 'Rome',     base: 1.40, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
-      { city: 'Milan',    base: 1.50, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
-      { city: 'Naples',   base: 1.20, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
-      { city: 'Florence', base: 1.30, tiers: [{ from_km: 0, to_km: 50, multiplier: 1.0 }, { from_km: 50, to_km: 100, multiplier: 0.9 }, { from_km: 100, to_km: 200, multiplier: 0.8 }, { from_km: 200, to_km: 400, multiplier: 0.7 }, { from_km: 400, to_km: 600, multiplier: 0.65 }] },
+    const targetCountry = country || 'Italy';
+    const hasForCountry = cities.some(c => c.country === targetCountry);
+    if (hasForCountry) { setSeeded(true); return; }
+    const standardTiers = [
+      { from_km: 0, to_km: 50, multiplier: 1.0 },
+      { from_km: 50, to_km: 100, multiplier: 0.9 },
+      { from_km: 100, to_km: 200, multiplier: 0.8 },
+      { from_km: 200, to_km: 400, multiplier: 0.7 },
+      { from_km: 400, to_km: 600, multiplier: 0.65 },
     ];
+    const seedsByCountry: Record<string, { city: string; base: number }[]> = {
+      Italy:    [{ city: 'Rome', base: 1.40 }, { city: 'Milan', base: 1.50 }, { city: 'Naples', base: 1.20 }, { city: 'Florence', base: 1.30 }],
+      Morocco:  [{ city: 'Marrakech', base: 0.80 }, { city: 'Casablanca', base: 0.90 }, { city: 'Fes', base: 0.75 }, { city: 'Agadir', base: 0.85 }],
+      Tunisia:  [{ city: 'Tunis', base: 0.70 }, { city: 'Sousse', base: 0.65 }, { city: 'Djerba', base: 0.75 }, { city: 'Hammamet', base: 0.70 }],
+      France:   [{ city: 'Paris', base: 1.80 }, { city: 'Nice', base: 1.60 }, { city: 'Lyon', base: 1.50 }, { city: 'Marseille', base: 1.50 }],
+      Spain:    [{ city: 'Madrid', base: 1.40 }, { city: 'Barcelona', base: 1.50 }, { city: 'Seville', base: 1.20 }, { city: 'Valencia', base: 1.20 }],
+      Portugal: [{ city: 'Lisbon', base: 1.30 }, { city: 'Porto', base: 1.20 }, { city: 'Faro', base: 1.10 }],
+      Greece:   [{ city: 'Athens', base: 1.20 }, { city: 'Thessaloniki', base: 1.10 }, { city: 'Heraklion', base: 1.20 }],
+      Turkey:   [{ city: 'Istanbul', base: 0.90 }, { city: 'Antalya', base: 0.80 }, { city: 'Izmir', base: 0.80 }, { city: 'Bodrum', base: 0.85 }],
+      Germany:  [{ city: 'Berlin', base: 1.70 }, { city: 'Munich', base: 1.80 }, { city: 'Frankfurt', base: 1.70 }, { city: 'Hamburg', base: 1.60 }],
+    };
+    const dummyCities = seedsByCountry[targetCountry] ?? [{ city: targetCountry, base: 1.20 }];
+    setSeeded(true);
     dummyCities.forEach((d) => {
       addCity.mutate({
         agency_id: agencyId,
         city_name: d.city,
-        country: 'Italy',
+        country: targetCountry,
         transfer_base_fee: 0,
         transfer_per_km_rate: d.base,
         drop_off_fee: 0,
-        distance_tiers: d.tiers,
+        distance_tiers: standardTiers,
       });
     });
-  }, [isSuccess, cities, seeded, agencyId, addCity]);
+  }, [isSuccess, cities, seeded, agencyId, addCity, country]);
 
   const handleAddCity = () => {
     if (!newCityName.trim()) return;
