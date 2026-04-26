@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 // ── Types ──
 export type TransferCategory = 'economy' | 'business' | 'first_class';
-export type LimoCategory = 'business' | 'first_class' | 'van' | 'suv';
+export type LimoCategory = 'economy' | 'business' | 'first_class' | 'van' | 'suv';
 
 export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; description: string; defaultSeats: number }[] = [
   { id: 'economy', label: 'Economy', description: 'Skoda Octavia, Toyota Corolla', defaultSeats: 4 },
@@ -13,6 +13,7 @@ export const TRANSFER_CATEGORIES: { id: TransferCategory; label: string; descrip
 ];
 
 export const LIMO_CATEGORIES: { id: LimoCategory; label: string; description: string }[] = [
+  { id: 'economy', label: 'Economy', description: 'Skoda Octavia, Toyota Corolla (1-3 pax)' },
   { id: 'business', label: 'Business Sedan', description: 'E-Class, BMW 5 (1-3 pax)' },
   { id: 'first_class', label: 'First Class', description: 'S-Class, BMW 7 (1-3 pax)' },
   { id: 'van', label: 'Business Van', description: 'V-Class (4-7 pax)' },
