@@ -63,8 +63,12 @@ export interface StorefrontConfig {
   limo_p2p_base_fee?: number;
   limo_p2p_per_km_rate?: number;
 
-  // Transfer: tiered distance pricing (fixed price per bracket)
-  transfer_distance_tiers?: { from_km: number; to_km: number; fixed_price: number }[];
+  // Transfer: tiered distance pricing.
+  // New model: each tier has a `multiplier` applied to the base per-km rate
+  // (fare for tier = base_per_km × km_in_tier × multiplier).
+  // `fixed_price` is kept for backwards compatibility and used to derive a
+  // multiplier when no explicit one is set.
+  transfer_distance_tiers?: { from_km: number; to_km: number; fixed_price?: number; multiplier?: number }[];
 
   // Limo: city daily rates (half/full day) — country added for grouping/scope, max_days caps stay length
   limo_city_rates?: { city: string; country?: string; full_day_rate: number; half_day_rate: number; max_days?: number }[];
