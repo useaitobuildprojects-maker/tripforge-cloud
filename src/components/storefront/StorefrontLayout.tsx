@@ -56,11 +56,14 @@ const StorefrontLayout = () => {
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
 
-  // Logo: Expedia-style bold sans (no serif), brand-colored on light templates
+  // Editorial logo: Playfair Display, brand-colored on light templates
   const accent = ts.isDark ? btnColor : expediaPalette.brand;
-  const logoTextStyle: React.CSSProperties = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em', color: ts.isDark ? (tk.textPrimary.color as string) : accent };
-  const navPillBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
-  const navPillActiveBg = ts.isDark ? 'rgba(255,255,255,0.12)' : '#ffffff';
+  const logoTextStyle: React.CSSProperties = {
+    fontFamily: "'Playfair Display', Georgia, serif",
+    fontWeight: 700,
+    letterSpacing: '-0.01em',
+    color: ts.isDark ? (tk.textPrimary.color as string) : accent,
+  };
   const navInactive: React.CSSProperties = tk.textBody;
   const navActive: React.CSSProperties = tk.textPrimary;
   const iconBtnBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
@@ -75,52 +78,95 @@ const StorefrontLayout = () => {
   return (
     <div className={`min-h-screen ${fontClass}`} style={bodyStyle}>
       {/* ═══ Nav ═══ */}
-      <header className="sticky top-0 z-50 border-b" style={{ ...tk.surface, ...tk.border }}>
+      <header
+        className="sticky top-0 z-50 border-b backdrop-blur-md"
+        style={{
+          ...tk.surface,
+          ...tk.border,
+          backgroundColor: ts.isDark ? 'rgba(10,10,10,0.85)' : 'rgba(255,255,255,0.88)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-[68px]">
-            <Link to={`/agency/${slug}`} className="flex items-center gap-2">
+          <div className="flex items-center justify-between h-[72px]">
+            <Link to={`/agency/${slug}`} className="flex items-center gap-2 shrink-0">
               {agency.logo_url ? (
-                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-9 w-auto object-contain" />
+                <img src={agency.logo_url} alt={`${agency.name} logo`} className="h-10 w-auto object-contain" />
               ) : (
-                <span className="text-xl font-bold tracking-tight" style={logoTextStyle}>{agency.name}</span>
+                <span className="text-2xl" style={logoTextStyle}>{agency.name}</span>
               )}
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1 rounded-full px-1.5 py-1" style={{ backgroundColor: navPillBg }}>
+            <nav className="hidden md:flex items-center gap-7">
               {navLinks.map((link) => {
                 const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
                 return (
-                  <Link key={link.label} to={link.to}
-                    className="px-4 py-2 text-[13px] font-medium rounded-full transition-all duration-200"
-                    style={isActive ? { backgroundColor: navPillActiveBg, ...navActive, boxShadow: ts.isDark ? '0 1px 2px rgba(0,0,0,0.4)' : '0 1px 2px rgba(0,0,0,0.05)' } : navInactive}>
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    data-active={isActive ? 'true' : undefined}
+                    className="nav-underline text-[13px] font-medium tracking-wide transition-colors duration-200"
+                    style={isActive ? navActive : navInactive}
+                  >
                     {link.label}
                   </Link>
                 );
               })}
             </nav>
 
-            <div className="hidden md:flex items-center gap-3">
-              <button onClick={handleShare} className="h-9 w-9 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: iconBtnBg, ...tk.textBody }} title="Share">
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={handleShare}
+                className="h-10 w-10 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
+                style={{ backgroundColor: iconBtnBg, ...tk.textBody }}
+                title="Share"
+              >
                 <Share2 className="h-4 w-4" />
               </button>
-              <Link to={`/agency/${slug}/contact`} className="h-9 w-9 rounded-full flex items-center justify-center transition-colors" style={{ backgroundColor: iconBtnBg, ...tk.textBody }}>
-                <Phone className="h-4 w-4" />
+              <Link
+                to={`/agency/${slug}/contact`}
+                className="inline-flex items-center gap-2 h-10 px-5 rounded-full text-[13px] font-semibold transition-all hover:brightness-110"
+                style={{ backgroundColor: accent, color: '#ffffff' }}
+              >
+                <Phone className="h-3.5 w-3.5" /> Get in touch
               </Link>
             </div>
 
-            <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} style={tk.textPrimary}>
+            <button
+              className="md:hidden h-10 w-10 rounded-full flex items-center justify-center"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{ backgroundColor: iconBtnBg, ...tk.textPrimary }}
+              aria-label="Toggle menu"
+            >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t px-4 py-4 space-y-1 shadow-lg" style={{ ...tk.surface, ...tk.border }}>
-            {navLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="block text-sm font-medium py-2.5 px-3 rounded-lg" style={tk.textBody} onClick={() => setMobileMenuOpen(false)}>
-                {link.label}
-              </Link>
-            ))}
+          <div className="md:hidden border-t px-4 py-5 space-y-1 shadow-lg" style={{ ...tk.surface, ...tk.border }}>
+            {navLinks.map((link) => {
+              const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
+              return (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  className="flex items-center justify-between text-base font-medium py-3.5 px-3 rounded-lg transition-colors"
+                  style={isActive ? { ...navActive, backgroundColor: ts.isDark ? 'rgba(255,255,255,0.04)' : '#f9fafb' } : tk.textBody}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                  <ArrowRight className="h-4 w-4 opacity-40" />
+                </Link>
+              );
+            })}
+            <Link
+              to={`/agency/${slug}/contact`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="mt-3 flex items-center justify-center gap-2 h-12 rounded-full text-sm font-semibold"
+              style={{ backgroundColor: accent, color: '#ffffff' }}
+            >
+              <Phone className="h-4 w-4" /> Get in touch
+            </Link>
           </div>
         )}
       </header>
