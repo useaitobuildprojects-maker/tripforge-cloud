@@ -208,20 +208,19 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
 
   return (
     <div ref={wrapperRef} className="relative">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-      {loading && <Loader2 className="absolute right-9 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground animate-spin" />}
+      {loading && <Loader2 className="absolute right-7 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground animate-spin" />}
       <input
         type="text"
         value={query}
         onChange={(e) => handleInputChange(e.target.value)}
         onFocus={() => setOpen(true)}
         placeholder={placeholder}
-        className="w-full h-11 rounded-lg border border-border bg-muted/30 pl-10 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full bg-transparent border-0 p-0 pr-6 text-sm focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60"
       />
       {query && (
         <button
           onClick={() => { setQuery(''); onChange(''); setSearchResults([]); }}
-          className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
+          className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
         >
           <X className="h-3 w-3" />
         </button>
