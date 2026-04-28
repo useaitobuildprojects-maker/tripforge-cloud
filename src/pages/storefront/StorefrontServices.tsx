@@ -78,7 +78,7 @@ const StorefrontServices = () => {
       </section>
 
       {/* Detailed service cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 pb-16">
         {enabledServices.length === 0 ? (
           <p className="text-center py-20" style={tk.textMuted}>No services configured yet.</p>
         ) : (
