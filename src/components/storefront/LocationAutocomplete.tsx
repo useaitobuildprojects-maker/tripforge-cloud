@@ -155,20 +155,11 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
     }
   }, [agencyCity, countryCode]);
 
-  // Filter configured locations
-  const filteredConfigured = locations.filter((loc) =>
-    loc.name.toLowerCase().includes(query.toLowerCase()) ||
-    (loc.address && loc.address.toLowerCase().includes(query.toLowerCase()))
-  );
-
   // POI results (instant, from local database)
   const poiResults = useMemo(() => {
     if (!query || query.length < 1) return [];
     const pois = searchPOIs(query, agencyCountry || '');
-    const configuredNames = new Set(locations.map((l) => l.name.toLowerCase()));
-    return pois
-      .filter((p) => !configuredNames.has(p.name.toLowerCase()))
-      .map((p, i) => ({
+    return pois.map((p, i) => ({
         id: `poi-${i}`,
         name: p.name,
         type: p.type,
@@ -177,18 +168,14 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
         coords: p.coords,
         fullName: p.address ? `${p.name}, ${p.address}` : p.name,
       }));
-  }, [query, agencyCountry, locations]);
+  }, [query, agencyCountry]);
 
-  // Merge: configured first, then POI, then search results (deduplicated)
-  const allNames = new Set([
-    ...filteredConfigured.map((l) => l.name.toLowerCase()),
-    ...poiResults.map((l) => l.name.toLowerCase()),
-  ]);
+  // Merge: POI first, then search results (deduplicated)
+  const allNames = new Set(poiResults.map((l) => l.name.toLowerCase()));
   const dedupedSearch = searchResults.filter((r) => !allNames.has(r.name.toLowerCase()));
-  const allResults = [...filteredConfigured, ...poiResults, ...dedupedSearch];
+  const allResults = [...poiResults, ...dedupedSearch];
 
   const grouped = {
-    configured: filteredConfigured,
     poi: poiResults,
     searchResults: dedupedSearch,
   };
@@ -234,16 +221,13 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-0 right-0 top-[calc(100%+12px)] z-50 bg-white rounded-md shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] border border-[#e5e7eb] max-h-[360px] overflow-y-auto"
+            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] z-50 bg-white rounded-md shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] border border-[#e5e7eb] max-h-[420px] overflow-y-auto w-[460px] max-w-[92vw]"
           >
-            {(['configured','poi','searchResults'] as const).map((groupKey, gi) => {
+            {(['poi','searchResults'] as const).map((groupKey, gi) => {
               const items = grouped[groupKey];
               if (items.length === 0) return null;
-              const labels = { configured: 'Our locations', poi: 'Popular destinations', searchResults: 'More places' };
-              const showDivider = gi > 0 && (
-                (groupKey === 'poi' && grouped.configured.length > 0) ||
-                (groupKey === 'searchResults' && (grouped.configured.length > 0 || grouped.poi.length > 0))
-              );
+              const labels = { poi: 'Popular destinations', searchResults: 'More places' };
+              const showDivider = groupKey === 'searchResults' && grouped.poi.length > 0;
               const typeLabel = (t: string) => t === 'airport' ? 'Airport' : t === 'city' ? 'City' : t === 'hotel_zone' ? 'Hotel zone' : 'Station';
               return (
                 <div key={groupKey}>
