@@ -179,13 +179,15 @@ const StorefrontHome = () => {
                       className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
                   </div>
                 </div>
-                <button
-                  className="sm:col-span-2 md:col-span-2 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
-                  style={{ backgroundColor: accent, color: '#ffffff' }}
-                  onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
-                >
-                  <Search className="h-4 w-4" /> Search
-                </button>
+                <div className="sm:col-span-2 md:col-span-2 flex items-center justify-center">
+                  <button
+                    className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                    style={{ backgroundColor: accent, color: '#ffffff' }}
+                    onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+                  >
+                    <Search className="h-4 w-4" /> Search
+                  </button>
+                </div>
               </div>
               </div>
             </div>
