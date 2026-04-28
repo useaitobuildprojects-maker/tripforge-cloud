@@ -120,14 +120,6 @@ const StorefrontLayout = () => {
             </nav>
 
             <div className="hidden md:flex items-center gap-2">
-              <button
-                onClick={handleShare}
-                className="h-9 w-9 rounded-md flex items-center justify-center transition-colors hover:opacity-80"
-                style={{ backgroundColor: iconBtnBg, color: headerText }}
-                title="Share"
-              >
-                <Share2 className="h-4 w-4" />
-              </button>
               <Link
                 to={`/agency/${slug}/contact`}
                 className="inline-flex items-center gap-2 h-9 px-4 rounded-md text-sm font-bold transition-all border-2"
