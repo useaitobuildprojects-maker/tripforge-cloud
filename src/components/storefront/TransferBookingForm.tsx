@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, ArrowRight, Car, Crown, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock } from 'lucide-react';
+import { MapPin, ArrowRight, Car, Crown, Loader2, AlertCircle, MessageCircle, CalendarIcon, Clock, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { TransferCategory } from '@/hooks/use-service-pricing';
@@ -48,9 +48,16 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [quote, setQuote] = useState<TransferQuote | null>(null);
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState('');
+  const [pax, setPax] = useState<number>(1);
   const [loading, setLoading] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
+
+  // Filter classes by seat capacity
+  const suitableClasses = useMemo(
+    () => vehicleClasses.map((vc, idx) => ({ ...vc, idx })).filter(vc => vc.seats >= pax),
+    [vehicleClasses, pax]
+  );
 
   const effectiveOrigin = origin;
   const effectiveDest = destination;
@@ -88,7 +95,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     const vc = vehicleClasses[selectedClassIndex];
     const dateStr = date ? format(date, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n👥 Passengers: ${pax}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -141,7 +148,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
         </div>
 
         {/* Date & Time */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium flex items-center gap-1.5">
               <CalendarIcon className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Date
@@ -186,6 +193,18 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Passengers
+            </Label>
+            <div className="flex items-center gap-2 h-10 rounded-md border border-input px-3">
+              <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))}
+                className="h-7 w-7 rounded-md border border-border hover:bg-muted text-sm font-bold">−</button>
+              <span className="flex-1 text-center text-sm font-semibold">{pax}</span>
+              <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))}
+                className="h-7 w-7 rounded-md border border-border hover:bg-muted text-sm font-bold">+</button>
+            </div>
+          </div>
         </div>
 
         <Separator />
@@ -194,14 +213,14 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
         <div className="space-y-3">
           <Label className="text-xs font-medium">Vehicle Class</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {vehicleClasses.map((vc, idx) => {
+            {suitableClasses.map((vc) => {
               const Icon = CATEGORY_ICONS[vc.category] ?? Car;
-              const isSelected = selectedClassIndex === idx;
+              const isSelected = selectedClassIndex === vc.idx;
 
               return (
                 <button
-                  key={idx}
-                  onClick={() => { setSelectedClassIndex(idx); setQuote(null); }}
+                  key={vc.idx}
+                  onClick={() => { setSelectedClassIndex(vc.idx); setQuote(null); }}
                   className={`relative p-4 rounded-xl border-2 text-left transition-all ${
                     isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
                   }`}
@@ -214,6 +233,12 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
               );
             })}
           </div>
+          {suitableClasses.length === 0 && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+              <p className="text-[11px] text-destructive">No vehicle fits {pax} passengers. Reduce passenger count or contact us.</p>
+            </div>
+          )}
         </div>
 
         {/* Get Quote / Results */}

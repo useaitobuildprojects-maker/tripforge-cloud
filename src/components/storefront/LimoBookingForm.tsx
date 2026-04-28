@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8 } from 'lucide-react';
+import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -69,6 +69,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
   const [selectedClassIdx, setSelectedClassIdx] = useState(0);
   const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
   const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
+  const [pax, setPax] = useState<number>(1);
 
   const [itinerary, setItinerary] = useState<ItineraryStop[]>([
     { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
@@ -149,7 +150,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
       })
       .join('\n');
     const multLine = catMult !== 1 ? `\n✖️ ${catLabel} multiplier: × ${catMult}` : '';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n🚗 Category: ${catLabel}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a Limo Service:\n🚗 Category: ${catLabel}\n👥 Passengers: ${pax}\n\n📋 Itinerary (${totalDays} day${totalDays !== 1 ? 's' : ''}):\n${plan}\n\nSubtotal: €${subtotal}${multLine}\n💰 Total: €${total}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -284,11 +285,25 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
 
             {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
-              <Label className="text-xs font-medium">Vehicle Class</Label>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <Label className="text-xs font-medium">Vehicle Class</Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs font-medium flex items-center gap-1">
+                    <Users className="h-3 w-3" /> Passengers
+                  </Label>
+                  <div className="flex items-center gap-2 h-9 rounded-md border border-input px-2">
+                    <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))}
+                      className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">−</button>
+                    <span className="w-6 text-center text-sm font-semibold">{pax}</span>
+                    <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))}
+                      className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">+</button>
+                  </div>
+                </div>
+              </div>
               {(['economy', 'business', 'first_class', 'suv'] as LimoCategory[]).map((cat) => {
                 const classesInCat = vehicleClasses
                   .map((vc, idx) => ({ ...vc, idx }))
-                  .filter(vc => vc.category === cat);
+                  .filter(vc => vc.category === cat && vc.seats >= pax);
                 if (classesInCat.length === 0) return null;
                 const catMeta = LIMO_CATEGORIES.find(c => c.id === cat);
                 const Icon = LIMO_CATEGORY_ICONS[cat];
@@ -318,6 +333,12 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
                   </div>
                 );
               })}
+              {vehicleClasses.filter(vc => vc.seats >= pax).length === 0 && (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-destructive">No vehicle fits {pax} passengers. Reduce passenger count or contact us.</p>
+                </div>
+              )}
             </div>
 
             {/* Price Summary with breakdown */}

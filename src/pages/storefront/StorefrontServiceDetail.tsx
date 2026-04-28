@@ -1,7 +1,7 @@
 import { useOutletContext, useParams, Link } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Car, UserCheck, Crown, Building, Truck, ChevronLeft, Phone, CheckCircle2, SlidersHorizontal, X } from 'lucide-react';
+import { Car, UserCheck, Crown, Building, Truck, ChevronLeft, Phone, CheckCircle2, SlidersHorizontal, X, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -56,7 +56,11 @@ const StorefrontServiceDetail = () => {
 
   const [filters, setFilters] = useState<VehicleFilters>(emptyFilters);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const filteredVehicles = useMemo(() => applyFilters(vehicles, filters), [vehicles, filters]);
+  const [pax, setPax] = useState<number>(1);
+  const filteredVehicles = useMemo(
+    () => applyFilters(vehicles, filters).filter(v => (v.seats ?? 99) >= pax),
+    [vehicles, filters, pax]
+  );
   const activeFilterCount = countActiveFilters(filters);
 
   if (!agency.services?.includes(service)) {
@@ -132,14 +136,25 @@ const StorefrontServiceDetail = () => {
               <h2 className="text-2xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
                 {service === 'apartment' ? 'Available Apartments' : service === 'car_rental' ? 'Choose Your Vehicle' : 'Available Packages'}
               </h2>
-              <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
-                <SlidersHorizontal className="h-4 w-4" /> Filter
-                {activeFilterCount > 0 && (
-                  <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
-                    {activeFilterCount}
-                  </span>
-                )}
-              </Button>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 h-9 rounded-md border border-input px-3 bg-background">
+                  <Users className="h-3.5 w-3.5" style={{ color: buttonColor }} />
+                  <span className="text-xs font-medium hidden sm:inline">Passengers</span>
+                  <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))}
+                    className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">−</button>
+                  <span className="w-5 text-center text-sm font-semibold">{pax}</span>
+                  <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))}
+                    className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">+</button>
+                </div>
+                <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
+                  <SlidersHorizontal className="h-4 w-4" /> Filter
+                  {activeFilterCount > 0 && (
+                    <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </Button>
+              </div>
             </div>
 
             <div className="flex gap-8">
