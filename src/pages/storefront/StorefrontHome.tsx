@@ -169,7 +169,7 @@ const StorefrontHome = () => {
                     <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
-                <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
@@ -181,7 +181,7 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up date</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
                         <p className={cn("text-sm truncate", !pickupDateObj && "text-muted-foreground")} style={pickupDateObj ? tk.textPrimary : undefined}>
                           {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : 'Select date'}
                         </p>
@@ -204,7 +204,7 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off date</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
                           {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : 'Select date'}
                         </p>
@@ -224,13 +224,11 @@ const StorefrontHome = () => {
                 </Popover>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="md:col-span-1 px-2 py-2.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Passengers</p>
-                        <p className="text-sm truncate" style={tk.textPrimary}>
-                          {passengers} {passengers === 1 ? 'passenger' : 'passengers'}
-                        </p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pax</p>
+                        <p className="text-sm truncate" style={tk.textPrimary}>{passengers}</p>
                       </div>
                     </button>
                   </PopoverTrigger>
