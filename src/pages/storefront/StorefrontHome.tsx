@@ -165,14 +165,14 @@ const StorefrontHome = () => {
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
-                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} />
+                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
-                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} />
+                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <Popover>
