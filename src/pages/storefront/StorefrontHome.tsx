@@ -123,7 +123,7 @@ const StorefrontHome = () => {
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
             className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
-            <div className="rounded-md shadow-2xl overflow-hidden" style={{ backgroundColor: EXP.cta, padding: '3px' }}>
+            <div className="rounded-md shadow-2xl overflow-hidden border" style={{ ...tk.surface, ...tk.border }}>
               <div className="rounded-[5px]" style={tk.surface}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
