@@ -125,29 +125,6 @@ const StorefrontHome = () => {
             className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
             <div className="rounded-md shadow-2xl overflow-hidden" style={{ backgroundColor: EXP.cta, padding: '3px' }}>
               <div className="rounded-[5px]" style={tk.surface}>
-              {/* Service tabs */}
-              {enabledServices.length > 0 && (
-                <div className="flex flex-nowrap overflow-x-auto items-center gap-2 px-3 pt-3 pb-0 scrollbar-hide" style={tk.border}>
-                  {enabledServices.map((service) => {
-                    const Icon = SERVICE_ICONS[service] ?? Car;
-                    const isActive = activeService === service;
-                    return (
-                      <button
-                        key={service}
-                        onClick={() => setActiveService(service)}
-                        className="inline-flex shrink-0 items-center gap-2 px-4 h-9 text-sm font-semibold rounded-full border transition-all whitespace-nowrap"
-                        style={isActive
-                          ? { color: '#ffffff', backgroundColor: accent, borderColor: accent }
-                          : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span>{SERVICE_LABELS[service] ?? service}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-
               {/* Search fields row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
                 <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: '#1a1a1a' }}>
