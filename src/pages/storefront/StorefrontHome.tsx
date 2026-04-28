@@ -239,12 +239,13 @@ const StorefrontHome = () => {
       {/* ═══════════════ DEAL CARDS ═══════════════ */}
       <section className="py-16" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
             <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight" style={tk.textPrimary}>
+              <p className="editorial-eyebrow mb-3" style={{ color: accent }}>Curated escapes</p>
+              <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl" style={tk.textPrimary}>
                 Last-minute weekend deals
               </h2>
-              <p className="text-sm mt-1.5" style={tk.textMuted}>Hand-picked offers for short, unforgettable getaways.</p>
+              <p className="text-sm mt-3 max-w-md leading-relaxed" style={tk.textMuted}>Hand-picked offers for short, unforgettable getaways — chosen by our travel team.</p>
             </div>
             <Link to={`/agency/${slug}/services`} className="hidden md:inline-flex items-center gap-1 text-sm font-bold" style={{ color: accent }}>
               See all <ChevronRight className="h-4 w-4" />
@@ -308,10 +309,11 @@ const StorefrontHome = () => {
             </motion.div>
           )}
 
-          <div className="flex items-end justify-between mb-8">
+          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
             <div>
-              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
-              <p className="text-sm mt-1.5" style={tk.textMuted}>{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} available now.</p>
+              <p className="editorial-eyebrow mb-3" style={{ color: accent }}>The fleet</p>
+              <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
+              <p className="text-sm mt-3" style={tk.textMuted}>{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} available now.</p>
             </div>
           </div>
 
@@ -400,13 +402,15 @@ const StorefrontHome = () => {
       {/* ═══════════════ INSPIRATION CTA ═══════════════ */}
       <section className="py-16" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl overflow-hidden relative h-[280px] md:h-[340px]">
-            <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="rounded-3xl overflow-hidden relative h-[320px] md:h-[400px]">
+              <div className="absolute inset-0 overflow-hidden">
+                <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover animate-kenburns" />
+              </div>
             <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)' }} />
-            <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
-              <Plane className="h-7 w-7 text-white mb-4" />
-              <h2 className="text-2xl md:text-4xl font-extrabold text-white tracking-tight">Where to next?</h2>
-              <p className="text-white/85 mt-3 text-sm md:text-base">Get inspired with curated trips, hidden gems, and exclusive member offers from {agency.name}.</p>
+              <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
+                <span className="editorial-eyebrow mb-4 text-white/85"><Plane className="h-3.5 w-3.5" /> Inspiration</span>
+                <h2 className="font-editorial text-white text-3xl md:text-5xl leading-[1.05]">Where to next?</h2>
+                <p className="text-white/85 mt-4 text-sm md:text-base font-light leading-relaxed">Curated trips, hidden gems, and exclusive member offers from {agency.name}.</p>
               <Link to={`/agency/${slug}/services`} className="mt-6 w-fit">
                 <Button className="rounded-xl font-bold gap-2 h-12 px-7 text-sm hover:brightness-95"
                   style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
