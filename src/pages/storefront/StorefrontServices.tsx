@@ -44,7 +44,7 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Expert local guides', 'Half-day & full-day', 'Popular landmarks', 'Flexible schedules'],
 };
 
-const serifFont = { fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 600, letterSpacing: '-0.015em' };
+const headingFont = { fontFamily: 'var(--font-sans)', fontWeight: 800, letterSpacing: '-0.025em' };
 
 const StorefrontServices = () => {
   const { slug } = useParams();
@@ -65,27 +65,20 @@ const StorefrontServices = () => {
         fallbackDescription={`Explore the services offered by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* Hero — uses surfaceDeep so it's "very dark" on light templates and seamless on dark ones */}
-      <section className="relative overflow-hidden" style={{ ...tk.surfaceDeep, minHeight: '340px' }}>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '340px' }}>
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <p className="editorial-eyebrow mb-5 mx-auto" style={{ color: accent }}>What we offer</p>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6" style={{ ...serifFont, ...tk.textOnDeep }}>
-              {cfg.services_title || 'Our Services'}
-            </h1>
-            <p className="max-w-xl mx-auto text-base md:text-lg leading-relaxed font-light" style={tk.textOnDeepMuted}>
-              {cfg.services_subtitle || `Premium travel services designed around your comfort and convenience in ${agency.city}.`}
-            </p>
-          </motion.div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" className="w-full"><path d="M0 60V30C360 0 720 0 1080 30C1260 45 1350 52 1440 60H0Z" fill={ts.surfaceFill} /></svg>
+      {/* Compact header band — Booking.com style */}
+      <section className="relative" style={tk.surfaceDeep}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl mb-2" style={{ ...headingFont, ...tk.textOnDeep }}>
+            {cfg.services_title || 'Our services'}
+          </h1>
+          <p className="max-w-2xl text-sm md:text-base" style={tk.textOnDeepMuted}>
+            {cfg.services_subtitle || `Browse vehicles, transfers and tours across ${agency.city}. Best price guaranteed.`}
+          </p>
         </div>
       </section>
 
       {/* Services overview grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {enabledServices.length > 1 && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-16">
             {enabledServices.map((service, i) => {
@@ -108,11 +101,11 @@ const StorefrontServices = () => {
       </section>
 
       {/* Detailed service cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {enabledServices.length === 0 ? (
           <p className="text-center py-20" style={tk.textMuted}>No services configured yet.</p>
         ) : (
-          <div className="space-y-20">
+          <div className="space-y-10">
             {enabledServices.map((service, i) => {
               const Icon = SERVICE_ICONS[service] ?? Car;
               const label = SERVICE_LABELS[service] ?? service;
@@ -124,39 +117,34 @@ const StorefrontServices = () => {
 
               return (
                 <motion.div id={`service-${service}`} key={service}
-                  initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6 }}
-                  className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-stretch gap-0 rounded-3xl overflow-hidden border shadow-sm hover:shadow-xl transition-all duration-500`}
+                  initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.4 }}
+                  className={`flex flex-col ${isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-stretch gap-0 rounded-md overflow-hidden border hover:shadow-lg transition-all duration-300`}
                   style={{ ...tk.surface, ...tk.border }}>
-                  <div className="lg:w-1/2 relative overflow-hidden group">
-                    <img src={image} alt={label} className="w-full h-72 lg:h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                    <div className="absolute bottom-6 left-6">
-                      <span className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm text-xs font-semibold px-3 py-1.5 rounded-full" style={{ color: '#111827' }}>
+                  <div className="lg:w-2/5 relative overflow-hidden group">
+                    <img src={image} alt={label} className="w-full h-56 lg:h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-3">
+                      <span className="inline-flex items-center gap-1.5 bg-white text-xs font-extrabold px-2.5 py-1 rounded-sm" style={{ color: accent }}>
                         <Icon className="h-3.5 w-3.5" /> {label}
                       </span>
                     </div>
                   </div>
 
-                  <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
-                    <p className="text-xs font-semibold tracking-[0.2em] uppercase mb-3" style={{ color: accent }}>
-                      {`0${i + 1}.`}
-                    </p>
-                    <h2 className="text-2xl lg:text-3xl font-bold mb-4" style={{ ...serifFont, ...tk.textPrimary }}>{label}</h2>
-                    <p className="leading-relaxed mb-8" style={tk.textBody}>{desc}</p>
+                  <div className="lg:w-3/5 p-6 lg:p-8 flex flex-col justify-center">
+                    <h2 className="text-xl lg:text-2xl mb-2" style={{ ...headingFont, ...tk.textPrimary }}>{label}</h2>
+                    <p className="text-sm leading-relaxed mb-5" style={tk.textBody}>{desc}</p>
 
-                    <div className="grid grid-cols-2 gap-3 mb-8">
+                    <div className="grid grid-cols-2 gap-2 mb-5">
                       {features.map((feat, fi) => (
-                        <div key={fi} className="flex items-center gap-2.5 text-sm" style={tk.textBody}>
-                          <span className="h-5 w-5 rounded-full flex items-center justify-center shrink-0 text-white" style={{ backgroundColor: accent }}>
-                            <Check className="h-3 w-3" />
-                          </span>
+                        <div key={fi} className="flex items-center gap-2 text-sm" style={tk.textBody}>
+                          <Check className="h-4 w-4 shrink-0" style={{ color: 'hsl(155 50% 36%)' }} />
                           {feat}
                         </div>
                       ))}
                     </div>
 
                     <Link to={`/agency/${slug}/services/${service}`}>
-                      <Button className="rounded-xl font-bold gap-2 px-8 h-12 text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
+                      <Button className="rounded-md font-extrabold gap-2 px-6 h-11 text-sm hover:brightness-95" style={{ backgroundColor: accent, color: '#ffffff' }}>
                         Explore {label} <ArrowRight className="h-4 w-4" />
                       </Button>
                     </Link>
@@ -169,14 +157,14 @@ const StorefrontServices = () => {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-20" style={tk.surfaceDeep}>
+      <section className="py-12" style={tk.surfaceDeep}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ ...serifFont, ...tk.textOnDeep }}>Ready to Start Your Journey?</h2>
-            <p className="mb-8 max-w-lg mx-auto" style={tk.textOnDeepMuted}>Book any of our services with confidence. Professional support, premium vehicles, and unforgettable experiences await.</p>
+            <h2 className="text-2xl md:text-3xl mb-3" style={{ ...headingFont, ...tk.textOnDeep }}>Ready to start your journey?</h2>
+            <p className="text-sm mb-6 max-w-lg mx-auto" style={tk.textOnDeepMuted}>Best price guarantee. Free cancellation on most bookings. 24/7 support.</p>
             <Link to={`/agency/${slug}/contact`}>
-              <Button className="rounded-xl font-bold gap-2 px-10 h-12 text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
-                Contact Us <ArrowRight className="h-4 w-4" />
+              <Button className="rounded-md font-extrabold gap-2 px-8 h-11 text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
+                Contact us <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </motion.div>
