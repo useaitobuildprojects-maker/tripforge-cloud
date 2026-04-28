@@ -92,43 +92,42 @@ const StorefrontHome = () => {
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
       />
 
-      {/* ═══════════════ HERO — Expedia style ═══════════════ */}
-      <section className="relative" style={tk.surface}>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10 pb-40 sm:pb-32">
-          <div className="relative rounded-3xl overflow-hidden h-[520px] md:h-[620px]">
-            <div className="absolute inset-0 overflow-hidden">
-              <img
-                src={cfg.home_hero_image || defaultHeroImage}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover animate-kenburns"
-                width={1920}
-                height={1080}
-              />
-            </div>
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0.10) 35%, rgba(0,0,0,0.55) 100%)' }} />
-            <div className="relative h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20 max-w-3xl">
-              <motion.span initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="editorial-eyebrow mb-5 text-white/85">
-                {(cfg as any).hero_eyebrow || `${agency.city} · ${agency.country}`}
-              </motion.span>
-              <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}
-                className="font-editorial text-white text-[2.5rem] sm:text-5xl lg:text-7xl leading-[1.02]">
-                {cfg.hero_title || 'Your next chapter, beautifully arranged.'}
-              </motion.h1>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}
-                className="mt-6 text-base md:text-lg text-white/85 max-w-xl leading-relaxed font-light">
-                {cfg.hero_subtitle || `Vehicles, transfers, and curated experiences across ${agency.city} — handpicked, hand-driven, and ready when you are.`}
-              </motion.p>
-            </div>
-          </div>
+      {/* ═══════════════ HERO — Booking.com style ═══════════════ */}
+      <section className="relative" style={{ backgroundColor: EXP.brandDeep }}>
+        {/* Background image with strong navy wash */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={cfg.home_hero_image || defaultHeroImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
+            width={1920}
+            height={1080}
+          />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${EXP.brandDeep}E0 0%, ${EXP.brandDeep}F5 100%)` }} />
+        </div>
 
-          {/* Search card overlapping hero */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }}
-            className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-4 sm:-bottom-2 max-w-7xl mx-auto">
-            <div className="rounded-2xl shadow-2xl border overflow-hidden" style={{ ...tk.surface, ...tk.border }}>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-28 sm:pb-32">
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+            className="font-editorial text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl"
+          >
+            {cfg.hero_title || `Find your next trip in ${agency.city}`}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+            className="mt-3 text-base md:text-lg text-white/85 max-w-2xl"
+          >
+            {cfg.hero_subtitle || `Search low prices on vehicles, transfers and tours across ${agency.city}.`}
+          </motion.p>
+
+          {/* Search card sitting at bottom of hero, with yellow border */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
+            <div className="rounded-md shadow-2xl overflow-hidden" style={{ backgroundColor: EXP.cta, padding: '3px' }}>
+              <div className="rounded-[5px]" style={tk.surface}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
-                <div className="flex flex-nowrap overflow-x-auto items-center gap-1 px-3 sm:px-4 pt-3 border-b scrollbar-hide" style={tk.border}>
+                <div className="flex flex-nowrap overflow-x-auto items-center gap-1 px-2 pt-2 border-b scrollbar-hide" style={tk.border}>
                   {enabledServices.map((service) => {
                     const Icon = SERVICE_ICONS[service] ?? Car;
                     const isActive = activeService === service;
@@ -136,7 +135,7 @@ const StorefrontHome = () => {
                       <button
                         key={service}
                         onClick={() => setActiveService(service)}
-                        className="inline-flex shrink-0 items-center gap-2 px-3 sm:px-4 py-2.5 text-sm font-semibold rounded-t-lg transition-all relative whitespace-nowrap"
+                        className="inline-flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-bold rounded-t-md transition-all relative whitespace-nowrap"
                         style={isActive
                           ? { color: accent, backgroundColor: 'transparent' }
                           : { ...tk.textBody, backgroundColor: 'transparent' }}
@@ -144,7 +143,7 @@ const StorefrontHome = () => {
                         <Icon className="h-4 w-4" />
                         {SERVICE_LABELS[service] ?? service}
                         {isActive && (
-                          <span className="absolute left-3 right-3 -bottom-px h-0.5 rounded-full" style={{ backgroundColor: accent }} />
+                          <span className="absolute left-3 right-3 -bottom-px h-[3px] rounded-full" style={{ backgroundColor: accent }} />
                         )}
                       </button>
                     );
@@ -153,22 +152,22 @@ const StorefrontHome = () => {
               )}
 
               {/* Search fields row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2 p-3">
-                <div className="md:col-span-3 px-3 py-3 rounded-xl border flex items-center gap-2.5" style={{ ...tk.inputSurface, ...tk.inputBorder }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
+                <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: '#1a1a1a' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
                     <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} />
                   </div>
                 </div>
-                <div className="md:col-span-3 px-3 py-3 rounded-xl border flex items-center gap-2.5" style={{ ...tk.inputSurface, ...tk.inputBorder }}>
+                <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: '#1a1a1a' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
                     <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} />
                   </div>
                 </div>
-                <div className="md:col-span-2 px-3 py-3 rounded-xl border flex items-center gap-2.5" style={{ ...tk.inputSurface, ...tk.inputBorder }}>
+                <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: '#1a1a1a' }}>
                   <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up date</p>
@@ -176,7 +175,7 @@ const StorefrontHome = () => {
                       className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
                   </div>
                 </div>
-                <div className="md:col-span-2 px-3 py-3 rounded-xl border flex items-center gap-2.5" style={{ ...tk.inputSurface, ...tk.inputBorder }}>
+                <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: '#1a1a1a' }}>
                   <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off date</p>
@@ -185,12 +184,13 @@ const StorefrontHome = () => {
                   </div>
                 </div>
                 <button
-                  className="sm:col-span-2 md:col-span-2 h-13 min-h-[52px] rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-wide"
-                  style={{ backgroundColor: ctaBg, color: ctaTextColor }}
+                  className="sm:col-span-2 md:col-span-2 min-h-[52px] rounded-md font-extrabold text-base flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                  style={{ backgroundColor: accent, color: '#ffffff' }}
                   onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                 >
-                  <Search className="h-4 w-4" /> Search trips
+                  <Search className="h-5 w-5" /> Search
                 </button>
+              </div>
               </div>
             </div>
           </motion.div>
@@ -198,37 +198,38 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ MEMBER PROMO BANNER ═══════════════ */}
-      <section className="pt-20 pb-6" style={tk.surface}>
+      <section className="pt-16 pb-4" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl p-5 md:p-6 flex flex-wrap items-center justify-between gap-4" style={{ backgroundColor: ts.isDark ? 'rgba(255,255,255,0.04)' : EXP.brandSoftBg }}>
-            <div className="flex items-center gap-4">
-              <div className="h-11 w-11 rounded-xl flex items-center justify-center text-white font-bold shrink-0" style={{ backgroundColor: accent }}>
+          <div className="rounded-md border-2 p-4 flex flex-wrap items-center justify-between gap-3" style={{ backgroundColor: EXP.brandSoftBg, borderColor: accent }}>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-md flex items-center justify-center text-white font-bold shrink-0" style={{ backgroundColor: accent }}>
                 <BadgePercent className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-bold" style={tk.textPrimary}>Members save 10% or more</p>
-                <p className="text-xs mt-0.5" style={tk.textBody}>Sign in to unlock instant savings on selected vehicles and tours.</p>
+                <p className="text-sm font-extrabold" style={tk.textPrimary}>Sign in, save 10% or more</p>
+                <p className="text-xs mt-0.5" style={tk.textBody}>Members get access to exclusive Genius prices on selected vehicles and tours.</p>
               </div>
             </div>
             <Link to={`/agency/${slug}/contact`}
-              className="text-sm font-bold underline-offset-4 hover:underline" style={{ color: accent }}>
-              Sign in or join free →
+              className="inline-flex items-center gap-1 text-sm font-bold px-4 h-9 rounded-md border-2 transition-colors hover:bg-white"
+              style={{ color: accent, borderColor: accent }}>
+              Sign in
             </Link>
           </div>
         </div>
       </section>
 
       {/* ═══════════════ TRUST STRIP ═══════════════ */}
-      <section className="py-6" style={tk.surface}>
+      <section className="py-4" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-3">
           {TRUST_ITEMS.map((item) => (
-            <div key={item.title} className="flex items-start gap-3 p-4 rounded-xl border" style={{ ...tk.surface, ...tk.border }}>
-              <div className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+            <div key={item.title} className="flex items-start gap-3 p-3 rounded-md border" style={{ ...tk.surface, ...tk.border }}>
+              <div className="h-9 w-9 rounded-md flex items-center justify-center shrink-0"
                 style={{ backgroundColor: ts.isDark ? 'rgba(255,255,255,0.06)' : EXP.brandSoftBg, color: accent }}>
                 <item.icon className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-bold" style={tk.textPrimary}>{item.title}</p>
+                <p className="text-sm font-extrabold" style={tk.textPrimary}>{item.title}</p>
                 <p className="text-xs mt-0.5 leading-relaxed" style={tk.textMuted}>{item.desc}</p>
               </div>
             </div>
