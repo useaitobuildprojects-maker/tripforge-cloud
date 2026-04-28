@@ -78,6 +78,64 @@
     font-family: var(--font-display);
   }
 
+  /* Editorial travel-magazine headline — large serif with tight tracking */
+  .font-editorial {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    font-feature-settings: "ss01", "liga";
+  }
+
+  /* Small uppercase eyebrow with hairline divider — used to introduce sections */
+  .editorial-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .editorial-eyebrow::before {
+    content: "";
+    width: 1.75rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  /* Slow, subtle Ken-Burns zoom for hero imagery */
+  @keyframes kenburns {
+    0%   { transform: scale(1.04) translate3d(0,0,0); }
+    100% { transform: scale(1.12) translate3d(-1%, -1%, 0); }
+  }
+  .animate-kenburns {
+    animation: kenburns 18s ease-out infinite alternate;
+    will-change: transform;
+  }
+
+  /* Soft underline that grows on hover — for editorial nav links */
+  .nav-underline {
+    position: relative;
+  }
+  .nav-underline::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -2px;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 240ms ease, left 240ms ease;
+    opacity: 0.7;
+  }
+  .nav-underline:hover::after,
+  .nav-underline[data-active="true"]::after {
+    width: 70%;
+    left: 15%;
+  }
+
   .glass {
     @apply bg-card border border-border;
   }
