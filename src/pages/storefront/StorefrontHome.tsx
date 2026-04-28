@@ -340,46 +340,54 @@ const StorefrontHome = () => {
                     const mv = vehicle as MarketplaceVehicle;
                     return (
                       <motion.div key={vehicle.id} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-                        className="rounded-2xl border overflow-hidden hover:shadow-xl transition-all duration-300 group relative"
+                        className="rounded-md border overflow-hidden hover:shadow-lg transition-all duration-200 group relative"
                         style={{ ...tk.surface, ...tk.border }}>
                         {mv.agency_name && !mv.is_own && (
-                          <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-sm text-white text-[10px] font-semibold">
+                          <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-0.5 rounded-sm bg-black/75 text-white text-[10px] font-bold">
                             {mv.agency_logo_url ? <img src={mv.agency_logo_url} alt="" className="h-4 w-4 rounded-full object-cover" /> : <Briefcase className="h-3 w-3" />}
                             via {mv.agency_name}
                           </div>
                         )}
                         {vehicle.photo_url ? (
-                          <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         ) : (
-                          <div className="h-44 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
+                          <div className="h-40 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
                         )}
-                        <div className="p-5">
-                          <div className="flex items-center gap-1 mb-1">
-                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            <span className="text-xs font-bold" style={tk.textPrimary}>4.7</span>
-                            <span className="text-xs" style={tk.textMuted}>(450+)</span>
+                        <div className="p-4">
+                          <h4 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h4>
+                          <p className="text-[11px] mt-0.5" style={tk.textMuted}>{vehicle.year}</p>
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>4.7</span>
+                            <span className="text-xs font-bold" style={tk.textPrimary}>Very good</span>
+                            <span className="text-xs" style={tk.textMuted}>· 450+ reviews</span>
                           </div>
-                          <h4 className="font-bold text-sm" style={tk.textPrimary}>{vehicle.brand} {vehicle.model} {vehicle.year}</h4>
-                          <div className="flex items-center gap-3 mt-2 text-[11px]" style={tk.textMuted}>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]" style={tk.textMuted}>
                             <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
                             <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
                           </div>
-                          <div className="flex items-center justify-between mt-4 pt-3 border-t" style={tk.border}>
+                          <p className="text-[11px] mt-2 font-bold" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
+                          <div className="flex items-end justify-between mt-3 pt-3 border-t" style={tk.border}>
                             <div>
-                              <p className="text-[10px]" style={tk.textMuted}>From</p>
                               {vehicle.display_price_per_km ? (
-                                <p className="text-lg font-extrabold" style={tk.textPrimary}>{vehicle.display_price_per_km}€<span className="text-xs font-normal" style={tk.textMuted}> /km</span></p>
+                                <>
+                                  <p className="text-[10px]" style={tk.textMuted}>From</p>
+                                  <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>{vehicle.display_price_per_km}€<span className="text-xs font-normal" style={tk.textMuted}> /km</span></p>
+                                </>
                               ) : vehicle.daily_rate ? (
-                                <p className="text-lg font-extrabold" style={tk.textPrimary}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-normal" style={tk.textMuted}> /day</span></p>
+                                <>
+                                  <p className="text-[10px] line-through" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
+                                  <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-normal" style={tk.textMuted}> /day</span></p>
+                                  <p className="text-[10px]" style={tk.textMuted}>Incl. taxes & fees</p>
+                                </>
                               ) : (
                                 <p className="text-sm" style={tk.textMuted}>Contact</p>
                               )}
                             </div>
-                            <Button size="sm" className="rounded-lg text-xs font-bold h-9 px-4 hover:brightness-95"
-                              style={{ backgroundColor: ctaBg, color: ctaTextColor }}
+                            <Button size="sm" className="rounded-md text-xs font-extrabold h-9 px-4 hover:brightness-95"
+                              style={{ backgroundColor: accent, color: '#ffffff' }}
                               onClick={() => setBookingVehicle(mv)}>
-                              {cfg.cta_text || 'Reserve'}
+                              {cfg.cta_text || 'See availability'}
                             </Button>
                           </div>
                         </div>
@@ -399,20 +407,20 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ INSPIRATION CTA ═══════════════ */}
-      <section className="py-16" style={tk.surface}>
+      <section className="py-10" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl overflow-hidden relative h-[320px] md:h-[400px]">
-              <div className="absolute inset-0 overflow-hidden">
-                <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover animate-kenburns" />
-              </div>
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%)' }} />
-              <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
-                <span className="editorial-eyebrow mb-4 text-white/85"><Plane className="h-3.5 w-3.5" /> Inspiration</span>
-                <h2 className="font-editorial text-white text-3xl md:text-5xl leading-[1.05]">Where to next?</h2>
-                <p className="text-white/85 mt-4 text-sm md:text-base font-light leading-relaxed">Curated trips, hidden gems, and exclusive member offers from {agency.name}.</p>
-              <Link to={`/agency/${slug}/services`} className="mt-6 w-fit">
-                <Button className="rounded-xl font-bold gap-2 h-12 px-7 text-sm hover:brightness-95"
-                  style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
+          <div className="rounded-md overflow-hidden relative h-[260px] md:h-[320px]" style={{ backgroundColor: EXP.brandDeep }}>
+            <div className="absolute inset-0 overflow-hidden">
+              <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+            </div>
+            <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}66 100%)` }} />
+            <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
+              <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1" /> Plan ahead</p>
+              <h2 className="font-editorial text-white text-2xl md:text-4xl leading-tight">Where to next?</h2>
+              <p className="text-white/85 mt-2 text-sm md:text-base">Discover top destinations and member-only offers from {agency.name}.</p>
+              <Link to={`/agency/${slug}/services`} className="mt-5 w-fit">
+                <Button className="rounded-md font-extrabold gap-2 h-11 px-6 text-sm hover:brightness-95"
+                  style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                   Explore destinations <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
