@@ -20,6 +20,10 @@ import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -76,6 +80,14 @@ const StorefrontHome = () => {
     d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
   }, [pickupDate, todayStr]);
+
+  const todayDate = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
+  const pickupDateObj = pickupDate ? new Date(pickupDate) : undefined;
+  const dropoffDateObj = dropoffDate ? new Date(dropoffDate) : undefined;
+  const minReturnDateObj = useMemo(() => {
+    if (!pickupDateObj) return todayDate;
+    const d = new Date(pickupDateObj); d.setDate(d.getDate() + 1); return d;
+  }, [pickupDateObj, todayDate]);
 
   // Expedia accent — fall back to palette when agency uses default-ish color
   const EXP = expediaPalette;
