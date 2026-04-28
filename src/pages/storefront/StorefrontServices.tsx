@@ -77,29 +77,6 @@ const StorefrontServices = () => {
         </div>
       </section>
 
-      {/* Services overview grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {enabledServices.length > 1 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-16">
-            {enabledServices.map((service, i) => {
-              const Icon = SERVICE_ICONS[service] ?? Car;
-              const label = SERVICE_LABELS[service] ?? service;
-              return (
-                <motion.a key={service} href={`#service-${service}`}
-                  initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                  className="group flex flex-col items-center gap-3 p-5 rounded-2xl border hover:shadow-lg transition-all duration-300 text-center"
-                  style={{ ...tk.surface, ...tk.border }}>
-                  <div className="h-12 w-12 rounded-xl flex items-center justify-center transition-colors duration-300" style={{ backgroundColor: `${accent}12` }}>
-                    <Icon className="h-5 w-5 transition-colors duration-300" style={{ color: accent }} />
-                  </div>
-                  <span className="text-sm font-semibold" style={tk.textPrimary}>{label}</span>
-                </motion.a>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
       {/* Detailed service cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {enabledServices.length === 0 ? (
