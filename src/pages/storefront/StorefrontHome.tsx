@@ -180,11 +180,11 @@ const StorefrontHome = () => {
                   </div>
                 </div>
                 <button
-                  className="sm:col-span-2 md:col-span-2 min-h-[52px] rounded-md font-extrabold text-base flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                  className="sm:col-span-2 md:col-span-2 h-11 rounded-md font-bold text-sm flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                   style={{ backgroundColor: accent, color: '#ffffff' }}
                   onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
                 >
-                  <Search className="h-5 w-5" /> Search
+                  <Search className="h-4 w-4" /> Search
                 </button>
               </div>
               </div>
