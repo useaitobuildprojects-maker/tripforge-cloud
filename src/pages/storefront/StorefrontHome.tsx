@@ -127,7 +127,7 @@ const StorefrontHome = () => {
               <div className="rounded-[5px]" style={tk.surface}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
-                <div className="flex flex-nowrap overflow-x-auto items-center gap-1 px-2 pt-2 border-b scrollbar-hide" style={tk.border}>
+                <div className="flex flex-nowrap overflow-x-auto items-center gap-2 px-3 pt-3 pb-0 scrollbar-hide" style={tk.border}>
                   {enabledServices.map((service) => {
                     const Icon = SERVICE_ICONS[service] ?? Car;
                     const isActive = activeService === service;
@@ -135,16 +135,13 @@ const StorefrontHome = () => {
                       <button
                         key={service}
                         onClick={() => setActiveService(service)}
-                        className="inline-flex shrink-0 items-center gap-2 px-3 py-2 text-sm font-bold rounded-t-md transition-all relative whitespace-nowrap"
+                        className="inline-flex shrink-0 items-center gap-2 px-4 h-9 text-sm font-semibold rounded-full border transition-all whitespace-nowrap"
                         style={isActive
-                          ? { color: accent, backgroundColor: 'transparent' }
-                          : { ...tk.textBody, backgroundColor: 'transparent' }}
+                          ? { color: '#ffffff', backgroundColor: accent, borderColor: accent }
+                          : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
                         <Icon className="h-4 w-4" />
-                        {SERVICE_LABELS[service] ?? service}
-                        {isActive && (
-                          <span className="absolute left-3 right-3 -bottom-px h-[3px] rounded-full" style={{ backgroundColor: accent }} />
-                        )}
+                        <span>{SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
                   })}
