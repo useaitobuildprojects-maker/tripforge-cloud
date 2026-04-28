@@ -80,9 +80,10 @@
 
   /* Editorial travel-magazine headline — large serif with tight tracking */
   .font-editorial {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    /* Booking.com-style: bold sans, tight tracking, NOT serif */
+    font-family: var(--font-sans);
+    font-weight: 800;
+    letter-spacing: -0.025em;
     font-feature-settings: "ss01", "liga";
   }
 
