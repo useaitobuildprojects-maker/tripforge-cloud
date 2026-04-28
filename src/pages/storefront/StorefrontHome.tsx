@@ -135,10 +135,10 @@ const StorefrontHome = () => {
                       <button
                         key={service}
                         onClick={() => setActiveService(service)}
-                        className="inline-flex shrink-0 items-center gap-2 px-4 h-9 text-sm font-semibold rounded-full border transition-all whitespace-nowrap"
+                        className="inline-flex shrink-0 items-center gap-2 px-4 h-9 text-sm font-semibold rounded-full border-2 transition-all whitespace-nowrap"
                         style={isActive
                           ? { color: '#ffffff', backgroundColor: accent, borderColor: accent }
-                          : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
+                          : { ...tk.textBody, backgroundColor: 'transparent', borderColor: '#1a1a1a' }}
                       >
                         <Icon className="h-4 w-4" />
                         <span>{SERVICE_LABELS[service] ?? service}</span>
