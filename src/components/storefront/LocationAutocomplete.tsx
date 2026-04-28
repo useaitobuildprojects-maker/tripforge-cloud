@@ -233,71 +233,41 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 bg-popover border border-border rounded-xl shadow-lg max-h-72 overflow-y-auto"
+            className="absolute left-0 right-0 top-[calc(100%+10px)] z-50 bg-white rounded-md shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)] border border-[#e5e7eb] max-h-80 overflow-y-auto py-1"
           >
-            {/* Configured locations (agency's own) */}
-            {grouped.configured.length > 0 && (
-              <div>
-                <div className="px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Our locations</div>
-                {grouped.configured.map((loc) => {
-                  const Icon = TYPE_ICONS[loc.type] || MapPin;
-                  return (
-                    <button key={loc.id} onClick={() => handleSelect(loc)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left">
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium truncate">{loc.name}</div>
-                        {loc.address && <div className="text-xs text-muted-foreground truncate">{loc.address}</div>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* POI database results (instant, local) */}
-            {grouped.poi.length > 0 && (
-              <div>
-                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${grouped.configured.length > 0 ? 'border-t border-border' : ''}`}>
-                  Popular locations
+            {(['configured','poi','searchResults'] as const).map((groupKey, gi) => {
+              const items = grouped[groupKey];
+              if (items.length === 0) return null;
+              const labels = { configured: 'Our locations', poi: 'Popular', searchResults: 'Other places' };
+              const showDivider = gi > 0 && (
+                (groupKey === 'poi' && grouped.configured.length > 0) ||
+                (groupKey === 'searchResults' && (grouped.configured.length > 0 || grouped.poi.length > 0))
+              );
+              return (
+                <div key={groupKey}>
+                  {showDivider && <div className="my-1 h-px bg-[#f0f0f0]" />}
+                  <div className="px-4 pt-2 pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#6b7280]">{labels[groupKey]}</div>
+                  {items.map((loc) => {
+                    const Icon = TYPE_ICONS[loc.type] || MapPin;
+                    return (
+                      <button
+                        key={loc.id}
+                        onClick={() => handleSelect(loc)}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f7f9fc] transition-colors text-left group"
+                      >
+                        <span className="h-8 w-8 rounded-md bg-[#f3f4f6] flex items-center justify-center shrink-0 group-hover:bg-white group-hover:border group-hover:border-[#e5e7eb] transition-colors">
+                          <Icon className="h-4 w-4 text-[#374151]" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-sm font-semibold text-[#111827] truncate">{loc.name}</div>
+                          {loc.address && <div className="text-xs text-[#6b7280] truncate">{loc.address}</div>}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
-                {grouped.poi.map((loc) => {
-                  const Icon = TYPE_ICONS[loc.type] || MapPin;
-                  return (
-                    <button key={loc.id} onClick={() => handleSelect(loc)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left">
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium truncate">{loc.name}</div>
-                        {loc.address && <div className="text-xs text-muted-foreground truncate">{loc.address}</div>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* Search results from Google Places */}
-            {grouped.searchResults.length > 0 && (
-              <div>
-                <div className={`px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground ${(grouped.configured.length > 0 || grouped.poi.length > 0) ? 'border-t border-border' : ''}`}>
-                  Other places
-                </div>
-                {grouped.searchResults.map((loc) => {
-                  const Icon = TYPE_ICONS[loc.type] || MapPin;
-                  return (
-                    <button key={loc.id} onClick={() => handleSelect(loc)}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors text-left">
-                      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium truncate">{loc.name}</div>
-                        {loc.address && <div className="text-xs text-muted-foreground truncate">{loc.address}</div>}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>

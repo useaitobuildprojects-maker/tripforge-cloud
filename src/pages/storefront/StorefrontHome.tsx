@@ -20,6 +20,10 @@ import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
@@ -76,6 +80,14 @@ const StorefrontHome = () => {
     d.setDate(d.getDate() + 1);
     return d.toISOString().split('T')[0];
   }, [pickupDate, todayStr]);
+
+  const todayDate = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
+  const pickupDateObj = pickupDate ? new Date(pickupDate) : undefined;
+  const dropoffDateObj = dropoffDate ? new Date(dropoffDate) : undefined;
+  const minReturnDateObj = useMemo(() => {
+    if (!pickupDateObj) return todayDate;
+    const d = new Date(pickupDateObj); d.setDate(d.getDate() + 1); return d;
+  }, [pickupDateObj, todayDate]);
 
   // Expedia accent — fall back to palette when agency uses default-ish color
   const EXP = expediaPalette;
@@ -163,22 +175,52 @@ const StorefrontHome = () => {
                     <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} />
                   </div>
                 </div>
-                <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                  <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up date</p>
-                    <input type="date" value={pickupDate} min={todayStr} onChange={(e) => setPickupDate(e.target.value)}
-                      className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
-                  </div>
-                </div>
-                <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                  <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off date</p>
-                    <input type="date" value={dropoffDate} min={minReturnDate} onChange={(e) => setDropoffDate(e.target.value)}
-                      className="text-sm bg-transparent focus:outline-none w-full" style={tk.textPrimary} />
-                  </div>
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                      <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up date</p>
+                        <p className={cn("text-sm truncate", !pickupDateObj && "text-muted-foreground")} style={pickupDateObj ? tk.textPrimary : undefined}>
+                          {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : 'Select date'}
+                        </p>
+                      </div>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-md border border-[#e5e7eb] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)]" align="start">
+                    <CalendarPicker
+                      mode="single"
+                      selected={pickupDateObj}
+                      onSelect={(d) => d && setPickupDate(d.toISOString().split('T')[0])}
+                      disabled={(d) => d < todayDate}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                      <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off date</p>
+                        <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
+                          {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : 'Select date'}
+                        </p>
+                      </div>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-md border border-[#e5e7eb] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)]" align="start">
+                    <CalendarPicker
+                      mode="single"
+                      selected={dropoffDateObj}
+                      onSelect={(d) => d && setDropoffDate(d.toISOString().split('T')[0])}
+                      disabled={(d) => d < minReturnDateObj}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
                 <div className="sm:col-span-2 md:col-span-2 flex items-center justify-center">
                   <button
                     className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
