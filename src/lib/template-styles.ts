@@ -22,11 +22,12 @@ export interface SurfaceTokens {
 
 /** Expedia-inspired accent palette — bright blue brand + yellow CTA. */
 export const expediaPalette = {
-  brand: '#1668E3',          // Expedia blue (links, accents, badges)
-  brandDeep: '#0E47A1',      // deeper for hovers / borders
-  brandSoftBg: '#E8F1FE',    // very light blue tint for chip backgrounds
-  cta: '#FFC94A',            // yellow CTA
-  ctaHover: '#F0B82E',
+  // Booking.com-inspired palette — deep navy-blue header & links, yellow conversion CTA
+  brand: '#0071C2',          // Booking.com blue (links, accents)
+  brandDeep: '#003580',      // dark navy used in headers, hero, CTA bands
+  brandSoftBg: '#EBF3FF',    // very light blue tint for chip/info backgrounds
+  cta: '#FEBB02',            // signature yellow CTA
+  ctaHover: '#E8AB02',
   ctaText: '#1A1A1A',        // dark text on yellow
 } as const;
 
