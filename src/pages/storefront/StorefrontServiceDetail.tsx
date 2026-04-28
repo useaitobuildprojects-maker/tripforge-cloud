@@ -1,10 +1,10 @@
 import { useOutletContext, useParams, Link } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
-import { Car, UserCheck, Crown, Building, Truck, ChevronLeft, Phone, CheckCircle2, SlidersHorizontal, X, Users } from 'lucide-react';
+import { Car, UserCheck, Crown, Building, ChevronLeft, Phone, CheckCircle2, SlidersHorizontal, X, Users, Fuel, Settings2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles } from '@/lib/template-styles';
+import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,9 +38,14 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Half-day & full-day options', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules', 'Private tours available'],
 };
 
+const headingFont = { fontFamily: 'var(--font-sans)', fontWeight: 800, letterSpacing: '-0.025em' };
+
 const StorefrontServiceDetail = () => {
   const { slug, serviceType } = useParams<{ slug: string; serviceType: string }>();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
+  const tk = ts.tokens;
+  const EXP = expediaPalette;
+  const accent = ts.isDark ? buttonColor : EXP.brand;
 
   const service = serviceType as ServiceType;
   const Icon = SERVICE_ICONS[service] ?? Car;
@@ -65,10 +70,10 @@ const StorefrontServiceDetail = () => {
 
   if (!agency.services?.includes(service)) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold mb-2">Service Not Available</h1>
-        <p className="opacity-60 mb-6">This service is not currently offered.</p>
-        <Link to={`/agency/${slug}/services`} className="text-sm font-medium" style={{ color: buttonColor }}>
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center" style={tk.surface}>
+        <h1 className="text-2xl font-bold mb-2" style={tk.textPrimary}>Service Not Available</h1>
+        <p className="mb-6" style={tk.textBody}>This service is not currently offered.</p>
+        <Link to={`/agency/${slug}/services`} className="text-sm font-bold" style={{ color: accent }}>
           ← Back to Services
         </Link>
       </div>
@@ -76,81 +81,83 @@ const StorefrontServiceDetail = () => {
   }
 
   return (
-    <div>
+    <div style={tk.surface}>
       <StorefrontSeo agency={agency} page="fleet" fallbackTitle={`${heroText.title} | ${agency.name}`} fallbackDescription={heroText.subtitle} />
 
-      {/* Hero */}
-      <section className={`relative overflow-hidden ${ts.heroClass}`} style={{ ...ts.heroStyle, ...(cfg.hero_bg_color ? { backgroundColor: cfg.hero_bg_color } : {}) }}>
-        {(ts.heroOverlayClass || ts.heroOverlayStyle) && !cfg.hero_bg_color && <div className={`absolute inset-0 ${ts.heroOverlayClass}`} style={ts.heroOverlayStyle} />}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Link to={`/agency/${slug}/services`} className={`inline-flex items-center gap-1 text-sm mb-4 opacity-70 hover:opacity-100 transition-opacity ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>
+      {/* Hero — compact navy band, Booking.com style */}
+      <section className="relative" style={tk.surfaceDeep}>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-12">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+            <Link to={`/agency/${slug}/services`} className="inline-flex items-center gap-1 text-xs font-bold mb-4 hover:underline" style={tk.textOnDeepMuted}>
               <ChevronLeft className="h-4 w-4" /> All Services
             </Link>
-            <div className="flex items-center gap-4 mb-5">
-              <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-white/10">
-                <Icon className="h-7 w-7" style={{ ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : ts.heroTitleStyle) }} />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-11 w-11 rounded-md flex items-center justify-center bg-white/10">
+                <Icon className="h-5 w-5" style={tk.textOnDeep} />
               </div>
-              <h1 className={`font-editorial text-4xl md:text-5xl lg:text-6xl ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl" style={{ ...headingFont, ...tk.textOnDeep }}>
                 {heroText.title}
               </h1>
             </div>
-            <p className={`text-base md:text-lg max-w-xl font-light leading-relaxed ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
+            <p className="text-sm md:text-base max-w-2xl" style={tk.textOnDeepMuted}>
               {heroText.subtitle}
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <p className="editorial-eyebrow mb-3 text-foreground/60">Included</p>
-        <h2 className="font-editorial text-3xl md:text-4xl mb-10" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>What's included</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((f, i) => (
-            <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
-              className="flex items-center gap-3 p-4 rounded-xl" style={ts.cardStyle}>
-              <CheckCircle2 className="h-5 w-5 shrink-0" style={{ color: buttonColor }} />
-              <span className="text-sm font-medium">{f}</span>
-            </motion.div>
+      {/* Trust strip — compact, Booking-style */}
+      <section className="border-b py-4" style={{ ...tk.surface, ...tk.border }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+          {features.slice(0, 5).map((f, i) => (
+            <div key={i} className="flex items-center gap-2 text-xs md:text-sm">
+              <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: 'hsl(155 50% 36%)' }} />
+              <span className="font-semibold" style={tk.textBody}>{f}</span>
+            </div>
           ))}
         </div>
       </section>
 
       {isTransfer ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : isLimo ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : isCityTour ? (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
         </section>
       ) : (
         /* Vehicle/Package Listings with Filter Sidebar */
-        <section className={`py-16 ${ts.sectionAltClass}`} style={ts.sectionAltStyle}>
+        <section className="py-8" style={tk.surfaceAlt}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>
-                {service === 'apartment' ? 'Available Apartments' : service === 'car_rental' ? 'Choose Your Vehicle' : 'Available Packages'}
-              </h2>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 h-9 rounded-md border border-input px-3 bg-background">
-                  <Users className="h-3.5 w-3.5" style={{ color: buttonColor }} />
-                  <span className="text-xs font-medium hidden sm:inline">Passengers</span>
+            <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
+              <div>
+                <h2 className="text-xl md:text-2xl" style={{ ...headingFont, ...tk.textPrimary }}>
+                  {service === 'apartment' ? 'Available apartments' : service === 'car_rental' ? 'Choose your vehicle' : 'Available packages'}
+                </h2>
+                <p className="text-xs mt-1" style={tk.textMuted}>
+                  <span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span>{' '}
+                  result{filteredVehicles.length !== 1 ? 's' : ''} · sorted by our top picks
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 h-9 rounded-md border-2 px-3" style={{ ...tk.inputSurface, ...tk.inputBorder }}>
+                  <Users className="h-3.5 w-3.5" style={{ color: accent }} />
+                  <span className="text-xs font-bold hidden sm:inline" style={tk.textPrimary}>Guests</span>
                   <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))}
-                    className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">−</button>
-                  <span className="w-5 text-center text-sm font-semibold">{pax}</span>
+                    className="h-6 w-6 rounded-md border text-xs font-extrabold hover:bg-black/5" style={tk.border}>−</button>
+                  <span className="w-5 text-center text-sm font-extrabold" style={tk.textPrimary}>{pax}</span>
                   <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))}
-                    className="h-6 w-6 rounded-md border border-border hover:bg-muted text-xs font-bold">+</button>
+                    className="h-6 w-6 rounded-md border text-xs font-extrabold hover:bg-black/5" style={tk.border}>+</button>
                 </div>
-                <Button variant="outline" size="sm" className="lg:hidden gap-2" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
+                <Button variant="outline" size="sm" className="lg:hidden gap-2 rounded-md font-bold" onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}>
                   <SlidersHorizontal className="h-4 w-4" /> Filter
                   {activeFilterCount > 0 && (
-                    <span className="ml-1 h-5 w-5 rounded-full text-xs flex items-center justify-center text-white" style={{ backgroundColor: buttonColor }}>
+                    <span className="ml-1 h-5 w-5 rounded-full text-[10px] flex items-center justify-center text-white" style={{ backgroundColor: accent }}>
                       {activeFilterCount}
                     </span>
                   )}
@@ -158,82 +165,90 @@ const StorefrontServiceDetail = () => {
               </div>
             </div>
 
-            <div className="flex gap-8">
-              <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} className="hidden lg:block w-64 shrink-0 sticky top-4 self-start" />
+            <div className="flex gap-6">
+              <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={accent} className="hidden lg:block w-64 shrink-0 sticky top-20 self-start" />
 
               {mobileFiltersOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                   <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFiltersOpen(false)} />
-                  <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] bg-background p-6 overflow-y-auto shadow-xl">
+                  <div className="absolute left-0 top-0 bottom-0 w-80 max-w-[85vw] p-6 overflow-y-auto shadow-xl" style={tk.surface}>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="font-bold text-lg">Filters</span>
-                      <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" /></button>
+                      <span className="font-extrabold text-lg" style={tk.textPrimary}>Filters</span>
+                      <button onClick={() => setMobileFiltersOpen(false)}><X className="h-5 w-5" style={tk.textPrimary} /></button>
                     </div>
-                    <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={buttonColor} />
+                    <VehicleFilterSidebar vehicles={vehicles} filters={filters} onChange={setFilters} buttonColor={accent} />
                   </div>
                 </div>
               )}
 
               <div className="flex-1 min-w-0">
                 {vehiclesLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {[1, 2, 3].map((i) => (
-                      <div key={i} className="rounded-xl border border-current/10 overflow-hidden" style={ts.cardStyle}>
+                      <div key={i} className="rounded-md border overflow-hidden" style={{ ...tk.surface, ...tk.border }}>
                         <Skeleton className="h-44 w-full" />
-                        <div className="p-5">
-                          <Skeleton className="h-5 w-3/4 mb-2" />
-                          <Skeleton className="h-4 w-1/2 mb-4" />
-                          <Skeleton className="h-10 w-full" />
-                        </div>
+                        <div className="p-4 space-y-2"><Skeleton className="h-5 w-3/4" /><Skeleton className="h-4 w-1/2" /><Skeleton className="h-9 w-full mt-2" /></div>
                       </div>
                     ))}
                   </div>
                 ) : filteredVehicles.length === 0 ? (
-                  <div className="text-center py-16 opacity-50">
-                    <Icon className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">
+                  <div className="text-center py-16 rounded-md border" style={{ ...tk.surface, ...tk.border }}>
+                    <Icon className="h-12 w-12 mx-auto mb-3 opacity-30" style={tk.textFaint} />
+                    <p className="text-sm" style={tk.textMuted}>
                       {hasAnyFilter(filters) ? 'No vehicles match your filters. Try adjusting your criteria.' : 'No listings available at the moment. Check back soon!'}
                     </p>
                     {hasAnyFilter(filters) && (
-                      <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-medium underline" style={{ color: buttonColor }}>
+                      <button onClick={() => setFilters(emptyFilters)} className="mt-3 text-sm font-bold underline" style={{ color: accent }}>
                         Clear all filters
                       </button>
                     )}
                   </div>
                 ) : (
-                  <>
-                    <p className="text-sm opacity-50 mb-4">{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} found</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                      {filteredVehicles.map((vehicle, i) => (
-                        <motion.div key={vehicle.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                          className="rounded-xl border border-current/10 overflow-hidden transition-shadow hover:shadow-lg" style={ts.cardStyle}>
-                          {vehicle.photo_url ? (
-                            <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-44 w-full object-cover" />
-                          ) : (
-                            <div className="h-44 flex items-center justify-center opacity-10 bg-current">
-                              <Icon className="h-14 w-14" />
-                            </div>
-                          )}
-                          <div className="p-5">
-                            <h3 className="font-bold text-lg">{vehicle.brand} {vehicle.model}</h3>
-                            <p className="text-xs opacity-50 mb-4">{vehicle.year}</p>
-                            <div className="flex items-center justify-between pt-3 border-t border-current/10">
-                              {vehicle.daily_rate ? (
-                                <p className="text-lg font-bold">${vehicle.daily_rate.toLocaleString()}<span className="text-xs font-normal opacity-50"> / {service === 'apartment' ? 'night' : 'day'}</span></p>
-                              ) : (
-                                <p className="text-sm opacity-50">Contact for price</p>
-                              )}
-                              <Button size="sm" variant="outline" className="rounded-lg text-sm font-semibold border-2" style={{ borderColor: buttonColor, color: buttonColor }}
-                                onMouseEnter={e => { const el = e.target as HTMLElement; el.style.backgroundColor = buttonColor; el.style.color = '#fff'; }}
-                                onMouseLeave={e => { const el = e.target as HTMLElement; el.style.backgroundColor = 'transparent'; el.style.color = buttonColor; }}>
-                                {cfg.cta_text || 'Book Now'}
-                              </Button>
-                            </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {filteredVehicles.map((vehicle, i) => (
+                      <motion.div key={vehicle.id} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+                        className="rounded-md border overflow-hidden hover:shadow-lg transition-all duration-200 group" style={{ ...tk.surface, ...tk.border }}>
+                        {vehicle.photo_url ? (
+                          <img src={vehicle.photo_url} alt={`${vehicle.brand} ${vehicle.model}`} className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                        ) : (
+                          <div className="h-40 flex items-center justify-center" style={tk.surfaceAlt}>
+                            <Icon className="h-12 w-12" style={tk.textFaint} />
                           </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </>
+                        )}
+                        <div className="p-4">
+                          <h3 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h3>
+                          <p className="text-[11px] mt-0.5" style={tk.textMuted}>{vehicle.year}</p>
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>4.7</span>
+                            <span className="text-xs font-bold" style={tk.textPrimary}>Very good</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]" style={tk.textMuted}>
+                            <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
+                            <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
+                            <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
+                          </div>
+                          <p className="text-[11px] mt-2 font-bold" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
+                          <div className="flex items-end justify-between mt-3 pt-3 border-t" style={tk.border}>
+                            <div>
+                              {vehicle.daily_rate ? (
+                                <>
+                                  <p className="text-[10px] line-through" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
+                                  <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-normal" style={tk.textMuted}> / {service === 'apartment' ? 'night' : 'day'}</span></p>
+                                  <p className="text-[10px]" style={tk.textMuted}>Incl. taxes & fees</p>
+                                </>
+                              ) : (
+                                <p className="text-sm" style={tk.textMuted}>Contact for price</p>
+                              )}
+                            </div>
+                            <Button size="sm" className="rounded-md text-xs font-extrabold h-9 px-4 hover:brightness-95"
+                              style={{ backgroundColor: accent, color: '#ffffff' }}>
+                              {cfg.cta_text || 'See availability'}
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -241,14 +256,15 @@ const StorefrontServiceDetail = () => {
         </section>
       )}
 
-      {/* CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-        <h2 className="text-2xl font-bold mb-3" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>Ready to Book?</h2>
-        <p className="opacity-60 mb-6 max-w-md mx-auto text-sm">Contact us to learn more or make a reservation today.</p>
-        <div className="flex items-center justify-center gap-4">
+      {/* CTA — navy band */}
+      <section className="py-10" style={tk.surfaceDeep}>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl md:text-3xl mb-2" style={{ ...headingFont, ...tk.textOnDeep }}>Need help booking?</h2>
+          <p className="text-sm mb-5 max-w-lg mx-auto" style={tk.textOnDeepMuted}>Real people, ready to help anywhere, anytime.</p>
           <Link to={`/agency/${slug}/contact`}>
-            <Button className="rounded-lg text-white gap-2" style={{ backgroundColor: buttonColor }}>
-              <Phone className="h-4 w-4" /> Contact Us
+            <Button className="rounded-md font-extrabold gap-2 px-8 h-11 text-sm hover:brightness-95"
+              style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
+              <Phone className="h-4 w-4" /> Contact us <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
