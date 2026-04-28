@@ -56,17 +56,18 @@ const StorefrontLayout = () => {
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
 
-  // Editorial logo: Playfair Display, brand-colored on light templates
+  // Booking.com-style: solid navy header with white text on light templates
   const accent = ts.isDark ? btnColor : expediaPalette.brand;
+  const headerBg = ts.isDark ? '#0a0a0a' : expediaPalette.brandDeep;
+  const headerText = '#ffffff';
+  const headerTextMuted = 'rgba(255,255,255,0.75)';
   const logoTextStyle: React.CSSProperties = {
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontWeight: 700,
-    letterSpacing: '-0.01em',
-    color: ts.isDark ? (tk.textPrimary.color as string) : accent,
+    fontFamily: 'var(--font-sans)',
+    fontWeight: 800,
+    letterSpacing: '-0.025em',
+    color: headerText,
   };
-  const navInactive: React.CSSProperties = tk.textBody;
-  const navActive: React.CSSProperties = tk.textPrimary;
-  const iconBtnBg = ts.isDark ? 'rgba(255,255,255,0.06)' : '#f9fafb';
+  const iconBtnBg = 'rgba(255,255,255,0.12)';
 
   const navLinks = [
     { label: 'Home', to: `/agency/${slug}` },
