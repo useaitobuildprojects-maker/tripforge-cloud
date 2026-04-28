@@ -221,7 +221,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-1/2 -translate-x-1/2 top-[calc(100%+12px)] z-50 bg-white rounded-md shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] border border-[#e5e7eb] max-h-[420px] overflow-y-auto w-[460px] max-w-[92vw]"
+            className="absolute left-0 top-[calc(100%+12px)] z-50 bg-white rounded-md shadow-[0_20px_50px_-12px_rgba(15,23,42,0.25)] border border-[#e5e7eb] max-h-[420px] overflow-y-auto w-[460px] max-w-[92vw]"
           >
             {(['poi','searchResults'] as const).map((groupKey, gi) => {
               const items = grouped[groupKey];
