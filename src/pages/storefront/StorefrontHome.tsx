@@ -238,53 +238,52 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ DEAL CARDS ═══════════════ */}
-      <section className="py-16" style={tk.surface}>
+      <section className="py-10" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+          <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <p className="editorial-eyebrow mb-3" style={{ color: accent }}>Curated escapes</p>
-              <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl" style={tk.textPrimary}>
-                Last-minute weekend deals
+              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>
+                Deals for the weekend
               </h2>
-              <p className="text-sm mt-3 max-w-md leading-relaxed" style={tk.textMuted}>Hand-picked offers for short, unforgettable getaways — chosen by our travel team.</p>
+              <p className="text-sm mt-1" style={tk.textMuted}>Save on stays for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} – {new Date(Date.now() + 2*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.</p>
             </div>
             <Link to={`/agency/${slug}/services`} className="hidden md:inline-flex items-center gap-1 text-sm font-bold" style={{ color: accent }}>
-              See all <ChevronRight className="h-4 w-4" />
+              See all deals <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {DESTINATIONS.map((dest, i) => (
-              <motion.div key={dest.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className="group rounded-2xl overflow-hidden border hover:shadow-xl transition-all duration-300 cursor-pointer"
+              <motion.div key={dest.name} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
+                className="group rounded-md overflow-hidden border hover:shadow-lg transition-all duration-200 cursor-pointer"
                 style={{ ...tk.surface, ...tk.border }}>
-                <div className="relative h-52 overflow-hidden">
-                  <img src={dest.image} alt={dest.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
-                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-bold"
-                    style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
+                <div className="relative h-44 overflow-hidden">
+                  <img src={dest.image} alt={dest.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-sm text-[10px] font-extrabold uppercase tracking-wide"
+                    style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                     {dest.tag}
                   </span>
-                  <button className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors">
+                  <button className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors">
                     <Heart className="h-4 w-4" style={{ color: accent }} />
                   </button>
                 </div>
-                <div className="p-5">
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span className="text-xs font-bold" style={tk.textPrimary}>{dest.rating}</span>
-                    <span className="text-xs" style={tk.textMuted}>({dest.reviews.toLocaleString()})</span>
-                  </div>
-                  <h3 className="text-base font-bold mb-1" style={tk.textPrimary}>{dest.name}</h3>
-                  <p className="text-xs mb-3" style={tk.textMuted}>
+                <div className="p-4">
+                  <h3 className="text-base font-extrabold mb-1 hover:underline" style={{ color: accent }}>{dest.name}</h3>
+                  <p className="text-xs mb-2" style={tk.textMuted}>
                     <MapPin className="h-3 w-3 inline mr-1" />{dest.location} · {dest.nights} nights
                   </p>
-                  <div className="flex items-baseline justify-between pt-3 border-t" style={tk.border}>
+                  <div className="flex items-center gap-1.5 mb-3">
+                    <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>{dest.rating}</span>
+                    <span className="text-xs font-bold" style={tk.textPrimary}>Excellent</span>
+                    <span className="text-xs" style={tk.textMuted}>· {dest.reviews.toLocaleString()} reviews</span>
+                  </div>
+                  <div className="flex items-end justify-between pt-2 border-t" style={tk.border}>
                     <div>
-                      <p className="text-[10px]" style={tk.textMuted}>From</p>
-                      <p className="text-xl font-extrabold" style={tk.textPrimary}>
+                      <p className="text-[10px] line-through" style={tk.textMuted}>${Math.round(dest.price * 1.25)}</p>
+                      <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>
                         ${dest.price}
-                        <span className="text-xs font-normal" style={tk.textMuted}> /person</span>
                       </p>
+                      <p className="text-[10px]" style={tk.textMuted}>per person · taxes incl.</p>
                     </div>
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" style={{ color: accent }} />
                   </div>
@@ -296,7 +295,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ VEHICLE LISTINGS ═══════════════ */}
-      <section ref={vehiclesRef} className="py-16 scroll-mt-8" style={tk.surfaceAlt}>
+      <section ref={vehiclesRef} className="py-10 scroll-mt-8" style={tk.surfaceAlt}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
@@ -310,11 +309,10 @@ const StorefrontHome = () => {
             </motion.div>
           )}
 
-          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+          <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <p className="editorial-eyebrow mb-3" style={{ color: accent }}>The fleet</p>
-              <h2 className="font-editorial text-3xl md:text-4xl lg:text-5xl" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
-              <p className="text-sm mt-3" style={tk.textMuted}>{filteredVehicles.length} vehicle{filteredVehicles.length !== 1 ? 's' : ''} available now.</p>
+              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
+              <p className="text-sm mt-1" style={tk.textMuted}><span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
             </div>
           </div>
 
