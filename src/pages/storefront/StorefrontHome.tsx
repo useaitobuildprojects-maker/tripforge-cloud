@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, Star, ChevronRight, Car, Building, Users, Briefcase,
   Fuel, Settings2, Navigation, Globe, Heart, ShieldCheck, BadgePercent,
-  HeadphonesIcon, ArrowRight, Tag, Plane,
+  HeadphonesIcon, ArrowRight, Plane,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
