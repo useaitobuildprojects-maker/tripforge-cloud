@@ -222,6 +222,31 @@ const StorefrontHome = () => {
                     />
                   </PopoverContent>
                 </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                      <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Passengers</p>
+                        <p className="text-sm truncate" style={tk.textPrimary}>
+                          {passengers} {passengers === 1 ? 'passenger' : 'passengers'}
+                        </p>
+                      </div>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-3 rounded-md border border-[#e5e7eb] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)]" align="start">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-medium" style={tk.textPrimary}>Passengers</span>
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => setPassengers(p => Math.max(1, p - 1))}
+                          className="h-8 w-8 rounded-md border border-border hover:bg-muted text-base font-bold">−</button>
+                        <span className="w-6 text-center text-sm font-semibold" style={tk.textPrimary}>{passengers}</span>
+                        <button type="button" onClick={() => setPassengers(p => Math.min(20, p + 1))}
+                          className="h-8 w-8 rounded-md border border-border hover:bg-muted text-base font-bold">+</button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <div className="sm:col-span-2 md:col-span-2 flex items-center justify-center">
                   <button
                     className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
