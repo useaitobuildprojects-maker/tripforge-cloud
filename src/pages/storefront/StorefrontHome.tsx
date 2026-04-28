@@ -57,6 +57,7 @@ const StorefrontHome = () => {
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
+  const [passengers, setPassengers] = useState<number>(1);
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
