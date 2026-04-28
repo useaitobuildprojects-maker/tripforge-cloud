@@ -87,15 +87,15 @@ const StorefrontServiceDetail = () => {
             <Link to={`/agency/${slug}/services`} className={`inline-flex items-center gap-1 text-sm mb-4 opacity-70 hover:opacity-100 transition-opacity ${ts.heroSubtitleClass}`} style={ts.heroSubtitleStyle}>
               <ChevronLeft className="h-4 w-4" /> All Services
             </Link>
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-4 mb-5">
               <div className="h-14 w-14 rounded-2xl flex items-center justify-center bg-white/10">
                 <Icon className="h-7 w-7" style={{ ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : ts.heroTitleStyle) }} />
               </div>
-              <h1 className={`text-3xl md:text-4xl font-bold ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
+              <h1 className={`font-editorial text-4xl md:text-5xl lg:text-6xl ${ts.heroTitleClass}`} style={{ ...ts.heroTitleStyle, ...(cfg.hero_text_color ? { color: cfg.hero_text_color } : {}) }}>
                 {heroText.title}
               </h1>
             </div>
-            <p className={`text-sm md:text-base max-w-xl ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
+            <p className={`text-base md:text-lg max-w-xl font-light leading-relaxed ${ts.heroSubtitleClass}`} style={{ ...ts.heroSubtitleStyle, ...(cfg.hero_subtitle_color ? { color: cfg.hero_subtitle_color } : {}) }}>
               {heroText.subtitle}
             </p>
           </motion.div>
@@ -104,7 +104,8 @@ const StorefrontServiceDetail = () => {
 
       {/* Features */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-2xl font-bold mb-8" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>What's Included</h2>
+        <p className="editorial-eyebrow mb-3 text-foreground/60">Included</p>
+        <h2 className="font-editorial text-3xl md:text-4xl mb-10" style={cfg.heading_color ? { color: cfg.heading_color } : undefined}>What's included</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
