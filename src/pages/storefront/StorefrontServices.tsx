@@ -44,7 +44,7 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Expert local guides', 'Half-day & full-day', 'Popular landmarks', 'Flexible schedules'],
 };
 
-const serifFont = { fontFamily: "'Inter', system-ui, sans-serif", fontWeight: 800, letterSpacing: '-0.02em' };
+const serifFont = { fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 600, letterSpacing: '-0.015em' };
 
 const StorefrontServices = () => {
   const { slug } = useParams();
@@ -70,11 +70,11 @@ const StorefrontServices = () => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '340px' }}>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <p className="text-xs font-semibold tracking-[0.25em] uppercase mb-4" style={{ color: accent }}>What We Offer</p>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-5" style={{ ...serifFont, ...tk.textOnDeep }}>
+            <p className="editorial-eyebrow mb-5 mx-auto" style={{ color: accent }}>What we offer</p>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6" style={{ ...serifFont, ...tk.textOnDeep }}>
               {cfg.services_title || 'Our Services'}
             </h1>
-            <p className="max-w-xl mx-auto text-base leading-relaxed" style={tk.textOnDeepMuted}>
+            <p className="max-w-xl mx-auto text-base md:text-lg leading-relaxed font-light" style={tk.textOnDeepMuted}>
               {cfg.services_subtitle || `Premium travel services designed around your comfort and convenience in ${agency.city}.`}
             </p>
           </motion.div>
