@@ -27,6 +27,7 @@ interface LocationAutocompleteProps {
   locations: LocationOption[];
   agencyCity: string;
   agencyCountry?: string;
+  accentColor?: string;
 }
 
 interface GooglePlaceSuggestion {
@@ -49,7 +50,7 @@ function detectTypeFromGoogle(types: string[]): LocationOption['type'] {
 
 const TYPE_ICONS: Record<string, React.ElementType> = { station: MapPin, airport: Plane, city: Building2, hotel_zone: MapPin };
 
-const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry }: LocationAutocompleteProps) => {
+const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location', locations, agencyCity, agencyCountry, accentColor = '#0f172a' }: LocationAutocompleteProps) => {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(value);
   const [searchResults, setSearchResults] = useState<LocationOption[]>([]);
@@ -247,7 +248,8 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
               return (
                 <div key={groupKey}>
                   {showDivider && <div className="h-px bg-[#eef0f3] mx-4" />}
-                  <div className="px-4 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#94a3b8] flex items-center gap-2">
+                  <div className="px-4 pt-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] flex items-center gap-2" style={{ color: accentColor }}>
+                    <span className="inline-block h-1 w-1 rounded-full" style={{ backgroundColor: accentColor }} />
                     <span>{labels[groupKey]}</span>
                     <span className="flex-1 h-px bg-[#f1f3f6]" />
                   </div>
@@ -257,19 +259,23 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
                       <button
                         key={loc.id}
                         onClick={() => handleSelect(loc)}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f7f9fc] transition-all text-left group border-l-2 border-transparent hover:border-l-[#0f172a]"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#f7f9fc] transition-all text-left group border-l-2 border-transparent"
+                        onMouseEnter={(e) => { e.currentTarget.style.borderLeftColor = accentColor; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderLeftColor = 'transparent'; }}
                       >
                         <span className="h-9 w-9 rounded-md bg-[#f4f6fa] flex items-center justify-center shrink-0 group-hover:bg-white group-hover:shadow-[0_2px_8px_rgba(15,23,42,0.08)] group-hover:ring-1 group-hover:ring-[#e5e7eb] transition-all">
-                          <Icon className="h-4 w-4 text-[#0f172a]" />
+                          <Icon className="h-4 w-4" style={{ color: accentColor }} />
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <div className="text-sm font-semibold text-[#0f172a] truncate">{loc.name}</div>
-                            <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#f1f5f9] text-[#64748b] shrink-0">{typeLabel(loc.type)}</span>
+                            <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0" style={{ backgroundColor: `${accentColor}14`, color: accentColor }}>{typeLabel(loc.type)}</span>
                           </div>
                           {loc.address && <div className="text-xs text-[#64748b] truncate mt-0.5">{loc.address}</div>}
                         </div>
-                        <span className="text-[#cbd5e1] group-hover:text-[#0f172a] transition-colors shrink-0 text-xs">→</span>
+                        <span className="text-[#cbd5e1] transition-colors shrink-0 text-xs group-hover:font-bold" style={{}}>
+                          <span className="inline-block transition-transform group-hover:translate-x-0.5" style={{ color: 'inherit' }}>→</span>
+                        </span>
                       </button>
                     );
                   })}
@@ -278,7 +284,7 @@ const LocationAutocomplete = ({ value, onChange, placeholder = 'Enter location',
             })}
             <div className="px-4 py-2 border-t border-[#f1f3f6] bg-[#fafbfc] text-[10px] text-[#94a3b8] flex items-center justify-between">
               <span>Powered by Google Places</span>
-              <span className="font-medium">{allResults.length} result{allResults.length !== 1 ? 's' : ''}</span>
+              <span className="font-semibold" style={{ color: accentColor }}>{allResults.length} result{allResults.length !== 1 ? 's' : ''}</span>
             </div>
           </motion.div>
         )}
