@@ -182,7 +182,7 @@ const StorefrontLayout = () => {
               {agency.logo_url ? (
                 <img src={agency.logo_url} alt="" className="h-9 w-auto object-contain mb-4" />
               ) : (
-                <h3 className="text-xl mb-4" style={logoTextStyle}>{agency.name}</h3>
+                <h3 className="text-2xl mb-4" style={logoTextStyle}>{agency.name}</h3>
               )}
               <p className="text-sm leading-relaxed mb-5 max-w-xs" style={tk.textMuted}>
                 Book vehicles, transfers and experiences in {agency.city} with confidence.
