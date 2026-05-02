@@ -46,7 +46,7 @@ const TemplateMiniPreview = ({ template, selected }: { template: typeof STOREFRO
 
 const TemplatePicker = ({ value, onChange }: TemplatePickerProps) => {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
       {STOREFRONT_TEMPLATES.map((template) => {
         const selected = value === template.id;
         return (

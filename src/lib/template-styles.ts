@@ -194,6 +194,18 @@ const blacklanePalette: TemplatePalette = {
   brand: '#0066ff', brandDeep: '#000000', brandSoftBg: 'rgba(0,102,255,0.12)',
   cta: '#0066ff', ctaHover: '#0052cc', ctaText: '#ffffff', onBrandDeep: '#ffffff',
 };
+const sunsetPalette: TemplatePalette = {
+  brand: '#f97316', brandDeep: '#7c2d12', brandSoftBg: '#ffedd5',
+  cta: '#f97316', ctaHover: '#ea580c', ctaText: '#ffffff', onBrandDeep: '#fff7ed',
+};
+const forestPalette: TemplatePalette = {
+  brand: '#059669', brandDeep: '#064e3b', brandSoftBg: '#d1fae5',
+  cta: '#059669', ctaHover: '#047857', ctaText: '#ffffff', onBrandDeep: '#ecfdf5',
+};
+const midnightPalette: TemplatePalette = {
+  brand: '#a855f7', brandDeep: '#0f0a24', brandSoftBg: 'rgba(168,85,247,0.14)',
+  cta: '#a855f7', ctaHover: '#9333ea', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
 
 const classicStyles = makeLightTemplate(classicPalette, {
   sectionAltStyle: { backgroundColor: '#f9fafb' },
@@ -221,6 +233,53 @@ const coastalStyles = makeLightTemplate(coastalPalette, {
   bodyStyle: { backgroundColor: '#f0f9ff' },
   sectionAltStyle: { backgroundColor: '#e0f2fe' },
 });
+const sunsetStyles = makeLightTemplate(sunsetPalette, {
+  bodyStyle: { backgroundColor: '#fff7ed' },
+  sectionAltStyle: { backgroundColor: '#ffedd5' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #7c2d12 0%, #f97316 100%)' },
+});
+const forestStyles = makeLightTemplate(forestPalette, {
+  bodyStyle: { backgroundColor: '#f7faf7' },
+  sectionAltStyle: { backgroundColor: '#ecfdf5' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)' },
+});
+
+const midnightStyles: TemplateStyles = {
+  headerClass: 'border-b',
+  headerStyle: { backgroundColor: '#0f0a24', borderColor: 'rgba(168,85,247,0.18)', color: '#ffffff' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#0a0719', borderColor: 'rgba(168,85,247,0.18)', color: '#ffffff' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#0f0a24', color: '#ffffff' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#1a103a' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #1a103a 0%, #4c1d95 60%, #a855f7 100%)' },
+  heroTitleClass: 'tracking-tight',
+  heroTitleStyle: { color: '#ffffff' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: 'rgba(255,255,255,0.78)' },
+  cardClass: 'rounded-2xl',
+  cardStyle: { backgroundColor: '#1c1640', borderWidth: '1px', borderColor: 'rgba(168,85,247,0.18)', color: '#ffffff' },
+  cardHoverClass: 'hover:border-purple-400/40',
+  sectionAltClass: '',
+  sectionAltStyle: { backgroundColor: '#15102e' },
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'rounded-2xl',
+  testimonialHighlightStyle: { backgroundColor: '#a855f7', color: '#ffffff', borderColor: '#a855f7' },
+  testimonialNormalClass: 'rounded-2xl',
+  testimonialNormalStyle: { backgroundColor: '#1c1640', borderColor: 'rgba(168,85,247,0.18)', color: '#ffffff' },
+  searchBarClass: 'rounded-2xl shadow-2xl',
+  searchBarStyle: { backgroundColor: 'rgba(28,22,64,0.92)', borderWidth: '1px', borderColor: 'rgba(168,85,247,0.25)', backdropFilter: 'blur(12px)' },
+  iconBgClass: '',
+  iconBgStyle: { backgroundColor: 'rgba(168,85,247,0.16)', color: '#c084fc' },
+  subHeroClass: '',
+  isDark: true,
+  surfaceFill: '#0f0a24',
+  surfaceDeepFill: '#1a103a',
+  tokens: darkTokens,
+  palette: midnightPalette,
+};
 
 const blacklaneStyles: TemplateStyles = {
   headerClass: 'border-b',
@@ -267,6 +326,9 @@ const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
   fresh: freshStyles,
   coastal: coastalStyles,
   blacklane: blacklaneStyles,
+  sunset: sunsetStyles,
+  forest: forestStyles,
+  midnight: midnightStyles,
 };
 
 export const getTemplateStyles = (template: StorefrontTemplate): TemplateStyles => {
