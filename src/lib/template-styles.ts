@@ -37,6 +37,28 @@ export interface TemplatePalette {
   onBrandDeep: string;
 }
 
+/** Per-template typography pairing. Loaded globally via Google Fonts in index.html. */
+export interface TemplateTypography {
+  /** Font stack for hero / page headings. */
+  heading: string;
+  /** Font stack for body copy. */
+  body: string;
+  /** Tailwind class applied to the hero <h1> for case / weight / italic flavor. */
+  headingClass: string;
+}
+
+/** Per-template shape language (radius + button feel). */
+export interface TemplateShape {
+  /** CSS radius for hero search bar, cards, modals. */
+  cardRadius: string;
+  /** CSS radius for buttons & input chips. */
+  buttonRadius: string;
+  /** Card shadow style. */
+  cardShadow: string;
+  /** Border weight on cards (e.g. '1px' or '2px'). */
+  borderWidth: string;
+}
+
 /** Expedia-inspired accent palette — bright blue brand + yellow CTA. */
 export const expediaPalette = {
   // Booking.com-inspired palette — deep navy-blue header & links, yellow conversion CTA
@@ -88,6 +110,10 @@ export interface TemplateStyles {
   tokens: SurfaceTokens;
   /** Accent palette driving header / hero / CTA colors. */
   palette: TemplatePalette;
+  /** Font pairing for headings & body. */
+  typography: TemplateTypography;
+  /** Card / button radius & shadow language. */
+  shape: TemplateShape;
 }
 
 // ─────────────────────────────────────────────────────────────────
