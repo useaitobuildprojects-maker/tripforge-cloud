@@ -8,7 +8,17 @@ export type StorefrontTemplate =
   | 'blacklane'
   | 'sunset'
   | 'forest'
-  | 'midnight';
+  | 'midnight'
+  | 'monochrome'
+  | 'rosegold'
+  | 'desert'
+  | 'arctic'
+  | 'royal'
+  | 'cyberpunk'
+  | 'vintage'
+  | 'lavender'
+  | 'noir'
+  | 'tropical';
 
 export interface TemplateConfig {
   id: StorefrontTemplate;
@@ -153,6 +163,136 @@ export const STOREFRONT_TEMPLATES: TemplateConfig[] = [
       cardBg: '#1c1640',
       accent: '#a855f7',
       bodyBg: '#0f0a24',
+    },
+  },
+  {
+    id: 'monochrome',
+    name: 'Monochrome',
+    description: 'Pure black & white editorial design with razor-sharp typography',
+    preview: {
+      headerBg: '#ffffff',
+      heroBg: '#000000',
+      heroText: '#ffffff',
+      cardBg: '#ffffff',
+      accent: '#000000',
+      bodyBg: '#ffffff',
+    },
+  },
+  {
+    id: 'rosegold',
+    name: 'Rose Gold',
+    description: 'Soft blush pinks with metallic rose gold accents — feminine luxury',
+    preview: {
+      headerBg: '#fdf2f8',
+      heroBg: '#831843',
+      heroText: '#fdf2f8',
+      cardBg: '#ffffff',
+      accent: '#e11d48',
+      bodyBg: '#fff1f2',
+    },
+  },
+  {
+    id: 'desert',
+    name: 'Desert',
+    description: 'Warm terracotta and sand tones inspired by Moroccan riads',
+    preview: {
+      headerBg: '#fef3c7',
+      heroBg: '#92400e',
+      heroText: '#fffbeb',
+      cardBg: '#fffbeb',
+      accent: '#d97706',
+      bodyBg: '#fffbeb',
+    },
+  },
+  {
+    id: 'arctic',
+    name: 'Arctic',
+    description: 'Crisp icy blues and pristine whites — clean Scandinavian minimalism',
+    preview: {
+      headerBg: '#ffffff',
+      heroBg: '#e0f2fe',
+      heroText: '#0c4a6e',
+      cardBg: '#ffffff',
+      accent: '#06b6d4',
+      bodyBg: '#f0f9ff',
+    },
+  },
+  {
+    id: 'royal',
+    name: 'Royal',
+    description: 'Deep regal purple with gold accents — opulent palace aesthetic',
+    preview: {
+      headerBg: '#3b0764',
+      heroBg: '#3b0764',
+      heroText: '#fef3c7',
+      cardBg: '#ffffff',
+      accent: '#eab308',
+      bodyBg: '#faf5ff',
+    },
+  },
+  {
+    id: 'cyberpunk',
+    name: 'Cyberpunk',
+    description: 'Neon magenta and electric cyan on jet black — futuristic tech aesthetic',
+    preview: {
+      headerBg: '#0a0014',
+      heroBg: '#0a0014',
+      heroText: '#f0abfc',
+      cardBg: '#170028',
+      accent: '#ec4899',
+      bodyBg: '#0a0014',
+    },
+  },
+  {
+    id: 'vintage',
+    name: 'Vintage',
+    description: 'Aged paper cream with deep burgundy — old-world travel poster charm',
+    preview: {
+      headerBg: '#fef6e4',
+      heroBg: '#7f1d1d',
+      heroText: '#fef6e4',
+      cardBg: '#fef6e4',
+      accent: '#991b1b',
+      bodyBg: '#fbf5e6',
+    },
+  },
+  {
+    id: 'lavender',
+    name: 'Lavender',
+    description: 'Soft lavender and lilac pastels for a calming, gentle ambience',
+    preview: {
+      headerBg: '#faf5ff',
+      heroBg: '#6b21a8',
+      heroText: '#faf5ff',
+      cardBg: '#ffffff',
+      accent: '#8b5cf6',
+      bodyBg: '#faf5ff',
+    },
+  },
+  {
+    id: 'noir',
+    name: 'Noir',
+    description: 'Deep charcoal with crimson red — moody film-noir cinematic feel',
+    preview: {
+      headerBg: '#18181b',
+      heroBg: '#09090b',
+      heroText: '#fafafa',
+      cardBg: '#27272a',
+      accent: '#dc2626',
+      bodyBg: '#18181b',
+    },
+  },
+  {
+    id: 'tropical',
+    name: 'Tropical',
+    description: 'Vibrant teal and sunny yellow — Caribbean island vacation vibes',
+    preview: {
+      headerBg: '#ffffff',
+      heroBg: '#115e59',
+      heroText: '#ecfeff',
+      cardBg: '#ffffff',
+      accent: '#14b8a6',
+      bodyBg: '#f0fdfa',
     },
   },
 ];

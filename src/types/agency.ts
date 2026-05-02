@@ -11,7 +11,17 @@ export type StorefrontTemplate =
   | 'blacklane'
   | 'sunset'
   | 'forest'
-  | 'midnight';
+  | 'midnight'
+  | 'monochrome'
+  | 'rosegold'
+  | 'desert'
+  | 'arctic'
+  | 'royal'
+  | 'cyberpunk'
+  | 'vintage'
+  | 'lavender'
+  | 'noir'
+  | 'tropical';
 export type StorefrontFont = 'sans' | 'serif' | 'modern' | 'rounded';
 
 export interface StorefrontConfig {
