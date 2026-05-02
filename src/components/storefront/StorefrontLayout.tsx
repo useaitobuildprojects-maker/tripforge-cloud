@@ -49,7 +49,8 @@ const StorefrontLayout = () => {
 
   const ts = getTemplateStyles(agency.storefront_template);
   const tk = ts.tokens;
-  const btnColor = agency.button_color ?? '#1a3a4a';
+  // Use the template's CTA as default; allow per-agency override.
+  const btnColor = agency.button_color ?? ts.palette.cta;
   // For dark templates (e.g. blacklane), ignore any legacy light background_color so the theme actually applies.
   const bgColor = ts.isDark ? undefined : (agency.background_color ?? undefined);
   const cfg = agency.storefront_config ?? {};
@@ -65,7 +66,7 @@ const StorefrontLayout = () => {
   // template (Classic, Minimal, Elegant, Corporate, Fresh, Coastal, Blacklane)
   // visually distinguishes itself.
   const pal = ts.palette;
-  const accent = pal.brand;
+  const accent = btnColor;
   const headerBg = pal.brandDeep;
   const headerText = pal.onBrandDeep;
   const headerTextMuted = 'rgba(255,255,255,0.75)';

@@ -15,6 +15,7 @@ import PageContentEditor from '@/components/agency-admin/PageContentEditor';
 import ServicePricingEditor from '@/components/agency-admin/ServicePricingEditor';
 import { COUNTRY_LIST } from '@/lib/country-utils';
 import { getCitiesForCountry } from '@/data/city-database';
+import { getTemplateStyles } from '@/lib/template-styles';
 
 const serviceOptions: ServiceType[] = ['car_rental', 'apartment', 'transfer', 'limo_tour', 'city_tour'];
 const seoPages: StorefrontPage[] = ['home', 'fleet', 'contact', 'about'];
@@ -83,7 +84,9 @@ const AgencyAdminSettings = () => {
     }
   };
   const [selectedTemplate, setSelectedTemplate] = useState<StorefrontTemplate>(agency.storefront_template ?? 'classic');
-  const [buttonColor, setButtonColor] = useState(agency.button_color ?? '#c8a951');
+  const [buttonColor, setButtonColor] = useState(
+    agency.button_color ?? getTemplateStyles(agency.storefront_template ?? 'classic').palette.cta
+  );
   const [bgColor, setBgColor] = useState(agency.background_color ?? '#ffffff');
   const [storefrontConfig, setStorefrontConfig] = useState<StorefrontConfig>(agency.storefront_config ?? {});
   
@@ -223,7 +226,15 @@ const AgencyAdminSettings = () => {
           <h2 className="text-lg font-display font-bold text-foreground">Storefront Template</h2>
           <p className="text-sm text-muted-foreground mt-1">Choose a design template for your public website</p>
         </div>
-        <TemplatePicker value={selectedTemplate} onChange={setSelectedTemplate} />
+        <TemplatePicker
+          value={selectedTemplate}
+          onChange={(tpl) => {
+            setSelectedTemplate(tpl);
+            // Sync the button color to the new template's CTA so each theme
+            // gets its own coherent color by default.
+            setButtonColor(getTemplateStyles(tpl).palette.cta);
+          }}
+        />
 
         {/* Color Customization */}
         <div className="pt-4 border-t border-border space-y-4">

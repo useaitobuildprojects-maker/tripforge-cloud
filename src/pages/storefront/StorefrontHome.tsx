@@ -93,8 +93,8 @@ const StorefrontHome = () => {
   // Pull colors from the active template's palette so switching templates
   // visually changes hero / CTA / accent treatments across the storefront.
   const EXP = ts.palette;
-  const accent = EXP.brand;
-  const ctaBg = EXP.cta;
+  const accent = buttonColor || EXP.brand;
+  const ctaBg = buttonColor || EXP.cta;
   const ctaTextColor = EXP.ctaText;
   const typo = ts.typography;
   const shape = ts.shape;
