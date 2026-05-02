@@ -117,23 +117,24 @@ export interface TemplateStyles {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// LIGHT defaults (classic / minimal / fresh / coastal / corporate / elegant)
+// LIGHT defaults — surfaceDeep is palette-driven so each template's
+// hero/CTA bands match its brand color (not a global Booking blue).
 // ─────────────────────────────────────────────────────────────────
-const lightTokens: SurfaceTokens = {
+const makeLightTokens = (palette: TemplatePalette): SurfaceTokens => ({
   surface: { backgroundColor: '#ffffff' },
   surfaceAlt: { backgroundColor: '#f7f9fc' },
-  surfaceDeep: { backgroundColor: expediaPalette.brandDeep, color: '#ffffff' },
+  surfaceDeep: { backgroundColor: palette.brandDeep, color: palette.onBrandDeep },
   textPrimary: { color: '#111827' },
   textBody: { color: '#4b5563' },
   textMuted: { color: '#6b7280' },
   textFaint: { color: '#d1d5db' },
-  textOnDeep: { color: '#ffffff' },
+  textOnDeep: { color: palette.onBrandDeep },
   textOnDeepMuted: { color: 'rgba(255,255,255,0.75)' },
   border: { borderColor: '#e5e7eb' },
   divider: { backgroundColor: '#e5e7eb' },
   inputSurface: { backgroundColor: '#ffffff' },
   inputBorder: { borderColor: '#d1d5db' },
-};
+});
 
 // ─────────────────────────────────────────────────────────────────
 // DARK tokens (blacklane)
