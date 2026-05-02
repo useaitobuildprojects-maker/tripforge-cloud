@@ -1,4 +1,14 @@
-export type StorefrontTemplate = 'classic' | 'minimal' | 'elegant' | 'corporate' | 'fresh' | 'coastal' | 'blacklane';
+export type StorefrontTemplate =
+  | 'classic'
+  | 'minimal'
+  | 'elegant'
+  | 'corporate'
+  | 'fresh'
+  | 'coastal'
+  | 'blacklane'
+  | 'sunset'
+  | 'forest'
+  | 'midnight';
 
 export interface TemplateConfig {
   id: StorefrontTemplate;
@@ -104,6 +114,45 @@ export const STOREFRONT_TEMPLATES: TemplateConfig[] = [
       cardBg: '#141414',
       accent: '#0066ff',
       bodyBg: '#0a0a0a',
+    },
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    description: 'Warm coral and amber palette evoking golden-hour Mediterranean coastlines',
+    preview: {
+      headerBg: '#7c2d12',
+      heroBg: '#7c2d12',
+      heroText: '#fff7ed',
+      cardBg: '#ffffff',
+      accent: '#f97316',
+      bodyBg: '#fff7ed',
+    },
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    description: 'Deep emerald and warm cream tones for an organic, nature-inspired retreat feel',
+    preview: {
+      headerBg: '#064e3b',
+      heroBg: '#064e3b',
+      heroText: '#ecfdf5',
+      cardBg: '#ffffff',
+      accent: '#059669',
+      bodyBg: '#f7faf7',
+    },
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    description: 'Dark indigo and violet aesthetic with vibrant purple accents — premium nightlife & VIP feel',
+    preview: {
+      headerBg: '#0f0a24',
+      heroBg: '#1a103a',
+      heroText: '#ffffff',
+      cardBg: '#1c1640',
+      accent: '#a855f7',
+      bodyBg: '#0f0a24',
     },
   },
 ];
