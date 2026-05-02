@@ -1,15 +1,14 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { Agency, SERVICE_LABELS, ServiceType, StorefrontPage, PAGE_LABELS, PageSeo, PageSeoEntry, StorefrontTemplate, StorefrontConfig } from '@/types/agency';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUpdateAgency } from '@/hooks/use-agency-mutations';
 import { useAgencyImageUpload } from '@/hooks/use-agency-image-upload';
-import { Upload, Image } from 'lucide-react';
+import { Upload, Image, Check, Loader2 } from 'lucide-react';
 import TemplatePicker from '@/components/agency-admin/TemplatePicker';
 import StorefrontConfigEditor from '@/components/agency-admin/StorefrontConfigEditor';
 import PageContentEditor from '@/components/agency-admin/PageContentEditor';
@@ -169,14 +168,48 @@ const AgencyAdminSettings = () => {
     });
   };
 
+  // Auto-save: debounce changes and persist automatically
+  const isFirstRun = useRef(true);
+  useEffect(() => {
+    if (isFirstRun.current) {
+      isFirstRun.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      handleSave().catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    form,
+    pageSeo,
+    selectedTemplate,
+    buttonColor,
+    bgColor,
+    storefrontConfig,
+    commissionRate,
+    oneWayFee,
+  ]);
+
   return (
     <div className="space-y-8 max-w-[800px]">
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-        <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">Configuration</p>
-        <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1.5 font-light">
-          Manage your agency profile and storefront settings
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">Configuration</p>
+            <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">Settings</h1>
+            <p className="text-sm text-muted-foreground mt-1.5 font-light">
+              Changes are saved automatically
+            </p>
+          </div>
+          <div className="text-xs text-muted-foreground flex items-center gap-2 mt-2">
+            {updateAgency.isPending ? (
+              <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Saving…</>
+            ) : (
+              <><Check className="h-3.5 w-3.5 text-accent" /> Saved</>
+            )}
+          </div>
+        </div>
       </motion.div>
 
       {/* Storefront Template */}
@@ -507,15 +540,6 @@ const AgencyAdminSettings = () => {
         </div>
       </motion.div>
 
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={updateAgency.isPending}
-          className="gradient-accent text-accent-foreground rounded-xl font-semibold px-8"
-        >
-          {updateAgency.isPending ? 'Saving...' : 'Save Changes'}
-        </Button>
-      </div>
     </div>
   );
 };
