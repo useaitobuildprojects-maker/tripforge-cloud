@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays, Sparkles } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,20 @@ import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
 import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
 import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+const DUMMY_VEHICLES = [
+  { brand: 'Mercedes-Benz', model: 'S-Class', year: 2023, license_plate: 'AB-100-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.45, daily_rate_base: 180, free_km_per_day: 250, status: 'available', photo_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800' },
+  { brand: 'BMW', model: '5 Series', year: 2023, license_plate: 'AB-101-CD', category: 'sedan', transmission: 'automatic', seats: 5, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.35, daily_rate_base: 120, free_km_per_day: 250, status: 'available', photo_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800' },
+  { brand: 'Audi', model: 'Q7', year: 2022, license_plate: 'AB-102-CD', category: 'suv', transmission: 'automatic', seats: 7, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'limited', price_per_km: 0.40, daily_rate_base: 150, free_km_per_day: 200, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800' },
+  { brand: 'Volkswagen', model: 'Golf', year: 2024, license_plate: 'AB-103-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.22, daily_rate_base: 55, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=800' },
+  { brand: 'Tesla', model: 'Model 3', year: 2024, license_plate: 'AB-104-CD', category: 'electric', transmission: 'automatic', seats: 5, fuel_type: 'electric', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.30, daily_rate_base: 110, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800' },
+  { brand: 'Renault', model: 'Clio', year: 2023, license_plate: 'AB-105-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.18, daily_rate_base: 38, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800' },
+  { brand: 'Porsche', model: 'Cayenne', year: 2023, license_plate: 'AB-106-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'limited', price_per_km: 0.55, daily_rate_base: 240, free_km_per_day: 200, status: 'maintenance', photo_url: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800' },
+  { brand: 'Fiat', model: '500', year: 2024, license_plate: 'AB-107-CD', category: 'hatchback', transmission: 'manual', seats: 4, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.20, daily_rate_base: 32, free_km_per_day: 300, status: 'rented', photo_url: 'https://images.unsplash.com/photo-1583267826935-bcb371fbc0f9?w=800' },
+];
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -23,6 +37,23 @@ const AgencyAdminVehicles = () => {
   const [search, setSearch] = useState('');
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [pricingVehicle, setPricingVehicle] = useState<Vehicle | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const qc = useQueryClient();
+
+  const handleSeed = async () => {
+    setSeeding(true);
+    try {
+      const rows = DUMMY_VEHICLES.map(v => ({ ...v, agency_id: agency.id }));
+      const { error } = await supabase.from('vehicles').insert(rows);
+      if (error) throw error;
+      toast.success(`Added ${rows.length} dummy vehicles`);
+      qc.invalidateQueries({ queryKey: ['vehicles', agency.id] });
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
 
   const filtered = vehicles.filter((v) =>
@@ -38,7 +69,13 @@ const AgencyAdminVehicles = () => {
           <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">Vehicles</h1>
           <p className="text-sm text-muted-foreground mt-1.5 font-light">Manage your car fleet and availability</p>
         </div>
-        <CreateVehicleDialog agencyId={agency.id} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleSeed} disabled={seeding} className="gap-2 rounded-xl">
+            <Sparkles className="h-4 w-4" />
+            {seeding ? 'Seeding...' : 'Seed dummy vehicles'}
+          </Button>
+          <CreateVehicleDialog agencyId={agency.id} />
+        </div>
       </motion.div>
 
       {/* Search */}
