@@ -250,6 +250,46 @@ const midnightPalette: TemplatePalette = {
   brand: '#a855f7', brandDeep: '#0f0a24', brandSoftBg: 'rgba(168,85,247,0.14)',
   cta: '#a855f7', ctaHover: '#9333ea', ctaText: '#ffffff', onBrandDeep: '#ffffff',
 };
+const monochromePalette: TemplatePalette = {
+  brand: '#000000', brandDeep: '#000000', brandSoftBg: '#f4f4f5',
+  cta: '#000000', ctaHover: '#27272a', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
+const rosegoldPalette: TemplatePalette = {
+  brand: '#e11d48', brandDeep: '#831843', brandSoftBg: '#ffe4e6',
+  cta: '#e11d48', ctaHover: '#be123c', ctaText: '#ffffff', onBrandDeep: '#fdf2f8',
+};
+const desertPalette: TemplatePalette = {
+  brand: '#d97706', brandDeep: '#92400e', brandSoftBg: '#fef3c7',
+  cta: '#d97706', ctaHover: '#b45309', ctaText: '#ffffff', onBrandDeep: '#fffbeb',
+};
+const arcticPalette: TemplatePalette = {
+  brand: '#06b6d4', brandDeep: '#0c4a6e', brandSoftBg: '#cffafe',
+  cta: '#06b6d4', ctaHover: '#0891b2', ctaText: '#ffffff', onBrandDeep: '#ecfeff',
+};
+const royalPalette: TemplatePalette = {
+  brand: '#eab308', brandDeep: '#3b0764', brandSoftBg: '#f3e8ff',
+  cta: '#eab308', ctaHover: '#ca8a04', ctaText: '#3b0764', onBrandDeep: '#fef3c7',
+};
+const cyberpunkPalette: TemplatePalette = {
+  brand: '#ec4899', brandDeep: '#0a0014', brandSoftBg: 'rgba(236,72,153,0.14)',
+  cta: '#ec4899', ctaHover: '#06b6d4', ctaText: '#ffffff', onBrandDeep: '#f0abfc',
+};
+const vintagePalette: TemplatePalette = {
+  brand: '#991b1b', brandDeep: '#7f1d1d', brandSoftBg: '#fee2e2',
+  cta: '#991b1b', ctaHover: '#7f1d1d', ctaText: '#fef6e4', onBrandDeep: '#fef6e4',
+};
+const lavenderPalette: TemplatePalette = {
+  brand: '#8b5cf6', brandDeep: '#6b21a8', brandSoftBg: '#ede9fe',
+  cta: '#8b5cf6', ctaHover: '#7c3aed', ctaText: '#ffffff', onBrandDeep: '#faf5ff',
+};
+const noirPalette: TemplatePalette = {
+  brand: '#dc2626', brandDeep: '#09090b', brandSoftBg: 'rgba(220,38,38,0.14)',
+  cta: '#dc2626', ctaHover: '#b91c1c', ctaText: '#ffffff', onBrandDeep: '#fafafa',
+};
+const tropicalPalette: TemplatePalette = {
+  brand: '#14b8a6', brandDeep: '#115e59', brandSoftBg: '#ccfbf1',
+  cta: '#facc15', ctaHover: '#eab308', ctaText: '#115e59', onBrandDeep: '#ecfeff',
+};
 
 const classicStyles = makeLightTemplate(classicPalette, {
   sectionAltStyle: { backgroundColor: '#f9fafb' },
@@ -360,6 +400,197 @@ const forestStyles = makeLightTemplate(forestPalette, {
   borderWidth: '1px',
 });
 
+const monochromeStyles = makeLightTemplate(monochromePalette, {
+  heroStyle: { backgroundColor: '#000000' },
+  heroOverlayStyle: { background: '#000000' },
+  heroTitleStyle: { color: '#ffffff' },
+  surfaceDeepFill: '#000000',
+  sectionAltStyle: { backgroundColor: '#fafafa' },
+}, {
+  heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-[-0.05em] font-black uppercase',
+}, {
+  cardRadius: '0', buttonRadius: '0',
+  cardShadow: 'none', borderWidth: '2px',
+});
+const rosegoldStyles = makeLightTemplate(rosegoldPalette, {
+  bodyStyle: { backgroundColor: '#fff1f2' },
+  sectionAltStyle: { backgroundColor: '#ffe4e6' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #831843 0%, #e11d48 100%)' },
+}, {
+  heading: '"Fraunces", "Playfair Display", Georgia, serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'italic font-medium tracking-tight',
+}, {
+  cardRadius: '1.5rem', buttonRadius: '9999px',
+  cardShadow: '0 8px 24px rgba(225,29,72,0.12)', borderWidth: '1px',
+});
+const desertStyles = makeLightTemplate(desertPalette, {
+  bodyStyle: { backgroundColor: '#fffbeb' },
+  sectionAltStyle: { backgroundColor: '#fef3c7' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #92400e 0%, #d97706 100%)' },
+}, {
+  heading: '"DM Serif Display", "Playfair Display", Georgia, serif',
+  body: '"Lora", Georgia, serif',
+  headingClass: 'tracking-tight font-normal',
+}, {
+  cardRadius: '0.5rem', buttonRadius: '0.25rem',
+  cardShadow: '0 6px 18px rgba(146,64,14,0.12)', borderWidth: '1px',
+});
+const arcticStyles = makeLightTemplate(arcticPalette, {
+  bodyStyle: { backgroundColor: '#f0f9ff' },
+  sectionAltStyle: { backgroundColor: '#e0f2fe' },
+  heroStyle: { backgroundColor: '#e0f2fe' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #e0f2fe 0%, #cffafe 100%)' },
+  heroTitleStyle: { color: '#0c4a6e' },
+  heroSubtitleStyle: { color: '#0e7490' },
+  surfaceDeepFill: '#0c4a6e',
+}, {
+  heading: '"Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-[-0.03em] font-light',
+}, {
+  cardRadius: '0.75rem', buttonRadius: '0.5rem',
+  cardShadow: '0 2px 8px rgba(6,182,212,0.08)', borderWidth: '1px',
+});
+const royalStyles = makeLightTemplate(royalPalette, {
+  bodyStyle: { backgroundColor: '#faf5ff' },
+  sectionAltStyle: { backgroundColor: '#f3e8ff' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #3b0764 0%, #6b21a8 100%)' },
+}, {
+  heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+  body: '"Lora", Georgia, serif',
+  headingClass: 'italic font-semibold tracking-tight',
+}, {
+  cardRadius: '0.5rem', buttonRadius: '0.375rem',
+  cardShadow: '0 10px 30px rgba(59,7,100,0.18)', borderWidth: '1px',
+});
+const vintageStyles = makeLightTemplate(vintagePalette, {
+  bodyStyle: { backgroundColor: '#fbf5e6' },
+  sectionAltStyle: { backgroundColor: '#fef6e4' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)' },
+}, {
+  heading: '"Playfair Display", Georgia, serif',
+  body: '"Lora", Georgia, serif',
+  headingClass: 'tracking-tight font-bold uppercase',
+}, {
+  cardRadius: '0.125rem', buttonRadius: '0.125rem',
+  cardShadow: '0 4px 12px rgba(127,29,29,0.10)', borderWidth: '2px',
+});
+const lavenderStyles = makeLightTemplate(lavenderPalette, {
+  bodyStyle: { backgroundColor: '#faf5ff' },
+  sectionAltStyle: { backgroundColor: '#ede9fe' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%)' },
+}, {
+  heading: '"Poppins", "Inter", system-ui, sans-serif',
+  body: '"Poppins", "Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-semibold',
+}, {
+  cardRadius: '1.25rem', buttonRadius: '9999px',
+  cardShadow: '0 6px 20px rgba(139,92,246,0.12)', borderWidth: '1px',
+});
+const tropicalStyles = makeLightTemplate(tropicalPalette, {
+  bodyStyle: { backgroundColor: '#f0fdfa' },
+  sectionAltStyle: { backgroundColor: '#ccfbf1' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #115e59 0%, #14b8a6 70%, #facc15 100%)' },
+}, {
+  heading: '"Poppins", "Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-extrabold',
+}, {
+  cardRadius: '1rem', buttonRadius: '9999px',
+  cardShadow: '0 8px 22px rgba(20,184,166,0.15)', borderWidth: '1px',
+});
+
+const cyberpunkStyles: TemplateStyles = {
+  headerClass: 'border-b',
+  headerStyle: { backgroundColor: '#0a0014', borderColor: 'rgba(236,72,153,0.25)', color: '#f0abfc' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#0a0014', borderColor: 'rgba(236,72,153,0.25)', color: '#f0abfc' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#0a0014', color: '#f0abfc' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#0a0014' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #0a0014 0%, #581c87 50%, #ec4899 100%)' },
+  heroTitleClass: 'tracking-tight font-bold uppercase',
+  heroTitleStyle: { color: '#f0abfc', textShadow: '0 0 24px rgba(236,72,153,0.6)' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: '#67e8f9' },
+  cardClass: 'rounded-lg',
+  cardStyle: { backgroundColor: '#170028', borderWidth: '1px', borderColor: 'rgba(236,72,153,0.3)', color: '#f0abfc' },
+  cardHoverClass: 'hover:border-cyan-400/60',
+  sectionAltClass: '',
+  sectionAltStyle: { backgroundColor: '#120020' },
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'rounded-lg',
+  testimonialHighlightStyle: { backgroundColor: '#ec4899', color: '#ffffff', borderColor: '#06b6d4' },
+  testimonialNormalClass: 'rounded-lg',
+  testimonialNormalStyle: { backgroundColor: '#170028', borderColor: 'rgba(236,72,153,0.3)', color: '#f0abfc' },
+  searchBarClass: 'rounded-lg shadow-2xl',
+  searchBarStyle: { backgroundColor: 'rgba(23,0,40,0.92)', borderWidth: '1px', borderColor: 'rgba(6,182,212,0.4)', backdropFilter: 'blur(12px)' },
+  iconBgClass: '',
+  iconBgStyle: { backgroundColor: 'rgba(236,72,153,0.16)', color: '#06b6d4' },
+  subHeroClass: '',
+  isDark: true,
+  surfaceFill: '#0a0014',
+  surfaceDeepFill: '#0a0014',
+  tokens: darkTokens,
+  palette: cyberpunkPalette,
+  typography: {
+    heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
+    body: '"Space Grotesk", "Inter", system-ui, sans-serif',
+    headingClass: 'tracking-tight font-bold uppercase',
+  },
+  shape: { cardRadius: '0.5rem', buttonRadius: '0.25rem',
+    cardShadow: '0 0 24px rgba(236,72,153,0.25)', borderWidth: '1px' },
+};
+
+const noirStyles: TemplateStyles = {
+  headerClass: 'border-b',
+  headerStyle: { backgroundColor: '#18181b', borderColor: 'rgba(220,38,38,0.2)', color: '#fafafa' },
+  footerClass: 'border-t',
+  footerStyle: { backgroundColor: '#09090b', borderColor: 'rgba(220,38,38,0.2)', color: '#fafafa' },
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#18181b', color: '#fafafa' },
+  heroClass: '',
+  heroStyle: { backgroundColor: '#09090b' },
+  heroOverlayClass: '',
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #09090b 0%, #27272a 70%, #7f1d1d 100%)' },
+  heroTitleClass: 'font-serif italic tracking-tight',
+  heroTitleStyle: { color: '#fafafa' },
+  heroSubtitleClass: '',
+  heroSubtitleStyle: { color: 'rgba(250,250,250,0.7)' },
+  cardClass: 'rounded-md',
+  cardStyle: { backgroundColor: '#27272a', borderWidth: '1px', borderColor: 'rgba(255,255,255,0.08)', color: '#fafafa' },
+  cardHoverClass: 'hover:border-red-500/40',
+  sectionAltClass: '',
+  sectionAltStyle: { backgroundColor: '#1c1c1f' },
+  primaryBtnClass: '',
+  testimonialHighlightClass: 'rounded-md',
+  testimonialHighlightStyle: { backgroundColor: '#dc2626', color: '#ffffff', borderColor: '#dc2626' },
+  testimonialNormalClass: 'rounded-md',
+  testimonialNormalStyle: { backgroundColor: '#27272a', borderColor: 'rgba(255,255,255,0.08)', color: '#fafafa' },
+  searchBarClass: 'rounded-md shadow-2xl',
+  searchBarStyle: { backgroundColor: 'rgba(39,39,42,0.92)', borderWidth: '1px', borderColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)' },
+  iconBgClass: '',
+  iconBgStyle: { backgroundColor: 'rgba(220,38,38,0.14)', color: '#ef4444' },
+  subHeroClass: '',
+  isDark: true,
+  surfaceFill: '#18181b',
+  surfaceDeepFill: '#09090b',
+  tokens: darkTokens,
+  palette: noirPalette,
+  typography: {
+    heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+    body: '"Inter", system-ui, sans-serif',
+    headingClass: 'italic font-medium tracking-tight',
+  },
+  shape: { cardRadius: '0.375rem', buttonRadius: '0.25rem',
+    cardShadow: '0 12px 30px rgba(0,0,0,0.5)', borderWidth: '1px' },
+};
+
 const midnightStyles: TemplateStyles = {
   headerClass: 'border-b',
   headerStyle: { backgroundColor: '#0f0a24', borderColor: 'rgba(168,85,247,0.18)', color: '#ffffff' },
@@ -467,6 +698,16 @@ const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
   sunset: sunsetStyles,
   forest: forestStyles,
   midnight: midnightStyles,
+  monochrome: monochromeStyles,
+  rosegold: rosegoldStyles,
+  desert: desertStyles,
+  arctic: arcticStyles,
+  royal: royalStyles,
+  cyberpunk: cyberpunkStyles,
+  vintage: vintageStyles,
+  lavender: lavenderStyles,
+  noir: noirStyles,
+  tropical: tropicalStyles,
 };
 
 export const getTemplateStyles = (template: StorefrontTemplate): TemplateStyles => {
