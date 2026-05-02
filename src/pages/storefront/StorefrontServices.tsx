@@ -50,8 +50,8 @@ const StorefrontServices = () => {
   const tk = ts.tokens;
   const enabledServices = agency.services ?? [];
   const EXP = ts.palette;
-  const accent = EXP.brand;
-  const ctaBg = EXP.cta;
+  const accent = buttonColor || EXP.brand;
+  const ctaBg = buttonColor || EXP.cta;
   const ctaTextColor = EXP.ctaText;
   const headingFont: React.CSSProperties = { fontFamily: ts.typography.heading, letterSpacing: '-0.015em' };
 

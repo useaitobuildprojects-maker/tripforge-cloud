@@ -43,7 +43,7 @@ const StorefrontServiceDetail = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const EXP = ts.palette;
-  const accent = EXP.brand;
+  const accent = buttonColor || EXP.brand;
   const headingFont: React.CSSProperties = { fontFamily: ts.typography.heading, letterSpacing: '-0.015em' };
 
   const service = serviceType as ServiceType;

@@ -15,8 +15,8 @@ const StorefrontContact = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const EXP = ts.palette;
-  const accent = EXP.brand;
-  const ctaBg = EXP.cta;
+  const accent = buttonColor || EXP.brand;
+  const ctaBg = buttonColor || EXP.cta;
   const ctaTextColor = EXP.ctaText;
 
   const contactItems = [
