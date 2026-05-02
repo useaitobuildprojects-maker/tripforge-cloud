@@ -38,14 +38,13 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Half-day & full-day options', 'Local expert drivers', 'Popular landmarks', 'Flexible schedules', 'Private tours available'],
 };
 
-const headingFont = { fontFamily: 'var(--font-sans)', fontWeight: 800, letterSpacing: '-0.025em' };
-
 const StorefrontServiceDetail = () => {
   const { slug, serviceType } = useParams<{ slug: string; serviceType: string }>();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
+  const headingFont: React.CSSProperties = { fontFamily: ts.typography.heading, letterSpacing: '-0.015em' };
 
   const service = serviceType as ServiceType;
   const Icon = SERVICE_ICONS[service] ?? Car;

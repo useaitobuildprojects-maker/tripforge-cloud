@@ -13,8 +13,6 @@ import VehicleFilterSidebar, {
 } from '@/components/storefront/VehicleFilterSidebar';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 
-const headingFont = { fontFamily: 'var(--font-sans)', fontWeight: 800, letterSpacing: '-0.025em' };
-
 const StorefrontFleet = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } =
@@ -22,6 +20,7 @@ const StorefrontFleet = () => {
   const tk = ts.tokens;
   const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
+  const headingFont: React.CSSProperties = { fontFamily: ts.typography.heading, letterSpacing: '-0.015em' };
 
   const { data: vehicles = [], isLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);
 
