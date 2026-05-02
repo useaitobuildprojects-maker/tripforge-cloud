@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Car, Users, Fuel, Settings2, Briefcase, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { TemplateStyles } from "@/lib/template-styles";
 import { useMarketplaceVehicles, MarketplaceVehicle } from '@/hooks/use-marketplace-vehicles';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useState, useMemo } from 'react';
@@ -20,7 +20,7 @@ const StorefrontFleet = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } =
     useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
-  const EXP = expediaPalette;
+  const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
 
   const { data: vehicles = [], isLoading } = useMarketplaceVehicles(agency.id, agency.commission_rate);

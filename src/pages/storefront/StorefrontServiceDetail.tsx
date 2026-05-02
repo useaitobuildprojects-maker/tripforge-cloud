@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Car, UserCheck, Crown, Building, ChevronLeft, Phone, CheckCircle2, SlidersHorizontal, X, Users, Fuel, Settings2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { TemplateStyles } from "@/lib/template-styles";
 import { useStorefrontVehicles } from '@/hooks/use-storefront-vehicles';
 
 import { Skeleton } from '@/components/ui/skeleton';
@@ -44,7 +44,7 @@ const StorefrontServiceDetail = () => {
   const { slug, serviceType } = useParams<{ slug: string; serviceType: string }>();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
-  const EXP = expediaPalette;
+  const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
 
   const service = serviceType as ServiceType;
