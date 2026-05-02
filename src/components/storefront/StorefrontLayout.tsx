@@ -54,7 +54,12 @@ const StorefrontLayout = () => {
   const bgColor = ts.isDark ? undefined : (agency.background_color ?? undefined);
   const cfg = agency.storefront_config ?? {};
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
-  const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
+  // Apply the template's body font globally to the storefront so every page,
+  // section and component picks up the correct typography.
+  const bodyStyle: React.CSSProperties = {
+    ...(bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface }),
+    fontFamily: ts.typography.body,
+  };
 
   // Header derives its colors from the active template's palette so each
   // template (Classic, Minimal, Elegant, Corporate, Fresh, Coastal, Blacklane)
@@ -65,7 +70,7 @@ const StorefrontLayout = () => {
   const headerText = pal.onBrandDeep;
   const headerTextMuted = 'rgba(255,255,255,0.75)';
   const logoTextStyle: React.CSSProperties = {
-    fontFamily: 'var(--font-sans)',
+    fontFamily: ts.typography.heading,
     fontWeight: 800,
     letterSpacing: '-0.025em',
     color: headerText,

@@ -96,6 +96,9 @@ const StorefrontHome = () => {
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const typo = ts.typography;
+  const shape = ts.shape;
+  const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
 
   return (
     <div>
@@ -107,7 +110,7 @@ const StorefrontHome = () => {
       />
 
       {/* ═══════════════ HERO — Booking.com style ═══════════════ */}
-      <section className="relative" style={{ backgroundColor: EXP.brandDeep }}>
+      <section className="relative" style={{ backgroundColor: EXP.brandDeep, ...(ts.heroStyle ?? {}) }}>
         {/* Background image with strong navy wash */}
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -123,7 +126,8 @@ const StorefrontHome = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-28 sm:pb-32">
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="font-editorial text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl"
+            className={`text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl ${ts.heroTitleClass}`}
+            style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
@@ -137,8 +141,8 @@ const StorefrontHome = () => {
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
             className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
-            <div className="rounded-md shadow-2xl border" style={{ ...tk.surface, ...tk.border }}>
-              <div className="rounded-[5px]" style={tk.surface}>
+            <div className="shadow-2xl border" style={{ ...tk.surface, ...tk.border, borderRadius: shape.cardRadius }}>
+              <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
                 <div className="flex flex-nowrap overflow-x-auto items-center gap-2 px-3 pt-3 pb-1 scrollbar-hide">
@@ -307,7 +311,7 @@ const StorefrontHome = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>
+              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
                 Deals for the weekend
               </h2>
               <p className="text-sm mt-1" style={tk.textMuted}>Save on stays for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} – {new Date(Date.now() + 2*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.</p>
@@ -345,7 +349,7 @@ const StorefrontHome = () => {
                   <div className="flex items-end justify-between pt-2 border-t" style={tk.border}>
                     <div>
                       <p className="text-[10px] line-through" style={tk.textMuted}>${Math.round(dest.price * 1.25)}</p>
-                      <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>
+                      <p className="text-xl font-extrabold leading-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
                         ${dest.price}
                       </p>
                       <p className="text-[10px]" style={tk.textMuted}>per person · taxes incl.</p>
@@ -376,7 +380,7 @@ const StorefrontHome = () => {
 
           <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
+              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>Top vehicles in {agency.city}</h2>
               <p className="text-sm mt-1" style={tk.textMuted}><span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
             </div>
           </div>
@@ -481,7 +485,7 @@ const StorefrontHome = () => {
             <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}66 100%)` }} />
             <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
               <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1" /> Plan ahead</p>
-              <h2 className="font-editorial text-white text-2xl md:text-4xl leading-tight">Where to next?</h2>
+              <h2 className={`text-white text-2xl md:text-4xl leading-tight ${ts.heroTitleClass}`} style={headingFontStyle}>Where to next?</h2>
               <p className="text-white/85 mt-2 text-sm md:text-base">Discover top destinations and member-only offers from {agency.name}.</p>
               <Link to={`/agency/${slug}/services`} className="mt-5 w-fit">
                 <Button className="rounded-md font-extrabold gap-2 h-11 px-6 text-sm hover:brightness-95"
