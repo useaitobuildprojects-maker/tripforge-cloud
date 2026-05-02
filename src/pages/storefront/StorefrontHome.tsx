@@ -110,7 +110,7 @@ const StorefrontHome = () => {
       />
 
       {/* ═══════════════ HERO — Booking.com style ═══════════════ */}
-      <section className="relative" style={{ backgroundColor: EXP.brandDeep }}>
+      <section className="relative" style={{ backgroundColor: EXP.brandDeep, ...(ts.heroStyle ?? {}) }}>
         {/* Background image with strong navy wash */}
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -126,7 +126,8 @@ const StorefrontHome = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-28 sm:pb-32">
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className="font-editorial text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl"
+            className={`text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl ${ts.heroTitleClass}`}
+            style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
@@ -140,8 +141,8 @@ const StorefrontHome = () => {
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
             className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
-            <div className="rounded-md shadow-2xl border" style={{ ...tk.surface, ...tk.border }}>
-              <div className="rounded-[5px]" style={tk.surface}>
+            <div className="shadow-2xl border" style={{ ...tk.surface, ...tk.border, borderRadius: shape.cardRadius }}>
+              <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
                 <div className="flex flex-nowrap overflow-x-auto items-center gap-2 px-3 pt-3 pb-1 scrollbar-hide">
