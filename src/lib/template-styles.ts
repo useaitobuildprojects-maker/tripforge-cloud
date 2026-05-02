@@ -20,6 +20,23 @@ export interface SurfaceTokens {
   inputBorder: React.CSSProperties;
 }
 
+/** Per-template accent palette consumed by the storefront header, hero & CTAs. */
+export interface TemplatePalette {
+  /** Main brand accent (links, icons, secondary CTAs). */
+  brand: string;
+  /** Deeper brand shade (header bg, hero bg, CTA bands). */
+  brandDeep: string;
+  /** Soft tint of the brand for chip/info backgrounds. */
+  brandSoftBg: string;
+  /** Conversion CTA fill. */
+  cta: string;
+  ctaHover: string;
+  /** Text color used on top of `cta`. */
+  ctaText: string;
+  /** Text color used on top of `brandDeep` (header). */
+  onBrandDeep: string;
+}
+
 /** Expedia-inspired accent palette — bright blue brand + yellow CTA. */
 export const expediaPalette = {
   // Booking.com-inspired palette — deep navy-blue header & links, yellow conversion CTA
@@ -69,6 +86,8 @@ export interface TemplateStyles {
   surfaceDeepFill: string;
   /** Token-based surfaces for page content. */
   tokens: SurfaceTokens;
+  /** Accent palette driving header / hero / CTA colors. */
+  palette: TemplatePalette;
 }
 
 // ─────────────────────────────────────────────────────────────────
