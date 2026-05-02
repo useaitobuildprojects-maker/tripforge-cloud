@@ -554,8 +554,7 @@ const cyberpunkStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0a0014',
   surfaceDeepFill: '#0a0014',
-  tokens: darkTokens,
-  palette: cyberpunkPalette,
+  tokens: cyberpunkTokens,palette: cyberpunkPalette,
   typography: {
     heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
     body: '"Space Grotesk", "Inter", system-ui, sans-serif',
@@ -598,8 +597,7 @@ const noirStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#18181b',
   surfaceDeepFill: '#09090b',
-  tokens: darkTokens,
-  palette: noirPalette,
+  tokens: noirTokens,palette: noirPalette,
   typography: {
     heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
     body: '"Inter", system-ui, sans-serif',
@@ -642,8 +640,7 @@ const midnightStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0f0a24',
   surfaceDeepFill: '#1a103a',
-  tokens: darkTokens,
-  palette: midnightPalette,
+  tokens: midnightTokens,palette: midnightPalette,
   typography: {
     heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
     body: '"Inter", system-ui, sans-serif',
@@ -690,8 +687,7 @@ const blacklaneStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0a0a0a',
   surfaceDeepFill: '#000000',
-  tokens: darkTokens,
-  palette: blacklanePalette,
+  tokens: blacklaneTokens,palette: blacklanePalette,
   typography: {
     heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
     body: '"Inter", system-ui, sans-serif',
