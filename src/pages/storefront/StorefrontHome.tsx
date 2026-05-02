@@ -311,7 +311,7 @@ const StorefrontHome = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>
+              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={tk.textPrimary}>
                 Deals for the weekend
               </h2>
               <p className="text-sm mt-1" style={tk.textMuted}>Save on stays for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} – {new Date(Date.now() + 2*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.</p>
@@ -380,7 +380,7 @@ const StorefrontHome = () => {
 
           <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
             <div>
-              <h2 className="font-editorial text-2xl md:text-3xl" style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
+              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={tk.textPrimary}>Top vehicles in {agency.city}</h2>
               <p className="text-sm mt-1" style={tk.textMuted}><span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
             </div>
           </div>
@@ -485,7 +485,7 @@ const StorefrontHome = () => {
             <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}66 100%)` }} />
             <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
               <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1" /> Plan ahead</p>
-              <h2 className="font-editorial text-white text-2xl md:text-4xl leading-tight">Where to next?</h2>
+              <h2 className={`text-white text-2xl md:text-4xl leading-tight ${ts.heroTitleClass}`}>Where to next?</h2>
               <p className="text-white/85 mt-2 text-sm md:text-base">Discover top destinations and member-only offers from {agency.name}.</p>
               <Link to={`/agency/${slug}/services`} className="mt-5 w-fit">
                 <Button className="rounded-md font-extrabold gap-2 h-11 px-6 text-sm hover:brightness-95"
