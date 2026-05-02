@@ -5,7 +5,7 @@ import { Mail, MapPin, Facebook, Twitter, Instagram, MessageCircle, Share2, Menu
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { getShareUrl } from '@/lib/share-url';
-import { getTemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { getTemplateStyles } from '@/lib/template-styles';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
@@ -56,10 +56,13 @@ const StorefrontLayout = () => {
   const fontClass = cfg.font === 'serif' ? 'font-serif' : cfg.font === 'modern' ? 'font-sans tracking-tight' : 'font-sans';
   const bodyStyle: React.CSSProperties = bgColor ? { backgroundColor: bgColor } : { ...(ts.bodyStyle ?? {}), ...tk.surface };
 
-  // Booking.com-style: solid navy header with white text on light templates
-  const accent = ts.isDark ? btnColor : expediaPalette.brand;
-  const headerBg = ts.isDark ? '#0a0a0a' : expediaPalette.brandDeep;
-  const headerText = '#ffffff';
+  // Header derives its colors from the active template's palette so each
+  // template (Classic, Minimal, Elegant, Corporate, Fresh, Coastal, Blacklane)
+  // visually distinguishes itself.
+  const pal = ts.palette;
+  const accent = ts.isDark ? btnColor : pal.brand;
+  const headerBg = ts.isDark ? '#0a0a0a' : pal.brandDeep;
+  const headerText = pal.onBrandDeep;
   const headerTextMuted = 'rgba(255,255,255,0.75)';
   const logoTextStyle: React.CSSProperties = {
     fontFamily: 'var(--font-sans)',
@@ -163,7 +166,7 @@ const StorefrontLayout = () => {
               to={`/agency/${slug}/contact`}
               onClick={() => setMobileMenuOpen(false)}
               className="mt-3 flex items-center justify-center gap-2 h-11 rounded-md text-sm font-bold"
-              style={{ backgroundColor: expediaPalette.cta, color: expediaPalette.ctaText }}
+              style={{ backgroundColor: pal.cta, color: pal.ctaText }}
             >
               <Phone className="h-4 w-4" /> Contact us
             </Link>
