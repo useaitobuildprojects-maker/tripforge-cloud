@@ -15,9 +15,9 @@ const StorefrontContact = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const EXP = ts.palette;
-  const accent = ts.isDark ? buttonColor : EXP.brand;
-  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
-  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const accent = EXP.brand;
+  const ctaBg = EXP.cta;
+  const ctaTextColor = EXP.ctaText;
 
   const contactItems = [
     { icon: Mail, title: 'Email Us', value: agency.contact_email, subtitle: 'We reply within 24 hours' },

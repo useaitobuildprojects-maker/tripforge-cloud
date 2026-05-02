@@ -93,9 +93,9 @@ const StorefrontHome = () => {
   // Pull colors from the active template's palette so switching templates
   // visually changes hero / CTA / accent treatments across the storefront.
   const EXP = ts.palette;
-  const accent = ts.isDark ? buttonColor : EXP.brand;
-  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
-  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const accent = EXP.brand;
+  const ctaBg = EXP.cta;
+  const ctaTextColor = EXP.ctaText;
   const typo = ts.typography;
   const shape = ts.shape;
   const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };

@@ -30,9 +30,9 @@ const StorefrontAbout = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const EXP = ts.palette;
-  const accent = ts.isDark ? buttonColor : EXP.brand;
-  const ctaBg = ts.isDark ? buttonColor : EXP.cta;
-  const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const accent = EXP.brand;
+  const ctaBg = EXP.cta;
+  const ctaTextColor = EXP.ctaText;
 
   const values = cfg.about_values && cfg.about_values.length > 0
     ? cfg.about_values.map((v, i) => ({ ...v, icon: ICONS[i % ICONS.length] }))
