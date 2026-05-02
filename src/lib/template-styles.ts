@@ -202,7 +202,7 @@ const makeLightTemplate = (
   isDark: false,
   surfaceFill: '#ffffff',
   surfaceDeepFill: palette.brandDeep,
-  tokens: lightTokens,
+  tokens: makeLightTokens(palette),
   palette,
   typography,
   shape,
