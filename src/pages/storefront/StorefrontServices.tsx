@@ -3,7 +3,7 @@ import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/a
 import { motion } from 'framer-motion';
 import { Car, UserCheck, Crown, Building, Star, ChevronRight, Check, ArrowRight, Globe } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { TemplateStyles } from "@/lib/template-styles";
 import { Button } from '@/components/ui/button';
 
 import serviceTransfer from '@/assets/service-transfer.jpg';
@@ -51,7 +51,7 @@ const StorefrontServices = () => {
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const enabledServices = agency.services ?? [];
-  const EXP = expediaPalette;
+  const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;

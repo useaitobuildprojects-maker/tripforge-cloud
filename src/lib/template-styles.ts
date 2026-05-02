@@ -20,6 +20,23 @@ export interface SurfaceTokens {
   inputBorder: React.CSSProperties;
 }
 
+/** Per-template accent palette consumed by the storefront header, hero & CTAs. */
+export interface TemplatePalette {
+  /** Main brand accent (links, icons, secondary CTAs). */
+  brand: string;
+  /** Deeper brand shade (header bg, hero bg, CTA bands). */
+  brandDeep: string;
+  /** Soft tint of the brand for chip/info backgrounds. */
+  brandSoftBg: string;
+  /** Conversion CTA fill. */
+  cta: string;
+  ctaHover: string;
+  /** Text color used on top of `cta`. */
+  ctaText: string;
+  /** Text color used on top of `brandDeep` (header). */
+  onBrandDeep: string;
+}
+
 /** Expedia-inspired accent palette — bright blue brand + yellow CTA. */
 export const expediaPalette = {
   // Booking.com-inspired palette — deep navy-blue header & links, yellow conversion CTA
@@ -69,6 +86,8 @@ export interface TemplateStyles {
   surfaceDeepFill: string;
   /** Token-based surfaces for page content. */
   tokens: SurfaceTokens;
+  /** Accent palette driving header / hero / CTA colors. */
+  palette: TemplatePalette;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -109,19 +128,21 @@ const darkTokens: SurfaceTokens = {
   inputBorder: { borderColor: 'rgba(255,255,255,0.12)' },
 };
 
-// Shared Expedia-style base for all light templates. Per-template variants only
-// tweak accents (sectionAlt tint, iconBg, testimonial highlight) so the overall
-// look stays consistent with the Expedia redesign.
-const makeLightTemplate = (overrides: Partial<TemplateStyles> = {}): TemplateStyles => ({
+// Shared light-template factory. Each template passes its own `palette` so the
+// header / hero / CTAs visually distinguish it from siblings.
+const makeLightTemplate = (
+  palette: TemplatePalette,
+  overrides: Partial<TemplateStyles> = {},
+): TemplateStyles => ({
   headerClass: 'bg-white border-b border-gray-200',
   footerClass: 'bg-white border-t border-gray-200 text-gray-900',
   bodyClass: 'bg-white',
   heroClass: '',
-  heroStyle: { backgroundColor: expediaPalette.brandDeep },
+  heroStyle: { backgroundColor: palette.brandDeep },
   heroOverlayClass: '',
-  heroOverlayStyle: { background: `linear-gradient(135deg, ${expediaPalette.brandDeep} 0%, ${expediaPalette.brand} 100%)` },
+  heroOverlayStyle: { background: `linear-gradient(135deg, ${palette.brandDeep} 0%, ${palette.brand} 100%)` },
   heroTitleClass: 'tracking-tight',
-  heroTitleStyle: { color: '#ffffff' },
+  heroTitleStyle: { color: palette.onBrandDeep },
   heroSubtitleClass: '',
   heroSubtitleStyle: { color: 'rgba(255,255,255,0.85)' },
   cardClass: 'bg-white border border-gray-200 rounded-2xl shadow-sm',
@@ -130,25 +151,76 @@ const makeLightTemplate = (overrides: Partial<TemplateStyles> = {}): TemplateSty
   sectionAltStyle: { backgroundColor: '#f7f9fc' },
   primaryBtnClass: '',
   testimonialHighlightClass: 'rounded-2xl',
-  testimonialHighlightStyle: { backgroundColor: expediaPalette.brand, color: '#ffffff', borderColor: expediaPalette.brand },
+  testimonialHighlightStyle: { backgroundColor: palette.brand, color: '#ffffff', borderColor: palette.brand },
   testimonialNormalClass: 'bg-white border-gray-200 rounded-2xl',
   searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-200',
   iconBgClass: '',
-  iconBgStyle: { backgroundColor: expediaPalette.brandSoftBg, color: expediaPalette.brand },
+  iconBgStyle: { backgroundColor: palette.brandSoftBg, color: palette.brand },
   subHeroClass: '',
   isDark: false,
   surfaceFill: '#ffffff',
-  surfaceDeepFill: expediaPalette.brandDeep,
+  surfaceDeepFill: palette.brandDeep,
   tokens: lightTokens,
+  palette,
   ...overrides,
 });
 
-const classicStyles = makeLightTemplate();
-const minimalStyles = makeLightTemplate();
-const elegantStyles = makeLightTemplate();
-const corporateStyles = makeLightTemplate();
-const freshStyles = makeLightTemplate();
-const coastalStyles = makeLightTemplate();
+// ─── Per-template palettes (match preview swatches in storefront-templates.ts) ───
+const classicPalette: TemplatePalette = {
+  brand: '#c8a951', brandDeep: '#1a1f36', brandSoftBg: '#f5efdc',
+  cta: '#c8a951', ctaHover: '#b3954a', ctaText: '#1a1f36', onBrandDeep: '#ffffff',
+};
+const minimalPalette: TemplatePalette = {
+  brand: '#3b82f6', brandDeep: '#1e293b', brandSoftBg: '#eff6ff',
+  cta: '#3b82f6', ctaHover: '#2563eb', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
+const elegantPalette: TemplatePalette = {
+  brand: '#b8860b', brandDeep: '#2c1810', brandSoftBg: '#faf3e0',
+  cta: '#b8860b', ctaHover: '#9c7209', ctaText: '#ffffff', onBrandDeep: '#faf8f5',
+};
+const corporatePalette: TemplatePalette = {
+  brand: '#2563eb', brandDeep: '#1e3a5f', brandSoftBg: '#dbeafe',
+  cta: '#2563eb', ctaHover: '#1d4ed8', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
+const freshPalette: TemplatePalette = {
+  brand: '#16a34a', brandDeep: '#14532d', brandSoftBg: '#dcfce7',
+  cta: '#16a34a', ctaHover: '#15803d', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
+const coastalPalette: TemplatePalette = {
+  brand: '#0ea5e9', brandDeep: '#0c4a6e', brandSoftBg: '#e0f2fe',
+  cta: '#0ea5e9', ctaHover: '#0284c7', ctaText: '#ffffff', onBrandDeep: '#f0f9ff',
+};
+const blacklanePalette: TemplatePalette = {
+  brand: '#0066ff', brandDeep: '#000000', brandSoftBg: 'rgba(0,102,255,0.12)',
+  cta: '#0066ff', ctaHover: '#0052cc', ctaText: '#ffffff', onBrandDeep: '#ffffff',
+};
+
+const classicStyles = makeLightTemplate(classicPalette, {
+  sectionAltStyle: { backgroundColor: '#f9fafb' },
+});
+const minimalStyles = makeLightTemplate(minimalPalette, {
+  heroStyle: { backgroundColor: '#f1f5f9' },
+  heroOverlayStyle: { background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)' },
+  heroTitleStyle: { color: '#1e293b' },
+  heroSubtitleStyle: { color: '#475569' },
+  surfaceDeepFill: '#1e293b',
+});
+const elegantStyles = makeLightTemplate(elegantPalette, {
+  bodyClass: '',
+  bodyStyle: { backgroundColor: '#f5f0eb' },
+  sectionAltStyle: { backgroundColor: '#faf3e0' },
+});
+const corporateStyles = makeLightTemplate(corporatePalette, {
+  sectionAltStyle: { backgroundColor: '#f8fafc' },
+});
+const freshStyles = makeLightTemplate(freshPalette, {
+  bodyStyle: { backgroundColor: '#fafffe' },
+  sectionAltStyle: { backgroundColor: '#f0fdf4' },
+});
+const coastalStyles = makeLightTemplate(coastalPalette, {
+  bodyStyle: { backgroundColor: '#f0f9ff' },
+  sectionAltStyle: { backgroundColor: '#e0f2fe' },
+});
 
 const blacklaneStyles: TemplateStyles = {
   headerClass: 'border-b',
@@ -184,6 +256,7 @@ const blacklaneStyles: TemplateStyles = {
   surfaceFill: '#0a0a0a',
   surfaceDeepFill: '#000000',
   tokens: darkTokens,
+  palette: blacklanePalette,
 };
 
 const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {

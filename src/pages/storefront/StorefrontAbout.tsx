@@ -3,7 +3,7 @@ import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Shield, Award, Users, Clock, ArrowRight, Heart } from 'lucide-react';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { TemplateStyles } from "@/lib/template-styles";
 import { Button } from '@/components/ui/button';
 import destTemple from '@/assets/dest-temple.jpg';
 import adventureMountain from '@/assets/adventure-mountain.jpg';
@@ -29,7 +29,7 @@ const StorefrontAbout = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
-  const EXP = expediaPalette;
+  const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
