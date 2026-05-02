@@ -44,8 +44,6 @@ const SERVICE_FEATURES: Record<ServiceType, string[]> = {
   city_tour: ['Expert local guides', 'Half-day & full-day', 'Popular landmarks', 'Flexible schedules'],
 };
 
-const headingFont = { fontFamily: 'var(--font-sans)', fontWeight: 800, letterSpacing: '-0.025em' };
-
 const StorefrontServices = () => {
   const { slug } = useParams();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
@@ -55,6 +53,7 @@ const StorefrontServices = () => {
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const headingFont: React.CSSProperties = { fontFamily: ts.typography.heading, letterSpacing: '-0.015em' };
 
   return (
     <div style={tk.surface}>
