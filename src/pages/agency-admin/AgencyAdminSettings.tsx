@@ -226,7 +226,15 @@ const AgencyAdminSettings = () => {
           <h2 className="text-lg font-display font-bold text-foreground">Storefront Template</h2>
           <p className="text-sm text-muted-foreground mt-1">Choose a design template for your public website</p>
         </div>
-        <TemplatePicker value={selectedTemplate} onChange={setSelectedTemplate} />
+        <TemplatePicker
+          value={selectedTemplate}
+          onChange={(tpl) => {
+            setSelectedTemplate(tpl);
+            // Sync the button color to the new template's CTA so each theme
+            // gets its own coherent color by default.
+            setButtonColor(getTemplateStyles(tpl).palette.cta);
+          }}
+        />
 
         {/* Color Customization */}
         <div className="pt-4 border-t border-border space-y-4">
