@@ -442,6 +442,17 @@ const blacklaneStyles: TemplateStyles = {
   surfaceDeepFill: '#000000',
   tokens: darkTokens,
   palette: blacklanePalette,
+  typography: {
+    heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+    body: '"Inter", system-ui, sans-serif',
+    headingClass: 'italic font-medium tracking-tight',
+  },
+  shape: {
+    cardRadius: '1rem',
+    buttonRadius: '0.5rem',
+    cardShadow: '0 16px 48px rgba(0,0,0,0.5)',
+    borderWidth: '1px',
+  },
 };
 
 const STYLE_MAP: Record<StorefrontTemplate, TemplateStyles> = {
