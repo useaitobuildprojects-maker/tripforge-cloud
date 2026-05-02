@@ -65,8 +65,8 @@ const StorefrontLayout = () => {
   // template (Classic, Minimal, Elegant, Corporate, Fresh, Coastal, Blacklane)
   // visually distinguishes itself.
   const pal = ts.palette;
-  const accent = ts.isDark ? btnColor : pal.brand;
-  const headerBg = ts.isDark ? '#0a0a0a' : pal.brandDeep;
+  const accent = pal.brand;
+  const headerBg = pal.brandDeep;
   const headerText = pal.onBrandDeep;
   const headerTextMuted = 'rgba(255,255,255,0.75)';
   const logoTextStyle: React.CSSProperties = {
