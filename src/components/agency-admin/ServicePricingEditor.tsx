@@ -207,13 +207,15 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
   const handleAddTier = (cityId: string) => {
     const from = Number(newTierFrom);
     const to = Number(newTierTo);
-    const mult = Number(newTierMultiplier);
-    if (isNaN(from) || isNaN(to) || isNaN(mult) || to <= from || mult <= 0) return;
+    const euroPerKm = Number(newTierEuroPerKm);
+    if (isNaN(from) || isNaN(to) || isNaN(euroPerKm) || to <= from || euroPerKm <= 0) return;
     const city = cities.find(c => c.id === cityId);
     if (!city) return;
+    const base = city.transfer_per_km_rate ?? 0;
+    const mult = base > 0 ? euroPerKm / base : 1;
     const updated = [...(city.distance_tiers || []), { from_km: from, to_km: to, multiplier: mult }].sort((a, b) => a.from_km - b.from_km);
     updateCity.mutate({ id: cityId, agencyId, distance_tiers: updated });
-    setNewTierFrom(''); setNewTierTo(''); setNewTierMultiplier('');
+    setNewTierFrom(''); setNewTierTo(''); setNewTierEuroPerKm('');
   };
 
   const handleRemoveTier = (cityId: string, tierIdx: number) => {
@@ -239,9 +241,11 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
     updateCity.mutate({ id: cityId, agencyId, country: value });
   };
 
-  const handleUpdateTierMultiplier = (cityId: string, tierIdx: number, value: number) => {
+  const handleUpdateTierEuroPerKm = (cityId: string, tierIdx: number, euroPerKm: number) => {
     const city = cities.find(c => c.id === cityId);
     if (!city) return;
+    const base = city.transfer_per_km_rate ?? 0;
+    const value = base > 0 ? euroPerKm / base : 1;
     const updated = city.distance_tiers.map((t, i) =>
       i === tierIdx ? { from_km: t.from_km, to_km: t.to_km, multiplier: value } : t
     );
@@ -343,7 +347,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                   <Input type="number" min={0} step={0.05} value={city.transfer_per_km_rate ?? 0}
                     onChange={(e) => handleUpdateBasePerKm(city.id, Number(e.target.value) || 0)}
                     className="text-xs font-mono w-full" />
-                  <p className="text-[10px] text-muted-foreground">Each tier multiplier scales this base.</p>
+                  <p className="text-[10px] text-muted-foreground">Default €/km, used when no tier matches.</p>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] whitespace-nowrap">Drop-off fee (€)</Label>
@@ -361,7 +365,6 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                     <tr>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">From (km)</th>
                       <th className="px-3 py-1.5 text-left font-medium text-muted-foreground">To (km)</th>
-                      <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">Multiplier (×)</th>
                       <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">€/km</th>
                       <th className="px-3 py-1.5 w-10" />
                     </tr>
@@ -370,6 +373,7 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                     {city.distance_tiers.map((t, i) => {
                       const base = city.transfer_per_km_rate ?? 0;
                       const eff = tierEffectiveMultiplier(t, base);
+                      const euroPerKm = base * eff;
                       return (
                         <tr key={i} className="border-t border-border">
                           <td className="px-3 py-1.5 font-mono">
@@ -401,15 +405,12 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                           <td className="px-3 py-1.5 text-right font-mono">
                             <Input
                               type="number"
-                              min={0.1}
+                              min={0}
                               step={0.05}
-                              value={eff}
-                              onChange={(e) => handleUpdateTierMultiplier(city.id, i, Number(e.target.value) || 0)}
-                              className="text-xs font-mono w-20 ml-auto"
+                              value={Number(euroPerKm.toFixed(2))}
+                              onChange={(e) => handleUpdateTierEuroPerKm(city.id, i, Number(e.target.value) || 0)}
+                              className="text-xs font-mono w-24 ml-auto"
                             />
-                          </td>
-                          <td className="px-3 py-1.5 text-right font-mono text-muted-foreground">
-                            €{(base * eff).toFixed(2)}
                           </td>
                           <td className="px-3 py-1.5">
                             <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveTier(city.id, i)}>
@@ -434,11 +435,11 @@ const CityPricingSection = ({ agencyId, globalTiers, country }: { agencyId: stri
                   <Input type="number" min={0} placeholder="50" value={newTierTo} onChange={(e) => setNewTierTo(e.target.value)} className="text-xs font-mono" />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px]">Multiplier (×)</Label>
-                  <Input type="number" min={0.1} step={0.05} placeholder="1.0" value={newTierMultiplier} onChange={(e) => setNewTierMultiplier(e.target.value)} className="text-xs font-mono" />
+                  <Label className="text-[10px]">€/km</Label>
+                  <Input type="number" min={0} step={0.05} placeholder="1.20" value={newTierEuroPerKm} onChange={(e) => setNewTierEuroPerKm(e.target.value)} className="text-xs font-mono" />
                 </div>
                 <div className="flex items-end">
-                  <Button size="sm" onClick={() => handleAddTier(city.id)} disabled={!newTierFrom || !newTierTo || !newTierMultiplier} className="gradient-accent text-accent-foreground w-full h-8">
+                  <Button size="sm" onClick={() => handleAddTier(city.id)} disabled={!newTierFrom || !newTierTo || !newTierEuroPerKm} className="gradient-accent text-accent-foreground w-full h-8">
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add
                   </Button>
                 </div>
