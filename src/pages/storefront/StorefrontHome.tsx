@@ -96,6 +96,9 @@ const StorefrontHome = () => {
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
+  const typo = ts.typography;
+  const shape = ts.shape;
+  const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
 
   return (
     <div>
