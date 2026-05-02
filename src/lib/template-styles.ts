@@ -156,9 +156,24 @@ const darkTokens: SurfaceTokens = {
 
 // Shared light-template factory. Each template passes its own `palette` so the
 // header / hero / CTAs visually distinguish it from siblings.
+// ─── Default typography & shape (overridable per template) ───
+const defaultTypography: TemplateTypography = {
+  heading: '"Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-bold',
+};
+const defaultShape: TemplateShape = {
+  cardRadius: '0.5rem',
+  buttonRadius: '0.375rem',
+  cardShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+  borderWidth: '1px',
+};
+
 const makeLightTemplate = (
   palette: TemplatePalette,
   overrides: Partial<TemplateStyles> = {},
+  typography: TemplateTypography = defaultTypography,
+  shape: TemplateShape = defaultShape,
 ): TemplateStyles => ({
   headerClass: 'bg-white border-b border-gray-200',
   footerClass: 'bg-white border-t border-gray-200 text-gray-900',
@@ -167,19 +182,19 @@ const makeLightTemplate = (
   heroStyle: { backgroundColor: palette.brandDeep },
   heroOverlayClass: '',
   heroOverlayStyle: { background: `linear-gradient(135deg, ${palette.brandDeep} 0%, ${palette.brand} 100%)` },
-  heroTitleClass: 'tracking-tight',
+  heroTitleClass: typography.headingClass,
   heroTitleStyle: { color: palette.onBrandDeep },
   heroSubtitleClass: '',
   heroSubtitleStyle: { color: 'rgba(255,255,255,0.85)' },
-  cardClass: 'bg-white border border-gray-200 rounded-2xl shadow-sm',
+  cardClass: 'bg-white border border-gray-200',
   cardHoverClass: 'hover:shadow-lg hover:-translate-y-0.5 transition-all',
   sectionAltClass: '',
   sectionAltStyle: { backgroundColor: '#f7f9fc' },
   primaryBtnClass: '',
-  testimonialHighlightClass: 'rounded-2xl',
+  testimonialHighlightClass: '',
   testimonialHighlightStyle: { backgroundColor: palette.brand, color: '#ffffff', borderColor: palette.brand },
-  testimonialNormalClass: 'bg-white border-gray-200 rounded-2xl',
-  searchBarClass: 'bg-white rounded-2xl shadow-xl border border-gray-200',
+  testimonialNormalClass: 'bg-white border-gray-200',
+  searchBarClass: 'bg-white border border-gray-200',
   iconBgClass: '',
   iconBgStyle: { backgroundColor: palette.brandSoftBg, color: palette.brand },
   subHeroClass: '',
@@ -188,6 +203,8 @@ const makeLightTemplate = (
   surfaceDeepFill: palette.brandDeep,
   tokens: lightTokens,
   palette,
+  typography,
+  shape,
   ...overrides,
 });
 
@@ -235,6 +252,15 @@ const midnightPalette: TemplatePalette = {
 
 const classicStyles = makeLightTemplate(classicPalette, {
   sectionAltStyle: { backgroundColor: '#f9fafb' },
+}, {
+  heading: '"Playfair Display", Georgia, serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-bold',
+}, {
+  cardRadius: '0.375rem',
+  buttonRadius: '0.25rem',
+  cardShadow: '0 4px 12px rgba(26,31,54,0.08)',
+  borderWidth: '1px',
 });
 const minimalStyles = makeLightTemplate(minimalPalette, {
   heroStyle: { backgroundColor: '#f1f5f9' },
@@ -242,32 +268,95 @@ const minimalStyles = makeLightTemplate(minimalPalette, {
   heroTitleStyle: { color: '#1e293b' },
   heroSubtitleStyle: { color: '#475569' },
   surfaceDeepFill: '#1e293b',
+}, {
+  heading: '"Inter", system-ui, sans-serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-[-0.04em] font-extrabold',
+}, {
+  cardRadius: '0.25rem',
+  buttonRadius: '0.25rem',
+  cardShadow: 'none',
+  borderWidth: '1px',
 });
 const elegantStyles = makeLightTemplate(elegantPalette, {
   bodyClass: '',
   bodyStyle: { backgroundColor: '#f5f0eb' },
   sectionAltStyle: { backgroundColor: '#faf3e0' },
+}, {
+  heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+  body: '"Lora", Georgia, serif',
+  headingClass: 'italic font-medium tracking-tight',
+}, {
+  cardRadius: '0.125rem',
+  buttonRadius: '0.125rem',
+  cardShadow: '0 8px 24px rgba(44,24,16,0.10)',
+  borderWidth: '1px',
 });
 const corporateStyles = makeLightTemplate(corporatePalette, {
   sectionAltStyle: { backgroundColor: '#f8fafc' },
+}, {
+  heading: '"IBM Plex Sans", "Inter", system-ui, sans-serif',
+  body: '"IBM Plex Sans", "Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-semibold',
+}, {
+  cardRadius: '0.375rem',
+  buttonRadius: '0.375rem',
+  cardShadow: '0 2px 6px rgba(30,58,95,0.08)',
+  borderWidth: '1px',
 });
 const freshStyles = makeLightTemplate(freshPalette, {
   bodyStyle: { backgroundColor: '#fafffe' },
   sectionAltStyle: { backgroundColor: '#f0fdf4' },
+}, {
+  heading: '"Poppins", "Inter", system-ui, sans-serif',
+  body: '"Poppins", "Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-bold',
+}, {
+  cardRadius: '1rem',
+  buttonRadius: '9999px',
+  cardShadow: '0 4px 16px rgba(22,163,74,0.10)',
+  borderWidth: '1px',
 });
 const coastalStyles = makeLightTemplate(coastalPalette, {
   bodyStyle: { backgroundColor: '#f0f9ff' },
   sectionAltStyle: { backgroundColor: '#e0f2fe' },
+}, {
+  heading: '"DM Serif Display", "Playfair Display", Georgia, serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-normal',
+}, {
+  cardRadius: '1.25rem',
+  buttonRadius: '9999px',
+  cardShadow: '0 6px 20px rgba(14,165,233,0.12)',
+  borderWidth: '1px',
 });
 const sunsetStyles = makeLightTemplate(sunsetPalette, {
   bodyStyle: { backgroundColor: '#fff7ed' },
   sectionAltStyle: { backgroundColor: '#ffedd5' },
   heroOverlayStyle: { background: 'linear-gradient(135deg, #7c2d12 0%, #f97316 100%)' },
+}, {
+  heading: '"Fraunces", "Playfair Display", Georgia, serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-bold',
+}, {
+  cardRadius: '1rem',
+  buttonRadius: '9999px',
+  cardShadow: '0 8px 24px rgba(249,115,22,0.15)',
+  borderWidth: '1px',
 });
 const forestStyles = makeLightTemplate(forestPalette, {
   bodyStyle: { backgroundColor: '#f7faf7' },
   sectionAltStyle: { backgroundColor: '#ecfdf5' },
   heroOverlayStyle: { background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)' },
+}, {
+  heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
+  body: '"Inter", system-ui, sans-serif',
+  headingClass: 'tracking-tight font-semibold',
+}, {
+  cardRadius: '0.75rem',
+  buttonRadius: '0.5rem',
+  cardShadow: '0 4px 16px rgba(6,78,59,0.10)',
+  borderWidth: '1px',
 });
 
 const midnightStyles: TemplateStyles = {
