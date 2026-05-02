@@ -504,7 +504,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
   const [showTiers, setShowTiers] = useState(false);
   const [newTierFrom, setNewTierFrom] = useState('');
   const [newTierTo, setNewTierTo] = useState('');
-  const [newTierMultiplier, setNewTierMultiplier] = useState('');
+  const [newTierEuroPerKm, setNewTierEuroPerKm] = useState('');
 
   // Vehicle classes
   const [newClassCategory, setNewClassCategory] = useState<'economy' | 'business' | 'first_class'>('economy');
