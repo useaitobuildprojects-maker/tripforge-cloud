@@ -394,6 +394,17 @@ const midnightStyles: TemplateStyles = {
   surfaceDeepFill: '#1a103a',
   tokens: darkTokens,
   palette: midnightPalette,
+  typography: {
+    heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
+    body: '"Inter", system-ui, sans-serif',
+    headingClass: 'tracking-tight font-bold',
+  },
+  shape: {
+    cardRadius: '1rem',
+    buttonRadius: '9999px',
+    cardShadow: '0 12px 32px rgba(168,85,247,0.18)',
+    borderWidth: '1px',
+  },
 };
 
 const blacklaneStyles: TemplateStyles = {
