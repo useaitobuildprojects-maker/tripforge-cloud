@@ -49,9 +49,6 @@ const StorefrontContact = () => {
             </p>
           </motion.div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 60" fill="none" className="w-full"><path d="M0 60V30C360 0 720 0 1080 30C1260 45 1350 52 1440 60H0Z" fill={ts.surfaceFill} /></svg>
-        </div>
       </section>
 
       {/* Contact cards */}
