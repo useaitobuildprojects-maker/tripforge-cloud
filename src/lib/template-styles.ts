@@ -139,21 +139,39 @@ const makeLightTokens = (palette: TemplatePalette): SurfaceTokens => ({
 // ─────────────────────────────────────────────────────────────────
 // DARK tokens (blacklane)
 // ─────────────────────────────────────────────────────────────────
-const darkTokens: SurfaceTokens = {
-  surface: { backgroundColor: '#0a0a0a', color: '#ffffff' },
-  surfaceAlt: { backgroundColor: '#111111', color: '#ffffff' },
-  surfaceDeep: { backgroundColor: '#000000', color: '#ffffff' },
+const makeDarkTokens = (opts: {
+  surface: string; surfaceAlt: string; surfaceDeep: string;
+  input: string; border?: string; textBody?: string;
+}): SurfaceTokens => ({
+  surface: { backgroundColor: opts.surface, color: '#ffffff' },
+  surfaceAlt: { backgroundColor: opts.surfaceAlt, color: '#ffffff' },
+  surfaceDeep: { backgroundColor: opts.surfaceDeep, color: '#ffffff' },
   textPrimary: { color: '#ffffff' },
-  textBody: { color: 'rgba(255,255,255,0.7)' },
-  textMuted: { color: 'rgba(255,255,255,0.45)' },
-  textFaint: { color: 'rgba(255,255,255,0.25)' },
+  textBody: { color: opts.textBody ?? 'rgba(255,255,255,0.78)' },
+  textMuted: { color: 'rgba(255,255,255,0.6)' },
+  textFaint: { color: 'rgba(255,255,255,0.35)' },
   textOnDeep: { color: '#ffffff' },
-  textOnDeepMuted: { color: 'rgba(255,255,255,0.5)' },
-  border: { borderColor: 'rgba(255,255,255,0.08)' },
-  divider: { backgroundColor: 'rgba(255,255,255,0.1)' },
-  inputSurface: { backgroundColor: '#1a1a1a', color: '#ffffff' },
-  inputBorder: { borderColor: 'rgba(255,255,255,0.12)' },
-};
+  textOnDeepMuted: { color: 'rgba(255,255,255,0.65)' },
+  border: { borderColor: opts.border ?? 'rgba(255,255,255,0.12)' },
+  divider: { backgroundColor: opts.border ?? 'rgba(255,255,255,0.14)' },
+  inputSurface: { backgroundColor: opts.input, color: '#ffffff' },
+  inputBorder: { borderColor: opts.border ?? 'rgba(255,255,255,0.18)' },
+});
+const blacklaneTokens = makeDarkTokens({
+  surface: '#141414', surfaceAlt: '#1a1a1a', surfaceDeep: '#000000', input: '#1a1a1a',
+});
+const midnightTokens = makeDarkTokens({
+  surface: '#1c1640', surfaceAlt: '#15102e', surfaceDeep: '#0f0a24',
+  input: '#231a52', border: 'rgba(168,85,247,0.25)',
+});
+const cyberpunkTokens = makeDarkTokens({
+  surface: '#170028', surfaceAlt: '#120020', surfaceDeep: '#0a0014',
+  input: '#1f0035', border: 'rgba(236,72,153,0.32)',
+  textBody: 'rgba(240,171,252,0.88)',
+});
+const noirTokens = makeDarkTokens({
+  surface: '#27272a', surfaceAlt: '#1c1c1f', surfaceDeep: '#09090b', input: '#27272a',
+});
 
 // Shared light-template factory. Each template passes its own `palette` so the
 // header / hero / CTAs visually distinguish it from siblings.
@@ -536,8 +554,7 @@ const cyberpunkStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0a0014',
   surfaceDeepFill: '#0a0014',
-  tokens: darkTokens,
-  palette: cyberpunkPalette,
+  tokens: cyberpunkTokens,palette: cyberpunkPalette,
   typography: {
     heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
     body: '"Space Grotesk", "Inter", system-ui, sans-serif',
@@ -580,8 +597,7 @@ const noirStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#18181b',
   surfaceDeepFill: '#09090b',
-  tokens: darkTokens,
-  palette: noirPalette,
+  tokens: noirTokens,palette: noirPalette,
   typography: {
     heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
     body: '"Inter", system-ui, sans-serif',
@@ -624,8 +640,7 @@ const midnightStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0f0a24',
   surfaceDeepFill: '#1a103a',
-  tokens: darkTokens,
-  palette: midnightPalette,
+  tokens: midnightTokens,palette: midnightPalette,
   typography: {
     heading: '"Space Grotesk", "Inter", system-ui, sans-serif',
     body: '"Inter", system-ui, sans-serif',
@@ -672,8 +687,7 @@ const blacklaneStyles: TemplateStyles = {
   isDark: true,
   surfaceFill: '#0a0a0a',
   surfaceDeepFill: '#000000',
-  tokens: darkTokens,
-  palette: blacklanePalette,
+  tokens: blacklaneTokens,palette: blacklanePalette,
   typography: {
     heading: '"Cormorant Garamond", "Playfair Display", Georgia, serif',
     body: '"Inter", system-ui, sans-serif',
