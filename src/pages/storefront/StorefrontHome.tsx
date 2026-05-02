@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
-import { TemplateStyles, expediaPalette } from '@/lib/template-styles';
+import { TemplateStyles } from '@/lib/template-styles';
 import defaultHeroImage from '@/assets/hero-desert.jpg';
 import destTemple from '@/assets/dest-temple.jpg';
 import destPalace from '@/assets/dest-palace.jpg';
@@ -90,8 +90,9 @@ const StorefrontHome = () => {
     const d = new Date(pickupDateObj); d.setDate(d.getDate() + 1); return d;
   }, [pickupDateObj, todayDate]);
 
-  // Expedia accent — fall back to palette when agency uses default-ish color
-  const EXP = expediaPalette;
+  // Pull colors from the active template's palette so switching templates
+  // visually changes hero / CTA / accent treatments across the storefront.
+  const EXP = ts.palette;
   const accent = ts.isDark ? buttonColor : EXP.brand;
   const ctaBg = ts.isDark ? buttonColor : EXP.cta;
   const ctaTextColor = ts.isDark ? '#ffffff' : EXP.ctaText;
