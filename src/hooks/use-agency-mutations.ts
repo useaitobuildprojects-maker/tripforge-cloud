@@ -32,7 +32,7 @@ export const useCreateAgency = () => {
     mutationFn: async (input: CreateAgencyInput) => {
       const { data, error } = await supabase
         .from('agencies')
-        .insert([input])
+        .insert([input as any])
         .select()
         .single();
       if (error) throw error;
@@ -55,7 +55,7 @@ export const useUpdateAgency = () => {
     mutationFn: async ({ id, ...input }: CreateAgencyInput & { id: string }) => {
       const { data, error } = await supabase
         .from('agencies')
-        .update(input)
+        .update(input as any)
         .eq('id', id)
         .select()
         .maybeSingle();
