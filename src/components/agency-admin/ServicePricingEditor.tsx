@@ -1510,18 +1510,18 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
 
   const seedDummy = async () => {
     const dummy = [
-      { vehicle_class: 'Economy', brand: 'Fiat', model: '500', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 4, daily_rate: 32, weekly_rate: 190, monthly_rate: 720, drop_off_fee: 25, drop_off_mode: 'fixed' as const, price_per_km: 0.30, free_km_per_day: 300, extra_km_rate: 0.20, description: 'A/C, compact city car' },
-      { vehicle_class: 'Compact', brand: 'Volkswagen', model: 'Golf', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 5, daily_rate: 55, weekly_rate: 320, monthly_rate: 1100, drop_off_fee: 30, drop_off_mode: 'per_km' as const, price_per_km: 0.35, free_km_per_day: 250, extra_km_rate: 0.25, description: 'A/C, Bluetooth' },
-      { vehicle_class: 'Sedan', brand: 'BMW', model: '3 Series', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 110, weekly_rate: 660, monthly_rate: 2200, drop_off_fee: 40, drop_off_mode: 'per_km' as const, price_per_km: 0.45, free_km_per_day: 250, extra_km_rate: 0.30, description: 'Premium sedan' },
-      { vehicle_class: 'Luxury', brand: 'Mercedes-Benz', model: 'E-Class', year: 2024, transmission: 'automatic', fuel_type: 'hybrid', seats: 5, daily_rate: 180, weekly_rate: 1080, monthly_rate: 3600, drop_off_fee: 60, drop_off_mode: 'per_km' as const, price_per_km: 0.60, free_km_per_day: 200, extra_km_rate: 0.45, description: 'Executive class' },
-      { vehicle_class: 'SUV', brand: 'Audi', model: 'Q5', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 140, weekly_rate: 840, monthly_rate: 2800, drop_off_fee: 50, drop_off_mode: 'fixed' as const, price_per_km: 0.50, free_km_per_day: 200, extra_km_rate: 0.35, description: 'Spacious SUV, 4WD' },
-      { vehicle_class: 'Van', brand: 'Mercedes-Benz', model: 'V-Class', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 8, daily_rate: 160, weekly_rate: 960, monthly_rate: 3200, drop_off_fee: 70, drop_off_mode: 'per_km' as const, price_per_km: 0.55, free_km_per_day: 200, extra_km_rate: 0.40, description: '8 seats, ideal for groups' },
+      { vehicle_class: 'Economy', brand: 'Fiat', model: '500', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 4, daily_rate: 32, weekly_rate: 190, monthly_rate: 720, drop_off_fee: 25, drop_off_mode: 'fixed' as const, price_per_km: 0.30, free_km_per_day: 300, extra_km_rate: 0.20, description: 'A/C, compact city car', image_url: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800&q=80' },
+      { vehicle_class: 'Compact', brand: 'Volkswagen', model: 'Golf', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 5, daily_rate: 55, weekly_rate: 320, monthly_rate: 1100, drop_off_fee: 30, drop_off_mode: 'per_km' as const, price_per_km: 0.35, free_km_per_day: 250, extra_km_rate: 0.25, description: 'A/C, Bluetooth', image_url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80' },
+      { vehicle_class: 'Sedan', brand: 'BMW', model: '3 Series', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 110, weekly_rate: 660, monthly_rate: 2200, drop_off_fee: 40, drop_off_mode: 'per_km' as const, price_per_km: 0.45, free_km_per_day: 250, extra_km_rate: 0.30, description: 'Premium sedan', image_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80' },
+      { vehicle_class: 'Luxury', brand: 'Mercedes-Benz', model: 'E-Class', year: 2024, transmission: 'automatic', fuel_type: 'hybrid', seats: 5, daily_rate: 180, weekly_rate: 1080, monthly_rate: 3600, drop_off_fee: 60, drop_off_mode: 'per_km' as const, price_per_km: 0.60, free_km_per_day: 200, extra_km_rate: 0.45, description: 'Executive class', image_url: 'https://images.unsplash.com/photo-1617814086367-de5d04b1a8a3?w=800&q=80' },
+      { vehicle_class: 'SUV', brand: 'Audi', model: 'Q5', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 140, weekly_rate: 840, monthly_rate: 2800, drop_off_fee: 50, drop_off_mode: 'fixed' as const, price_per_km: 0.50, free_km_per_day: 200, extra_km_rate: 0.35, description: 'Spacious SUV, 4WD', image_url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80' },
+      { vehicle_class: 'Van', brand: 'Mercedes-Benz', model: 'V-Class', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 8, daily_rate: 160, weekly_rate: 960, monthly_rate: 3200, drop_off_fee: 70, drop_off_mode: 'per_km' as const, price_per_km: 0.55, free_km_per_day: 200, extra_km_rate: 0.40, description: '8 seats, ideal for groups', image_url: 'https://images.unsplash.com/photo-1609520505218-7421df17ed40?w=800&q=80' },
     ];
     setSeeding(true);
     try {
       let added = 0;
       for (const d of dummy) {
-        await addPrice.mutateAsync({ agency_id: agencyId, image_url: null, ...d });
+        await addPrice.mutateAsync({ agency_id: agencyId, ...d });
         added++;
       }
       toast.success(`Seeded ${added} dummy cars`);
