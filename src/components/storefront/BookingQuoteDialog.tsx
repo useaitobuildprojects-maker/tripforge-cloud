@@ -117,7 +117,7 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
                   This car is based in <strong>{vehicle.home_city}</strong> and your pickup is in <strong>{pickupCity}</strong>.
                   {vehicle.drop_off_mode === 'fixed'
                     ? ` A fixed delivery fee of ${Number(vehicle.drop_off_fee ?? 0).toFixed(2)} € applies.`
-                    : ' Delivery is charged by distance × price/km.'}
+                    : ` Delivery is charged by distance × ${pricePerKm} €/km.`}
                 </p>
                 {vehicle.drop_off_mode === 'per_km' && (
                   <div className="space-y-1">
@@ -127,6 +127,9 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
                       value={crossCityDistance}
                       onChange={e => setCrossCityDistance(Math.max(0, parseInt(e.target.value) || 0))}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      {crossCityDistance} km × {pricePerKm} €/km = <strong>{(crossCityDistance * pricePerKm).toFixed(2)} €</strong>
+                    </p>
                   </div>
                 )}
               </div>
