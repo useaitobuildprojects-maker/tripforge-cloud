@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -805,6 +806,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newHalfDay, setNewHalfDay] = useState('');
   const [newMaxDays, setNewMaxDays] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
@@ -1414,6 +1416,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const deletePrice = useDeleteCarRentalPrice();
   const updatePrice = useUpdateCarRentalPrice();
   const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const [vehicleClass, setVehicleClass] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
@@ -1432,6 +1435,47 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [desc, setDesc] = useState('');
   const [uploading, setUploading] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imgUploading, setImgUploading] = useState(false);
+  const [rowUploadingId, setRowUploadingId] = useState<string | null>(null);
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `${agencyId}/car-rental/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('vehicle-photos').upload(path, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from('vehicle-photos').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleImagePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImgUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setImageUrl(url);
+      toast.success('Image uploaded');
+    } catch (err: any) {
+      toast.error('Upload failed: ' + err.message);
+    } finally {
+      setImgUploading(false);
+      if (imageRef.current) imageRef.current.value = '';
+    }
+  };
+
+  const handleRowImageUpload = async (rowId: string, file: File) => {
+    setRowUploadingId(rowId);
+    try {
+      const url = await uploadImage(file);
+      await updatePrice.mutateAsync({ id: rowId, agencyId, image_url: url });
+      toast.success('Image updated');
+    } catch (err: any) {
+      toast.error('Upload failed: ' + err.message);
+    } finally {
+      setRowUploadingId(null);
+    }
+  };
 
   const seedDummy = async () => {
     const dummy = [
@@ -1468,7 +1512,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       transmission,
       fuel_type: fuelType,
       seats: Number(seats) || 5,
-      image_url: null,
+      image_url: imageUrl,
       daily_rate: Number(dailyRate),
       weekly_rate: weeklyRate ? Number(weeklyRate) : null,
       monthly_rate: monthlyRate ? Number(monthlyRate) : null,
@@ -1483,6 +1527,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     setTransmission('automatic'); setFuelType('gasoline'); setSeats('5');
     setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
     setDropOffMode('fixed'); setPricePerKm(''); setFreeKm('200'); setExtraKmRate('0.25');
+    setImageUrl(null);
   };
 
   const downloadTemplate = () => {
@@ -1640,6 +1685,27 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
         </div>
         <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
+        <div className="flex items-center gap-3 pt-1">
+          {imageUrl ? (
+            <img src={imageUrl} alt="Preview" className="h-14 w-20 object-cover rounded border border-border" />
+          ) : (
+            <div className="h-14 w-20 rounded border border-dashed border-border flex items-center justify-center bg-muted/30">
+              <ImageIcon className="h-5 w-5 text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1">
+            <Label className="text-[11px]">Vehicle Image (optional)</Label>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" className="text-xs h-7" onClick={() => imageRef.current?.click()} disabled={imgUploading}>
+                <Upload className="h-3.5 w-3.5 mr-1" /> {imgUploading ? 'Uploading...' : imageUrl ? 'Replace' : 'Upload Image'}
+              </Button>
+              {imageUrl && (
+                <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={() => setImageUrl(null)}>Remove</Button>
+              )}
+            </div>
+            <input ref={imageRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -1648,6 +1714,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <table className="w-full text-xs">
             <thead className="bg-secondary/50">
               <tr>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground w-20">Image</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Vehicle</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Details</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th>
@@ -1663,6 +1730,21 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
             <tbody>
               {prices.map((p) => (
                 <tr key={p.id} className="border-t border-border hover:bg-secondary/20">
+                  <td className="px-3 py-2">
+                    <label className="block cursor-pointer group relative">
+                      {p.image_url ? (
+                        <img src={p.image_url} alt={p.vehicle_class} className="h-12 w-16 object-cover rounded border border-border" />
+                      ) : (
+                        <div className="h-12 w-16 rounded border border-dashed border-border flex items-center justify-center bg-muted/30">
+                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 text-white text-[10px] rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        {rowUploadingId === p.id ? '...' : 'Change'}
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleRowImageUpload(p.id, f); e.target.value=''; }} />
+                    </label>
+                  </td>
                   <td className="px-3 py-2">
                     <div className="font-medium text-foreground">{p.brand && p.model ? `${p.brand} ${p.model}` : p.vehicle_class}</div>
                     <div className="text-muted-foreground">{p.vehicle_class}{p.year ? ` • ${p.year}` : ''}</div>
