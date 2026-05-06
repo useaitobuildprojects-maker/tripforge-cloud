@@ -1441,6 +1441,68 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [rowUploadingId, setRowUploadingId] = useState<string | null>(null);
   const [editing, setEditing] = useState<any | null>(null);
   const [editImgUploading, setEditImgUploading] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+
+  const IMAGE_POOL: Record<string, string[]> = {
+    economy: [
+      'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800&q=80',
+      'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80',
+      'https://images.unsplash.com/photo-1471444928139-48c5bf5173f8?w=800&q=80',
+    ],
+    compact: [
+      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80',
+      'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80',
+      'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80',
+    ],
+    sedan: [
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80',
+      'https://images.unsplash.com/photo-1568844293986-8d0400bd4745?w=800&q=80',
+      'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=800&q=80',
+    ],
+    luxury: [
+      'https://images.unsplash.com/photo-1617814086367-de5d04b1a8a3?w=800&q=80',
+      'https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&q=80',
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+    ],
+    suv: [
+      'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80',
+      'https://images.unsplash.com/photo-1519440733250-1b00f7d83b3a?w=800&q=80',
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80',
+    ],
+    van: [
+      'https://images.unsplash.com/photo-1609520505218-7421df17ed40?w=800&q=80',
+      'https://images.unsplash.com/photo-1558981852-426c6c22a060?w=800&q=80',
+      'https://images.unsplash.com/photo-1597007030739-6d2e7172ee6c?w=800&q=80',
+    ],
+    default: [
+      'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+      'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
+      'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80',
+    ],
+  };
+
+  const pickImageFor = (vehicleClass: string) => {
+    const key = (vehicleClass || '').toLowerCase();
+    const pool = IMAGE_POOL[key] || IMAGE_POOL.default;
+    return pool[Math.floor(Math.random() * pool.length)];
+  };
+
+  const regenerateImages = async () => {
+    if (!prices.length) { toast.info('No cars to update'); return; }
+    setRegenerating(true);
+    try {
+      let updated = 0;
+      for (const p of prices) {
+        await updatePrice.mutateAsync({ id: p.id, agencyId, image_url: pickImageFor(p.vehicle_class) });
+        updated++;
+      }
+      toast.success(`Updated images for ${updated} cars`);
+    } catch (err: any) {
+      toast.error('Failed to update images: ' + err.message);
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   const saveEdit = async () => {
     if (!editing) return;
