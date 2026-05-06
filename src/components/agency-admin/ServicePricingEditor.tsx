@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
