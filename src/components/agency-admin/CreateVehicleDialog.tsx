@@ -195,7 +195,10 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-3 pt-6">
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center gap-3">
               <Switch checked={airConditioning} onCheckedChange={setAirConditioning} />
               <Label>Air Conditioning</Label>
             </div>
