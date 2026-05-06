@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -1426,6 +1426,31 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [dropOff, setDropOff] = useState('');
   const [desc, setDesc] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [seeding, setSeeding] = useState(false);
+
+  const seedDummy = async () => {
+    const dummy = [
+      { vehicle_class: 'Economy', brand: 'Fiat', model: '500', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 4, daily_rate: 32, weekly_rate: 190, monthly_rate: 720, drop_off_fee: 25, description: 'A/C, compact city car' },
+      { vehicle_class: 'Compact', brand: 'Volkswagen', model: 'Golf', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 5, daily_rate: 55, weekly_rate: 320, monthly_rate: 1100, drop_off_fee: 30, description: 'A/C, Bluetooth' },
+      { vehicle_class: 'Sedan', brand: 'BMW', model: '3 Series', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 110, weekly_rate: 660, monthly_rate: 2200, drop_off_fee: 40, description: 'Premium sedan' },
+      { vehicle_class: 'Luxury', brand: 'Mercedes-Benz', model: 'E-Class', year: 2024, transmission: 'automatic', fuel_type: 'hybrid', seats: 5, daily_rate: 180, weekly_rate: 1080, monthly_rate: 3600, drop_off_fee: 60, description: 'Executive class' },
+      { vehicle_class: 'SUV', brand: 'Audi', model: 'Q5', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 140, weekly_rate: 840, monthly_rate: 2800, drop_off_fee: 50, description: 'Spacious SUV, 4WD' },
+      { vehicle_class: 'Van', brand: 'Mercedes-Benz', model: 'V-Class', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 8, daily_rate: 160, weekly_rate: 960, monthly_rate: 3200, drop_off_fee: 70, description: '8 seats, ideal for groups' },
+    ];
+    setSeeding(true);
+    try {
+      let added = 0;
+      for (const d of dummy) {
+        await addPrice.mutateAsync({ agency_id: agencyId, image_url: null, ...d });
+        added++;
+      }
+      toast.success(`Seeded ${added} dummy cars`);
+    } catch (err: any) {
+      toast.error('Failed to seed: ' + err.message);
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleAdd = () => {
     if (!vehicleClass || !dailyRate) return;
@@ -1569,6 +1594,9 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
 
       {/* Excel import/export */}
       <div className="flex gap-2 flex-wrap">
+        <Button variant="outline" size="sm" className="text-xs" onClick={seedDummy} disabled={seeding || addPrice.isPending}>
+          <Sparkles className="h-3.5 w-3.5 mr-1" /> {seeding ? 'Seeding...' : 'Seed dummy cars'}
+        </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
           <Download className="h-3.5 w-3.5 mr-1" /> Download Template
         </Button>
