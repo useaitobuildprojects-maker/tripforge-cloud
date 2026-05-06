@@ -1816,13 +1816,117 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
                         className="text-xs font-mono h-7 w-20 text-center mx-auto" />
                     )}
                   </td>
-                  <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditing({ ...p })}><Pencil className="h-3.5 w-3.5 text-muted-foreground" /></Button>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       )}
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Edit Vehicle</DialogTitle></DialogHeader>
+          {editing && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                {editing.image_url ? (
+                  <img src={editing.image_url} alt="" className="h-20 w-28 object-cover rounded border border-border" />
+                ) : (
+                  <div className="h-20 w-28 rounded border border-dashed border-border flex items-center justify-center bg-muted/30">
+                    <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[11px]">Vehicle Image</Label>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" className="text-xs h-7" disabled={editImgUploading} onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file'; input.accept = 'image/*';
+                      input.onchange = async (e: any) => {
+                        const f = e.target.files?.[0]; if (!f) return;
+                        setEditImgUploading(true);
+                        try { const url = await uploadImage(f); setEditing((prev: any) => ({ ...prev, image_url: url })); }
+                        catch (err: any) { toast.error('Upload failed: ' + err.message); }
+                        finally { setEditImgUploading(false); }
+                      };
+                      input.click();
+                    }}>
+                      <Upload className="h-3.5 w-3.5 mr-1" /> {editImgUploading ? 'Uploading...' : editing.image_url ? 'Replace' : 'Upload'}
+                    </Button>
+                    {editing.image_url && (
+                      <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={() => setEditing({ ...editing, image_url: null })}>Remove</Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <div className="space-y-1"><Label className="text-[11px]">Vehicle Class *</Label><Input value={editing.vehicle_class || ''} onChange={(e) => setEditing({ ...editing, vehicle_class: e.target.value })} className="text-xs" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Brand</Label><Input value={editing.brand || ''} onChange={(e) => setEditing({ ...editing, brand: e.target.value })} className="text-xs" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Model</Label><Input value={editing.model || ''} onChange={(e) => setEditing({ ...editing, model: e.target.value })} className="text-xs" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Year</Label><Input type="number" value={editing.year || ''} onChange={(e) => setEditing({ ...editing, year: e.target.value })} className="text-xs font-mono" /></div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[11px]">Transmission</Label>
+                  <Select value={editing.transmission || 'automatic'} onValueChange={(v) => setEditing({ ...editing, transmission: v })}>
+                    <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="automatic">Automatic</SelectItem>
+                      <SelectItem value="manual">Manual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[11px]">Fuel Type</Label>
+                  <Select value={editing.fuel_type || 'gasoline'} onValueChange={(v) => setEditing({ ...editing, fuel_type: v })}>
+                    <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gasoline">Gasoline</SelectItem>
+                      <SelectItem value="diesel">Diesel</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                      <SelectItem value="lpg">LPG</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1"><Label className="text-[11px]">Seats</Label><Input type="number" min={1} max={50} value={editing.seats || ''} onChange={(e) => setEditing({ ...editing, seats: e.target.value })} className="text-xs font-mono" /></div>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
+                <div className="space-y-1"><Label className="text-[11px]">Per Night (€) *</Label><Input type="number" value={editing.daily_rate ?? ''} onChange={(e) => setEditing({ ...editing, daily_rate: e.target.value })} className="text-xs font-mono" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" value={editing.weekly_rate ?? ''} onChange={(e) => setEditing({ ...editing, weekly_rate: e.target.value })} className="text-xs font-mono" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" value={editing.monthly_rate ?? ''} onChange={(e) => setEditing({ ...editing, monthly_rate: e.target.value })} className="text-xs font-mono" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Free KM/day</Label><Input type="number" value={editing.free_km_per_day ?? ''} onChange={(e) => setEditing({ ...editing, free_km_per_day: e.target.value })} className="text-xs font-mono" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Extra KM (€)</Label><Input type="number" step={0.05} value={editing.extra_km_rate ?? ''} onChange={(e) => setEditing({ ...editing, extra_km_rate: e.target.value })} className="text-xs font-mono" /></div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-[11px]">Drop-off Mode</Label>
+                  <Select value={editing.drop_off_mode || 'fixed'} onValueChange={(v) => setEditing({ ...editing, drop_off_mode: v })}>
+                    <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fixed">Fixed fee</SelectItem>
+                      <SelectItem value="per_km">Distance × Price/km</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1"><Label className="text-[11px]">Drop-off Fee (€)</Label><Input type="number" value={editing.drop_off_fee ?? ''} onChange={(e) => setEditing({ ...editing, drop_off_fee: e.target.value })} className="text-xs font-mono" /></div>
+                <div className="space-y-1"><Label className="text-[11px]">Price / km (€)</Label><Input type="number" step={0.05} value={editing.price_per_km ?? ''} onChange={(e) => setEditing({ ...editing, price_per_km: e.target.value })} className="text-xs font-mono" /></div>
+              </div>
+              <div className="space-y-1"><Label className="text-[11px]">Notes</Label><Input value={editing.description || ''} onChange={(e) => setEditing({ ...editing, description: e.target.value })} className="text-xs" /></div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setEditing(null)}>Cancel</Button>
+            <Button size="sm" onClick={saveEdit} disabled={updatePrice.isPending} className="gradient-accent text-accent-foreground">Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
