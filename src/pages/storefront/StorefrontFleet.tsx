@@ -194,14 +194,7 @@ const StorefrontFleet = () => {
 
                         <div className="flex items-end justify-between mt-3 pt-3 border-t" style={tk.border}>
                           <div>
-                            {vehicle.display_price_per_km ? (
-                              <>
-                                <p className="text-[10px]" style={tk.textMuted}>From</p>
-                                <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>
-                                  {vehicle.display_price_per_km}€<span className="text-xs font-normal" style={tk.textMuted}> /km</span>
-                                </p>
-                              </>
-                            ) : vehicle.daily_rate ? (
+                            {vehicle.daily_rate ? (
                               <>
                                 <p className="text-[10px] line-through" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
                                 <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>
