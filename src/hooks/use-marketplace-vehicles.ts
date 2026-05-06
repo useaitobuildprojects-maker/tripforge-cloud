@@ -9,10 +9,7 @@ export interface MarketplaceVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
-  price_per_km: number | null;
-  display_price_per_km: number | null;
   daily_rate_base: number | null;
-  free_km_per_day: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -32,8 +29,6 @@ export interface MarketplaceVehicle {
   display_rate: number | null;
   home_city: string | null;
   home_country: string | null;
-  drop_off_mode: 'fixed' | 'per_km';
-  drop_off_fee: number;
 }
 
 export const useMarketplaceVehicles = (currentAgencyId: string | undefined, commissionRate: number = 10) => {
@@ -45,7 +40,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
       
       let res: any = await supabase
         .from('vehicles')
-        .select(`${baseCols}, price_per_km, daily_rate_base, free_km_per_day, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee, city, country, storefront_config)`)
+        .select(`${baseCols}, daily_rate_base, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee, city, country, storefront_config)`)
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
@@ -107,13 +102,6 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
         const displayRate = originalRate && !isOwn
           ? Math.round(originalRate * (1 + agencyCommission / 100))
           : originalRate;
-        const originalPricePerKm = v.price_per_km ?? null;
-        const displayPricePerKm = originalPricePerKm && !isOwn
-          ? +(originalPricePerKm * (1 + agencyCommission / 100)).toFixed(2)
-          : originalPricePerKm;
-        const sc = v.agencies?.storefront_config ?? {};
-        const dropMode = (sc.car_rental_drop_off_mode ?? 'fixed') as 'fixed' | 'per_km';
-        const dropFee = Number(sc.car_rental_drop_off_fee ?? 0);
 
         return {
           id: v.id,
@@ -128,10 +116,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           category: v.category,
           air_conditioning: v.air_conditioning,
           mileage_policy: v.mileage_policy,
-          price_per_km: originalPricePerKm,
-          display_price_per_km: displayPricePerKm,
           daily_rate_base: v.daily_rate_base ?? null,
-          free_km_per_day: v.free_km_per_day ?? 200,
           agency_id: v.agency_id,
           agency_name: v.agencies?.name ?? '',
           agency_slug: v.agencies?.slug ?? '',
@@ -144,8 +129,6 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           display_rate: displayRate,
           home_city: v.agencies?.city ?? null,
           home_country: v.agencies?.country ?? null,
-          drop_off_mode: dropMode,
-          drop_off_fee: dropFee,
         };
       });
     },
