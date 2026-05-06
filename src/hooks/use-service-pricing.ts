@@ -66,10 +66,10 @@ export interface CarRentalPrice {
   weekly_rate: number | null;
   monthly_rate: number | null;
   drop_off_fee: number;
-  drop_off_mode: 'fixed' | 'per_km';
-  price_per_km: number | null;
-  free_km_per_day: number | null;
-  extra_km_rate: number | null;
+  drop_off_mode?: 'fixed' | 'per_km';
+  price_per_km?: number | null;
+  free_km_per_day?: number | null;
+  extra_km_rate?: number | null;
   description: string | null;
   brand: string | null;
   model: string | null;
