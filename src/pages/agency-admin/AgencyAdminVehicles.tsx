@@ -133,11 +133,6 @@ const AgencyAdminVehicles = () => {
                           <> · <span className="capitalize">{vehicle.vehicle_class.replace('_', ' ')}</span></>
                         )}
                       </p>
-                      {vehicle.daily_rate_base ? (
-                        <p className="text-sm font-bold text-accent mt-0.5">{vehicle.daily_rate_base} €/day</p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground/50 mt-0.5 italic">No price set</p>
-                      )}
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Button

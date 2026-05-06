@@ -27,7 +27,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [category, setCategory] = useState('sedan');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
-  const [dailyRateBase, setDailyRateBase] = useState('');
   const [vehicleClass, setVehicleClass] = useState('economy');
 
   const updateVehicle = useUpdateVehicle();
@@ -46,7 +45,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setCategory((vehicle as any).category ?? 'sedan');
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
-      setDailyRateBase(vehicle.daily_rate_base != null ? String(vehicle.daily_rate_base) : '');
       setVehicleClass((vehicle as any).vehicle_class ?? 'economy');
     }
   }, [vehicle]);
@@ -54,7 +52,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!vehicle) return;
-    const baseRate = parseFloat(dailyRateBase);
     updateVehicle.mutate(
       {
         id: vehicle.id,
@@ -66,7 +63,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         fuel_type: fuelType, category,
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
-        daily_rate_base: baseRate > 0 ? baseRate : null,
         vehicle_class: vehicleClass,
       },
       { onSuccess: () => onOpenChange(false) }
@@ -194,12 +190,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
               <Label htmlFor="editPlate">License Plate</Label>
               <Input id="editPlate" value={licensePlate} onChange={(e) => setLicensePlate(e.target.value)} />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="editDailyRate">Daily Rate (€)</Label>
-              <Input id="editDailyRate" type="number" min={0} step="1" value={dailyRateBase} onChange={(e) => setDailyRateBase(e.target.value)} placeholder="45" />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 gap-3">
             <div className="space-y-2">
               <Label htmlFor="editVin">VIN</Label>
               <Input id="editVin" value={vin} onChange={(e) => setVin(e.target.value)} />

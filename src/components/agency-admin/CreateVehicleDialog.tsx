@@ -30,7 +30,6 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [vehicleClass, setVehicleClass] = useState('economy');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
-  const [dailyRateBase, setDailyRateBase] = useState('');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -40,7 +39,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
-    setDailyRateBase(''); setVehicleClass('economy');
+    setVehicleClass('economy');
   };
 
   const handleSubmit = async () => {
@@ -51,7 +50,6 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       photo_url = await uploadPhoto.mutateAsync({ file: photoFile, agencyId });
     }
 
-    const baseRate = parseFloat(dailyRateBase);
     await createVehicle.mutateAsync({
       agency_id: agencyId,
       brand: brand.trim(),
@@ -67,7 +65,6 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       category,
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
-      daily_rate_base: baseRate > 0 ? baseRate : null,
       vehicle_class: vehicleClass,
     });
 
@@ -209,13 +206,6 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
               <Label htmlFor="plate">License Plate</Label>
               <Input id="plate" value={plate} onChange={(e) => setPlate(e.target.value)} placeholder="AB-123-CD" />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="dailyRate">Daily Rate (€)</Label>
-              <Input id="dailyRate" type="number" min={0} step="1" value={dailyRateBase} onChange={(e) => setDailyRateBase(e.target.value)} placeholder="45" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="vin">VIN</Label>
               <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
