@@ -1685,6 +1685,27 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
         </div>
         <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
+        <div className="flex items-center gap-3 pt-1">
+          {imageUrl ? (
+            <img src={imageUrl} alt="Preview" className="h-14 w-20 object-cover rounded border border-border" />
+          ) : (
+            <div className="h-14 w-20 rounded border border-dashed border-border flex items-center justify-center bg-muted/30">
+              <ImageIcon className="h-5 w-5 text-muted-foreground" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1">
+            <Label className="text-[11px]">Vehicle Image (optional)</Label>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" size="sm" className="text-xs h-7" onClick={() => imageRef.current?.click()} disabled={imgUploading}>
+                <Upload className="h-3.5 w-3.5 mr-1" /> {imgUploading ? 'Uploading...' : imageUrl ? 'Replace' : 'Upload Image'}
+              </Button>
+              {imageUrl && (
+                <Button type="button" variant="ghost" size="sm" className="text-xs h-7" onClick={() => setImageUrl(null)}>Remove</Button>
+              )}
+            </div>
+            <input ref={imageRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
+          </div>
+        </div>
       </div>
 
       {/* Table */}
@@ -1693,6 +1714,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <table className="w-full text-xs">
             <thead className="bg-secondary/50">
               <tr>
+                <th className="px-3 py-2 text-left font-medium text-muted-foreground w-20">Image</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Vehicle</th>
                 <th className="px-3 py-2 text-left font-medium text-muted-foreground">Details</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th>
@@ -1708,6 +1730,21 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
             <tbody>
               {prices.map((p) => (
                 <tr key={p.id} className="border-t border-border hover:bg-secondary/20">
+                  <td className="px-3 py-2">
+                    <label className="block cursor-pointer group relative">
+                      {p.image_url ? (
+                        <img src={p.image_url} alt={p.vehicle_class} className="h-12 w-16 object-cover rounded border border-border" />
+                      ) : (
+                        <div className="h-12 w-16 rounded border border-dashed border-border flex items-center justify-center bg-muted/30">
+                          <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/40 text-white text-[10px] rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                        {rowUploadingId === p.id ? '...' : 'Change'}
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleRowImageUpload(p.id, f); e.target.value=''; }} />
+                    </label>
+                  </td>
                   <td className="px-3 py-2">
                     <div className="font-medium text-foreground">{p.brand && p.model ? `${p.brand} ${p.model}` : p.vehicle_class}</div>
                     <div className="text-muted-foreground">{p.vehicle_class}{p.year ? ` • ${p.year}` : ''}</div>
