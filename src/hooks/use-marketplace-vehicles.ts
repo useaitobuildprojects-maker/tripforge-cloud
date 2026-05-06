@@ -45,7 +45,7 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
       
       let res: any = await supabase
         .from('vehicles')
-        .select(`${baseCols}, price_per_km, daily_rate_base, free_km_per_day, home_city, home_country, drop_off_mode, drop_off_fee, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee)`)
+        .select(`${baseCols}, price_per_km, daily_rate_base, free_km_per_day, agency_id, agencies!inner(name, slug, logo_url, commission_rate, one_way_fee, city, country, storefront_config)`)
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
@@ -111,6 +111,9 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
         const displayPricePerKm = originalPricePerKm && !isOwn
           ? +(originalPricePerKm * (1 + agencyCommission / 100)).toFixed(2)
           : originalPricePerKm;
+        const sc = v.agencies?.storefront_config ?? {};
+        const dropMode = (sc.car_rental_drop_off_mode ?? 'fixed') as 'fixed' | 'per_km';
+        const dropFee = Number(sc.car_rental_drop_off_fee ?? 0);
 
         return {
           id: v.id,
@@ -139,10 +142,10 @@ export const useMarketplaceVehicles = (currentAgencyId: string | undefined, comm
           original_rate: originalRate,
           daily_rate: displayRate,
           display_rate: displayRate,
-          home_city: v.home_city ?? null,
-          home_country: v.home_country ?? null,
-          drop_off_mode: (v.drop_off_mode ?? 'fixed') as 'fixed' | 'per_km',
-          drop_off_fee: Number(v.drop_off_fee ?? 0),
+          home_city: v.agencies?.city ?? null,
+          home_country: v.agencies?.country ?? null,
+          drop_off_mode: dropMode,
+          drop_off_fee: dropFee,
         };
       });
     },
