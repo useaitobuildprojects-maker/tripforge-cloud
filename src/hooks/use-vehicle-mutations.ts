@@ -20,10 +20,6 @@ interface CreateVehicleInput {
   price_per_km?: number | null;
   daily_rate_base?: number | null;
   free_km_per_day?: number | null;
-  home_city?: string | null;
-  home_country?: string | null;
-  drop_off_mode?: 'fixed' | 'per_km';
-  drop_off_fee?: number | null;
 }
 
 export const useCreateVehicle = () => {
@@ -63,10 +59,6 @@ interface UpdateVehicleInput {
   price_per_km?: number | null;
   daily_rate_base?: number | null;
   free_km_per_day?: number | null;
-  home_city?: string | null;
-  home_country?: string | null;
-  drop_off_mode?: 'fixed' | 'per_km';
-  drop_off_fee?: number | null;
 }
 
 export const useUpdateVehicle = () => {

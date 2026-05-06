@@ -67,6 +67,9 @@ export interface StorefrontConfig {
   // Car rental mileage settings
   car_rental_free_km?: number;
   car_rental_extra_km_rate?: number;
+  // Car rental cross-city drop-off (when pickup city differs from agency's home city)
+  car_rental_drop_off_mode?: 'fixed' | 'per_km';
+  car_rental_drop_off_fee?: number;
   // Limo amenities (displayed on storefront)
   limo_amenities?: string[];
   // Limo service fixed package pricing (per category)
