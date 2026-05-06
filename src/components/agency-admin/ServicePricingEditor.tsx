@@ -1553,53 +1553,10 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
 
   return (
     <div className="space-y-5">
-      {/* Mileage config */}
-      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Mileage & Cross-City Drop-off</h4>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Free KM / Day</Label>
-            <Input type="number" min={0} step={10} placeholder="200"
-              value={storefrontConfig.car_rental_free_km ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_free_km: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Extra KM Rate (€)</Label>
-            <Input type="number" min={0} step={0.05} placeholder="0.25"
-              value={storefrontConfig.car_rental_extra_km_rate ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_extra_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 pt-1">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Drop-off Mode (when pickup ≠ home city)</Label>
-            <Select
-              value={storefrontConfig.car_rental_drop_off_mode ?? 'fixed'}
-              onValueChange={(v) => onConfigChange({ ...storefrontConfig, car_rental_drop_off_mode: v as 'fixed' | 'per_km' })}
-            >
-              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fixed">Fixed fee</SelectItem>
-                <SelectItem value="per_km">Distance × Price/km</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {(storefrontConfig.car_rental_drop_off_mode ?? 'fixed') === 'fixed' ? (
-            <div className="space-y-1">
-              <Label className="text-[11px]">Drop-off Fee (€)</Label>
-              <Input type="number" min={0} step={1} placeholder="50"
-                value={storefrontConfig.car_rental_drop_off_fee ?? ''}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_drop_off_fee: e.target.value ? Number(e.target.value) : undefined })}
-                className="text-xs font-mono" />
-            </div>
-          ) : (
-            <p className="text-[11px] text-muted-foreground self-end pb-1">
-              Customer enters distance; fee = distance × vehicle's Price/km.
-            </p>
-          )}
-        </div>
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-3">
+        <p className="text-[11px] text-muted-foreground">
+          <span className="font-semibold text-foreground">Per-car mileage & drop-off:</span> Each vehicle below has its own free km, extra km rate, drop-off mode, and price/km. Configure them in the Add form or inline in the table.
+        </p>
       </div>
 
       {/* Excel import/export */}
