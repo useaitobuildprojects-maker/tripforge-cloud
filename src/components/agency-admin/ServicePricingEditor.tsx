@@ -1416,6 +1416,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const deletePrice = useDeleteCarRentalPrice();
   const updatePrice = useUpdateCarRentalPrice();
   const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const [vehicleClass, setVehicleClass] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
