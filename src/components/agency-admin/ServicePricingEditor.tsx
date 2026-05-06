@@ -16,7 +16,7 @@ import {
   TRANSFER_CATEGORIES,
   useLimoTourPricing, useAddLimoTourPrice, useDeleteLimoTourPrice,
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
-  useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice,
+  useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice, useUpdateCarRentalPrice,
 } from '@/hooks/use-service-pricing';
 
 import { StorefrontConfig } from '@/types/agency';
@@ -1412,6 +1412,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const { data: prices = [], isLoading } = useCarRentalPricing(agencyId);
   const addPrice = useAddCarRentalPrice();
   const deletePrice = useDeleteCarRentalPrice();
+  const updatePrice = useUpdateCarRentalPrice();
   const fileRef = useRef<HTMLInputElement>(null);
   const [vehicleClass, setVehicleClass] = useState('');
   const [brand, setBrand] = useState('');
@@ -1424,18 +1425,22 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [weeklyRate, setWeeklyRate] = useState('');
   const [monthlyRate, setMonthlyRate] = useState('');
   const [dropOff, setDropOff] = useState('');
+  const [dropOffMode, setDropOffMode] = useState<'fixed' | 'per_km'>('fixed');
+  const [pricePerKm, setPricePerKm] = useState('');
+  const [freeKm, setFreeKm] = useState('200');
+  const [extraKmRate, setExtraKmRate] = useState('0.25');
   const [desc, setDesc] = useState('');
   const [uploading, setUploading] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
   const seedDummy = async () => {
     const dummy = [
-      { vehicle_class: 'Economy', brand: 'Fiat', model: '500', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 4, daily_rate: 32, weekly_rate: 190, monthly_rate: 720, drop_off_fee: 25, description: 'A/C, compact city car' },
-      { vehicle_class: 'Compact', brand: 'Volkswagen', model: 'Golf', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 5, daily_rate: 55, weekly_rate: 320, monthly_rate: 1100, drop_off_fee: 30, description: 'A/C, Bluetooth' },
-      { vehicle_class: 'Sedan', brand: 'BMW', model: '3 Series', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 110, weekly_rate: 660, monthly_rate: 2200, drop_off_fee: 40, description: 'Premium sedan' },
-      { vehicle_class: 'Luxury', brand: 'Mercedes-Benz', model: 'E-Class', year: 2024, transmission: 'automatic', fuel_type: 'hybrid', seats: 5, daily_rate: 180, weekly_rate: 1080, monthly_rate: 3600, drop_off_fee: 60, description: 'Executive class' },
-      { vehicle_class: 'SUV', brand: 'Audi', model: 'Q5', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 140, weekly_rate: 840, monthly_rate: 2800, drop_off_fee: 50, description: 'Spacious SUV, 4WD' },
-      { vehicle_class: 'Van', brand: 'Mercedes-Benz', model: 'V-Class', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 8, daily_rate: 160, weekly_rate: 960, monthly_rate: 3200, drop_off_fee: 70, description: '8 seats, ideal for groups' },
+      { vehicle_class: 'Economy', brand: 'Fiat', model: '500', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 4, daily_rate: 32, weekly_rate: 190, monthly_rate: 720, drop_off_fee: 25, drop_off_mode: 'fixed' as const, price_per_km: 0.30, free_km_per_day: 300, extra_km_rate: 0.20, description: 'A/C, compact city car' },
+      { vehicle_class: 'Compact', brand: 'Volkswagen', model: 'Golf', year: 2024, transmission: 'manual', fuel_type: 'gasoline', seats: 5, daily_rate: 55, weekly_rate: 320, monthly_rate: 1100, drop_off_fee: 30, drop_off_mode: 'per_km' as const, price_per_km: 0.35, free_km_per_day: 250, extra_km_rate: 0.25, description: 'A/C, Bluetooth' },
+      { vehicle_class: 'Sedan', brand: 'BMW', model: '3 Series', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 110, weekly_rate: 660, monthly_rate: 2200, drop_off_fee: 40, drop_off_mode: 'per_km' as const, price_per_km: 0.45, free_km_per_day: 250, extra_km_rate: 0.30, description: 'Premium sedan' },
+      { vehicle_class: 'Luxury', brand: 'Mercedes-Benz', model: 'E-Class', year: 2024, transmission: 'automatic', fuel_type: 'hybrid', seats: 5, daily_rate: 180, weekly_rate: 1080, monthly_rate: 3600, drop_off_fee: 60, drop_off_mode: 'per_km' as const, price_per_km: 0.60, free_km_per_day: 200, extra_km_rate: 0.45, description: 'Executive class' },
+      { vehicle_class: 'SUV', brand: 'Audi', model: 'Q5', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 5, daily_rate: 140, weekly_rate: 840, monthly_rate: 2800, drop_off_fee: 50, drop_off_mode: 'fixed' as const, price_per_km: 0.50, free_km_per_day: 200, extra_km_rate: 0.35, description: 'Spacious SUV, 4WD' },
+      { vehicle_class: 'Van', brand: 'Mercedes-Benz', model: 'V-Class', year: 2023, transmission: 'automatic', fuel_type: 'diesel', seats: 8, daily_rate: 160, weekly_rate: 960, monthly_rate: 3200, drop_off_fee: 70, drop_off_mode: 'per_km' as const, price_per_km: 0.55, free_km_per_day: 200, extra_km_rate: 0.40, description: '8 seats, ideal for groups' },
     ];
     setSeeding(true);
     try {
@@ -1468,11 +1473,16 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       weekly_rate: weeklyRate ? Number(weeklyRate) : null,
       monthly_rate: monthlyRate ? Number(monthlyRate) : null,
       drop_off_fee: Number(dropOff) || 0,
+      drop_off_mode: dropOffMode,
+      price_per_km: pricePerKm ? Number(pricePerKm) : 0,
+      free_km_per_day: freeKm ? Number(freeKm) : 200,
+      extra_km_rate: extraKmRate ? Number(extraKmRate) : 0.25,
       description: desc || null,
     });
     setVehicleClass(''); setBrand(''); setModel(''); setYear(new Date().getFullYear().toString());
     setTransmission('automatic'); setFuelType('gasoline'); setSeats('5');
     setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
+    setDropOffMode('fixed'); setPricePerKm(''); setFreeKm('200'); setExtraKmRate('0.25');
   };
 
   const downloadTemplate = () => {
@@ -1543,53 +1553,10 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
 
   return (
     <div className="space-y-5">
-      {/* Mileage config */}
-      <div className="rounded-lg border border-accent/30 bg-accent/5 p-4 space-y-3">
-        <h4 className="text-xs font-semibold text-foreground">Mileage & Cross-City Drop-off</h4>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Free KM / Day</Label>
-            <Input type="number" min={0} step={10} placeholder="200"
-              value={storefrontConfig.car_rental_free_km ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_free_km: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-[11px]">Extra KM Rate (€)</Label>
-            <Input type="number" min={0} step={0.05} placeholder="0.25"
-              value={storefrontConfig.car_rental_extra_km_rate ?? ''}
-              onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_extra_km_rate: e.target.value ? Number(e.target.value) : undefined })}
-              className="text-xs font-mono" />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 pt-1">
-          <div className="space-y-1">
-            <Label className="text-[11px]">Drop-off Mode (when pickup ≠ home city)</Label>
-            <Select
-              value={storefrontConfig.car_rental_drop_off_mode ?? 'fixed'}
-              onValueChange={(v) => onConfigChange({ ...storefrontConfig, car_rental_drop_off_mode: v as 'fixed' | 'per_km' })}
-            >
-              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="fixed">Fixed fee</SelectItem>
-                <SelectItem value="per_km">Distance × Price/km</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          {(storefrontConfig.car_rental_drop_off_mode ?? 'fixed') === 'fixed' ? (
-            <div className="space-y-1">
-              <Label className="text-[11px]">Drop-off Fee (€)</Label>
-              <Input type="number" min={0} step={1} placeholder="50"
-                value={storefrontConfig.car_rental_drop_off_fee ?? ''}
-                onChange={(e) => onConfigChange({ ...storefrontConfig, car_rental_drop_off_fee: e.target.value ? Number(e.target.value) : undefined })}
-                className="text-xs font-mono" />
-            </div>
-          ) : (
-            <p className="text-[11px] text-muted-foreground self-end pb-1">
-              Customer enters distance; fee = distance × vehicle's Price/km.
-            </p>
-          )}
-        </div>
+      <div className="rounded-lg border border-accent/30 bg-accent/5 p-3">
+        <p className="text-[11px] text-muted-foreground">
+          <span className="font-semibold text-foreground">Per-car mileage & drop-off:</span> Each vehicle below has its own free km, extra km rate, drop-off mode, and price/km. Configure them in the Add form or inline in the table.
+        </p>
       </div>
 
       {/* Excel import/export */}
@@ -1649,7 +1616,27 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <div className="space-y-1"><Label className="text-[11px]">Per Night (€) *</Label><Input type="number" min={0} placeholder="45" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="text-xs font-mono" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" min={0} placeholder="250" value={weeklyRate} onChange={(e) => setWeeklyRate(e.target.value)} className="text-xs font-mono" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" min={0} placeholder="850" value={monthlyRate} onChange={(e) => setMonthlyRate(e.target.value)} className="text-xs font-mono" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">Drop-off (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Free KM/day</Label><Input type="number" min={0} step={10} placeholder="200" value={freeKm} onChange={(e) => setFreeKm(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Extra KM (€)</Label><Input type="number" min={0} step={0.05} placeholder="0.25" value={extraKmRate} onChange={(e) => setExtraKmRate(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        {/* Drop-off row */}
+        <div className="grid grid-cols-5 gap-2">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Drop-off Mode</Label>
+            <Select value={dropOffMode} onValueChange={(v) => setDropOffMode(v as 'fixed' | 'per_km')}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Fixed fee</SelectItem>
+                <SelectItem value="per_km">Distance × Price/km</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {dropOffMode === 'fixed' ? (
+            <div className="space-y-1"><Label className="text-[11px]">Drop-off Fee (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+          ) : (
+            <div className="space-y-1"><Label className="text-[11px]">Price / km (€)</Label><Input type="number" min={0} step={0.05} placeholder="0.45" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} className="text-xs font-mono" /></div>
+          )}
+          <div className="col-span-2" />
           <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
         </div>
         <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
@@ -1666,7 +1653,10 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Month</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Free km/day</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Extra €/km</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Drop-off Mode</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Fee / Price/km</th>
                 <th className="px-3 py-2 w-10" />
               </tr>
             </thead>
@@ -1683,7 +1673,36 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
                   <td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.monthly_rate ? `€${p.monthly_rate}` : '—'}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td>
+                  <td className="px-3 py-2">
+                    <Input type="number" min={0} step={10} defaultValue={p.free_km_per_day ?? 200}
+                      onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.free_km_per_day ?? 200)) updatePrice.mutate({ id: p.id, agencyId, free_km_per_day: v }); }}
+                      className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input type="number" min={0} step={0.05} defaultValue={p.extra_km_rate ?? 0.25}
+                      onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.extra_km_rate ?? 0.25)) updatePrice.mutate({ id: p.id, agencyId, extra_km_rate: v }); }}
+                      className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Select value={p.drop_off_mode ?? 'fixed'} onValueChange={(v) => updatePrice.mutate({ id: p.id, agencyId, drop_off_mode: v as 'fixed' | 'per_km' })}>
+                      <SelectTrigger className="text-xs h-7 w-[130px] mx-auto"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fixed">Fixed</SelectItem>
+                        <SelectItem value="per_km">Per km</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="px-3 py-2">
+                    {(p.drop_off_mode ?? 'fixed') === 'fixed' ? (
+                      <Input type="number" min={0} defaultValue={p.drop_off_fee}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== p.drop_off_fee) updatePrice.mutate({ id: p.id, agencyId, drop_off_fee: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                    ) : (
+                      <Input type="number" min={0} step={0.05} defaultValue={p.price_per_km ?? 0}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.price_per_km ?? 0)) updatePrice.mutate({ id: p.id, agencyId, price_per_km: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                    )}
+                  </td>
                   <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
                 </tr>
               ))}

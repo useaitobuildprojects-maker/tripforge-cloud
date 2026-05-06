@@ -214,11 +214,15 @@ export type Database = {
           daily_rate: number
           description: string | null
           drop_off_fee: number
+          drop_off_mode: string
+          extra_km_rate: number | null
+          free_km_per_day: number | null
           fuel_type: string | null
           id: string
           image_url: string | null
           model: string | null
           monthly_rate: number | null
+          price_per_km: number | null
           seats: number | null
           transmission: string | null
           vehicle_class: string
@@ -232,11 +236,15 @@ export type Database = {
           daily_rate?: number
           description?: string | null
           drop_off_fee?: number
+          drop_off_mode?: string
+          extra_km_rate?: number | null
+          free_km_per_day?: number | null
           fuel_type?: string | null
           id?: string
           image_url?: string | null
           model?: string | null
           monthly_rate?: number | null
+          price_per_km?: number | null
           seats?: number | null
           transmission?: string | null
           vehicle_class: string
@@ -250,11 +258,15 @@ export type Database = {
           daily_rate?: number
           description?: string | null
           drop_off_fee?: number
+          drop_off_mode?: string
+          extra_km_rate?: number | null
+          free_km_per_day?: number | null
           fuel_type?: string | null
           id?: string
           image_url?: string | null
           model?: string | null
           monthly_rate?: number | null
+          price_per_km?: number | null
           seats?: number | null
           transmission?: string | null
           vehicle_class?: string

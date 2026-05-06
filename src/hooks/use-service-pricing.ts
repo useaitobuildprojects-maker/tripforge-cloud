@@ -66,6 +66,10 @@ export interface CarRentalPrice {
   weekly_rate: number | null;
   monthly_rate: number | null;
   drop_off_fee: number;
+  drop_off_mode?: 'fixed' | 'per_km';
+  price_per_km?: number | null;
+  free_km_per_day?: number | null;
+  extra_km_rate?: number | null;
   description: string | null;
   brand: string | null;
   model: string | null;
@@ -234,5 +238,17 @@ export const useDeleteCarRentalPrice = () => {
       if (error) throw error;
     },
     onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['car-rental-pricing', v.agencyId] }); },
+  });
+};
+
+export const useUpdateCarRentalPrice = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, agencyId, ...patch }: { id: string; agencyId: string } & Partial<CarRentalPrice>) => {
+      const { error } = await supabase.from('car_rental_pricing').update(patch).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['car-rental-pricing', v.agencyId] }); },
+    onError: (e: Error) => toast.error(e.message),
   });
 };
