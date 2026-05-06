@@ -27,6 +27,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [seats, setSeats] = useState('5');
   const [fuelType, setFuelType] = useState('gasoline');
   const [category, setCategory] = useState('sedan');
+  const [vehicleClass, setVehicleClass] = useState('economy');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [dailyRateBase, setDailyRateBase] = useState('');
@@ -39,7 +40,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setPlate(''); setVin(''); setStatus('available'); setPhotoFile(null);
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
-    setDailyRateBase('');
+    setDailyRateBase(''); setVehicleClass('economy');
   };
 
   const handleSubmit = async () => {
@@ -67,6 +68,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
       daily_rate_base: baseRate > 0 ? baseRate : null,
+      vehicle_class: vehicleClass,
     });
 
     reset();
@@ -138,6 +140,22 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
               </Select>
             </div>
             <div className="space-y-1.5">
+              <Label>Class</Label>
+              <Select value={vehicleClass} onValueChange={setVehicleClass}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="economy">Economy</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="first_class">First Class</SelectItem>
+                  <SelectItem value="van">Van</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
               <Label>Transmission</Label>
               <Select value={transmission} onValueChange={setTransmission}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -147,9 +165,6 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Fuel Type</Label>
               <Select value={fuelType} onValueChange={setFuelType}>
@@ -163,13 +178,13 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="seats">Seats</Label>
               <Input id="seats" type="number" min={1} max={50} value={seats} onChange={(e) => setSeats(e.target.value)} />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label>Mileage Policy</Label>
               <Select value={mileagePolicy} onValueChange={setMileagePolicy}>
@@ -180,7 +195,10 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-3 pt-6">
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            <div className="flex items-center gap-3">
               <Switch checked={airConditioning} onCheckedChange={setAirConditioning} />
               <Label>Air Conditioning</Label>
             </div>

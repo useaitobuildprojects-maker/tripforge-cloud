@@ -652,6 +652,7 @@ export type Database = {
           seats: number | null
           status: string
           transmission: string | null
+          vehicle_class: string
           vin: string | null
           year: number
         }
@@ -673,6 +674,7 @@ export type Database = {
           seats?: number | null
           status?: string
           transmission?: string | null
+          vehicle_class?: string
           vin?: string | null
           year: number
         }
@@ -694,6 +696,7 @@ export type Database = {
           seats?: number | null
           status?: string
           transmission?: string | null
+          vehicle_class?: string
           vin?: string | null
           year?: number
         }

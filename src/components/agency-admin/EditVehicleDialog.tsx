@@ -28,6 +28,7 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [dailyRateBase, setDailyRateBase] = useState('');
+  const [vehicleClass, setVehicleClass] = useState('economy');
 
   const updateVehicle = useUpdateVehicle();
 
@@ -46,6 +47,7 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
       setDailyRateBase(vehicle.daily_rate_base != null ? String(vehicle.daily_rate_base) : '');
+      setVehicleClass((vehicle as any).vehicle_class ?? 'economy');
     }
   }, [vehicle]);
 
@@ -65,6 +67,7 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
         daily_rate_base: baseRate > 0 ? baseRate : null,
+        vehicle_class: vehicleClass,
       },
       { onSuccess: () => onOpenChange(false) }
     );
@@ -125,6 +128,22 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
               </Select>
             </div>
             <div className="space-y-2">
+              <Label>Class</Label>
+              <Select value={vehicleClass} onValueChange={setVehicleClass}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="economy">Economy</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="first_class">First Class</SelectItem>
+                  <SelectItem value="van">Van</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
               <Label>Transmission</Label>
               <Select value={transmission} onValueChange={setTransmission}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -134,9 +153,6 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Fuel Type</Label>
               <Select value={fuelType} onValueChange={setFuelType}>
@@ -150,13 +166,13 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="editSeats">Seats</Label>
               <Input id="editSeats" type="number" min={1} max={50} value={seats} onChange={(e) => setSeats(Number(e.target.value))} />
             </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Mileage Policy</Label>
               <Select value={mileagePolicy} onValueChange={setMileagePolicy}>

@@ -12,6 +12,7 @@ export interface Vehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate_base: number | null;
+  vehicle_class?: string | null;
   created_at: string;
 }
 

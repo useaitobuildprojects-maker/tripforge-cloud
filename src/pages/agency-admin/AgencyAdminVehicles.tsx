@@ -127,7 +127,12 @@ const AgencyAdminVehicles = () => {
                   <div className="flex items-start justify-between">
                     <div>
                       <h3 className="text-sm font-semibold text-foreground">{vehicle.brand} {vehicle.model}</h3>
-                      <p className="text-xs text-muted-foreground">{vehicle.year}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {vehicle.year}
+                        {vehicle.vehicle_class && (
+                          <> · <span className="capitalize">{vehicle.vehicle_class.replace('_', ' ')}</span></>
+                        )}
+                      </p>
                       {vehicle.daily_rate_base ? (
                         <p className="text-sm font-bold text-accent mt-0.5">{vehicle.daily_rate_base} €/day</p>
                       ) : (
