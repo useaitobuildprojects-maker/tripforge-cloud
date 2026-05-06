@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -805,6 +806,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
   const [newHalfDay, setNewHalfDay] = useState('');
   const [newMaxDays, setNewMaxDays] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const [showClasses, setShowClasses] = useState(false);
 
   // Vehicle class form state
@@ -1432,6 +1434,47 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [desc, setDesc] = useState('');
   const [uploading, setUploading] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imgUploading, setImgUploading] = useState(false);
+  const [rowUploadingId, setRowUploadingId] = useState<string | null>(null);
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const ext = file.name.split('.').pop();
+    const path = `${agencyId}/car-rental/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from('vehicle-photos').upload(path, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from('vehicle-photos').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  const handleImagePick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImgUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setImageUrl(url);
+      toast.success('Image uploaded');
+    } catch (err: any) {
+      toast.error('Upload failed: ' + err.message);
+    } finally {
+      setImgUploading(false);
+      if (imageRef.current) imageRef.current.value = '';
+    }
+  };
+
+  const handleRowImageUpload = async (rowId: string, file: File) => {
+    setRowUploadingId(rowId);
+    try {
+      const url = await uploadImage(file);
+      await updatePrice.mutateAsync({ id: rowId, agencyId, image_url: url });
+      toast.success('Image updated');
+    } catch (err: any) {
+      toast.error('Upload failed: ' + err.message);
+    } finally {
+      setRowUploadingId(null);
+    }
+  };
 
   const seedDummy = async () => {
     const dummy = [
@@ -1468,7 +1511,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       transmission,
       fuel_type: fuelType,
       seats: Number(seats) || 5,
-      image_url: null,
+      image_url: imageUrl,
       daily_rate: Number(dailyRate),
       weekly_rate: weeklyRate ? Number(weeklyRate) : null,
       monthly_rate: monthlyRate ? Number(monthlyRate) : null,
@@ -1483,6 +1526,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     setTransmission('automatic'); setFuelType('gasoline'); setSeats('5');
     setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
     setDropOffMode('fixed'); setPricePerKm(''); setFreeKm('200'); setExtraKmRate('0.25');
+    setImageUrl(null);
   };
 
   const downloadTemplate = () => {
