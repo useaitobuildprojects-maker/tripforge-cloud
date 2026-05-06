@@ -641,9 +641,6 @@ export type Database = {
           category: string | null
           created_at: string | null
           daily_rate_base: number | null
-          drop_off_fee: number | null
-          drop_off_mode: string
-          free_km_per_day: number | null
           fuel_type: string | null
           home_city: string | null
           home_country: string | null
@@ -652,7 +649,6 @@ export type Database = {
           mileage_policy: string | null
           model: string
           photo_url: string | null
-          price_per_km: number | null
           seats: number | null
           status: string
           transmission: string | null
@@ -666,9 +662,6 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           daily_rate_base?: number | null
-          drop_off_fee?: number | null
-          drop_off_mode?: string
-          free_km_per_day?: number | null
           fuel_type?: string | null
           home_city?: string | null
           home_country?: string | null
@@ -677,7 +670,6 @@ export type Database = {
           mileage_policy?: string | null
           model: string
           photo_url?: string | null
-          price_per_km?: number | null
           seats?: number | null
           status?: string
           transmission?: string | null
@@ -691,9 +683,6 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           daily_rate_base?: number | null
-          drop_off_fee?: number | null
-          drop_off_mode?: string
-          free_km_per_day?: number | null
           fuel_type?: string | null
           home_city?: string | null
           home_country?: string | null
@@ -702,7 +691,6 @@ export type Database = {
           mileage_policy?: string | null
           model?: string
           photo_url?: string | null
-          price_per_km?: number | null
           seats?: number | null
           status?: string
           transmission?: string | null

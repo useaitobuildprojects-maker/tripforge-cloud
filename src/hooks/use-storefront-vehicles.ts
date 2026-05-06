@@ -9,9 +9,7 @@ export interface StorefrontVehicle {
   status: 'available' | 'rented' | 'maintenance';
   photo_url: string | null;
   daily_rate: number | null;
-  price_per_km: number | null;
   daily_rate_base: number | null;
-  free_km_per_day: number | null;
   transmission: string | null;
   seats: number | null;
   fuel_type: string | null;
@@ -28,7 +26,7 @@ export const useStorefrontVehicles = (agencyId: string | undefined) => {
       
       let res: any = await supabase
         .from('vehicles')
-        .select(`${baseCols}, price_per_km, daily_rate_base, free_km_per_day`)
+        .select(`${baseCols}, daily_rate_base`)
         .eq('agency_id', agencyId!)
         .eq('status', 'available')
         .order('created_at', { ascending: false });

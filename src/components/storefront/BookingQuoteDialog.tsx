@@ -38,20 +38,14 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
   }, 0);
 
   const dailyRate = vehicle.daily_rate ?? 0;
-  const pricePerKm = vehicle.display_price_per_km ?? vehicle.price_per_km ?? 0;
-  const freeKmPerDay = (vehicle as any).free_km_per_day ?? 200;
+  const pricePerKm = 0;
+  const freeKmPerDay = 200;
 
   // Cross-city drop-off: if vehicle has a home city and pickup is in a different city,
   // charge either a fixed drop_off_fee or distance × price_per_km.
   const norm = (s?: string | null) => (s ?? '').trim().toLowerCase();
   const isCrossCity = !!vehicle.home_city && !!pickupCity && norm(vehicle.home_city) !== norm(pickupCity);
-  const dropOffFee = useMemo(() => {
-    if (!isCrossCity) return 0;
-    if (vehicle.drop_off_mode === 'per_km') {
-      return +(crossCityDistance * pricePerKm).toFixed(2);
-    }
-    return Number(vehicle.drop_off_fee ?? 0);
-  }, [isCrossCity, vehicle.drop_off_mode, vehicle.drop_off_fee, crossCityDistance, pricePerKm]);
+  const dropOffFee = 0;
 
   const effectiveOneWayFee = isCrossCity ? dropOffFee : oneWayFee;
   const effectiveIsOneWay = isCrossCity ? true : isOneWay;
@@ -109,29 +103,13 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
               <Info className="h-3 w-3" /> {freeKmPerDay} km/day included free • Extra km at {pricePerKm} €/km
             </p>
             {isCrossCity && (
-              <div className="mt-3 p-3 rounded-md border border-border bg-muted/40 space-y-2">
+              <div className="mt-3 p-3 rounded-md border border-border bg-muted/40 space-y-1">
                 <p className="text-xs font-semibold flex items-center gap-1">
                   <Info className="h-3 w-3" /> Cross-city pickup
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  This car is based in <strong>{vehicle.home_city}</strong> and your pickup is in <strong>{pickupCity}</strong>.
-                  {vehicle.drop_off_mode === 'fixed'
-                    ? ` A fixed delivery fee of ${Number(vehicle.drop_off_fee ?? 0).toFixed(2)} € applies.`
-                    : ` Delivery is charged by distance × ${pricePerKm} €/km.`}
+                  This car is based in <strong>{vehicle.home_city}</strong> and your pickup is in <strong>{pickupCity}</strong>. Delivery fee will be confirmed by the agency.
                 </p>
-                {vehicle.drop_off_mode === 'per_km' && (
-                  <div className="space-y-1">
-                    <Label className="text-xs">Distance from {vehicle.home_city} to {pickupCity} (km)</Label>
-                    <Input
-                      type="number" min={0} step={1}
-                      value={crossCityDistance}
-                      onChange={e => setCrossCityDistance(Math.max(0, parseInt(e.target.value) || 0))}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      {crossCityDistance} km × {pricePerKm} €/km = <strong>{(crossCityDistance * pricePerKm).toFixed(2)} €</strong>
-                    </p>
-                  </div>
-                )}
               </div>
             )}
           </div>
