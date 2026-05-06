@@ -21,11 +21,13 @@ interface Props {
   numDays: number;
   isOneWay: boolean;
   oneWayFee: number;
+  pickupCity?: string;
 }
 
-const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays: initialDays, isOneWay, oneWayFee }: Props) => {
+const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays: initialDays, isOneWay, oneWayFee, pickupCity }: Props) => {
   const [numDays, setNumDays] = useState(Math.max(1, initialDays));
   const [estimatedKm, setEstimatedKm] = useState(100);
+  const [crossCityDistance, setCrossCityDistance] = useState(0);
   const [selectedInsurance, setSelectedInsurance] = useState<string>('basic');
   const [selectedExtras, setSelectedExtras] = useState<Record<string, number>>({});
 
@@ -39,19 +41,34 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
   const pricePerKm = vehicle.display_price_per_km ?? vehicle.price_per_km ?? 0;
   const freeKmPerDay = (vehicle as any).free_km_per_day ?? 200;
 
+  // Cross-city drop-off: if vehicle has a home city and pickup is in a different city,
+  // charge either a fixed drop_off_fee or distance × price_per_km.
+  const norm = (s?: string | null) => (s ?? '').trim().toLowerCase();
+  const isCrossCity = !!vehicle.home_city && !!pickupCity && norm(vehicle.home_city) !== norm(pickupCity);
+  const dropOffFee = useMemo(() => {
+    if (!isCrossCity) return 0;
+    if (vehicle.drop_off_mode === 'per_km') {
+      return +(crossCityDistance * pricePerKm).toFixed(2);
+    }
+    return Number(vehicle.drop_off_fee ?? 0);
+  }, [isCrossCity, vehicle.drop_off_mode, vehicle.drop_off_fee, crossCityDistance, pricePerKm]);
+
+  const effectiveOneWayFee = isCrossCity ? dropOffFee : oneWayFee;
+  const effectiveIsOneWay = isCrossCity ? true : isOneWay;
+
   const quote = useMemo(() => calculateQuote({
     daily_rate: dailyRate,
     price_per_km: pricePerKm,
     free_km_per_day: freeKmPerDay,
     num_days: numDays,
     estimated_km: estimatedKm,
-    is_one_way: isOneWay,
-    one_way_fee: oneWayFee,
+    is_one_way: effectiveIsOneWay,
+    one_way_fee: effectiveOneWayFee,
     insurance_daily: insurance.daily_price,
     extras_daily: extrasDailyTotal,
     commission_rate: vehicle.commission_rate,
     is_external: !vehicle.is_own,
-  }), [dailyRate, pricePerKm, freeKmPerDay, numDays, estimatedKm, isOneWay, oneWayFee, insurance, extrasDailyTotal, vehicle]);
+  }), [dailyRate, pricePerKm, freeKmPerDay, numDays, estimatedKm, effectiveIsOneWay, effectiveOneWayFee, insurance, extrasDailyTotal, vehicle]);
 
   const toggleExtra = (extra: BookingExtra) => {
     setSelectedExtras(prev => {
@@ -91,6 +108,29 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
             <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
               <Info className="h-3 w-3" /> {freeKmPerDay} km/day included free • Extra km at {pricePerKm} €/km
             </p>
+            {isCrossCity && (
+              <div className="mt-3 p-3 rounded-md border border-border bg-muted/40 space-y-2">
+                <p className="text-xs font-semibold flex items-center gap-1">
+                  <Info className="h-3 w-3" /> Cross-city pickup
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  This car is based in <strong>{vehicle.home_city}</strong> and your pickup is in <strong>{pickupCity}</strong>.
+                  {vehicle.drop_off_mode === 'fixed'
+                    ? ` A fixed delivery fee of ${Number(vehicle.drop_off_fee ?? 0).toFixed(2)} € applies.`
+                    : ' Delivery is charged by distance × price/km.'}
+                </p>
+                {vehicle.drop_off_mode === 'per_km' && (
+                  <div className="space-y-1">
+                    <Label className="text-xs">Distance from {vehicle.home_city} to {pickupCity} (km)</Label>
+                    <Input
+                      type="number" min={0} step={1}
+                      value={crossCityDistance}
+                      onChange={e => setCrossCityDistance(Math.max(0, parseInt(e.target.value) || 0))}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -185,7 +225,7 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
               )}
               {quote.one_way_fee > 0 && (
                 <div className="flex justify-between text-muted-foreground">
-                  <span>One-way drop-off fee</span>
+                  <span>{isCrossCity ? `Cross-city delivery (${vehicle.home_city} → ${pickupCity})` : 'One-way drop-off fee'}</span>
                   <span>{quote.one_way_fee.toFixed(2)} €</span>
                 </div>
               )}
