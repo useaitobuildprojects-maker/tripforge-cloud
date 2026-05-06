@@ -1439,6 +1439,36 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imgUploading, setImgUploading] = useState(false);
   const [rowUploadingId, setRowUploadingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<any | null>(null);
+  const [editImgUploading, setEditImgUploading] = useState(false);
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    const { id, ...patch } = editing;
+    await updatePrice.mutateAsync({
+      id,
+      agencyId,
+      vehicle_class: patch.vehicle_class,
+      brand: patch.brand || null,
+      model: patch.model || null,
+      year: patch.year ? Number(patch.year) : null,
+      transmission: patch.transmission,
+      fuel_type: patch.fuel_type,
+      seats: Number(patch.seats) || 5,
+      image_url: patch.image_url || null,
+      daily_rate: Number(patch.daily_rate) || 0,
+      weekly_rate: patch.weekly_rate ? Number(patch.weekly_rate) : null,
+      monthly_rate: patch.monthly_rate ? Number(patch.monthly_rate) : null,
+      drop_off_fee: Number(patch.drop_off_fee) || 0,
+      drop_off_mode: patch.drop_off_mode,
+      price_per_km: Number(patch.price_per_km) || 0,
+      free_km_per_day: Number(patch.free_km_per_day) || 200,
+      extra_km_rate: Number(patch.extra_km_rate) || 0.25,
+      description: patch.description || null,
+    });
+    toast.success('Vehicle updated');
+    setEditing(null);
+  };
 
   const uploadImage = async (file: File): Promise<string> => {
     const ext = file.name.split('.').pop();
