@@ -1616,7 +1616,27 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
           <div className="space-y-1"><Label className="text-[11px]">Per Night (€) *</Label><Input type="number" min={0} placeholder="45" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="text-xs font-mono" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Per Week (€)</Label><Input type="number" min={0} placeholder="250" value={weeklyRate} onChange={(e) => setWeeklyRate(e.target.value)} className="text-xs font-mono" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Per Month (€)</Label><Input type="number" min={0} placeholder="850" value={monthlyRate} onChange={(e) => setMonthlyRate(e.target.value)} className="text-xs font-mono" /></div>
-          <div className="space-y-1"><Label className="text-[11px]">Drop-off (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Free KM/day</Label><Input type="number" min={0} step={10} placeholder="200" value={freeKm} onChange={(e) => setFreeKm(e.target.value)} className="text-xs font-mono" /></div>
+          <div className="space-y-1"><Label className="text-[11px]">Extra KM (€)</Label><Input type="number" min={0} step={0.05} placeholder="0.25" value={extraKmRate} onChange={(e) => setExtraKmRate(e.target.value)} className="text-xs font-mono" /></div>
+        </div>
+        {/* Drop-off row */}
+        <div className="grid grid-cols-5 gap-2">
+          <div className="space-y-1">
+            <Label className="text-[11px]">Drop-off Mode</Label>
+            <Select value={dropOffMode} onValueChange={(v) => setDropOffMode(v as 'fixed' | 'per_km')}>
+              <SelectTrigger className="text-xs h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Fixed fee</SelectItem>
+                <SelectItem value="per_km">Distance × Price/km</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {dropOffMode === 'fixed' ? (
+            <div className="space-y-1"><Label className="text-[11px]">Drop-off Fee (€)</Label><Input type="number" min={0} placeholder="30" value={dropOff} onChange={(e) => setDropOff(e.target.value)} className="text-xs font-mono" /></div>
+          ) : (
+            <div className="space-y-1"><Label className="text-[11px]">Price / km (€)</Label><Input type="number" min={0} step={0.05} placeholder="0.45" value={pricePerKm} onChange={(e) => setPricePerKm(e.target.value)} className="text-xs font-mono" /></div>
+          )}
+          <div className="col-span-2" />
           <div className="flex items-end"><Button size="sm" onClick={handleAdd} disabled={addPrice.isPending || !vehicleClass || !dailyRate} className="gradient-accent text-accent-foreground w-full"><Plus className="h-3.5 w-3.5 mr-1" /> Add</Button></div>
         </div>
         <div className="space-y-1"><Label className="text-[11px]">Notes (optional)</Label><Input placeholder="Includes A/C, Bluetooth..." value={desc} onChange={(e) => setDesc(e.target.value)} className="text-xs" /></div>
@@ -1633,7 +1653,10 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Night</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Week</th>
                 <th className="px-3 py-2 text-right font-medium text-muted-foreground">Per Month</th>
-                <th className="px-3 py-2 text-right font-medium text-muted-foreground">Drop-off</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Free km/day</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Extra €/km</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Drop-off Mode</th>
+                <th className="px-3 py-2 text-center font-medium text-muted-foreground">Fee / Price/km</th>
                 <th className="px-3 py-2 w-10" />
               </tr>
             </thead>
@@ -1650,7 +1673,36 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
                   <td className="px-3 py-2 text-right font-mono text-foreground">€{p.daily_rate}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.weekly_rate ? `€${p.weekly_rate}` : '—'}</td>
                   <td className="px-3 py-2 text-right font-mono text-muted-foreground">{p.monthly_rate ? `€${p.monthly_rate}` : '—'}</td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">€{p.drop_off_fee}</td>
+                  <td className="px-3 py-2">
+                    <Input type="number" min={0} step={10} defaultValue={p.free_km_per_day ?? 200}
+                      onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.free_km_per_day ?? 200)) updatePrice.mutate({ id: p.id, agencyId, free_km_per_day: v }); }}
+                      className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input type="number" min={0} step={0.05} defaultValue={p.extra_km_rate ?? 0.25}
+                      onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.extra_km_rate ?? 0.25)) updatePrice.mutate({ id: p.id, agencyId, extra_km_rate: v }); }}
+                      className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Select value={p.drop_off_mode ?? 'fixed'} onValueChange={(v) => updatePrice.mutate({ id: p.id, agencyId, drop_off_mode: v as 'fixed' | 'per_km' })}>
+                      <SelectTrigger className="text-xs h-7 w-[130px] mx-auto"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fixed">Fixed</SelectItem>
+                        <SelectItem value="per_km">Per km</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </td>
+                  <td className="px-3 py-2">
+                    {(p.drop_off_mode ?? 'fixed') === 'fixed' ? (
+                      <Input type="number" min={0} defaultValue={p.drop_off_fee}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== p.drop_off_fee) updatePrice.mutate({ id: p.id, agencyId, drop_off_fee: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                    ) : (
+                      <Input type="number" min={0} step={0.05} defaultValue={p.price_per_km ?? 0}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== (p.price_per_km ?? 0)) updatePrice.mutate({ id: p.id, agencyId, price_per_km: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-center mx-auto" />
+                    )}
+                  </td>
                   <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deletePrice.mutate({ id: p.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
                 </tr>
               ))}
