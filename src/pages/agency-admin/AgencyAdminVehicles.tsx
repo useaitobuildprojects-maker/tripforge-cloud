@@ -15,14 +15,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 const DUMMY_VEHICLES = [
-  { brand: 'Mercedes-Benz', model: 'S-Class', year: 2023, license_plate: 'AB-100-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.45, daily_rate_base: 180, free_km_per_day: 250, status: 'available', photo_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800' },
-  { brand: 'BMW', model: '5 Series', year: 2023, license_plate: 'AB-101-CD', category: 'sedan', transmission: 'automatic', seats: 5, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.35, daily_rate_base: 120, free_km_per_day: 250, status: 'available', photo_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800' },
-  { brand: 'Audi', model: 'Q7', year: 2022, license_plate: 'AB-102-CD', category: 'suv', transmission: 'automatic', seats: 7, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'limited', price_per_km: 0.40, daily_rate_base: 150, free_km_per_day: 200, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800' },
-  { brand: 'Volkswagen', model: 'Golf', year: 2024, license_plate: 'AB-103-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.22, daily_rate_base: 55, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=800' },
-  { brand: 'Tesla', model: 'Model 3', year: 2024, license_plate: 'AB-104-CD', category: 'electric', transmission: 'automatic', seats: 5, fuel_type: 'electric', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.30, daily_rate_base: 110, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800' },
-  { brand: 'Renault', model: 'Clio', year: 2023, license_plate: 'AB-105-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.18, daily_rate_base: 38, free_km_per_day: 300, status: 'available', photo_url: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800' },
-  { brand: 'Porsche', model: 'Cayenne', year: 2023, license_plate: 'AB-106-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'limited', price_per_km: 0.55, daily_rate_base: 240, free_km_per_day: 200, status: 'maintenance', photo_url: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800' },
-  { brand: 'Fiat', model: '500', year: 2024, license_plate: 'AB-107-CD', category: 'hatchback', transmission: 'manual', seats: 4, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', price_per_km: 0.20, daily_rate_base: 32, free_km_per_day: 300, status: 'rented', photo_url: 'https://images.unsplash.com/photo-1583267826935-bcb371fbc0f9?w=800' },
+  { brand: 'Mercedes-Benz', model: 'S-Class', year: 2023, license_plate: 'AB-100-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 180, status: 'available', photo_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800' },
+  { brand: 'BMW', model: '5 Series', year: 2023, license_plate: 'AB-101-CD', category: 'sedan', transmission: 'automatic', seats: 5, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 120, status: 'available', photo_url: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800' },
+  { brand: 'Audi', model: 'Q7', year: 2022, license_plate: 'AB-102-CD', category: 'suv', transmission: 'automatic', seats: 7, fuel_type: 'diesel', air_conditioning: true, mileage_policy: 'limited', daily_rate_base: 150, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800' },
+  { brand: 'Volkswagen', model: 'Golf', year: 2024, license_plate: 'AB-103-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 55, status: 'available', photo_url: 'https://images.unsplash.com/photo-1606220838315-056192d5e927?w=800' },
+  { brand: 'Tesla', model: 'Model 3', year: 2024, license_plate: 'AB-104-CD', category: 'electric', transmission: 'automatic', seats: 5, fuel_type: 'electric', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 110, status: 'available', photo_url: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800' },
+  { brand: 'Renault', model: 'Clio', year: 2023, license_plate: 'AB-105-CD', category: 'hatchback', transmission: 'manual', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 38, status: 'available', photo_url: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800' },
+  { brand: 'Porsche', model: 'Cayenne', year: 2023, license_plate: 'AB-106-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'limited', daily_rate_base: 240, status: 'maintenance', photo_url: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=800' },
+  { brand: 'Fiat', model: '500', year: 2024, license_plate: 'AB-107-CD', category: 'hatchback', transmission: 'manual', seats: 4, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 32, status: 'rented', photo_url: 'https://images.unsplash.com/photo-1583267826935-bcb371fbc0f9?w=800' },
 ];
 
 const statusConfig = {
@@ -128,8 +128,8 @@ const AgencyAdminVehicles = () => {
                     <div>
                       <h3 className="text-sm font-semibold text-foreground">{vehicle.brand} {vehicle.model}</h3>
                       <p className="text-xs text-muted-foreground">{vehicle.year}</p>
-                      {vehicle.price_per_km ? (
-                        <p className="text-sm font-bold text-accent mt-0.5">{vehicle.price_per_km} €/km</p>
+                      {vehicle.daily_rate_base ? (
+                        <p className="text-sm font-bold text-accent mt-0.5">{vehicle.daily_rate_base} €/day</p>
                       ) : (
                         <p className="text-xs text-muted-foreground/50 mt-0.5 italic">No price set</p>
                       )}
