@@ -241,6 +241,7 @@ const StorefrontFleet = () => {
           oneWayFee={agency.one_way_fee}
           isOneWay={false}
           numDays={1}
+          pickupCity={agency.city}
         />
       )}
     </div>

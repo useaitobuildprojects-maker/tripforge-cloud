@@ -30,6 +30,10 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [pricePerKm, setPricePerKm] = useState('');
   const [dailyRateBase, setDailyRateBase] = useState('');
   const [freeKmPerDay, setFreeKmPerDay] = useState('200');
+  const [homeCity, setHomeCity] = useState('');
+  const [homeCountry, setHomeCountry] = useState('');
+  const [dropOffMode, setDropOffMode] = useState<'fixed' | 'per_km'>('fixed');
+  const [dropOffFee, setDropOffFee] = useState('');
 
   const updateVehicle = useUpdateVehicle();
 
@@ -50,6 +54,10 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setPricePerKm(vehicle.price_per_km != null ? String(vehicle.price_per_km) : '');
       setDailyRateBase(vehicle.daily_rate_base != null ? String(vehicle.daily_rate_base) : '');
       setFreeKmPerDay(vehicle.free_km_per_day != null ? String(vehicle.free_km_per_day) : '200');
+      setHomeCity((vehicle as any).home_city ?? '');
+      setHomeCountry((vehicle as any).home_country ?? '');
+      setDropOffMode(((vehicle as any).drop_off_mode ?? 'fixed') as 'fixed' | 'per_km');
+      setDropOffFee((vehicle as any).drop_off_fee != null ? String((vehicle as any).drop_off_fee) : '');
     }
   }, [vehicle]);
 
@@ -73,6 +81,10 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         price_per_km: kmPrice > 0 ? kmPrice : null,
         daily_rate_base: baseRate > 0 ? baseRate : null,
         free_km_per_day: freeKm > 0 ? freeKm : null,
+        home_city: homeCity.trim() || null,
+        home_country: homeCountry.trim() || null,
+        drop_off_mode: dropOffMode,
+        drop_off_fee: parseFloat(dropOffFee) > 0 ? parseFloat(dropOffFee) : 0,
       },
       { onSuccess: () => onOpenChange(false) }
     );
@@ -203,6 +215,37 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
             <div className="space-y-2">
               <Label htmlFor="editVin">VIN</Label>
               <Input id="editVin" value={vin} onChange={(e) => setVin(e.target.value)} />
+            </div>
+          </div>
+          <div className="rounded-md border border-border p-3 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cross-city drop-off</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="editHomeCity">Home City</Label>
+                <Input id="editHomeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Paris" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="editHomeCountry">Home Country</Label>
+                <Input id="editHomeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="France" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Drop-off Mode</Label>
+                <Select value={dropOffMode} onValueChange={(v) => setDropOffMode(v as 'fixed' | 'per_km')}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fixed">Fixed fee</SelectItem>
+                    <SelectItem value="per_km">Distance × Price/km</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {dropOffMode === 'fixed' && (
+                <div className="space-y-2">
+                  <Label htmlFor="editDropOffFee">Drop-off Fee (€)</Label>
+                  <Input id="editDropOffFee" type="number" min={0} step="1" value={dropOffFee} onChange={(e) => setDropOffFee(e.target.value)} placeholder="50" />
+                </div>
+              )}
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">

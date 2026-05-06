@@ -629,8 +629,12 @@ export type Database = {
           category: string | null
           created_at: string | null
           daily_rate_base: number | null
+          drop_off_fee: number | null
+          drop_off_mode: string
           free_km_per_day: number | null
           fuel_type: string | null
+          home_city: string | null
+          home_country: string | null
           id: string
           license_plate: string | null
           mileage_policy: string | null
@@ -650,8 +654,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           daily_rate_base?: number | null
+          drop_off_fee?: number | null
+          drop_off_mode?: string
           free_km_per_day?: number | null
           fuel_type?: string | null
+          home_city?: string | null
+          home_country?: string | null
           id?: string
           license_plate?: string | null
           mileage_policy?: string | null
@@ -671,8 +679,12 @@ export type Database = {
           category?: string | null
           created_at?: string | null
           daily_rate_base?: number | null
+          drop_off_fee?: number | null
+          drop_off_mode?: string
           free_km_per_day?: number | null
           fuel_type?: string | null
+          home_city?: string | null
+          home_country?: string | null
           id?: string
           license_plate?: string | null
           mileage_policy?: string | null

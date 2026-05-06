@@ -26,7 +26,7 @@ export async function seedAtlasTravelBookings() {
     { agency_id: agencyId, customer_name: 'Yasmine Belkacem', service_type: 'hotel', status: 'confirmed', amount: 1450, booking_date: '2026-03-14' },
   ];
 
-  const { error } = await supabase.from('bookings').insert(bookings);
+  const { error } = await supabase.from('bookings').insert(bookings as any);
 
   if (error) {
     console.error('Failed to seed bookings:', error);

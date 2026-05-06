@@ -32,6 +32,10 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [pricePerKm, setPricePerKm] = useState('');
   const [dailyRateBase, setDailyRateBase] = useState('');
   const [freeKmPerDay, setFreeKmPerDay] = useState('200');
+  const [homeCity, setHomeCity] = useState('');
+  const [homeCountry, setHomeCountry] = useState('');
+  const [dropOffMode, setDropOffMode] = useState<'fixed' | 'per_km'>('fixed');
+  const [dropOffFee, setDropOffFee] = useState('');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -42,6 +46,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
     setPricePerKm(''); setDailyRateBase(''); setFreeKmPerDay('200');
+    setHomeCity(''); setHomeCountry(''); setDropOffMode('fixed'); setDropOffFee('');
   };
 
   const handleSubmit = async () => {
@@ -73,6 +78,10 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       price_per_km: kmPrice > 0 ? kmPrice : null,
       daily_rate_base: baseRate > 0 ? baseRate : null,
       free_km_per_day: freeKm > 0 ? freeKm : null,
+      home_city: homeCity.trim() || null,
+      home_country: homeCountry.trim() || null,
+      drop_off_mode: dropOffMode,
+      drop_off_fee: parseFloat(dropOffFee) > 0 ? parseFloat(dropOffFee) : 0,
     });
 
     reset();
@@ -216,6 +225,41 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
               <Label htmlFor="vin">VIN</Label>
               <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
             </div>
+          </div>
+
+          <div className="rounded-md border border-border p-3 space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cross-city drop-off</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="homeCity">Home City</Label>
+                <Input id="homeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Paris" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="homeCountry">Home Country</Label>
+                <Input id="homeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="France" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Drop-off Mode</Label>
+                <Select value={dropOffMode} onValueChange={(v) => setDropOffMode(v as 'fixed' | 'per_km')}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fixed">Fixed fee</SelectItem>
+                    <SelectItem value="per_km">Distance × Price/km</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {dropOffMode === 'fixed' && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="dropOffFee">Drop-off Fee (€)</Label>
+                  <Input id="dropOffFee" type="number" min={0} step="1" value={dropOffFee} onChange={(e) => setDropOffFee(e.target.value)} placeholder="50" />
+                </div>
+              )}
+            </div>
+            {dropOffMode === 'per_km' && (
+              <p className="text-[11px] text-muted-foreground">Uses the vehicle's Price/KM × distance from home city to pickup city.</p>
+            )}
           </div>
 
           <div className="space-y-1.5">

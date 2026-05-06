@@ -20,6 +20,10 @@ interface CreateVehicleInput {
   price_per_km?: number | null;
   daily_rate_base?: number | null;
   free_km_per_day?: number | null;
+  home_city?: string | null;
+  home_country?: string | null;
+  drop_off_mode?: 'fixed' | 'per_km';
+  drop_off_fee?: number | null;
 }
 
 export const useCreateVehicle = () => {
@@ -27,7 +31,7 @@ export const useCreateVehicle = () => {
 
   return useMutation({
     mutationFn: async (input: CreateVehicleInput) => {
-      const { data, error } = await supabase.from('vehicles').insert(input).select().single();
+      const { data, error } = await supabase.from('vehicles').insert(input as any).select().single();
       if (error) throw error;
       return data;
     },
@@ -59,6 +63,10 @@ interface UpdateVehicleInput {
   price_per_km?: number | null;
   daily_rate_base?: number | null;
   free_km_per_day?: number | null;
+  home_city?: string | null;
+  home_country?: string | null;
+  drop_off_mode?: 'fixed' | 'per_km';
+  drop_off_fee?: number | null;
 }
 
 export const useUpdateVehicle = () => {
@@ -67,7 +75,7 @@ export const useUpdateVehicle = () => {
     mutationFn: async ({ id, agency_id, ...input }: UpdateVehicleInput) => {
       const { data, error } = await supabase
         .from('vehicles')
-        .update(input)
+        .update(input as any)
         .eq('id', id)
         .select()
         .single();

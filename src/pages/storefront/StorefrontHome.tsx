@@ -507,6 +507,7 @@ const StorefrontHome = () => {
           oneWayFee={agency.one_way_fee}
           isOneWay={false}
           numDays={1}
+          pickupCity={pickupLocation || agency.city}
         />
       )}
     </div>

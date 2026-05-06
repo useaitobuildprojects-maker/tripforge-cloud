@@ -34,7 +34,7 @@ export const useAgencyImageUpload = () => {
 
         const { data: updatedAgency, error: updateError } = await supabase
           .from('agencies')
-          .update({ [field]: publicUrl })
+          .update({ [field]: publicUrl } as any)
           .eq('id', agencyId)
           .select('id')
           .maybeSingle();
