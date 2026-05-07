@@ -1,10 +1,10 @@
 import { useOutletContext, Link, useParams, useNavigate } from 'react-router-dom';
-import { Agency, StorefrontConfig, ServiceType } from '@/types/agency';
+import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, Star, ChevronRight, Car, Building, Users, Briefcase,
   Fuel, Settings2, Navigation, Globe, Heart, ShieldCheck, BadgePercent,
-  HeadphonesIcon, ArrowRight, Plane,
+  HeadphonesIcon, ArrowRight, Plane, UserCheck, Crown, Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -22,37 +22,89 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
-  transfer: Navigation,
-  limo_tour: Briefcase,
+  transfer: UserCheck,
+  limo_tour: Crown,
   city_tour: Globe,
 };
 
-const HERO_SERVICE_LABELS: Record<ServiceType, string> = {
-  car_rental: 'Car Rental',
-  apartment: 'Apartment',
-  transfer: 'Transfer',
-  limo_tour: 'Limo',
-  city_tour: 'City Tour',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  sedan: 'Sedan',
-  suv: 'SUV',
-  hatchback: 'Hatchback',
-  coupe: 'Coupe',
-  convertible: 'Convertible',
-  minivan: 'Minivan',
-  pickup: 'Pickup Truck',
-  luxury: 'Luxury',
-  sports: 'Sports',
-  electric: 'Electric',
+const HERO_SEARCH_COPY: Record<ServiceType, {
+  originLabel: string;
+  originPlaceholder: string;
+  destinationLabel: string;
+  destinationPlaceholder: string;
+  startDateLabel: string;
+  startDatePlaceholder: string;
+  endDateLabel: string;
+  endDatePlaceholder: string;
+  countLabel: string;
+  cta: string;
+}> = {
+  car_rental: {
+    originLabel: 'Pick-up',
+    originPlaceholder: 'Pick-up location',
+    destinationLabel: 'Drop-off',
+    destinationPlaceholder: 'Same as pick-up',
+    startDateLabel: 'Pick-up',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Drop-off',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Pax',
+    cta: 'Search Car Rental',
+  },
+  apartment: {
+    originLabel: 'Destination',
+    originPlaceholder: 'City or area',
+    destinationLabel: 'Location',
+    destinationPlaceholder: 'Any area',
+    startDateLabel: 'Check-in',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Check-out',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Guests',
+    cta: 'Search Apartments',
+  },
+  transfer: {
+    originLabel: 'Pickup',
+    originPlaceholder: 'Airport, hotel, or address',
+    destinationLabel: 'Drop-off',
+    destinationPlaceholder: 'Destination address',
+    startDateLabel: 'Date',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Time',
+    endDatePlaceholder: 'Select time',
+    countLabel: 'Pax',
+    cta: 'Search Transfer',
+  },
+  limo_tour: {
+    originLabel: 'Start city',
+    originPlaceholder: 'Pickup city',
+    destinationLabel: 'Itinerary',
+    destinationPlaceholder: 'Destination city',
+    startDateLabel: 'Start',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'End',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Pax',
+    cta: 'Search Limo Service',
+  },
+  city_tour: {
+    originLabel: 'City',
+    originPlaceholder: 'Tour city',
+    destinationLabel: 'Pickup point',
+    destinationPlaceholder: 'Hotel or meeting point',
+    startDateLabel: 'Tour date',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Duration',
+    endDatePlaceholder: 'Select duration',
+    countLabel: 'Pax',
+    cta: 'Search City Tour',
+  },
 };
 
 const DESTINATIONS = [
