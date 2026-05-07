@@ -24,6 +24,7 @@ const AgencyAdminBookings = lazy(() => import("./pages/agency-admin/AgencyAdminB
 const AgencyAdminSettings = lazy(() => import("./pages/agency-admin/AgencyAdminSettings"));
 const AgencyAdminDrivers = lazy(() => import("./pages/agency-admin/AgencyAdminDrivers"));
 const AgencyAdminVehicles = lazy(() => import("./pages/agency-admin/AgencyAdminVehicles"));
+const AgencyAdminApartments = lazy(() => import("./pages/agency-admin/AgencyAdminApartments"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Agencies = lazy(() => import("./pages/Agencies"));
 const Bookings = lazy(() => import("./pages/Bookings"));
@@ -74,6 +75,7 @@ const App = () => (
                     <Route path="bookings" element={<AgencyAdminBookings />} />
                     <Route path="drivers" element={<AgencyAdminDrivers />} />
                     <Route path="vehicles" element={<AgencyAdminVehicles />} />
+                    <Route path="apartments" element={<AgencyAdminApartments />} />
                     <Route path="analytics" element={<ComingSoon title="Analytics" />} />
                     <Route path="settings" element={<AgencyAdminSettings />} />
                   </Route>

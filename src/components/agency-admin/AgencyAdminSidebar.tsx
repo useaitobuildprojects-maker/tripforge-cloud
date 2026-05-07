@@ -9,6 +9,7 @@ import {
   BarChart3,
   Users,
   ExternalLink,
+  Building,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,11 +26,13 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
 
   const base = `/agency/${slug}/admin`;
 
+  const hasApartments = agency?.services?.includes('apartment');
   const navItems = [
     { to: base, icon: LayoutDashboard, label: 'Dashboard', exact: true },
     { to: `${base}/bookings`, icon: CalendarDays, label: 'Bookings' },
     { to: `${base}/drivers`, icon: Users, label: 'Drivers' },
     { to: `${base}/vehicles`, icon: Car, label: 'Vehicles' },
+    ...(hasApartments ? [{ to: `${base}/apartments`, icon: Building, label: 'Apartments' }] : []),
     { to: `${base}/analytics`, icon: BarChart3, label: 'Analytics' },
     { to: `${base}/settings`, icon: Settings, label: 'Settings' },
   ];
