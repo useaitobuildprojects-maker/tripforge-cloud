@@ -585,22 +585,24 @@ const StorefrontHome = () => {
       <Dialog open={classPickerOpen} onOpenChange={setClassPickerOpen}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle style={{ fontFamily: typo.heading }}>Choose a vehicle class</DialogTitle>
-            <DialogDescription>Pick a category to view matching cars, or skip to see all.</DialogDescription>
+            <DialogTitle style={{ fontFamily: typo.heading }}>
+              Choose a {SERVICE_LABELS[activeService] ?? activeService} class
+            </DialogTitle>
+            <DialogDescription>Pick a class to view matching options, or skip to see all.</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-            {availableCategories.map((cat) => {
-              const Icon = SERVICE_ICONS.car_rental;
+            {serviceClasses.map((sc) => {
+              const Icon = SERVICE_ICONS[activeService] ?? Car;
               return (
                 <button
-                  key={cat}
-                  onClick={() => handlePickClass(cat)}
+                  key={sc.id}
+                  onClick={() => handlePickClass(sc.category)}
                   className="group rounded-lg border-2 border-border p-4 text-left hover:border-current transition-all"
                   style={{ color: accent }}
                 >
                   <Icon className="h-6 w-6 mb-2" />
-                  <p className="text-sm font-extrabold" style={tk.textPrimary}>{CATEGORY_LABELS[cat] ?? cat}</p>
-                  <p className="text-xs mt-0.5" style={tk.textMuted}>{categoryCounts[cat]} available</p>
+                  <p className="text-sm font-extrabold" style={tk.textPrimary}>{sc.label}</p>
+                  <p className="text-xs mt-0.5" style={tk.textMuted}>{sc.sublabel}</p>
                 </button>
               );
             })}
