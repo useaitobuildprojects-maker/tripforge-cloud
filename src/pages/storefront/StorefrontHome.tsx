@@ -1,10 +1,10 @@
 import { useOutletContext, Link, useParams, useNavigate } from 'react-router-dom';
-import { Agency, StorefrontConfig, ServiceType } from '@/types/agency';
+import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, Star, ChevronRight, Car, Building, Users, Briefcase,
   Fuel, Settings2, Navigation, Globe, Heart, ShieldCheck, BadgePercent,
-  HeadphonesIcon, ArrowRight, Plane,
+  HeadphonesIcon, ArrowRight, Plane, UserCheck, Crown, Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -22,37 +22,89 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   car_rental: Car,
   apartment: Building,
-  transfer: Navigation,
-  limo_tour: Briefcase,
+  transfer: UserCheck,
+  limo_tour: Crown,
   city_tour: Globe,
 };
 
-const HERO_SERVICE_LABELS: Record<ServiceType, string> = {
-  car_rental: 'Car Rental',
-  apartment: 'Apartment',
-  transfer: 'Transfer',
-  limo_tour: 'Limo',
-  city_tour: 'City Tour',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  sedan: 'Sedan',
-  suv: 'SUV',
-  hatchback: 'Hatchback',
-  coupe: 'Coupe',
-  convertible: 'Convertible',
-  minivan: 'Minivan',
-  pickup: 'Pickup Truck',
-  luxury: 'Luxury',
-  sports: 'Sports',
-  electric: 'Electric',
+const HERO_SEARCH_COPY: Record<ServiceType, {
+  originLabel: string;
+  originPlaceholder: string;
+  destinationLabel: string;
+  destinationPlaceholder: string;
+  startDateLabel: string;
+  startDatePlaceholder: string;
+  endDateLabel: string;
+  endDatePlaceholder: string;
+  countLabel: string;
+  cta: string;
+}> = {
+  car_rental: {
+    originLabel: 'Pick-up',
+    originPlaceholder: 'Pick-up location',
+    destinationLabel: 'Drop-off',
+    destinationPlaceholder: 'Same as pick-up',
+    startDateLabel: 'Pick-up',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Drop-off',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Pax',
+    cta: 'Search Car Rental',
+  },
+  apartment: {
+    originLabel: 'Destination',
+    originPlaceholder: 'City or area',
+    destinationLabel: 'Location',
+    destinationPlaceholder: 'Any area',
+    startDateLabel: 'Check-in',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Check-out',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Guests',
+    cta: 'Search Apartments',
+  },
+  transfer: {
+    originLabel: 'Pickup',
+    originPlaceholder: 'Airport, hotel, or address',
+    destinationLabel: 'Drop-off',
+    destinationPlaceholder: 'Destination address',
+    startDateLabel: 'Date',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Time',
+    endDatePlaceholder: 'Select time',
+    countLabel: 'Pax',
+    cta: 'Search Transfer',
+  },
+  limo_tour: {
+    originLabel: 'Start city',
+    originPlaceholder: 'Pickup city',
+    destinationLabel: 'Itinerary',
+    destinationPlaceholder: 'Destination city',
+    startDateLabel: 'Start',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'End',
+    endDatePlaceholder: 'Select date',
+    countLabel: 'Pax',
+    cta: 'Search Limo Service',
+  },
+  city_tour: {
+    originLabel: 'City',
+    originPlaceholder: 'Tour city',
+    destinationLabel: 'Pickup point',
+    destinationPlaceholder: 'Hotel or meeting point',
+    startDateLabel: 'Tour date',
+    startDatePlaceholder: 'Select date',
+    endDateLabel: 'Duration',
+    endDatePlaceholder: 'Select duration',
+    countLabel: 'Pax',
+    cta: 'Search City Tour',
+  },
 };
 
 const DESTINATIONS = [
@@ -82,7 +134,6 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
   const [searchActive, setSearchActive] = useState(false);
-  const [classPickerOpen, setClassPickerOpen] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
   const agencyLocations = useMemo(() => {
@@ -98,66 +149,9 @@ const StorefrontHome = () => {
   const activeFilterCount = countActiveFilters(filters);
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
 
-  const availableCategories = useMemo(
-    () => [...new Set(vehicles.map(v => v.category).filter(Boolean) as string[])].sort(),
-    [vehicles]
-  );
-  const categoryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    vehicles.forEach(v => { if (v.category) map[v.category] = (map[v.category] ?? 0) + 1; });
-    return map;
-  }, [vehicles]);
-
-  // Service-specific classes defined in admin → ServicePricingEditor
-  const serviceClasses = useMemo(() => {
-    if (activeService === 'transfer') {
-      return (cfg.transfer_vehicle_classes ?? []).map((c, idx) => ({
-        id: `transfer-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    if (activeService === 'limo_tour') {
-      return (cfg.limo_vehicle_classes ?? []).map((c, idx) => ({
-        id: `limo-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    if (activeService === 'city_tour') {
-      return (cfg.city_tour_vehicle_classes ?? []).map((c, idx) => ({
-        id: `tour-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    // car_rental → use vehicle categories from inventory
-    return availableCategories.map((cat) => ({
-      id: cat,
-      label: CATEGORY_LABELS[cat] ?? cat,
-      sublabel: `${categoryCounts[cat]} available`,
-      category: cat,
-    }));
-  }, [activeService, cfg.transfer_vehicle_classes, cfg.limo_vehicle_classes, cfg.city_tour_vehicle_classes, availableCategories, categoryCounts]);
-
   const handleSearch = () => {
     setSearchActive(true);
     navigate(`/agency/${slug}/services/${activeService}`);
-  };
-
-  const handlePickClass = (category: string | null) => {
-    setClassPickerOpen(false);
-    // For booking-form services, navigate to the service detail page
-    if (activeService === 'transfer' || activeService === 'limo_tour' || activeService === 'city_tour' || activeService === 'apartment') {
-      navigate(`/agency/${slug}/services/${activeService}`);
-      return;
-    }
-    // Car rental: filter the home listings by category and scroll
-    setFilters(prev => ({ ...prev, categories: category ? [category] : [] }));
-    setTimeout(() => vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }), 80);
   };
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
@@ -185,6 +179,7 @@ const StorefrontHome = () => {
   const typo = ts.typography;
   const shape = ts.shape;
   const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
+  const searchCopy = HERO_SEARCH_COPY[activeService];
 
   return (
     <div>
@@ -245,7 +240,7 @@ const StorefrontHome = () => {
                           : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
                         <Icon className="h-4 w-4" />
-                        <span>{HERO_SERVICE_LABELS[service] ?? service}</span>
+                        <span>{SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
                   })}
@@ -256,15 +251,15 @@ const StorefrontHome = () => {
                 <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
-                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.originLabel}</p>
+                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={searchCopy.originPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
-                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
+                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <Popover>
@@ -272,9 +267,9 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.startDateLabel}</p>
                         <p className={cn("text-sm truncate", !pickupDateObj && "text-muted-foreground")} style={pickupDateObj ? tk.textPrimary : undefined}>
-                          {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : 'Select date'}
+                          {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : searchCopy.startDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -293,11 +288,11 @@ const StorefrontHome = () => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                      <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                      {activeService === 'transfer' || activeService === 'city_tour' ? <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} /> : <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
-                          {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : 'Select date'}
+                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -318,7 +313,7 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-1 px-2 py-2.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pax</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.countLabel}</p>
                         <p className="text-sm truncate" style={tk.textPrimary}>{passengers}</p>
                       </div>
                     </button>
@@ -342,7 +337,7 @@ const StorefrontHome = () => {
                     style={{ backgroundColor: accent, color: '#ffffff' }}
                     onClick={handleSearch}
                   >
-                    <Search className="h-4 w-4" /> Search
+                    <Search className="h-4 w-4" /> {searchCopy.cta}
                   </button>
                 </div>
               </div>
@@ -592,39 +587,6 @@ const StorefrontHome = () => {
         />
       )}
 
-      {/* Vehicle class picker after Search */}
-      <Dialog open={classPickerOpen} onOpenChange={setClassPickerOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: typo.heading }}>
-              Choose a {HERO_SERVICE_LABELS[activeService] ?? activeService} class
-            </DialogTitle>
-            <DialogDescription>Pick a class to view matching options, or skip to see all.</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-            {serviceClasses.map((sc) => {
-              const Icon = SERVICE_ICONS[activeService] ?? Car;
-              return (
-                <button
-                  key={sc.id}
-                  onClick={() => handlePickClass(sc.category)}
-                  className="group rounded-lg border-2 border-border p-4 text-left hover:border-current transition-all"
-                  style={{ color: accent }}
-                >
-                  <Icon className="h-6 w-6 mb-2" />
-                  <p className="text-sm font-extrabold" style={tk.textPrimary}>{sc.label}</p>
-                  <p className="text-xs mt-0.5" style={tk.textMuted}>{sc.sublabel}</p>
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-end pt-2">
-            <Button variant="ghost" size="sm" onClick={() => handlePickClass(null)} className="text-xs font-bold" style={{ color: accent }}>
-              Show all classes
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
