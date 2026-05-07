@@ -411,37 +411,8 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
 
             <Separator />
 
-            {variant === 'hero' && (
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-                <div className="md:col-span-5 rounded-md border-2 px-3 py-2.5 bg-background/70">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5" style={{ color: buttonColor }} /> Itinerary
-                  </div>
-                  <p className="mt-1 text-sm font-semibold truncate">
-                    {itinerary.map(stop => stop.city).filter(Boolean).join(' → ') || 'Choose city'}
-                  </p>
-                </div>
-                <div className="md:col-span-2 rounded-md border-2 px-3 py-2.5 bg-background/70">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Duration</p>
-                  <p className="mt-1 text-sm font-semibold">{totalDays} day{totalDays !== 1 ? 's' : ''}</p>
-                </div>
-                <div className="md:col-span-2 rounded-md border-2 px-3 py-2.5 bg-background/70">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pax</p>
-                  <p className="mt-1 text-sm font-semibold">{pax}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSearch}
-                  className="md:col-span-3 h-12 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
-                  style={{ backgroundColor: buttonColor }}
-                >
-                  <Search className="h-4 w-4" /> Search Limo Service
-                </button>
-              </div>
-            )}
-
             {/* Vehicle Class (grouped by category) */}
-            <div className={cn("space-y-3", variant === 'hero' && "hidden")}>
+            <div className="space-y-3">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <Label className="text-xs font-medium">Vehicle Class</Label>
                 <div className="flex items-center gap-2">
