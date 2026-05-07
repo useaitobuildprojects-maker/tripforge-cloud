@@ -288,12 +288,9 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn(
-          "border border-border bg-card space-y-6",
-          variant === 'hero' ? "rounded-md border-0 bg-transparent p-0 shadow-none" : "rounded-2xl p-6 md:p-8 shadow-lg"
-        )}
+        className="border border-border bg-card space-y-6 rounded-2xl p-6 md:p-8 shadow-lg"
       >
-        <div className={cn("text-center mb-2", variant === 'hero' && "sr-only")}>
+        <div className="text-center mb-2">
           <h3 className="text-xl font-bold">Book Your Chauffeur</h3>
           <p className="text-sm text-muted-foreground mt-1">Build your itinerary — 1 city or many, 8h or 10h per day</p>
         </div>
@@ -316,7 +313,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
               {itinerary.map((stop, idx) => {
                 return (
-                  <div key={idx} className={cn("p-3 rounded-lg border border-border bg-muted/20 space-y-2", variant === 'hero' && "bg-background/70")}>
+                  <div key={idx} className="p-3 rounded-lg border border-border bg-muted/20 space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-muted-foreground w-14 shrink-0">Stop {idx + 1}</span>
                       <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
