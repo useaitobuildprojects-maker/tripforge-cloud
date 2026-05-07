@@ -587,39 +587,6 @@ const StorefrontHome = () => {
         />
       )}
 
-      {/* Vehicle class picker after Search */}
-      <Dialog open={classPickerOpen} onOpenChange={setClassPickerOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: typo.heading }}>
-              Choose a {HERO_SERVICE_LABELS[activeService] ?? activeService} class
-            </DialogTitle>
-            <DialogDescription>Pick a class to view matching options, or skip to see all.</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
-            {serviceClasses.map((sc) => {
-              const Icon = SERVICE_ICONS[activeService] ?? Car;
-              return (
-                <button
-                  key={sc.id}
-                  onClick={() => handlePickClass(sc.category)}
-                  className="group rounded-lg border-2 border-border p-4 text-left hover:border-current transition-all"
-                  style={{ color: accent }}
-                >
-                  <Icon className="h-6 w-6 mb-2" />
-                  <p className="text-sm font-extrabold" style={tk.textPrimary}>{sc.label}</p>
-                  <p className="text-xs mt-0.5" style={tk.textMuted}>{sc.sublabel}</p>
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex justify-end pt-2">
-            <Button variant="ghost" size="sm" onClick={() => handlePickClass(null)} className="text-xs font-bold" style={{ color: accent }}>
-              Show all classes
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
