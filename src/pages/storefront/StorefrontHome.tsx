@@ -257,6 +257,26 @@ const StorefrontHome = () => {
                 </div>
               )}
               {/* Search fields row */}
+              {activeService === 'limo_tour' ? (
+                <div className="p-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <div className="flex-1 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <Crown className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Limo chauffeur service</p>
+                      <p className="text-sm font-semibold truncate" style={tk.textPrimary}>
+                        Build a multi-city itinerary · 8h or 10h per day
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                    style={{ backgroundColor: accent, color: '#ffffff' }}
+                    onClick={handleSearch}
+                  >
+                    <Search className="h-4 w-4" /> {searchCopy.cta}
+                  </button>
+                </div>
+              ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
                 <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
@@ -269,23 +289,7 @@ const StorefrontHome = () => {
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
-                    {activeService === 'limo_tour' ? (
-                      <div className="flex gap-1 pt-0.5">
-                        {(['half', 'full'] as const).map((pkg) => (
-                          <button
-                            key={pkg}
-                            type="button"
-                            onClick={() => setLimoPackage(pkg)}
-                            className="h-6 flex-1 rounded-sm border px-2 text-[11px] font-bold transition-colors"
-                            style={limoPackage === pkg ? { backgroundColor: accent, borderColor: accent, color: '#ffffff' } : { ...tk.border, ...tk.textBody }}
-                          >
-                            {pkg === 'half' ? '8h' : '10h'}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
-                    )}
+                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <Popover>
@@ -318,7 +322,7 @@ const StorefrontHome = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
-                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : activeService === 'limo_tour' && !dropoffDateObj ? limoPackageLabel : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
+                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -367,6 +371,7 @@ const StorefrontHome = () => {
                   </button>
                 </div>
               </div>
+              )}
               </div>
             </div>
           </motion.div>
