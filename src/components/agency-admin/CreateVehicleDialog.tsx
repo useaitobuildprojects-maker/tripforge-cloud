@@ -133,6 +133,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
                   <SelectItem value="luxury">Luxury</SelectItem>
                   <SelectItem value="sports">Sports</SelectItem>
                   <SelectItem value="electric">Electric</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
                 </SelectContent>
               </Select>
             </div>
