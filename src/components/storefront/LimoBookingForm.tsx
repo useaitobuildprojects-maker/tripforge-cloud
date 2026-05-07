@@ -166,14 +166,32 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
     window.open(url, '_blank');
   };
 
+  const handleSearch = () => {
+    const firstStop = itinerary[0];
+    const lastStop = itinerary[itinerary.length - 1];
+    onSearch?.({
+      pickup: firstStop?.city,
+      dropoff: lastStop && lastStop !== firstStop ? lastStop.city : firstStop?.city,
+      start: firstStop?.pickupDate ? format(firstStop.pickupDate, 'yyyy-MM-dd') : undefined,
+      end: lastStop?.dropoffDate ? format(lastStop.dropoffDate, 'yyyy-MM-dd') : undefined,
+      pax,
+      package: firstStop?.dayType,
+      cities: itinerary.map(stop => stop.city).filter(Boolean),
+      vehicleClass: selectedClass?.label,
+    });
+  };
+
   return (
     <div className="w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6 shadow-lg"
+        className={cn(
+          "border border-border bg-card space-y-6",
+          variant === 'hero' ? "rounded-md border-0 bg-transparent p-0 shadow-none" : "rounded-2xl p-6 md:p-8 shadow-lg"
+        )}
       >
-        <div className="text-center mb-2">
+        <div className={cn("text-center mb-2", variant === 'hero' && "sr-only")}>
           <h3 className="text-xl font-bold">Book Your Chauffeur</h3>
           <p className="text-sm text-muted-foreground mt-1">Build your itinerary — 1 city or many, 8h or 10h per day</p>
         </div>
