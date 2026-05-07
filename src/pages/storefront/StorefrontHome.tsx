@@ -134,7 +134,6 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
   const [searchActive, setSearchActive] = useState(false);
-  const [classPickerOpen, setClassPickerOpen] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
   const agencyLocations = useMemo(() => {
@@ -150,66 +149,9 @@ const StorefrontHome = () => {
   const activeFilterCount = countActiveFilters(filters);
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
 
-  const availableCategories = useMemo(
-    () => [...new Set(vehicles.map(v => v.category).filter(Boolean) as string[])].sort(),
-    [vehicles]
-  );
-  const categoryCounts = useMemo(() => {
-    const map: Record<string, number> = {};
-    vehicles.forEach(v => { if (v.category) map[v.category] = (map[v.category] ?? 0) + 1; });
-    return map;
-  }, [vehicles]);
-
-  // Service-specific classes defined in admin → ServicePricingEditor
-  const serviceClasses = useMemo(() => {
-    if (activeService === 'transfer') {
-      return (cfg.transfer_vehicle_classes ?? []).map((c, idx) => ({
-        id: `transfer-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    if (activeService === 'limo_tour') {
-      return (cfg.limo_vehicle_classes ?? []).map((c, idx) => ({
-        id: `limo-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    if (activeService === 'city_tour') {
-      return (cfg.city_tour_vehicle_classes ?? []).map((c, idx) => ({
-        id: `tour-${idx}`,
-        label: c.label || `${c.category} (${c.seats} seats)`,
-        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
-        category: c.category,
-      }));
-    }
-    // car_rental → use vehicle categories from inventory
-    return availableCategories.map((cat) => ({
-      id: cat,
-      label: CATEGORY_LABELS[cat] ?? cat,
-      sublabel: `${categoryCounts[cat]} available`,
-      category: cat,
-    }));
-  }, [activeService, cfg.transfer_vehicle_classes, cfg.limo_vehicle_classes, cfg.city_tour_vehicle_classes, availableCategories, categoryCounts]);
-
   const handleSearch = () => {
     setSearchActive(true);
     navigate(`/agency/${slug}/services/${activeService}`);
-  };
-
-  const handlePickClass = (category: string | null) => {
-    setClassPickerOpen(false);
-    // For booking-form services, navigate to the service detail page
-    if (activeService === 'transfer' || activeService === 'limo_tour' || activeService === 'city_tour' || activeService === 'apartment') {
-      navigate(`/agency/${slug}/services/${activeService}`);
-      return;
-    }
-    // Car rental: filter the home listings by category and scroll
-    setFilters(prev => ({ ...prev, categories: category ? [category] : [] }));
-    setTimeout(() => vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }), 80);
   };
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
