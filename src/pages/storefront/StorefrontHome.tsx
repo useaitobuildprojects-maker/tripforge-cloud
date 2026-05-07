@@ -1,5 +1,5 @@
 import { useOutletContext, Link, useParams, useNavigate } from 'react-router-dom';
-import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
+import { Agency, StorefrontConfig, ServiceType } from '@/types/agency';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, Star, ChevronRight, Car, Building, Users, Briefcase,
@@ -32,6 +32,14 @@ const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   transfer: Navigation,
   limo_tour: Briefcase,
   city_tour: Globe,
+};
+
+const HERO_SERVICE_LABELS: Record<ServiceType, string> = {
+  car_rental: 'Car Rental',
+  apartment: 'Apartment',
+  transfer: 'Transfer',
+  limo_tour: 'Limo',
+  city_tour: 'City Tour',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -137,24 +145,7 @@ const StorefrontHome = () => {
 
   const handleSearch = () => {
     setSearchActive(true);
-    // For booking-form services, route straight to the service detail page
-    // (same destination as the Services page "Explore" buttons) so the user
-    // gets the proper booking form for that service.
-    if (
-      activeService === 'transfer' ||
-      activeService === 'limo_tour' ||
-      activeService === 'city_tour' ||
-      activeService === 'apartment'
-    ) {
-      navigate(`/agency/${slug}/services/${activeService}`);
-      return;
-    }
-    // Car rental: show class picker if classes exist, else scroll to listings
-    if (serviceClasses.length > 0) {
-      setClassPickerOpen(true);
-    } else {
-      vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(`/agency/${slug}/services/${activeService}`);
   };
 
   const handlePickClass = (category: string | null) => {
@@ -254,7 +245,7 @@ const StorefrontHome = () => {
                           : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
                         <Icon className="h-4 w-4" />
-                        <span>{SERVICE_LABELS[service] ?? service}</span>
+                        <span>{HERO_SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
                   })}
@@ -606,7 +597,7 @@ const StorefrontHome = () => {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: typo.heading }}>
-              Choose a {SERVICE_LABELS[activeService] ?? activeService} class
+              Choose a {HERO_SERVICE_LABELS[activeService] ?? activeService} class
             </DialogTitle>
             <DialogDescription>Pick a class to view matching options, or skip to see all.</DialogDescription>
           </DialogHeader>
