@@ -272,9 +272,17 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
 
         {/* Footer row: add city + pax + search */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 items-stretch pt-0.5">
-          <Button variant="outline" size="sm" className="md:col-span-3 h-11 text-xs" onClick={addStop}>
-            <Plus className="h-3.5 w-3.5 mr-1" /> Add city
-          </Button>
+          <button
+            type="button"
+            onClick={addStop}
+            className="md:col-span-3 px-3 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2 text-left transition-colors hover:bg-background"
+          >
+            <Plus className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Itinerary</p>
+              <p className="text-xs font-semibold">Add city</p>
+            </div>
+          </button>
 
           <div className="md:col-span-3 px-3 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2">
             <Users className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
@@ -292,7 +300,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full min-h-11 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
+              className="w-full rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
               style={{ backgroundColor: buttonColor }}
             >
               <Search className="h-4 w-4" /> Search Limo
