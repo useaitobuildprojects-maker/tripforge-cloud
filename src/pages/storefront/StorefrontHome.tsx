@@ -251,15 +251,15 @@ const StorefrontHome = () => {
                 <div className="md:col-span-3 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
-                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={agency.city} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.originLabel}</p>
+                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={searchCopy.originPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
-                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Same as pick-up" locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
+                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <Popover>
@@ -267,9 +267,9 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pick-up</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.startDateLabel}</p>
                         <p className={cn("text-sm truncate", !pickupDateObj && "text-muted-foreground")} style={pickupDateObj ? tk.textPrimary : undefined}>
-                          {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : 'Select date'}
+                          {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : searchCopy.startDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -288,11 +288,11 @@ const StorefrontHome = () => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                      <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                      {activeService === 'transfer' || activeService === 'city_tour' ? <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} /> : <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />}
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Drop-off</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
-                          {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : 'Select date'}
+                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -313,7 +313,7 @@ const StorefrontHome = () => {
                     <button type="button" className="md:col-span-1 px-2 py-2.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>Pax</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.countLabel}</p>
                         <p className="text-sm truncate" style={tk.textPrimary}>{passengers}</p>
                       </div>
                     </button>
@@ -337,7 +337,7 @@ const StorefrontHome = () => {
                     style={{ backgroundColor: accent, color: '#ffffff' }}
                     onClick={handleSearch}
                   >
-                    <Search className="h-4 w-4" /> Search
+                    <Search className="h-4 w-4" /> {searchCopy.cta}
                   </button>
                 </div>
               </div>
