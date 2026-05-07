@@ -1,5 +1,5 @@
 import { useOutletContext, Link, useParams, useNavigate } from 'react-router-dom';
-import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
+import { Agency, StorefrontConfig, ServiceType } from '@/types/agency';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, Star, ChevronRight, Car, Building, Users, Briefcase,
@@ -22,7 +22,6 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +31,14 @@ const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   transfer: Navigation,
   limo_tour: Briefcase,
   city_tour: Globe,
+};
+
+const HERO_SERVICE_LABELS: Record<ServiceType, string> = {
+  car_rental: 'Car Rental',
+  apartment: 'Apartment',
+  transfer: 'Transfer',
+  limo_tour: 'Limo',
+  city_tour: 'City Tour',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
