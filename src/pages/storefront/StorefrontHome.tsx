@@ -151,15 +151,32 @@ const StorefrontHome = () => {
   const activeFilterCount = countActiveFilters(filters);
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
 
-  const handleSearch = () => {
+  const handleSearch = (overrides?: {
+    pickup?: string;
+    dropoff?: string;
+    start?: string;
+    end?: string;
+    pax?: number;
+    package?: string;
+    cities?: string[];
+    vehicleClass?: string;
+  }) => {
     setSearchActive(true);
     const params = new URLSearchParams();
-    if (pickupLocation) params.set('pickup', pickupLocation);
-    if (dropoffLocation) params.set('dropoff', dropoffLocation);
-    if (pickupDate) params.set('start', pickupDate);
-    if (dropoffDate) params.set('end', dropoffDate);
-    if (passengers) params.set('pax', String(passengers));
-    if (activeService === 'limo_tour') params.set('package', limoPackage);
+    const searchPickup = overrides?.pickup ?? pickupLocation;
+    const searchDropoff = overrides?.dropoff ?? dropoffLocation;
+    const searchStart = overrides?.start ?? pickupDate;
+    const searchEnd = overrides?.end ?? dropoffDate;
+    const searchPax = overrides?.pax ?? passengers;
+    const searchPackage = overrides?.package ?? (activeService === 'limo_tour' ? limoPackage : undefined);
+    if (searchPickup) params.set('pickup', searchPickup);
+    if (searchDropoff) params.set('dropoff', searchDropoff);
+    if (searchStart) params.set('start', searchStart);
+    if (searchEnd) params.set('end', searchEnd);
+    if (searchPax) params.set('pax', String(searchPax));
+    if (searchPackage) params.set('package', searchPackage);
+    if (overrides?.cities?.length) params.set('cities', overrides.cities.join('|'));
+    if (overrides?.vehicleClass) params.set('class', overrides.vehicleClass);
     const qs = params.toString();
     const chauffeur = activeService === 'transfer' || activeService === 'limo_tour' || activeService === 'city_tour';
     const base = chauffeur ? `/agency/${slug}/search/${activeService}` : `/agency/${slug}/services/${activeService}`;
@@ -262,7 +279,7 @@ const StorefrontHome = () => {
               {/* Search fields row */}
               {activeService === 'limo_tour' ? (
                 <div className="p-3">
-                  <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />
+                  <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} variant="hero" onSearch={handleSearch} />
                 </div>
               ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
