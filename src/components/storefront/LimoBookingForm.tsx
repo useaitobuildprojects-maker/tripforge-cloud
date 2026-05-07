@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8, Users } from 'lucide-react';
+import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8, Users, Search, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -42,9 +42,20 @@ interface Props {
   agency: Agency;
   config: StorefrontConfig;
   buttonColor: string;
+  variant?: 'full' | 'hero';
+  onSearch?: (payload: {
+    pickup?: string;
+    dropoff?: string;
+    start?: string;
+    end?: string;
+    pax?: number;
+    package?: DayType;
+    cities?: string[];
+    vehicleClass?: string;
+  }) => void;
 }
 
-const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
   const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
 
