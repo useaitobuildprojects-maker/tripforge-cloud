@@ -137,6 +137,19 @@ const StorefrontHome = () => {
 
   const handleSearch = () => {
     setSearchActive(true);
+    // For booking-form services, route straight to the service detail page
+    // (same destination as the Services page "Explore" buttons) so the user
+    // gets the proper booking form for that service.
+    if (
+      activeService === 'transfer' ||
+      activeService === 'limo_tour' ||
+      activeService === 'city_tour' ||
+      activeService === 'apartment'
+    ) {
+      navigate(`/agency/${slug}/services/${activeService}`);
+      return;
+    }
+    // Car rental: show class picker if classes exist, else scroll to listings
     if (serviceClasses.length > 0) {
       setClassPickerOpen(true);
     } else {
