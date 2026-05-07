@@ -545,6 +545,38 @@ const StorefrontHome = () => {
           pickupCity={pickupLocation || agency.city}
         />
       )}
+
+      {/* Vehicle class picker after Search */}
+      <Dialog open={classPickerOpen} onOpenChange={setClassPickerOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: typo.heading }}>Choose a vehicle class</DialogTitle>
+            <DialogDescription>Pick a category to view matching cars, or skip to see all.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
+            {availableCategories.map((cat) => {
+              const Icon = SERVICE_ICONS.car_rental;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handlePickClass(cat)}
+                  className="group rounded-lg border-2 border-border p-4 text-left hover:border-current transition-all"
+                  style={{ color: accent }}
+                >
+                  <Icon className="h-6 w-6 mb-2" />
+                  <p className="text-sm font-extrabold" style={tk.textPrimary}>{CATEGORY_LABELS[cat] ?? cat}</p>
+                  <p className="text-xs mt-0.5" style={tk.textMuted}>{categoryCounts[cat]} available</p>
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex justify-end pt-2">
+            <Button variant="ghost" size="sm" onClick={() => handlePickClass(null)} className="text-xs font-bold" style={{ color: accent }}>
+              Show all classes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
