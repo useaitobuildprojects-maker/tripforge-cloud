@@ -82,16 +82,16 @@ const HERO_SEARCH_COPY: Record<ServiceType, {
     cta: 'Search Transfer',
   },
   limo_tour: {
-    originLabel: 'Start city',
-    originPlaceholder: 'Pickup city',
-    destinationLabel: 'Itinerary',
-    destinationPlaceholder: 'Destination city',
-    startDateLabel: 'Start',
+    originLabel: 'Service city',
+    originPlaceholder: 'Choose city',
+    destinationLabel: 'Package',
+    destinationPlaceholder: '8h chauffeur day',
+    startDateLabel: 'Pickup date',
     startDatePlaceholder: 'Select date',
-    endDateLabel: 'End',
+    endDateLabel: 'Drop-off date',
     endDatePlaceholder: 'Select date',
     countLabel: 'Pax',
-    cta: 'Search Limo Service',
+    cta: 'Open Limo Service',
   },
   city_tour: {
     originLabel: 'City',
@@ -133,6 +133,7 @@ const StorefrontHome = () => {
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
+  const [limoPackage, setLimoPackage] = useState<'half' | 'full'>('half');
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +181,7 @@ const StorefrontHome = () => {
   const shape = ts.shape;
   const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
   const searchCopy = HERO_SEARCH_COPY[activeService];
+  const limoPackageLabel = limoPackage === 'half' ? '8h chauffeur day' : '10h chauffeur day';
 
   return (
     <div>
@@ -259,7 +261,23 @@ const StorefrontHome = () => {
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
-                    <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    {activeService === 'limo_tour' ? (
+                      <div className="flex gap-1 pt-0.5">
+                        {(['half', 'full'] as const).map((pkg) => (
+                          <button
+                            key={pkg}
+                            type="button"
+                            onClick={() => setLimoPackage(pkg)}
+                            className="h-6 flex-1 rounded-sm border px-2 text-[11px] font-bold transition-colors"
+                            style={limoPackage === pkg ? { backgroundColor: accent, borderColor: accent, color: '#ffffff' } : { ...tk.border, ...tk.textBody }}
+                          >
+                            {pkg === 'half' ? '8h' : '10h'}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    )}
                   </div>
                 </div>
                 <Popover>
@@ -292,7 +310,7 @@ const StorefrontHome = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
-                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
+                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : activeService === 'limo_tour' && !dropoffDateObj ? limoPackageLabel : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
                       </div>
                     </button>
