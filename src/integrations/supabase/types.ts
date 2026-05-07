@@ -127,6 +127,66 @@ export type Database = {
           },
         ]
       }
+      apartments: {
+        Row: {
+          address: string | null
+          agency_id: string
+          amenities: string[]
+          bathrooms: number
+          bedrooms: number
+          city: string
+          cleaning_fee: number
+          country: string
+          created_at: string
+          description: string | null
+          id: string
+          max_guests: number
+          nightly_rate: number
+          photos: string[]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          agency_id: string
+          amenities?: string[]
+          bathrooms?: number
+          bedrooms?: number
+          city: string
+          cleaning_fee?: number
+          country: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_guests?: number
+          nightly_rate?: number
+          photos?: string[]
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          agency_id?: string
+          amenities?: string[]
+          bathrooms?: number
+          bedrooms?: number
+          city?: string
+          cleaning_fee?: number
+          country?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_guests?: number
+          nightly_rate?: number
+          photos?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           agency_id: string
