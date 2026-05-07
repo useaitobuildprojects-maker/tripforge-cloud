@@ -150,7 +150,6 @@ const ApartmentDialog = ({ agencyId, apartment, open: controlledOpen, onOpenChan
                 <SelectContent>
                   <SelectItem value="available">Available</SelectItem>
                   <SelectItem value="booked">Booked</SelectItem>
-                  <SelectItem value="maintenance">Maintenance</SelectItem>
                 </SelectContent>
               </Select>
             </div>

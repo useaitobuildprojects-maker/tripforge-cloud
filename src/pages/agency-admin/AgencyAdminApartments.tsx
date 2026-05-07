@@ -12,7 +12,6 @@ import ApartmentDialog from '@/components/agency-admin/ApartmentDialog';
 const statusConfig: Record<string, { label: string; className: string }> = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
   booked: { label: 'Booked', className: 'bg-accent/10 text-accent border-accent/20' },
-  maintenance: { label: 'Maintenance', className: 'bg-destructive/10 text-destructive border-destructive/20' },
 };
 
 const AgencyAdminApartments = () => {
