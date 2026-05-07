@@ -370,7 +370,7 @@ const StorefrontHome = () => {
                   <button
                     className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                     style={{ backgroundColor: accent, color: '#ffffff' }}
-                    onClick={handleSearch}
+                    onClick={() => handleSearch()}
                   >
                     <Search className="h-4 w-4" /> {searchCopy.cta}
                   </button>
