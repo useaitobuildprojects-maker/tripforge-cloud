@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8, Users } from 'lucide-react';
+import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Plus, Trash2, Clock4, Clock8, Users, Search, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
@@ -42,9 +42,20 @@ interface Props {
   agency: Agency;
   config: StorefrontConfig;
   buttonColor: string;
+  variant?: 'full' | 'hero';
+  onSearch?: (payload: {
+    pickup?: string;
+    dropoff?: string;
+    start?: string;
+    end?: string;
+    pax?: number;
+    package?: DayType;
+    cities?: string[];
+    vehicleClass?: string;
+  }) => void;
 }
 
-const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
+const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
   const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
 
@@ -155,12 +166,129 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
     window.open(url, '_blank');
   };
 
+  const handleSearch = () => {
+    const firstStop = itinerary[0];
+    const lastStop = itinerary[itinerary.length - 1];
+    onSearch?.({
+      pickup: firstStop?.city,
+      dropoff: lastStop && lastStop !== firstStop ? lastStop.city : firstStop?.city,
+      start: firstStop?.pickupDate ? format(firstStop.pickupDate, 'yyyy-MM-dd') : undefined,
+      end: lastStop?.dropoffDate ? format(lastStop.dropoffDate, 'yyyy-MM-dd') : undefined,
+      pax,
+      package: firstStop?.dayType,
+      cities: itinerary.map(stop => stop.city).filter(Boolean),
+      vehicleClass: selectedClass?.label,
+    });
+  };
+
+  if (variant === 'hero') {
+    const firstStop = itinerary[0];
+    const lastStop = itinerary[itinerary.length - 1];
+    const startLabel = firstStop?.pickupDate ? format(firstStop.pickupDate, 'EEE, MMM d') : 'Select date';
+    const endLabel = lastStop?.dropoffDate ? format(lastStop.dropoffDate, 'EEE, MMM d') : 'Select date';
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 p-1.5">
+        <div className="md:col-span-4 px-3 py-2.5 rounded-md border-2 bg-background/70 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <MapPin className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Cities</p>
+          </div>
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+            {itinerary.map((stop, idx) => (
+              <div key={idx} className="flex items-center gap-1 shrink-0">
+                <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
+                  <SelectTrigger className="h-8 w-[128px] text-xs border-border bg-background">
+                    <SelectValue placeholder="City" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cityRates.map(cr => (
+                      <SelectItem key={cr.city} value={cr.city}>
+                        {cr.city}{cr.country ? ` · ${cr.country}` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {itinerary.length > 1 && (
+                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => removeStop(idx)}>
+                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button variant="outline" size="sm" className="h-8 shrink-0 px-2 text-xs" onClick={addStop}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> City
+            </Button>
+          </div>
+        </div>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 bg-background/70 flex items-center gap-2.5 text-left transition-colors">
+              <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pickup date</p>
+                <p className={cn("text-sm truncate", !firstStop?.pickupDate && "text-muted-foreground")}>{startLabel}</p>
+              </div>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={firstStop?.pickupDate} onSelect={(d) => updateStop(0, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 bg-background/70 flex items-center gap-2.5 text-left transition-colors">
+              <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Drop-off date</p>
+                <p className={cn("text-sm truncate", !lastStop?.dropoffDate && "text-muted-foreground")}>{endLabel}</p>
+              </div>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={lastStop?.dropoffDate} onSelect={(d) => updateStop(itinerary.length - 1, { dropoffDate: d })} disabled={(d) => d < (lastStop?.pickupDate ?? firstStop?.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+
+        <div className="md:col-span-1 px-2 py-2.5 rounded-md border-2 bg-background/70">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Hours</p>
+          <div className="mt-1 flex gap-1">
+            <button type="button" onClick={() => updateStop(0, { dayType: 'half' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", firstStop?.dayType === 'half' ? 'text-foreground' : 'text-muted-foreground')} style={firstStop?.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}>8h</button>
+            <button type="button" onClick={() => updateStop(0, { dayType: 'full' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", firstStop?.dayType === 'full' ? 'text-foreground' : 'text-muted-foreground')} style={firstStop?.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}>10h</button>
+          </div>
+        </div>
+
+        <div className="md:col-span-1 px-2 py-2.5 rounded-md border-2 bg-background/70">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pax</p>
+          <div className="mt-1 flex items-center gap-1">
+            <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))} className="h-6 w-6 rounded-md border text-xs font-bold">−</button>
+            <span className="w-5 text-center text-sm font-semibold">{pax}</span>
+            <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))} className="h-6 w-6 rounded-md border text-xs font-bold">+</button>
+          </div>
+        </div>
+
+        <div className="md:col-span-2 flex items-stretch">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="w-full min-h-14 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
+            style={{ backgroundColor: buttonColor }}
+          >
+            <Search className="h-4 w-4" /> Search Limo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-border bg-card p-6 md:p-8 space-y-6 shadow-lg"
+        className="border border-border bg-card space-y-6 rounded-2xl p-6 md:p-8 shadow-lg"
       >
         <div className="text-center mb-2">
           <h3 className="text-xl font-bold">Book Your Chauffeur</h3>
@@ -342,7 +470,7 @@ const LimoBookingForm = ({ agency, config, buttonColor }: Props) => {
             </div>
 
             {/* Price Summary with breakdown */}
-            {total > 0 && (
+            {variant === 'full' && total > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
