@@ -597,7 +597,7 @@ const StorefrontHome = () => {
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: typo.heading }}>
-              Choose a {SERVICE_LABELS[activeService] ?? activeService} class
+              Choose a {HERO_SERVICE_LABELS[activeService] ?? activeService} class
             </DialogTitle>
             <DialogDescription>Pick a class to view matching options, or skip to see all.</DialogDescription>
           </DialogHeader>
