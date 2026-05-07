@@ -20,6 +20,7 @@ import { useState, useMemo, useRef } from 'react';
 import VehicleFilterSidebar, { VehicleFilters, emptyFilters, hasAnyFilter, countActiveFilters, applyFilters } from '@/components/storefront/VehicleFilterSidebar';
 import LocationAutocomplete, { getAgencyLocations } from '@/components/storefront/LocationAutocomplete';
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
+import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { format } from 'date-fns';
