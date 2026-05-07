@@ -160,7 +160,9 @@ const StorefrontHome = () => {
     if (passengers) params.set('pax', String(passengers));
     if (activeService === 'limo_tour') params.set('package', limoPackage);
     const qs = params.toString();
-    navigate(`/agency/${slug}/services/${activeService}${qs ? `?${qs}` : ''}`);
+    const chauffeur = activeService === 'transfer' || activeService === 'limo_tour' || activeService === 'city_tour';
+    const base = chauffeur ? `/agency/${slug}/search/${activeService}` : `/agency/${slug}/services/${activeService}`;
+    navigate(`${base}${qs ? `?${qs}` : ''}`);
   };
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
