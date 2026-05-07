@@ -184,22 +184,19 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
   if (variant === 'hero') {
     const firstStop = itinerary[0];
     const lastStop = itinerary[itinerary.length - 1];
-    const startLabel = firstStop?.pickupDate ? format(firstStop.pickupDate, 'EEE, MMM d') : 'Select date';
-    const endLabel = lastStop?.dropoffDate ? format(lastStop.dropoffDate, 'EEE, MMM d') : 'Select date';
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 p-1.5">
-        <div className="md:col-span-4 px-3 py-2.5 rounded-md border-2 bg-background/70 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <MapPin className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
-            <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Cities</p>
-          </div>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-            {itinerary.map((stop, idx) => (
-              <div key={idx} className="flex items-center gap-1 shrink-0">
-                <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v, days: 1 })}>
-                  <SelectTrigger className="h-8 w-[128px] text-xs border-border bg-background">
-                    <SelectValue placeholder="City" />
+      <div className="space-y-1.5 p-1.5">
+        {itinerary.map((stop, idx) => (
+          <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-1.5 items-stretch">
+            {/* City */}
+            <div className="md:col-span-4 px-3 py-2 rounded-md border-2 bg-background/70 min-w-0 flex items-center gap-2">
+              <MapPin className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Stop {idx + 1}</p>
+                <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v })}>
+                  <SelectTrigger className="h-7 text-xs border-0 px-0 bg-transparent shadow-none focus:ring-0">
+                    <SelectValue placeholder="Select city" />
                   </SelectTrigger>
                   <SelectContent>
                     {cityRates.map(cr => (
@@ -209,75 +206,98 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                     ))}
                   </SelectContent>
                 </Select>
-                {itinerary.length > 1 && (
-                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => removeStop(idx)}>
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
-                )}
               </div>
-            ))}
-            <Button variant="outline" size="sm" className="h-8 shrink-0 px-2 text-xs" onClick={addStop}>
-              <Plus className="h-3.5 w-3.5 mr-1" /> City
-            </Button>
-          </div>
-        </div>
+              {itinerary.length > 1 && (
+                <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeStop(idx)}>
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </Button>
+              )}
+            </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 bg-background/70 flex items-center gap-2.5 text-left transition-colors">
-              <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pickup date</p>
-                <p className={cn("text-sm truncate", !firstStop?.pickupDate && "text-muted-foreground")}>{startLabel}</p>
+            {/* Pickup date */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button type="button" disabled={idx > 0} className="md:col-span-2 px-3 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2 text-left transition-colors disabled:opacity-70">
+                  <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pickup</p>
+                    <p className={cn("text-xs truncate", !stop.pickupDate && "text-muted-foreground")}>
+                      {stop.pickupDate ? format(stop.pickupDate, 'EEE, MMM d') : (idx > 0 ? 'Auto' : 'Select')}
+                    </p>
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+
+            {/* Drop-off date */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <button type="button" className="md:col-span-2 px-3 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2 text-left transition-colors">
+                  <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Drop-off</p>
+                    <p className={cn("text-xs truncate", !stop.dropoffDate && "text-muted-foreground")}>
+                      {stop.dropoffDate ? format(stop.dropoffDate, 'EEE, MMM d') : 'Select'}
+                    </p>
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+              </PopoverContent>
+            </Popover>
+
+            {/* Hours */}
+            <div className="md:col-span-2 px-2 py-2 rounded-md border-2 bg-background/70">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Hours</p>
+              <div className="mt-0.5 flex gap-1">
+                <button type="button" onClick={() => updateStop(idx, { dayType: 'half' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", stop.dayType === 'half' ? 'text-foreground' : 'text-muted-foreground')} style={stop.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}>8h</button>
+                <button type="button" onClick={() => updateStop(idx, { dayType: 'full' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", stop.dayType === 'full' ? 'text-foreground' : 'text-muted-foreground')} style={stop.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}>10h</button>
               </div>
+            </div>
+
+            {/* Days display */}
+            <div className="md:col-span-2 px-2 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2">
+              <Clock4 className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Days</p>
+                <p className="text-xs font-semibold">{stop.days}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Footer row: add city + pax + search */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-1.5 items-stretch pt-0.5">
+          <Button variant="outline" size="sm" className="md:col-span-3 h-11 text-xs" onClick={addStop}>
+            <Plus className="h-3.5 w-3.5 mr-1" /> Add city
+          </Button>
+
+          <div className="md:col-span-3 px-3 py-2 rounded-md border-2 bg-background/70 flex items-center gap-2">
+            <Users className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
+            <div className="flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Passengers</p>
+              <div className="mt-0.5 flex items-center gap-1">
+                <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))} className="h-6 w-6 rounded-md border text-xs font-bold">−</button>
+                <span className="w-5 text-center text-sm font-semibold">{pax}</span>
+                <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))} className="h-6 w-6 rounded-md border text-xs font-bold">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-6 flex items-stretch">
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="w-full min-h-11 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
+              style={{ backgroundColor: buttonColor }}
+            >
+              <Search className="h-4 w-4" /> Search Limo
             </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={firstStop?.pickupDate} onSelect={(d) => updateStop(0, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
-          </PopoverContent>
-        </Popover>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 bg-background/70 flex items-center gap-2.5 text-left transition-colors">
-              <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Drop-off date</p>
-                <p className={cn("text-sm truncate", !lastStop?.dropoffDate && "text-muted-foreground")}>{endLabel}</p>
-              </div>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar mode="single" selected={lastStop?.dropoffDate} onSelect={(d) => updateStop(itinerary.length - 1, { dropoffDate: d })} disabled={(d) => d < (lastStop?.pickupDate ?? firstStop?.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
-          </PopoverContent>
-        </Popover>
-
-        <div className="md:col-span-1 px-2 py-2.5 rounded-md border-2 bg-background/70">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Hours</p>
-          <div className="mt-1 flex gap-1">
-            <button type="button" onClick={() => updateStop(0, { dayType: 'half' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", firstStop?.dayType === 'half' ? 'text-foreground' : 'text-muted-foreground')} style={firstStop?.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}>8h</button>
-            <button type="button" onClick={() => updateStop(0, { dayType: 'full' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", firstStop?.dayType === 'full' ? 'text-foreground' : 'text-muted-foreground')} style={firstStop?.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}>10h</button>
           </div>
-        </div>
-
-        <div className="md:col-span-1 px-2 py-2.5 rounded-md border-2 bg-background/70">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pax</p>
-          <div className="mt-1 flex items-center gap-1">
-            <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))} className="h-6 w-6 rounded-md border text-xs font-bold">−</button>
-            <span className="w-5 text-center text-sm font-semibold">{pax}</span>
-            <button type="button" onClick={() => setPax(p => Math.min(20, p + 1))} className="h-6 w-6 rounded-md border text-xs font-bold">+</button>
-          </div>
-        </div>
-
-        <div className="md:col-span-2 flex items-stretch">
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="w-full min-h-14 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 text-primary-foreground"
-            style={{ backgroundColor: buttonColor }}
-          >
-            <Search className="h-4 w-4" /> Search Limo
-          </button>
         </div>
       </div>
     );
