@@ -82,16 +82,16 @@ const HERO_SEARCH_COPY: Record<ServiceType, {
     cta: 'Search Transfer',
   },
   limo_tour: {
-    originLabel: 'Start city',
-    originPlaceholder: 'Pickup city',
-    destinationLabel: 'Itinerary',
-    destinationPlaceholder: 'Destination city',
-    startDateLabel: 'Start',
+    originLabel: 'Service city',
+    originPlaceholder: 'Choose city',
+    destinationLabel: 'Package',
+    destinationPlaceholder: '8h chauffeur day',
+    startDateLabel: 'Pickup date',
     startDatePlaceholder: 'Select date',
-    endDateLabel: 'End',
+    endDateLabel: 'Drop-off date',
     endDatePlaceholder: 'Select date',
     countLabel: 'Pax',
-    cta: 'Search Limo Service',
+    cta: 'Open Limo Service',
   },
   city_tour: {
     originLabel: 'City',
@@ -133,6 +133,7 @@ const StorefrontHome = () => {
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
+  const [limoPackage, setLimoPackage] = useState<'half' | 'full'>('half');
   const [searchActive, setSearchActive] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
@@ -180,6 +181,7 @@ const StorefrontHome = () => {
   const shape = ts.shape;
   const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
   const searchCopy = HERO_SEARCH_COPY[activeService];
+  const limoPackageLabel = limoPackage === 'half' ? '8h chauffeur day' : '10h chauffeur day';
 
   return (
     <div>
