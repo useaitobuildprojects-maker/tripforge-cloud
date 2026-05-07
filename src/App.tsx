@@ -16,6 +16,7 @@ const StorefrontLayout = lazy(() => import("./components/storefront/StorefrontLa
 const StorefrontHome = lazy(() => import("./pages/storefront/StorefrontHome"));
 const StorefrontServices = lazy(() => import("./pages/storefront/StorefrontServices"));
 const StorefrontServiceDetail = lazy(() => import("./pages/storefront/StorefrontServiceDetail"));
+const StorefrontSearch = lazy(() => import("./pages/storefront/StorefrontSearch"));
 const StorefrontContact = lazy(() => import("./pages/storefront/StorefrontContact"));
 const StorefrontAbout = lazy(() => import("./pages/storefront/StorefrontAbout"));
 const AgencyAdminLayout = lazy(() => import("./components/agency-admin/AgencyAdminLayout"));
@@ -83,6 +84,7 @@ const App = () => (
                     <Route index element={<StorefrontHome />} />
                     <Route path="services" element={<StorefrontServices />} />
                     <Route path="services/:serviceType" element={<StorefrontServiceDetail />} />
+                    <Route path="search/:serviceType" element={<StorefrontSearch />} />
                     <Route path="fleet" element={<StorefrontServices />} />
                     <Route path="contact" element={<StorefrontContact />} />
                     <Route path="about" element={<StorefrontAbout />} />
