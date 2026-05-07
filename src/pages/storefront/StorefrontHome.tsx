@@ -1,4 +1,4 @@
-import { useOutletContext, Link, useParams } from 'react-router-dom';
+import { useOutletContext, Link, useParams, useNavigate } from 'react-router-dom';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { motion } from 'framer-motion';
 import {
@@ -61,6 +61,7 @@ const TRUST_ITEMS = [
 
 const StorefrontHome = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { agency, templateStyles: ts, buttonColor, config: cfg } = useOutletContext<{ agency: Agency; templateStyles: TemplateStyles; buttonColor: string; config: StorefrontConfig }>();
   const tk = ts.tokens;
   const enabledServices = agency.services ?? [];
@@ -144,8 +145,14 @@ const StorefrontHome = () => {
   };
 
   const handlePickClass = (category: string | null) => {
-    setFilters(prev => ({ ...prev, categories: category ? [category] : [] }));
     setClassPickerOpen(false);
+    // For booking-form services, navigate to the service detail page
+    if (activeService === 'transfer' || activeService === 'limo_tour' || activeService === 'city_tour' || activeService === 'apartment') {
+      navigate(`/agency/${slug}/services/${activeService}`);
+      return;
+    }
+    // Car rental: filter the home listings by category and scroll
+    setFilters(prev => ({ ...prev, categories: category ? [category] : [] }));
     setTimeout(() => vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }), 80);
   };
 
