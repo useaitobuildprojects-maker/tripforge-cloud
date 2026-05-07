@@ -234,7 +234,10 @@ const StorefrontHome = () => {
           <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${EXP.brandDeep}E0 0%, ${EXP.brandDeep}F5 100%)` }} />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-28 sm:pb-32">
+        <div className={cn(
+          "relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10",
+          activeService === 'limo_tour' ? "pb-56 sm:pb-60" : "pb-28 sm:pb-32"
+        )}>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             className={`text-white text-3xl sm:text-4xl lg:text-5xl leading-[1.1] max-w-3xl ${ts.heroTitleClass}`}
