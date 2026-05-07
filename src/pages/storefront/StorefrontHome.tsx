@@ -22,6 +22,7 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +32,19 @@ const SERVICE_ICONS: Record<ServiceType, React.ElementType> = {
   transfer: Navigation,
   limo_tour: Briefcase,
   city_tour: Globe,
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  sedan: 'Sedan',
+  suv: 'SUV',
+  hatchback: 'Hatchback',
+  coupe: 'Coupe',
+  convertible: 'Convertible',
+  minivan: 'Minivan',
+  pickup: 'Pickup Truck',
+  luxury: 'Luxury',
+  sports: 'Sports',
+  electric: 'Electric',
 };
 
 const DESTINATIONS = [
@@ -59,6 +73,7 @@ const StorefrontHome = () => {
   const [dropoffDate, setDropoffDate] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
   const [searchActive, setSearchActive] = useState(false);
+  const [classPickerOpen, setClassPickerOpen] = useState(false);
   const vehiclesRef = useRef<HTMLDivElement>(null);
 
   const agencyLocations = useMemo(() => {
@@ -73,6 +88,31 @@ const StorefrontHome = () => {
   const filteredVehicles = useMemo(() => applyFilters(vehicles, filters), [vehicles, filters]);
   const activeFilterCount = countActiveFilters(filters);
   const [bookingVehicle, setBookingVehicle] = useState<MarketplaceVehicle | null>(null);
+
+  const availableCategories = useMemo(
+    () => [...new Set(vehicles.map(v => v.category).filter(Boolean) as string[])].sort(),
+    [vehicles]
+  );
+  const categoryCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    vehicles.forEach(v => { if (v.category) map[v.category] = (map[v.category] ?? 0) + 1; });
+    return map;
+  }, [vehicles]);
+
+  const handleSearch = () => {
+    setSearchActive(true);
+    if (availableCategories.length > 0) {
+      setClassPickerOpen(true);
+    } else {
+      vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handlePickClass = (category: string | null) => {
+    setFilters(prev => ({ ...prev, categories: category ? [category] : [] }));
+    setClassPickerOpen(false);
+    setTimeout(() => vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }), 80);
+  };
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const minReturnDate = useMemo(() => {
@@ -254,7 +294,7 @@ const StorefrontHome = () => {
                   <button
                     className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                     style={{ backgroundColor: accent, color: '#ffffff' }}
-                    onClick={() => { setSearchActive(true); vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' }); }}
+                    onClick={handleSearch}
                   >
                     <Search className="h-4 w-4" /> Search
                   </button>
