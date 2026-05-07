@@ -400,7 +400,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             </div>
 
             {/* Price Summary with breakdown */}
-            {total > 0 && (
+            {variant === 'full' && total > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
