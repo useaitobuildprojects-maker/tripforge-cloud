@@ -99,9 +99,44 @@ const StorefrontHome = () => {
     return map;
   }, [vehicles]);
 
+  // Service-specific classes defined in admin → ServicePricingEditor
+  const serviceClasses = useMemo(() => {
+    if (activeService === 'transfer') {
+      return (cfg.transfer_vehicle_classes ?? []).map((c, idx) => ({
+        id: `transfer-${idx}`,
+        label: c.label || `${c.category} (${c.seats} seats)`,
+        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
+        category: c.category,
+      }));
+    }
+    if (activeService === 'limo_tour') {
+      return (cfg.limo_vehicle_classes ?? []).map((c, idx) => ({
+        id: `limo-${idx}`,
+        label: c.label || `${c.category} (${c.seats} seats)`,
+        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
+        category: c.category,
+      }));
+    }
+    if (activeService === 'city_tour') {
+      return (cfg.city_tour_vehicle_classes ?? []).map((c, idx) => ({
+        id: `tour-${idx}`,
+        label: c.label || `${c.category} (${c.seats} seats)`,
+        sublabel: `${c.seats} seats · ${c.multiplier}× rate`,
+        category: c.category,
+      }));
+    }
+    // car_rental → use vehicle categories from inventory
+    return availableCategories.map((cat) => ({
+      id: cat,
+      label: CATEGORY_LABELS[cat] ?? cat,
+      sublabel: `${categoryCounts[cat]} available`,
+      category: cat,
+    }));
+  }, [activeService, cfg.transfer_vehicle_classes, cfg.limo_vehicle_classes, cfg.city_tour_vehicle_classes, availableCategories, categoryCounts]);
+
   const handleSearch = () => {
     setSearchActive(true);
-    if (availableCategories.length > 0) {
+    if (serviceClasses.length > 0) {
       setClassPickerOpen(true);
     } else {
       vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' });
