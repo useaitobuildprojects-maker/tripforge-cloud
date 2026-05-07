@@ -152,7 +152,15 @@ const StorefrontHome = () => {
 
   const handleSearch = () => {
     setSearchActive(true);
-    navigate(`/agency/${slug}/services/${activeService}`);
+    const params = new URLSearchParams();
+    if (pickupLocation) params.set('pickup', pickupLocation);
+    if (dropoffLocation) params.set('dropoff', dropoffLocation);
+    if (pickupDate) params.set('start', pickupDate);
+    if (dropoffDate) params.set('end', dropoffDate);
+    if (passengers) params.set('pax', String(passengers));
+    if (activeService === 'limo_tour') params.set('package', limoPackage);
+    const qs = params.toString();
+    navigate(`/agency/${slug}/services/${activeService}${qs ? `?${qs}` : ''}`);
   };
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
