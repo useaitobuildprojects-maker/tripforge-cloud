@@ -22,6 +22,7 @@ import LocationAutocomplete, { getAgencyLocations } from '@/components/storefron
 import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -144,24 +145,7 @@ const StorefrontHome = () => {
 
   const handleSearch = () => {
     setSearchActive(true);
-    // For booking-form services, route straight to the service detail page
-    // (same destination as the Services page "Explore" buttons) so the user
-    // gets the proper booking form for that service.
-    if (
-      activeService === 'transfer' ||
-      activeService === 'limo_tour' ||
-      activeService === 'city_tour' ||
-      activeService === 'apartment'
-    ) {
-      navigate(`/agency/${slug}/services/${activeService}`);
-      return;
-    }
-    // Car rental: show class picker if classes exist, else scroll to listings
-    if (serviceClasses.length > 0) {
-      setClassPickerOpen(true);
-    } else {
-      vehiclesRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(`/agency/${slug}/services/${activeService}`);
   };
 
   const handlePickClass = (category: string | null) => {
@@ -261,7 +245,7 @@ const StorefrontHome = () => {
                           : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
                         <Icon className="h-4 w-4" />
-                        <span>{SERVICE_LABELS[service] ?? service}</span>
+                        <span>{HERO_SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
                   })}
