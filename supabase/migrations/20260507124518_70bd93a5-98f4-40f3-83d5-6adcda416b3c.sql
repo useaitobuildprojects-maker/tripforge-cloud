@@ -1,0 +1,1 @@
+UPDATE public.apartments SET status = 'available' WHERE status = 'maintenance';
