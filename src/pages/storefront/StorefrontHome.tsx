@@ -179,6 +179,7 @@ const StorefrontHome = () => {
   const typo = ts.typography;
   const shape = ts.shape;
   const headingFontStyle: React.CSSProperties = { fontFamily: typo.heading };
+  const searchCopy = HERO_SEARCH_COPY[activeService];
 
   return (
     <div>
@@ -239,7 +240,7 @@ const StorefrontHome = () => {
                           : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
                         <Icon className="h-4 w-4" />
-                        <span>{HERO_SERVICE_LABELS[service] ?? service}</span>
+                        <span>{SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
                   })}
