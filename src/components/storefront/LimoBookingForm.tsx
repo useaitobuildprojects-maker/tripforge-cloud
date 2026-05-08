@@ -202,7 +202,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
     return (
       <div className="space-y-1.5 p-1.5">
         {itinerary.map((stop, idx) => (
-          <div key={idx} className="grid grid-cols-1 gap-1.5 items-stretch md:[grid-template-columns:repeat(14,minmax(0,1fr))]">
+          <div key={idx} className="grid grid-cols-1 gap-1.5 items-stretch md:[grid-template-columns:repeat(12,minmax(0,1fr))]">
             {/* City */}
             <div className="md:col-span-4 px-3 py-2 rounded-md border border-input bg-background min-w-0 flex items-center gap-2">
               <MapPin className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
@@ -245,24 +245,6 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                 <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
               </PopoverContent>
             </Popover>
-
-            {/* Pickup time */}
-            <div className="md:col-span-2 px-3 py-2 rounded-md border border-input bg-background flex items-center gap-2 min-w-0">
-              <Clock4 className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Time</p>
-                <Select value={stop.pickupTime ?? '09:00'} onValueChange={(v) => updateStop(idx, { pickupTime: v })}>
-                  <SelectTrigger className="h-7 text-xs border-0 px-0 bg-transparent shadow-none focus:ring-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    {timeSlots.map(t => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
 
             {/* Drop-off date */}
             <Popover>
