@@ -77,6 +77,17 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
   const hasItineraryPricing = cityRates.length > 0;
   const availableCities = cityRates.map(cr => cr.city);
 
+  // Time slots every 30 minutes
+  const timeSlots = useMemo(() => {
+    const slots: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+      }
+    }
+    return slots;
+  }, []);
+
   // Selected class index within vehicleClasses
   const [selectedClassIdx, setSelectedClassIdx] = useState(0);
   const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
