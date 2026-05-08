@@ -334,21 +334,39 @@ const StorefrontHome = () => {
                     <CalendarPicker
                       mode="single"
                       selected={pickupDateObj}
-                      onSelect={(d) => d && setPickupDate(d.toISOString().split('T')[0])}
+                      onSelect={(d) => d && setPickupDate(formatLocalDate(d))}
                       disabled={(d) => d < todayDate}
                       initialFocus
                       className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
+                {activeService === 'transfer' || activeService === 'city_tour' ? (
+                  <div className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
+                      <Select value={pickupTime} onValueChange={setPickupTime}>
+                        <SelectTrigger className="h-7 text-sm border-0 px-0 bg-transparent shadow-none focus:ring-0">
+                          <SelectValue placeholder={searchCopy.endDatePlaceholder} />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          {timeSlots.map(t => (
+                            <SelectItem key={t} value={t}>{t}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                ) : (
                 <Popover>
                   <PopoverTrigger asChild>
                     <button type="button" className="md:col-span-2 px-3 py-2.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                      {activeService === 'transfer' || activeService === 'city_tour' ? <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} /> : <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />}
+                      <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
-                          {activeService === 'transfer' || activeService === 'city_tour' ? searchCopy.endDatePlaceholder : dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
+                          {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
                       </div>
                     </button>
@@ -357,13 +375,14 @@ const StorefrontHome = () => {
                     <CalendarPicker
                       mode="single"
                       selected={dropoffDateObj}
-                      onSelect={(d) => d && setDropoffDate(d.toISOString().split('T')[0])}
+                      onSelect={(d) => d && setDropoffDate(formatLocalDate(d))}
                       disabled={(d) => d < minReturnDateObj}
                       initialFocus
                       className={cn("p-3 pointer-events-auto")}
                     />
                   </PopoverContent>
                 </Popover>
+                )}
                 <Popover>
                   <PopoverTrigger asChild>
                     <button type="button" className="md:col-span-1 px-2 py-2.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
