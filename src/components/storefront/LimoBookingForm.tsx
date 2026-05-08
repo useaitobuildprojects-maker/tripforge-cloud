@@ -358,6 +358,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
         ) : (
           <>
             {/* City stops with day count */}
+            {!hideItineraryFields && (
             <div className="space-y-2">
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
               {itinerary.map((stop, idx) => {
@@ -457,8 +458,9 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                 </div>
               )}
             </div>
+            )}
 
-            <Separator />
+            {!hideItineraryFields && <Separator />}
 
             {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">
