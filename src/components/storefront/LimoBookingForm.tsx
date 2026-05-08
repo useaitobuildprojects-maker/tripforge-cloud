@@ -167,7 +167,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
     const plan = breakdown
       .map((d, i) => {
         const stop = itinerary[i];
-        const pu = stop.pickupDate ? format(stop.pickupDate, 'PPP') : 'TBD';
+        const pu = stop.pickupDate ? `${format(stop.pickupDate, 'PPP')}${stop.pickupTime ? ` at ${stop.pickupTime}` : ''}` : 'TBD';
         const dr = stop.dropoffDate ? format(stop.dropoffDate, 'PPP') : 'TBD';
         return `  Stop ${i + 1}: ${d.city} — ${pu} → ${dr} (${d.days} day${d.days !== 1 ? 's' : ''} × ${d.dayType === 'full' ? '10h' : '8h'}, €${d.perDay}/day) = €${d.price}`;
       })
@@ -184,7 +184,9 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
     onSearch?.({
       pickup: firstStop?.city,
       dropoff: lastStop && lastStop !== firstStop ? lastStop.city : firstStop?.city,
-      start: firstStop?.pickupDate ? format(firstStop.pickupDate, 'yyyy-MM-dd') : undefined,
+      start: firstStop?.pickupDate
+        ? `${format(firstStop.pickupDate, 'yyyy-MM-dd')}${firstStop.pickupTime ? `T${firstStop.pickupTime}` : ''}`
+        : undefined,
       end: lastStop?.dropoffDate ? format(lastStop.dropoffDate, 'yyyy-MM-dd') : undefined,
       pax,
       package: firstStop?.dayType,
