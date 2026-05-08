@@ -25,9 +25,14 @@ interface Props {
   agency: Agency;
   config: StorefrontConfig;
   buttonColor: string;
+  initialOrigin?: string;
+  initialDestination?: string;
+  initialDate?: string; // yyyy-MM-dd or yyyy-MM-ddTHH:mm
+  initialPax?: number;
+  hideRouteFields?: boolean;
 }
 
-const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
+const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields }: Props) => {
   const { data: cityPricing = [] } = useCityPricing(agency.id);
 
   const agencyLocations = useMemo(() => {
@@ -38,17 +43,21 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
     return getAgencyLocations(agency.city, agency.country);
   }, [config.locations, agency.city, agency.country]);
 
-  const [origin, setOrigin] = useState('');
-  const [originLabel, setOriginLabel] = useState('');
-  const [destination, setDestination] = useState('');
-  const [destLabel, setDestLabel] = useState('');
+  const [origin, setOrigin] = useState(initialOrigin ?? '');
+  const [originLabel, setOriginLabel] = useState(initialOrigin ?? '');
+  const [destination, setDestination] = useState(initialDestination ?? '');
+  const [destLabel, setDestLabel] = useState(initialDestination ?? '');
   const [originCoords, setOriginCoords] = useState<[number, number] | undefined>();
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedClassIndex, setSelectedClassIndex] = useState(0);
   const [quote, setQuote] = useState<TransferQuote | null>(null);
-  const [date, setDate] = useState<Date>();
-  const [time, setTime] = useState('');
-  const [pax, setPax] = useState<number>(1);
+  const [date, setDate] = useState<Date | undefined>(() => {
+    if (!initialDate) return undefined;
+    const d = new Date(initialDate);
+    return isNaN(d.getTime()) ? undefined : d;
+  });
+  const [time, setTime] = useState(initialDate && initialDate.includes('T') ? initialDate.split('T')[1].slice(0, 5) : '');
+  const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
   const [loading, setLoading] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
@@ -113,6 +122,7 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
         </div>
 
         {/* Route Selection */}
+        {!hideRouteFields && (
         <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-3 items-end">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium flex items-center gap-1.5">
@@ -146,8 +156,10 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             />
           </div>
         </div>
+        )}
 
         {/* Date & Time */}
+        {!hideRouteFields && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium flex items-center gap-1.5">
@@ -206,8 +218,9 @@ const TransferBookingForm = ({ agency, config, buttonColor }: Props) => {
             </div>
           </div>
         </div>
+        )}
 
-        <Separator />
+        {!hideRouteFields && <Separator />}
 
         {/* Category Selection */}
         <div className="space-y-3">

@@ -39,7 +39,7 @@ const StorefrontSearch = () => {
   }
 
   const renderForm = () => {
-    if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />;
+    if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} initialOrigin={pickup} initialDestination={dropoff} initialDate={start} initialPax={pax ? Number(pax) : undefined} hideRouteFields />;
     if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />;
     if (service === 'city_tour') return <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />;
     return null;
