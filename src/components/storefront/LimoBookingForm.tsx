@@ -44,6 +44,10 @@ interface Props {
   config: StorefrontConfig;
   buttonColor: string;
   variant?: 'full' | 'hero';
+  hideItineraryFields?: boolean;
+  initialCities?: string[];
+  initialPax?: number;
+  initialPackage?: DayType;
   onSearch?: (payload: {
     pickup?: string;
     dropoff?: string;
@@ -56,7 +60,7 @@ interface Props {
   }) => void;
 }
 
-const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch }: Props) => {
+const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch, hideItineraryFields, initialCities, initialPax, initialPackage }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
   const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
 
@@ -92,11 +96,14 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
   const [selectedClassIdx, setSelectedClassIdx] = useState(0);
   const selectedClass = vehicleClasses[selectedClassIdx] ?? vehicleClasses[0];
   const selectedCategory: LimoCategory = selectedClass?.category ?? 'business';
-  const [pax, setPax] = useState<number>(1);
+  const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
 
-  const [itinerary, setItinerary] = useState<ItineraryStop[]>([
-    { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full', pickupTime: '09:00' },
-  ]);
+  const [itinerary, setItinerary] = useState<ItineraryStop[]>(() => {
+    if (initialCities && initialCities.length > 0) {
+      return initialCities.map(c => ({ city: c, days: 1, dayType: initialPackage ?? 'full', pickupTime: '09:00' }));
+    }
+    return [{ city: cityRates[0]?.city ?? '', days: 1, dayType: initialPackage ?? 'full', pickupTime: '09:00' }];
+  });
 
   const addStop = () => setItinerary(p => {
     const last = p[p.length - 1];
@@ -351,6 +358,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
         ) : (
           <>
             {/* City stops with day count */}
+            {!hideItineraryFields && (
             <div className="space-y-2">
               <Label className="text-xs font-medium">Itinerary ({totalDays} day{totalDays !== 1 ? 's' : ''})</Label>
               {itinerary.map((stop, idx) => {
@@ -450,8 +458,9 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                 </div>
               )}
             </div>
+            )}
 
-            <Separator />
+            {!hideItineraryFields && <Separator />}
 
             {/* Vehicle Class (grouped by category) */}
             <div className="space-y-3">

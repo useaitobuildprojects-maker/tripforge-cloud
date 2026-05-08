@@ -26,6 +26,8 @@ const StorefrontSearch = () => {
   const start = params.get('start') || '';
   const end = params.get('end') || '';
   const pax = params.get('pax') || '';
+  const cities = params.get('cities') || '';
+  const pkg = params.get('package') || '';
 
   const title = useMemo(() => SERVICE_LABELS[service] ?? 'Search', [service]);
 
@@ -40,7 +42,7 @@ const StorefrontSearch = () => {
 
   const renderForm = () => {
     if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} initialOrigin={pickup} initialDestination={dropoff} initialDate={start} initialPax={pax ? Number(pax) : undefined} hideRouteFields />;
-    if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />;
+    if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCities={cities ? cities.split('|').filter(Boolean) : undefined} initialPax={pax ? Number(pax) : undefined} initialPackage={pkg === 'half' || pkg === 'full' ? pkg : undefined} />;
     if (service === 'city_tour') return <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} />;
     return null;
   };
