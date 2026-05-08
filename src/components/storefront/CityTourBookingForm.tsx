@@ -44,9 +44,13 @@ interface Props {
   agency: Agency;
   config: StorefrontConfig;
   buttonColor: string;
+  hideItineraryFields?: boolean;
+  initialCity?: string;
+  initialDate?: string;
+  initialPax?: number;
 }
 
-const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
+const CityTourBookingForm = ({ agency, config, buttonColor, hideItineraryFields, initialCity, initialDate, initialPax }: Props) => {
   const { data: configuredTours = [], isLoading } = useCityTourPricing(agency.id);
 
   const fallbackTours = useMemo<CityTourPrice[]>(() => {
@@ -73,8 +77,8 @@ const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
     : DEFAULT_VEHICLE_CLASSES;
 
   const [selectedTourId, setSelectedTourId] = useState<string>('');
-  const [tourDate, setTourDate] = useState<Date | undefined>();
-  const [pax, setPax] = useState<number>(2);
+  const [tourDate, setTourDate] = useState<Date | undefined>(initialDate ? new Date(initialDate) : undefined);
+  const [pax, setPax] = useState<number>(initialPax ?? 2);
   const [durationType, setDurationType] = useState<DurationType>('full');
   const [selectedClassIdx, setSelectedClassIdx] = useState(0);
 
@@ -83,9 +87,12 @@ const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
   // Auto-select first tour once data arrives
   useEffect(() => {
     if (!selectedTourId && tours.length > 0) {
-      setSelectedTourId(tours[0].id);
+      const match = initialCity
+        ? tours.find(t => (t.city ?? '').toLowerCase() === initialCity.toLowerCase() || t.tour_name.toLowerCase().includes(initialCity.toLowerCase()))
+        : undefined;
+      setSelectedTourId((match ?? tours[0]).id);
     }
-  }, [tours, selectedTourId]);
+  }, [tours, selectedTourId, initialCity]);
 
   const hasHalfDay = !!selectedTour?.half_day_rate;
   const effectiveDurationType: DurationType = hasHalfDay ? durationType : 'full';
@@ -159,7 +166,8 @@ const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
           </div>
         ) : (
           <>
-            {/* Tour cards */}
+            {!hideItineraryFields && (
+            <>
             <div className="space-y-2">
               <Label className="text-xs font-medium">Choose a Tour</Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -281,6 +289,8 @@ const CityTourBookingForm = ({ agency, config, buttonColor }: Props) => {
             )}
 
             <Separator />
+            </>
+            )}
 
             {/* Vehicle Class */}
             <div className="space-y-3">
