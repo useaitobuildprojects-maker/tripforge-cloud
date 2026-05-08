@@ -36,6 +36,7 @@ interface ItineraryStop {
   dayType: DayType;
   pickupDate?: Date;
   dropoffDate?: Date;
+  pickupTime?: string;
 }
 
 interface Props {
@@ -83,12 +84,12 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
   const [pax, setPax] = useState<number>(1);
 
   const [itinerary, setItinerary] = useState<ItineraryStop[]>([
-    { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full' },
+    { city: cityRates[0]?.city ?? '', days: 1, dayType: 'full', pickupTime: '09:00' },
   ]);
 
   const addStop = () => setItinerary(p => {
     const last = p[p.length - 1];
-    return [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full', pickupDate: last?.dropoffDate }];
+    return [...p, { city: availableCities[0] ?? '', days: 1, dayType: 'full', pickupDate: last?.dropoffDate, pickupTime: last?.pickupTime ?? '09:00' }];
   });
   const removeStop = (idx: number) => itinerary.length > 1 && setItinerary(p => p.filter((_, i) => i !== idx));
   const updateStop = (idx: number, updates: Partial<ItineraryStop>) =>
