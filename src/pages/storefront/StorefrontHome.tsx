@@ -23,6 +23,7 @@ import BookingQuoteDialog from '@/components/storefront/BookingQuoteDialog';
 import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -133,6 +134,7 @@ const StorefrontHome = () => {
   const [pickupDate, setPickupDate] = useState('');
   const [dropoffLocation, setDropoffLocation] = useState('');
   const [dropoffDate, setDropoffDate] = useState('');
+  const [pickupTime, setPickupTime] = useState('');
   const [passengers, setPassengers] = useState<number>(1);
   const [limoPackage, setLimoPackage] = useState<'half' | 'full'>('half');
   const [searchActive, setSearchActive] = useState(false);
@@ -165,7 +167,8 @@ const StorefrontHome = () => {
     const params = new URLSearchParams();
     const searchPickup = overrides?.pickup ?? pickupLocation;
     const searchDropoff = overrides?.dropoff ?? dropoffLocation;
-    const searchStart = overrides?.start ?? pickupDate;
+    const isTimeService = activeService === 'transfer' || activeService === 'city_tour';
+    const searchStart = overrides?.start ?? (isTimeService && pickupDate && pickupTime ? `${pickupDate}T${pickupTime}` : pickupDate);
     const searchEnd = overrides?.end ?? dropoffDate;
     const searchPax = overrides?.pax ?? passengers;
     const searchPackage = overrides?.package ?? (activeService === 'limo_tour' ? limoPackage : undefined);
@@ -183,17 +186,32 @@ const StorefrontHome = () => {
     navigate(`${base}${qs ? `?${qs}` : ''}`);
   };
 
-  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const formatLocalDate = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+  const todayStr = useMemo(() => formatLocalDate(new Date()), []);
   const minReturnDate = useMemo(() => {
     if (!pickupDate) return todayStr;
     const d = new Date(pickupDate);
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+    return formatLocalDate(d);
   }, [pickupDate, todayStr]);
 
   const todayDate = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
   const pickupDateObj = pickupDate ? new Date(pickupDate) : undefined;
   const dropoffDateObj = dropoffDate ? new Date(dropoffDate) : undefined;
+  const timeSlots = useMemo(() => {
+    const slots: string[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (const m of [0, 30]) {
+        slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+      }
+    }
+    return slots;
+  }, []);
   const minReturnDateObj = useMemo(() => {
     if (!pickupDateObj) return todayDate;
     const d = new Date(pickupDateObj); d.setDate(d.getDate() + 1); return d;
