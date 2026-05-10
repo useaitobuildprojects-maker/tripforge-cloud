@@ -14,6 +14,7 @@ import { TransferCategory } from '@/hooks/use-service-pricing';
 import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/transfer-pricing';
 import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
+import { getVehicleClassImage } from '@/lib/vehicle-class-images';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   economy: Car,
@@ -227,7 +228,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
           <Label className="text-xs font-medium">Vehicle Class</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {suitableClasses.map((vc) => {
-              const Icon = CATEGORY_ICONS[vc.category] ?? Car;
               const isSelected = selectedClassIndex === vc.idx;
 
               return (
@@ -239,7 +239,12 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                   }`}
                   style={isSelected ? { borderColor: buttonColor } : undefined}
                 >
-                  <Icon className="h-6 w-6 mb-2 opacity-60" />
+                  <img
+                    src={getVehicleClassImage(vc.category)}
+                    alt={vc.label || vc.category}
+                    loading="lazy"
+                    className="h-16 w-full object-contain mb-2"
+                  />
                   <p className="text-sm font-bold">{vc.label || `${vc.category} ${vc.seats}s`}</p>
                   <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
                 </button>
