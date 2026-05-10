@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,14 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [loading, setLoading] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
+
+  // Auto-fetch quote when arriving with prefilled origin/destination
+  useEffect(() => {
+    if (hideRouteFields && initialOrigin && initialDestination && initialOrigin !== initialDestination && !quote && !loading) {
+      handleGetQuote();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Filter classes by seat capacity
   const suitableClasses = useMemo(
