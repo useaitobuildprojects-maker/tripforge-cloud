@@ -201,6 +201,18 @@ export const useDeleteCityTourPrice = () => {
   });
 };
 
+export const useUpdateCityTourPrice = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, agencyId, ...patch }: { id: string; agencyId: string } & Partial<CityTourPrice>) => {
+      const { error } = await supabase.from('city_tour_pricing').update(patch).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: (_, v) => { qc.invalidateQueries({ queryKey: ['city-tour-pricing', v.agencyId] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 // ── Car Rental Pricing ──
 export const useCarRentalPricing = (agencyId: string | undefined) =>
   useQuery({

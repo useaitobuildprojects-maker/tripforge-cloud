@@ -20,6 +20,7 @@ import {
   TRANSFER_CATEGORIES,
   useLimoTourPricing, useAddLimoTourPrice, useDeleteLimoTourPrice,
   useCityTourPricing, useAddCityTourPrice, useDeleteCityTourPrice,
+  useUpdateCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice, useUpdateCarRentalPrice,
 } from '@/hooks/use-service-pricing';
 
@@ -994,8 +995,16 @@ const LimoServicePricingTab = ({ agencyId, storefrontConfig, onConfigChange }: {
                   <tr key={i} className="border-t border-border hover:bg-secondary/20">
                     <td className="px-3 py-1.5 text-muted-foreground">{cr.country ?? '—'}</td>
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
-                    <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
-                    <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
+                    <td className="px-3 py-1.5">
+                      <Input type="number" min={0} defaultValue={cr.full_day_rate}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== cr.full_day_rate) updateCityRate(i, 'full_day_rate', v); }}
+                        className="text-xs font-mono h-7 w-20 ml-auto text-right" />
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <Input type="number" min={0} defaultValue={cr.half_day_rate}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== cr.half_day_rate) updateCityRate(i, 'half_day_rate', v); }}
+                        className="text-xs font-mono h-7 w-20 ml-auto text-right" />
+                    </td>
                     <td className="px-3 py-1.5">
                       <Input
                         type="number"
@@ -1181,6 +1190,7 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   const { data: tours = [], isLoading } = useCityTourPricing(agencyId);
   const addTour = useAddCityTourPrice();
   const deleteTour = useDeleteCityTourPrice();
+  const updateTour = useUpdateCityTourPrice();
   const [name, setName] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
@@ -1305,10 +1315,42 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
               return (
                 <tr key={t.id} className="border-t border-border hover:bg-secondary/20">
                   <td className="px-3 py-2 text-muted-foreground">{t.city ?? '—'}{t.country ? `, ${t.country}` : ''}</td>
-                  <td className="px-3 py-2 text-foreground font-medium">{t.tour_name}</td>
-                  <td className="px-3 py-2 text-right font-mono text-foreground">€{t.daily_rate} <span className="text-muted-foreground">/ {t.duration_hours ?? 8}h</span></td>
-                  <td className="px-3 py-2 text-right font-mono text-foreground">€{halfR} <span className="text-muted-foreground">/ {halfH}h</span></td>
-                  <td className="px-3 py-2 text-muted-foreground max-w-[200px] truncate">{t.description || '—'}</td>
+                  <td className="px-3 py-2">
+                    <Input defaultValue={t.tour_name}
+                      onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== t.tour_name) updateTour.mutate({ id: t.id, agencyId, tour_name: v }); }}
+                      className="text-xs h-7 min-w-[140px]" />
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center justify-end gap-1">
+                      <span className="text-muted-foreground">€</span>
+                      <Input type="number" min={0} defaultValue={t.daily_rate}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== t.daily_rate) updateTour.mutate({ id: t.id, agencyId, daily_rate: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-right" />
+                      <span className="text-muted-foreground">/</span>
+                      <Input type="number" min={1} defaultValue={t.duration_hours ?? 8}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v && v !== (t.duration_hours ?? 8)) updateTour.mutate({ id: t.id, agencyId, duration_hours: v }); }}
+                        className="text-xs font-mono h-7 w-14 text-right" />
+                      <span className="text-muted-foreground">h</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex items-center justify-end gap-1">
+                      <span className="text-muted-foreground">€</span>
+                      <Input type="number" min={0} defaultValue={halfR}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== halfR) updateTour.mutate({ id: t.id, agencyId, half_day_rate: v }); }}
+                        className="text-xs font-mono h-7 w-20 text-right" />
+                      <span className="text-muted-foreground">/</span>
+                      <Input type="number" min={1} defaultValue={halfH}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v && v !== halfH) updateTour.mutate({ id: t.id, agencyId, half_day_hours: v }); }}
+                        className="text-xs font-mono h-7 w-14 text-right" />
+                      <span className="text-muted-foreground">h</span>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 max-w-[200px]">
+                    <Input defaultValue={t.description ?? ''} placeholder="—"
+                      onBlur={(e) => { const v = e.target.value; if (v !== (t.description ?? '')) updateTour.mutate({ id: t.id, agencyId, description: v || null }); }}
+                      className="text-xs h-7" />
+                  </td>
                   <td className="px-3 py-2"><Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteTour.mutate({ id: t.id, agencyId })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button></td>
                 </tr>
               );
