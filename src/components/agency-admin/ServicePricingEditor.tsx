@@ -547,7 +547,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated.length ? updated : undefined });
   };
 
-  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+  const updateVehicleClass = (idx: number, field: string, value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value };
     onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated });
@@ -604,7 +604,8 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
-                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
+                        <VehicleClassImageEditor agencyId={agencyId} category={vc.category} imageUrl={vc.image_url}
+                          onChange={(url) => updateVehicleClass(vc.origIdx, 'image_url', url)} />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
