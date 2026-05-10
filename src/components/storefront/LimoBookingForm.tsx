@@ -487,6 +487,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                   .map((vc) => {
                     const isSelected = selectedClassIdx === vc.idx;
                     const catMeta = LIMO_CATEGORIES.find(c => c.id === vc.category);
+                    const rowTotal = Math.round(subtotal * (vc.multiplier ?? 1));
                     return (
                       <button
                         key={vc.idx}
@@ -510,7 +511,11 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                           <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-1">
                             <Users className="h-3 w-3" /> {vc.seats}
                             <span className="text-muted-foreground/40">·</span>
-                            <span className="tabular-nums">{vc.multiplier}×</span>
+                            {subtotal > 0 ? (
+                              <span className="font-semibold tabular-nums" style={isSelected ? { color: buttonColor } : undefined}>€{rowTotal}</span>
+                            ) : (
+                              <span className="tabular-nums">{vc.multiplier}×</span>
+                            )}
                           </p>
                         </div>
                         {isSelected && (
