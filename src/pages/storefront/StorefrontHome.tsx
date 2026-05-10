@@ -408,11 +408,11 @@ const StorefrontHome = () => {
                 </Popover>
                 <div className="sm:col-span-2 md:col-span-2 flex items-center justify-center">
                   <button
-                    className="h-11 px-8 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                    className="h-11 w-11 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                     style={{ backgroundColor: accent, color: '#ffffff' }}
                     onClick={() => handleSearch()}
                   >
-                    <Search className="h-4 w-4" /> {searchCopy.cta}
+                    <Search className="h-5 w-5" />
                   </button>
                 </div>
               </div>
