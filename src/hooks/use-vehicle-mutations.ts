@@ -19,6 +19,8 @@ interface CreateVehicleInput {
   mileage_policy?: string;
   daily_rate_base?: number | null;
   vehicle_class?: string;
+  home_city?: string;
+  home_country?: string;
 }
 
 export const useCreateVehicle = () => {
@@ -57,6 +59,8 @@ interface UpdateVehicleInput {
   mileage_policy?: string;
   daily_rate_base?: number | null;
   vehicle_class?: string;
+  home_city?: string | null;
+  home_country?: string | null;
 }
 
 export const useUpdateVehicle = () => {
