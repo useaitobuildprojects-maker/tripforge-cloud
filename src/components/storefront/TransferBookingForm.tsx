@@ -121,7 +121,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
     const vc = vehicleClasses[selectedClassIndex];
     const dateStr = date ? format(date, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n👥 Passengers: ${pax}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n👥 Passengers: ${pax}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${currentPrice}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
