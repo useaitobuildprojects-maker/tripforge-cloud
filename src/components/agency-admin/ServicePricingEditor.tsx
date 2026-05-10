@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getVehicleClassImage } from '@/lib/vehicle-class-images';
+import VehicleClassImageEditor from '@/components/agency-admin/VehicleClassImageEditor';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
@@ -72,7 +73,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
         </TabsList>
 
         {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} country={country} /></TabsContent>}
-        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
+        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
@@ -802,7 +803,7 @@ const DEFAULT_LIMO_CITY_RATES: NonNullable<StorefrontConfig['limo_city_rates']> 
   { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190, max_days: 5 },
 ];
 
-const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+const LimoServicePricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCountry, setNewCountry] = useState('');
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
