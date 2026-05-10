@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getVehicleClassImage } from '@/lib/vehicle-class-images';
+import VehicleClassImageEditor from '@/components/agency-admin/VehicleClassImageEditor';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
@@ -72,7 +73,7 @@ const ServicePricingEditor = ({ agencyId, enabledServices, storefrontConfig, onC
         </TabsList>
 
         {hasTransfer && <TabsContent value="transfer" className="mt-4"><TransferPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} country={country} /></TabsContent>}
-        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
+        {hasLimo && <TabsContent value="limo_tour" className="mt-4"><LimoServicePricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCityTour && <TabsContent value="city_tour" className="mt-4"><CityTourPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
         {hasCarRental && <TabsContent value="car_rental" className="mt-4"><CarRentalPricingTab agencyId={agencyId} storefrontConfig={storefrontConfig} onConfigChange={onConfigChange} /></TabsContent>}
       </Tabs>
@@ -546,7 +547,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
     onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated.length ? updated : undefined });
   };
 
-  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+  const updateVehicleClass = (idx: number, field: string, value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value };
     onConfigChange({ ...storefrontConfig, transfer_vehicle_classes: updated });
@@ -603,7 +604,8 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
-                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
+                        <VehicleClassImageEditor agencyId={agencyId} category={vc.category} imageUrl={vc.image_url}
+                          onChange={(url) => updateVehicleClass(vc.origIdx, 'image_url', url)} />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
@@ -802,7 +804,7 @@ const DEFAULT_LIMO_CITY_RATES: NonNullable<StorefrontConfig['limo_city_rates']> 
   { city: 'Istanbul', country: 'Turkey', full_day_rate: 320, half_day_rate: 190, max_days: 5 },
 ];
 
-const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
+const LimoServicePricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const [newCountry, setNewCountry] = useState('');
   const [newCity, setNewCity] = useState('');
   const [newFullDay, setNewFullDay] = useState('');
@@ -895,7 +897,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
     onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated.length ? updated : undefined });
   };
 
-  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+  const updateVehicleClass = (idx: number, field: string, value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value };
     onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
@@ -1085,7 +1087,8 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
-                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
+                        <VehicleClassImageEditor agencyId={agencyId} category={vc.category} imageUrl={vc.image_url}
+                          onChange={(url) => updateVehicleClass(vc.origIdx, 'image_url', url)} />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
@@ -1194,7 +1197,7 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
 
-  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier', value: string | number) => {
+  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier' | 'image_url', value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
     onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated });
@@ -1339,7 +1342,8 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
-                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
+                        <VehicleClassImageEditor agencyId={agencyId} category={vc.category} imageUrl={vc.image_url}
+                          onChange={(url) => updateVehicleClass(vc.origIdx, 'image_url', url)} />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">

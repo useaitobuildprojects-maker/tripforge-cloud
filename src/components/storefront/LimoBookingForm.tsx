@@ -498,7 +498,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                       >
                         <div className="h-16 w-24 shrink-0 rounded-lg bg-muted/30 flex items-center justify-center overflow-hidden">
                           <img
-                            src={getVehicleClassImage(vc.category)}
+                            src={vc.image_url || getVehicleClassImage(vc.category)}
                             alt={vc.label || vc.category}
                             loading="lazy"
                             className="h-full w-full object-contain transition-transform group-hover:scale-105"
