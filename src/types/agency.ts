@@ -63,6 +63,7 @@ export interface StorefrontConfig {
     label?: string;
     seats: number;
     multiplier: number;
+    image_url?: string;
   }[];
   // Car rental mileage settings
   car_rental_free_km?: number;
@@ -104,6 +105,7 @@ export interface StorefrontConfig {
     label?: string;
     seats: number;
     multiplier: number;
+    image_url?: string;
   }[];
 
   // ── Page Content (editable from admin) ──
@@ -137,6 +139,7 @@ export interface StorefrontConfig {
     label?: string;
     seats: number;
     multiplier: number;
+    image_url?: string;
   }[];
 
   // Blog
