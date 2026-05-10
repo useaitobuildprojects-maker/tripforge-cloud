@@ -11,6 +11,7 @@ import { Car, Crown, Truck, Shield, AlertCircle, MessageCircle, CalendarIcon, Ma
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { CityTourPrice, useCityTourPricing } from '@/hooks/use-service-pricing';
+import { getVehicleClassImage } from '@/lib/vehicle-class-images';
 
 type TourCategory = 'economy' | 'business' | 'first_class' | 'van' | 'suv';
 
@@ -317,6 +318,12 @@ const CityTourBookingForm = ({ agency, config, buttonColor, hideItineraryFields,
                             )}
                             style={isSelected ? { borderColor: buttonColor } : undefined}
                           >
+                            <img
+                              src={getVehicleClassImage(vc.category)}
+                              alt={vc.label || vc.category}
+                              loading="lazy"
+                              className="h-14 w-full object-contain mb-2"
+                            />
                             <p className="text-sm font-bold">{vc.label || CATEGORY_LABELS[vc.category]}</p>
                             <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
                           </button>
