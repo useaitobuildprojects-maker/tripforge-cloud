@@ -569,59 +569,6 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
               )}
             </div>
 
-            {/* Price Summary with breakdown */}
-            {variant === 'full' && total > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl p-5 space-y-3"
-                style={{ backgroundColor: `${buttonColor}10` }}
-              >
-                <p className="text-sm text-muted-foreground text-center">
-                  {selectedClass?.label ?? LIMO_CATEGORIES.find(c => c.id === selectedCategory)?.label} · {totalDays} day{totalDays !== 1 ? 's' : ''}
-                </p>
-
-                <div className="space-y-1.5 text-sm">
-                  {breakdown.map((b, i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <span className="text-muted-foreground">
-                        {b.city}: {b.days} × {b.dayType === 'full' ? '10h' : '8h'} (€{b.perDay}/day)
-                      </span>
-                      <span className="font-medium tabular-nums">€{b.price}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-center pt-2 border-t border-border text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium tabular-nums">€{subtotal}</span>
-                </div>
-                {catMult !== 1 && (
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">
-                      {selectedClass?.label} multiplier
-                    </span>
-                    <span className="font-medium tabular-nums">× {catMult}</span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center pt-2 border-t border-border">
-                  <span className="text-sm font-semibold">Total</span>
-                  <span className="text-3xl font-bold" style={{ color: buttonColor }}>€{total}</span>
-                </div>
-                <p className="text-xs text-muted-foreground text-center">Estimated price · Includes professional chauffeur</p>
-
-                {config.whatsapp_number && (
-                  <Button
-                    className="w-full h-12 rounded-xl font-bold text-white gap-2 mt-2"
-                    style={{ backgroundColor: '#25D366', opacity: exceededCities.length > 0 ? 0.5 : 1 }}
-                    onClick={handleWhatsApp}
-                    disabled={exceededCities.length > 0}
-                  >
-                    <MessageCircle className="h-5 w-5" /> Book via WhatsApp
-                  </Button>
-                )}
-              </motion.div>
-            )}
           </>
         )}
       </motion.div>
