@@ -212,10 +212,10 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
         {itinerary.map((stop, idx) => (
           <div key={idx} className="grid grid-cols-1 gap-1.5 items-stretch md:[grid-template-columns:repeat(12,minmax(0,1fr))]">
             {/* City */}
-            <div className="md:col-span-4 px-3 py-2 rounded-md border border-input bg-background min-w-0 flex items-center gap-2">
+            <div className="md:col-span-4 px-3 py-0.5 rounded-md border border-input bg-background min-w-0 flex items-center gap-2">
               <MapPin className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Stop {idx + 1}</p>
+                <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Stop {idx + 1}</p>
                 <Select value={stop.city} onValueChange={(v) => updateStop(idx, { city: v })}>
                   <SelectTrigger className="h-7 text-xs border-0 px-0 bg-transparent shadow-none focus:ring-0">
                     <SelectValue placeholder="Select city" />
@@ -239,10 +239,10 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             {/* Pickup date */}
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" disabled={idx > 0} className="md:col-span-2 px-3 py-2 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent disabled:opacity-70 disabled:hover:bg-background">
+                <button type="button" disabled={idx > 0} className="md:col-span-2 px-3 py-0.5 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent disabled:opacity-70 disabled:hover:bg-background">
                   <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Pickup</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Pickup</p>
                     <p className={cn("text-xs truncate", !stop.pickupDate && "text-muted-foreground")}>
                       {stop.pickupDate ? format(stop.pickupDate, 'EEE, MMM d') : (idx > 0 ? 'Auto' : 'Select')}
                     </p>
@@ -257,10 +257,10 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             {/* Drop-off date */}
             <Popover>
               <PopoverTrigger asChild>
-                <button type="button" className="md:col-span-2 px-3 py-2 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent">
+                <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent">
                   <CalendarIcon className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Drop-off</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Drop-off</p>
                     <p className={cn("text-xs truncate", !stop.dropoffDate && "text-muted-foreground")}>
                       {stop.dropoffDate ? format(stop.dropoffDate, 'EEE, MMM d') : 'Select'}
                     </p>
@@ -273,8 +273,8 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             </Popover>
 
             {/* Hours */}
-            <div className="md:col-span-2 px-2 py-2 rounded-md border border-input bg-background">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Hours</p>
+            <div className="md:col-span-2 px-2 py-0.5 rounded-md border border-input bg-background">
+              <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Hours</p>
               <div className="mt-0.5 flex gap-1">
                 <button type="button" onClick={() => updateStop(idx, { dayType: 'half' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", stop.dayType === 'half' ? 'text-foreground' : 'text-muted-foreground')} style={stop.dayType === 'half' ? { borderColor: buttonColor, color: buttonColor } : undefined}>8h</button>
                 <button type="button" onClick={() => updateStop(idx, { dayType: 'full' })} className={cn("h-6 px-2 rounded-md border text-xs font-bold", stop.dayType === 'full' ? 'text-foreground' : 'text-muted-foreground')} style={stop.dayType === 'full' ? { borderColor: buttonColor, color: buttonColor } : undefined}>10h</button>
@@ -282,10 +282,10 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
             </div>
 
             {/* Days display */}
-            <div className="md:col-span-2 px-2 py-2 rounded-md border border-input bg-background flex items-center gap-2">
+            <div className="md:col-span-2 px-2 py-0.5 rounded-md border border-input bg-background flex items-center gap-2">
               <Clock4 className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Days</p>
+                <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Days</p>
                 <p className="text-xs font-semibold">{stop.days}</p>
               </div>
             </div>
@@ -297,19 +297,19 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
           <button
             type="button"
             onClick={addStop}
-            className="md:col-span-3 px-3 py-2 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent"
+            className="md:col-span-3 px-3 py-0.5 rounded-md border border-input bg-background flex items-center gap-2 text-left transition-colors hover:bg-accent"
           >
             <Plus className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Itinerary</p>
+              <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Itinerary</p>
               <p className="text-xs font-semibold">Add city</p>
             </div>
           </button>
 
-          <div className="md:col-span-3 px-3 py-2 rounded-md border border-input bg-background flex items-center gap-2">
+          <div className="md:col-span-3 px-3 py-0.5 rounded-md border border-input bg-background flex items-center gap-2">
             <Users className="h-4 w-4 shrink-0" style={{ color: buttonColor }} />
             <div className="flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Passengers</p>
+              <p className="text-[9px] font-bold uppercase tracking-wide leading-tight text-muted-foreground">Passengers</p>
               <div className="mt-0.5 flex items-center gap-1">
                 <button type="button" onClick={() => setPax(p => Math.max(1, p - 1))} className="h-6 w-6 rounded-md border text-xs font-bold">−</button>
                 <span className="w-5 text-center text-sm font-semibold">{pax}</span>
