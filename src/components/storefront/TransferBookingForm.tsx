@@ -52,6 +52,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [destCoords, setDestCoords] = useState<[number, number] | undefined>();
   const [selectedClassIndex, setSelectedClassIndex] = useState(0);
   const [quote, setQuote] = useState<TransferQuote | null>(null);
+  const [quoteClassIdx, setQuoteClassIdx] = useState<number>(0);
   const [date, setDate] = useState<Date | undefined>(() => {
     if (!initialDate) return undefined;
     const d = new Date(initialDate);
@@ -93,6 +94,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
         originCoords, destCoords, selectedClassIndex
       );
       setQuote(result);
+      setQuoteClassIdx(selectedClassIndex);
     } catch {
       setQuote(null);
     } finally {
@@ -100,12 +102,26 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
     }
   };
 
+  // Base distance price (without class multiplier or drop-off) derived from quote
+  const quoteBaseDistance = useMemo(() => {
+    if (!quote || quote.price <= 0) return 0;
+    const m = vehicleClasses[quoteClassIdx]?.multiplier ?? 1;
+    return m > 0 ? (quote.distance_charge / m) : 0;
+  }, [quote, quoteClassIdx, vehicleClasses]);
+
+  const priceForClass = (mult: number) => {
+    if (!quote || quote.price <= 0) return 0;
+    return Math.round(quoteBaseDistance * mult + (quote.drop_off_fee ?? 0));
+  };
+
+  const currentPrice = quote ? priceForClass(vehicleClasses[selectedClassIndex]?.multiplier ?? 1) : 0;
+
   const handleWhatsApp = () => {
     if (!quote || !config.whatsapp_number) return;
     const vc = vehicleClasses[selectedClassIndex];
     const dateStr = date ? format(date, 'PPP') : 'Not specified';
     const timeStr = time || 'Not specified';
-    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n👥 Passengers: ${pax}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${quote.price}\n\nPlease confirm availability.`;
+    const msg = `Hello ${agency.name}!\n\nI'd like to book a transfer:\n📍 ${effectiveOrigin} → ${effectiveDest}\n📅 ${dateStr} at ${timeStr}\n👥 Passengers: ${pax}\n🚗 ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)\n📏 ${quote.distance_km ? `~${quote.distance_km} km` : ''}${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}\n💰 Price: €${currentPrice}\n\nPlease confirm availability.`;
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -233,7 +249,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
               return (
                 <button
                   key={vc.idx}
-                  onClick={() => { setSelectedClassIndex(vc.idx); setQuote(null); }}
+                  onClick={() => setSelectedClassIndex(vc.idx)}
                   className={`group relative flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                     isSelected ? 'shadow-md bg-muted/40' : 'border-border hover:border-muted-foreground/30 hover:bg-muted/20'
                   }`}
@@ -251,10 +267,13 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                     <p className="text-sm font-bold truncate">{vc.label || `${vc.category} ${vc.seats}s`}</p>
                     <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                       <Users className="h-3 w-3" /> {vc.seats}
-                      <span className="text-muted-foreground/40">·</span>
-                      <span className="tabular-nums">{vc.multiplier}×</span>
                     </p>
                   </div>
+                  {quote && quote.price > 0 && (
+                    <span className="text-sm font-bold tabular-nums shrink-0" style={{ color: buttonColor }}>
+                      €{priceForClass(vc.multiplier)}
+                    </span>
+                  )}
                   {isSelected && (
                     <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: buttonColor }} />
                   )}
@@ -304,7 +323,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                         {quote.distance_km && <span>~{quote.distance_km} km</span>}
                         {quote.duration_min && <span>· ~{quote.duration_min} min</span>}
                       </div>
-                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{quote.price}</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{currentPrice}</p>
                     </div>
 
                     {/* Uber-style fare breakdown */}
@@ -318,7 +337,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       {quote.distance_charge > 0 && (
                         <div className="flex justify-between text-muted-foreground">
                           <span>Distance ({quote.distance_km} km)</span>
-                          <span>€{quote.distance_charge}</span>
+                          <span>€{Math.round(quoteBaseDistance * (vehicleClasses[selectedClassIndex]?.multiplier ?? 1))}</span>
                         </div>
                       )}
                       {quote.time_charge > 0 && (
@@ -341,7 +360,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       )}
                       <div className="flex justify-between font-semibold text-sm pt-1 border-t border-border/30">
                         <span>Total</span>
-                        <span style={{ color: buttonColor }}>€{quote.price}</span>
+                        <span style={{ color: buttonColor }}>€{currentPrice}</span>
                       </div>
                     </div>
 
