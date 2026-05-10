@@ -30,6 +30,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   const [vehicleClass, setVehicleClass] = useState('economy');
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
+  const [homeCity, setHomeCity] = useState('');
+  const [homeCountry, setHomeCountry] = useState('');
 
   const createVehicle = useCreateVehicle();
   const uploadPhoto = useUploadVehiclePhoto();
@@ -40,6 +42,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
     setTransmission('manual'); setSeats('5'); setFuelType('gasoline');
     setCategory('sedan'); setAirConditioning(true); setMileagePolicy('unlimited');
     setVehicleClass('economy');
+    setHomeCity(''); setHomeCountry('');
   };
 
   const handleSubmit = async () => {
@@ -66,6 +69,8 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
       air_conditioning: airConditioning,
       mileage_policy: mileagePolicy,
       vehicle_class: vehicleClass,
+      home_city: homeCity.trim() || undefined,
+      home_country: homeCountry.trim() || undefined,
     });
 
     reset();
@@ -209,6 +214,17 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
             <div className="space-y-1.5">
               <Label htmlFor="vin">VIN</Label>
               <Input id="vin" value={vin} onChange={(e) => setVin(e.target.value)} placeholder="WDB1234567890" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="homeCity">Location (City)</Label>
+              <Input id="homeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="homeCountry">Location (Country)</Label>
+              <Input id="homeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" />
             </div>
           </div>
 
