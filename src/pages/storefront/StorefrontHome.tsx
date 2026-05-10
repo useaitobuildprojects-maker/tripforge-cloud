@@ -304,26 +304,26 @@ const StorefrontHome = () => {
                 </div>
               ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
-                <div className="md:col-span-3 px-3 py-1 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                <div className="md:col-span-3 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.originLabel}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.originLabel}</p>
                     <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={searchCopy.originPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
-                <div className="md:col-span-2 px-3 py-1 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                <div className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
                     <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-2 px-3 py-1 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.startDateLabel}</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.startDateLabel}</p>
                         <p className={cn("text-sm truncate", !pickupDateObj && "text-muted-foreground")} style={pickupDateObj ? tk.textPrimary : undefined}>
                           {pickupDateObj ? format(pickupDateObj, 'EEE, MMM d') : searchCopy.startDatePlaceholder}
                         </p>
@@ -342,10 +342,10 @@ const StorefrontHome = () => {
                   </PopoverContent>
                 </Popover>
                 {activeService === 'transfer' || activeService === 'city_tour' ? (
-                  <div className="md:col-span-2 px-3 py-1 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                  <div className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                     <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
+                      <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                       <Select value={pickupTime} onValueChange={setPickupTime}>
                         <SelectTrigger className="h-7 text-sm border-0 px-0 bg-transparent shadow-none focus:ring-0">
                           <SelectValue placeholder={searchCopy.endDatePlaceholder} />
@@ -361,10 +361,10 @@ const StorefrontHome = () => {
                 ) : (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-2 px-3 py-1 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
                         <p className={cn("text-sm truncate", !dropoffDateObj && "text-muted-foreground")} style={dropoffDateObj ? tk.textPrimary : undefined}>
                           {dropoffDateObj ? format(dropoffDateObj, 'EEE, MMM d') : searchCopy.endDatePlaceholder}
                         </p>
@@ -385,10 +385,10 @@ const StorefrontHome = () => {
                 )}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-1 px-2 py-1 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="md:col-span-1 px-2 py-0.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-wide" style={tk.textMuted}>{searchCopy.countLabel}</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.countLabel}</p>
                         <p className="text-sm truncate" style={tk.textPrimary}>{passengers}</p>
                       </div>
                     </button>
