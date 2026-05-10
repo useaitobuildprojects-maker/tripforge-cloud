@@ -28,6 +28,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
   const [airConditioning, setAirConditioning] = useState(true);
   const [mileagePolicy, setMileagePolicy] = useState('unlimited');
   const [vehicleClass, setVehicleClass] = useState('economy');
+  const [homeCity, setHomeCity] = useState('');
+  const [homeCountry, setHomeCountry] = useState('');
 
   const updateVehicle = useUpdateVehicle();
 
@@ -46,6 +48,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
       setAirConditioning((vehicle as any).air_conditioning ?? true);
       setMileagePolicy((vehicle as any).mileage_policy ?? 'unlimited');
       setVehicleClass((vehicle as any).vehicle_class ?? 'economy');
+      setHomeCity((vehicle as any).home_city ?? '');
+      setHomeCountry((vehicle as any).home_country ?? '');
     }
   }, [vehicle]);
 
@@ -64,6 +68,8 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
         air_conditioning: airConditioning,
         mileage_policy: mileagePolicy,
         vehicle_class: vehicleClass,
+        home_city: homeCity || null,
+        home_country: homeCountry || null,
       },
       { onSuccess: () => onOpenChange(false) }
     );
@@ -193,6 +199,16 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
             <div className="space-y-2">
               <Label htmlFor="editVin">VIN</Label>
               <Input id="editVin" value={vin} onChange={(e) => setVin(e.target.value)} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="editHomeCity">Location (City)</Label>
+              <Input id="editHomeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="editHomeCountry">Location (Country)</Label>
+              <Input id="editHomeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" />
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
