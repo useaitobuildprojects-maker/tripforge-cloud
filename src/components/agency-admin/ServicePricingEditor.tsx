@@ -897,7 +897,7 @@ const LimoServicePricingTab = ({ agencyId, storefrontConfig, onConfigChange }: {
     onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated.length ? updated : undefined });
   };
 
-  const updateVehicleClass = (idx: number, field: string, value: string | number) => {
+  const updateVehicleClass = (idx: number, field: string, value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value };
     onConfigChange({ ...storefrontConfig, limo_vehicle_classes: updated });
@@ -1196,7 +1196,7 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
   const [newClassSeats, setNewClassSeats] = useState('');
   const [newClassMultiplier, setNewClassMultiplier] = useState('');
 
-  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier', value: string | number) => {
+  const updateVehicleClass = (idx: number, field: 'label' | 'seats' | 'multiplier' | 'image_url', value: string | number | undefined) => {
     const updated = [...vehicleClasses];
     updated[idx] = { ...updated[idx], [field]: value } as typeof updated[number];
     onConfigChange({ ...storefrontConfig, city_tour_vehicle_classes: updated });
