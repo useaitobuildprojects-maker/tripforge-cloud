@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -63,6 +63,14 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [loading, setLoading] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
+
+  // Auto-fetch quote when arriving with prefilled origin/destination
+  useEffect(() => {
+    if (hideRouteFields && initialOrigin && initialDestination && initialOrigin !== initialDestination && !quote && !loading) {
+      handleGetQuote();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Filter classes by seat capacity
   const suitableClasses = useMemo(
@@ -290,6 +298,12 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
         </div>
 
         {/* Get Quote / Results */}
+        {effectiveOrigin && effectiveDest && effectiveOrigin === effectiveDest && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700">Pickup and drop-off are the same location. Please choose a different destination to see the price.</p>
+          </div>
+        )}
         {effectiveOrigin && effectiveDest && effectiveOrigin !== effectiveDest && (
           <>
               <>
