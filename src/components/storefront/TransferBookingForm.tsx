@@ -298,6 +298,12 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
         </div>
 
         {/* Get Quote / Results */}
+        {effectiveOrigin && effectiveDest && effectiveOrigin === effectiveDest && (
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700">Pickup and drop-off are the same location. Please choose a different destination to see the price.</p>
+          </div>
+        )}
         {effectiveOrigin && effectiveDest && effectiveOrigin !== effectiveDest && (
           <>
               <>
