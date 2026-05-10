@@ -296,43 +296,48 @@ const CityTourBookingForm = ({ agency, config, buttonColor, hideItineraryFields,
             {/* Vehicle Class */}
             <div className="space-y-3">
               <Label className="text-xs font-medium">Vehicle Class</Label>
-              {(['economy', 'business', 'first_class', 'van', 'suv'] as TourCategory[]).map(cat => {
-                const inCat = suitableClasses.filter(vc => vc.category === cat);
-                if (inCat.length === 0) return null;
-                const Icon = CATEGORY_ICONS[cat];
-                return (
-                  <div key={cat} className="space-y-1.5">
-                    <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-                      <Icon className="h-3 w-3" /> {CATEGORY_LABELS[cat]}
-                    </p>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {inCat.map(vc => {
-                        const isSelected = selectedClassIdx === vc.idx;
-                        return (
-                          <button
-                            key={vc.idx}
-                            onClick={() => setSelectedClassIdx(vc.idx)}
-                            className={cn(
-                              'p-3 rounded-xl border-2 text-left transition-all',
-                              isSelected ? 'shadow-md' : 'border-border hover:border-muted-foreground/30'
-                            )}
-                            style={isSelected ? { borderColor: buttonColor } : undefined}
-                          >
-                            <img
-                              src={getVehicleClassImage(vc.category)}
-                              alt={vc.label || vc.category}
-                              loading="lazy"
-                              className="h-14 w-full object-contain mb-2"
-                            />
-                            <p className="text-sm font-bold">{vc.label || CATEGORY_LABELS[vc.category]}</p>
-                            <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {suitableClasses.map(vc => {
+                  const isSelected = selectedClassIdx === vc.idx;
+                  const rowTotal = Math.round(baseRate * (vc.multiplier ?? 1));
+                  return (
+                    <button
+                      key={vc.idx}
+                      onClick={() => setSelectedClassIdx(vc.idx)}
+                      className={cn(
+                        'group relative flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all',
+                        isSelected ? 'shadow-md bg-muted/40' : 'border-border hover:border-muted-foreground/30 hover:bg-muted/20'
+                      )}
+                      style={isSelected ? { borderColor: buttonColor } : undefined}
+                    >
+                      <div className="h-16 w-24 shrink-0 rounded-lg bg-muted/30 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={getVehicleClassImage(vc.category)}
+                          alt={vc.label || vc.category}
+                          loading="lazy"
+                          className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate">{vc.label || CATEGORY_LABELS[vc.category as TourCategory]}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide mt-0.5">{CATEGORY_LABELS[vc.category as TourCategory] ?? vc.category}</p>
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-1">
+                          <Users className="h-3 w-3" /> {vc.seats}
+                          {baseRate > 0 && (
+                            <>
+                              <span className="text-muted-foreground/40">·</span>
+                              <span className="font-semibold tabular-nums" style={isSelected ? { color: buttonColor } : undefined}>€{rowTotal}</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: buttonColor }} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
               {suitableClasses.length === 0 && (
                 <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-2.5 flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
