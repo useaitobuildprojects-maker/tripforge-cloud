@@ -994,8 +994,16 @@ const LimoServicePricingTab = ({ agencyId, storefrontConfig, onConfigChange }: {
                   <tr key={i} className="border-t border-border hover:bg-secondary/20">
                     <td className="px-3 py-1.5 text-muted-foreground">{cr.country ?? '—'}</td>
                     <td className="px-3 py-1.5 text-foreground font-medium">{cr.city}</td>
-                    <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.full_day_rate}</td>
-                    <td className="px-3 py-1.5 text-right font-mono text-foreground">€{cr.half_day_rate}</td>
+                    <td className="px-3 py-1.5">
+                      <Input type="number" min={0} defaultValue={cr.full_day_rate}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== cr.full_day_rate) updateCityRate(i, 'full_day_rate', v); }}
+                        className="text-xs font-mono h-7 w-20 ml-auto text-right" />
+                    </td>
+                    <td className="px-3 py-1.5">
+                      <Input type="number" min={0} defaultValue={cr.half_day_rate}
+                        onBlur={(e) => { const v = Number(e.target.value); if (v !== cr.half_day_rate) updateCityRate(i, 'half_day_rate', v); }}
+                        className="text-xs font-mono h-7 w-20 ml-auto text-right" />
+                    </td>
                     <td className="px-3 py-1.5">
                       <Input
                         type="number"
