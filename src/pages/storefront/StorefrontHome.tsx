@@ -425,7 +425,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ TRUST STRIP ═══════════════ */}
-      <section className="py-4" style={tk.surface}>
+      <section className="pt-12 pb-4" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-3">
           {TRUST_ITEMS.map((item) => (
             <div key={item.title} className="flex items-start gap-3 p-3 rounded-md border" style={{ ...tk.surface, ...tk.border }}>
