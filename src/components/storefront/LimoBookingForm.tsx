@@ -49,6 +49,8 @@ interface Props {
   initialCities?: string[];
   initialPax?: number;
   initialPackage?: DayType;
+  initialStart?: string;
+  initialEnd?: string;
   onSearch?: (payload: {
     pickup?: string;
     dropoff?: string;
@@ -61,7 +63,7 @@ interface Props {
   }) => void;
 }
 
-const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch, hideItineraryFields, initialCities, initialPax, initialPackage }: Props) => {
+const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSearch, hideItineraryFields, initialCities, initialPax, initialPackage, initialStart, initialEnd }: Props) => {
   const cityRates = config.limo_city_rates ?? [];
   const legacyMultipliers = config.limo_category_multipliers ?? DEFAULT_LIMO_MULTIPLIERS;
 
@@ -100,10 +102,44 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
   const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
 
   const [itinerary, setItinerary] = useState<ItineraryStop[]>(() => {
+    const parsedStart = initialStart ? new Date(initialStart) : undefined;
+    const parsedEnd = initialEnd ? new Date(initialEnd) : undefined;
+    const validStart = parsedStart && !isNaN(parsedStart.getTime()) ? parsedStart : undefined;
+    const validEnd = parsedEnd && !isNaN(parsedEnd.getTime()) ? parsedEnd : undefined;
+    const pickupTime = validStart
+      ? `${String(validStart.getHours()).padStart(2, '0')}:${String(validStart.getMinutes()).padStart(2, '0')}`
+      : '09:00';
+    const computeDays = (a?: Date, b?: Date) => {
+      if (!a || !b) return 1;
+      const ms = b.getTime() - a.getTime();
+      if (ms < 0) return 1;
+      return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1);
+    };
     if (initialCities && initialCities.length > 0) {
-      return initialCities.map(c => ({ city: c, days: 1, dayType: initialPackage ?? 'full', pickupTime: '09:00' }));
+      const n = initialCities.length;
+      return initialCities.map((c, i) => {
+        const isFirst = i === 0;
+        const isLast = i === n - 1;
+        const pickupDate = isFirst ? validStart : undefined;
+        const dropoffDate = isLast ? validEnd : undefined;
+        return {
+          city: c,
+          days: n === 1 ? computeDays(validStart, validEnd) : 1,
+          dayType: initialPackage ?? 'full',
+          pickupTime,
+          pickupDate,
+          dropoffDate,
+        };
+      });
     }
-    return [{ city: cityRates[0]?.city ?? '', days: 1, dayType: initialPackage ?? 'full', pickupTime: '09:00' }];
+    return [{
+      city: cityRates[0]?.city ?? '',
+      days: computeDays(validStart, validEnd),
+      dayType: initialPackage ?? 'full',
+      pickupTime,
+      pickupDate: validStart,
+      dropoffDate: validEnd,
+    }];
   });
 
   const addStop = () => setItinerary(p => {

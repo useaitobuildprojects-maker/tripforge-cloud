@@ -42,7 +42,7 @@ const StorefrontSearch = () => {
 
   const renderForm = () => {
     if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} initialOrigin={pickup} initialDestination={dropoff} initialDate={start} initialPax={pax ? Number(pax) : undefined} hideRouteFields />;
-    if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCities={cities ? cities.split('|').filter(Boolean) : undefined} initialPax={pax ? Number(pax) : undefined} initialPackage={pkg === 'half' || pkg === 'full' ? pkg : undefined} />;
+    if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCities={cities ? cities.split('|').filter(Boolean) : undefined} initialPax={pax ? Number(pax) : undefined} initialPackage={pkg === 'half' || pkg === 'full' ? pkg : undefined} initialStart={start || undefined} initialEnd={end || undefined} />;
     if (service === 'city_tour') return <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCity={pickup || cities} initialDate={start} initialPax={pax ? Number(pax) : undefined} />;
     return null;
   };
