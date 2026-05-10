@@ -303,7 +303,7 @@ const StorefrontHome = () => {
                   <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} variant="hero" onSearch={handleSearch} />
                 </div>
               ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5 pb-3">
                 <div className="md:col-span-3 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
