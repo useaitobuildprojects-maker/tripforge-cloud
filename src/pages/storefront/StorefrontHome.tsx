@@ -304,17 +304,19 @@ const StorefrontHome = () => {
                 </div>
               ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5 pb-3">
-                <div className="md:col-span-3 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                  <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.originLabel}</p>
-                    <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={searchCopy.originPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                {activeService !== 'city_tour' && (
+                  <div className="md:col-span-3 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.originLabel}</p>
+                      <LocationAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder={searchCopy.originPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
+                    </div>
                   </div>
-                </div>
-                <div className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                )}
+                <div className={cn("px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5", activeService === 'city_tour' ? "md:col-span-5" : "md:col-span-2")} style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.destinationLabel}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{activeService === 'city_tour' ? 'Tour location' : searchCopy.destinationLabel}</p>
                     <LocationAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder={searchCopy.destinationPlaceholder} locations={agencyLocations} agencyCity={agency.city} agencyCountry={agency.country} accentColor={accent} />
                   </div>
                 </div>
