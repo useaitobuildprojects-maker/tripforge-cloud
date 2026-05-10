@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Navigation, Globe, Map, Car, Settings2, Download, Upload, Pencil, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { getVehicleClassImage } from '@/lib/vehicle-class-images';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import * as XLSX from 'xlsx';
 import LocationsEditor from '@/components/agency-admin/LocationsEditor';
@@ -602,6 +603,7 @@ const TransferPricingTab = ({ agencyId, storefrontConfig, onConfigChange, countr
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
@@ -1083,6 +1085,7 @@ const LimoServicePricingTab = ({ storefrontConfig, onConfigChange }: { storefron
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
@@ -1336,6 +1339,7 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
                   <div className="space-y-1.5">
                     {catClasses.map((vc) => (
                       <div key={vc.origIdx} className="flex items-center gap-2 p-2 rounded-lg bg-muted/20">
+                        <img src={getVehicleClassImage(vc.category)} alt={vc.category} className="h-10 w-14 object-contain shrink-0" />
                         <Input value={vc.label || ''} placeholder="Label" className="text-xs flex-1"
                           onChange={(e) => updateVehicleClass(vc.origIdx, 'label', e.target.value)} />
                         <div className="flex items-center gap-1">
