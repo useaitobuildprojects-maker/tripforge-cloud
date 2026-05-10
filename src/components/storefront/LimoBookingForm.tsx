@@ -11,6 +11,7 @@ import { Car, Crown, Truck, AlertCircle, MessageCircle, CalendarIcon, Shield, Pl
 import { cn } from '@/lib/utils';
 import { StorefrontConfig, Agency } from '@/types/agency';
 import { LIMO_CATEGORIES, LimoCategory } from '@/hooks/use-service-pricing';
+import { getVehicleClassImage } from '@/lib/vehicle-class-images';
 
 const LIMO_CATEGORY_ICONS: Record<LimoCategory, React.ElementType> = {
   economy: Car,
@@ -503,6 +504,12 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                             }`}
                             style={isSelected ? { borderColor: buttonColor } : undefined}
                           >
+                            <img
+                              src={getVehicleClassImage(vc.category)}
+                              alt={vc.label || vc.category}
+                              loading="lazy"
+                              className="h-14 w-full object-contain mb-2"
+                            />
                             <p className="text-sm font-bold">{vc.label || `${catMeta?.label} ${vc.seats}p`}</p>
                             <p className="text-[10px] text-muted-foreground">{vc.seats} seats · {vc.multiplier}×</p>
                           </button>
