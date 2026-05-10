@@ -423,28 +423,6 @@ const StorefrontHome = () => {
         </div>
       </section>
 
-      {/* ═══════════════ MEMBER PROMO BANNER ═══════════════ */}
-      <section className="pt-16 pb-4" style={tk.surface}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-md border-2 p-4 flex flex-wrap items-center justify-between gap-3" style={{ backgroundColor: EXP.brandSoftBg, borderColor: accent }}>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-md flex items-center justify-center text-white font-bold shrink-0" style={{ backgroundColor: accent }}>
-                <BadgePercent className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-extrabold" style={tk.textPrimary}>Sign in, save 10% or more</p>
-                <p className="text-xs mt-0.5" style={tk.textBody}>Members get access to exclusive Genius prices on selected vehicles and tours.</p>
-              </div>
-            </div>
-            <Link to={`/agency/${slug}/contact`}
-              className="inline-flex items-center gap-1 text-sm font-bold px-4 h-9 rounded-md border-2 transition-colors hover:bg-white"
-              style={{ color: accent, borderColor: accent }}>
-              Sign in
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* ═══════════════ TRUST STRIP ═══════════════ */}
       <section className="py-4" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-3">
