@@ -406,9 +406,9 @@ const StorefrontHome = () => {
                     </div>
                   </PopoverContent>
                 </Popover>
-                <div className="sm:col-span-2 md:col-span-2 flex items-center justify-center">
+                <div className="sm:col-span-2 md:col-span-2 flex items-stretch">
                   <button
-                    className="h-11 px-6 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                    className="w-full px-6 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                     style={{ backgroundColor: accent, color: '#ffffff' }}
                     onClick={() => handleSearch()}
                   >
