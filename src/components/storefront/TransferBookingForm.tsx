@@ -323,7 +323,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                         {quote.distance_km && <span>~{quote.distance_km} km</span>}
                         {quote.duration_min && <span>· ~{quote.duration_min} min</span>}
                       </div>
-                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{quote.price}</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{currentPrice}</p>
                     </div>
 
                     {/* Uber-style fare breakdown */}
@@ -337,7 +337,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       {quote.distance_charge > 0 && (
                         <div className="flex justify-between text-muted-foreground">
                           <span>Distance ({quote.distance_km} km)</span>
-                          <span>€{quote.distance_charge}</span>
+                          <span>€{Math.round(quoteBaseDistance * (vehicleClasses[selectedClassIndex]?.multiplier ?? 1))}</span>
                         </div>
                       )}
                       {quote.time_charge > 0 && (
@@ -360,7 +360,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       )}
                       <div className="flex justify-between font-semibold text-sm pt-1 border-t border-border/30">
                         <span>Total</span>
-                        <span style={{ color: buttonColor }}>€{quote.price}</span>
+                        <span style={{ color: buttonColor }}>€{currentPrice}</span>
                       </div>
                     </div>
 
