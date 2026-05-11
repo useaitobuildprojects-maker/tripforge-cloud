@@ -1559,9 +1559,17 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     const fleetKeys = new Set(
       fleetVehicles.map(v => `${(v.brand || '').toLowerCase().trim()}|${(v.model || '').toLowerCase().trim()}|${v.year ?? ''}`)
     );
-    return prices.filter(p => {
+    const matched = prices.filter(p => {
       const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
       return fleetKeys.has(key);
+    });
+    // Dedupe by brand|model|year, keep the first (oldest) one
+    const seen = new Set<string>();
+    return matched.filter(p => {
+      const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
     });
   }, [prices, fleetVehicles]);
 
