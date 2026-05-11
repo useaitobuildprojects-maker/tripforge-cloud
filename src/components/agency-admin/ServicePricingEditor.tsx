@@ -1504,6 +1504,16 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     return set;
   }, [prices]);
 
+  const fleetMatchedPrices = useMemo(() => {
+    const fleetKeys = new Set(
+      fleetVehicles.map(v => `${(v.brand || '').toLowerCase().trim()}|${(v.model || '').toLowerCase().trim()}|${v.year ?? ''}`)
+    );
+    return prices.filter(p => {
+      const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
+      return fleetKeys.has(key);
+    });
+  }, [prices, fleetVehicles]);
+
   const handlePickFleetVehicle = (vehicleId: string) => {
     setSelectedVehicleId(vehicleId);
     const v = fleetVehicles.find((x) => x.id === vehicleId) as any;
