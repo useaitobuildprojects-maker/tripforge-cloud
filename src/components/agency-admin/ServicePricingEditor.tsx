@@ -1506,7 +1506,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
 
   const handlePickFleetVehicle = (vehicleId: string) => {
     setSelectedVehicleId(vehicleId);
-    const v = fleetVehicles.find((x) => x.id === vehicleId);
+    const v = fleetVehicles.find((x) => x.id === vehicleId) as any;
     if (!v) return;
     setVehicleClass(v.vehicle_class || v.category || 'Economy');
     setBrand(v.brand || '');
