@@ -345,121 +345,46 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
         )}
         {effectiveOrigin && effectiveDest && effectiveOrigin !== effectiveDest && (
           <>
-              <>
-                {!quote && (
-                  <Button
-                    className="w-full h-12 rounded-xl font-bold text-white"
-                    style={{ backgroundColor: buttonColor }}
-                    onClick={handleGetQuote}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Calculating route...</>
-                    ) : (
-                      'Get Price Quote'
-                    )}
+            {!quote && (
+              <Button
+                className="w-full h-12 rounded-xl font-bold text-white"
+                style={{ backgroundColor: buttonColor }}
+                onClick={handleGetQuote}
+                disabled={loading}
+              >
+                {loading ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Calculating route...</>
+                ) : (
+                  'Get Price Quote'
+                )}
+              </Button>
+            )}
+
+            {quote && quote.price === 0 && (
+              <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
+                <AlertCircle className="h-5 w-5 mx-auto mb-2 text-destructive" />
+                <p className="text-sm font-medium">
+                  {quote.error === 'no_formula' && 'Pricing formula not configured'}
+                  {quote.error === 'geocode_origin' && `Could not locate "${effectiveOrigin}"`}
+                  {quote.error === 'geocode_destination' && `Could not locate "${effectiveDest}"`}
+                  {quote.error === 'osrm_failed' && 'Could not calculate route distance'}
+                  {!quote.error && 'Price unavailable for this route'}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {quote.error === 'no_formula'
+                    ? 'The agency has not set up distance-based pricing yet.'
+                    : 'Please contact us directly for a custom quote.'}
+                </p>
+                {config.whatsapp_number && (
+                  <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={() => {
+                    const msg = `Hello ${agency.name}, I need a quote for transfer from ${effectiveOrigin} to ${effectiveDest}. Please advise.`;
+                    window.open(`https://wa.me/${config.whatsapp_number!.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+                  }}>
+                    <MessageCircle className="h-3.5 w-3.5" /> Contact Us
                   </Button>
                 )}
-
-                {quote && quote.price > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl p-5 space-y-4"
-                    style={{ backgroundColor: `${buttonColor}10` }}
-                  >
-                    <div className="text-center">
-                      <p className="text-sm text-muted-foreground">
-                        {originLabel || effectiveOrigin} → {destLabel || effectiveDest}
-                      </p>
-                      <div className="flex items-center justify-center gap-3 mt-1 text-xs text-muted-foreground">
-                        {quote.distance_km && <span>~{quote.distance_km} km</span>}
-                        {quote.duration_min && <span>· ~{quote.duration_min} min</span>}
-                      </div>
-                      <p className="text-3xl font-bold mt-2" style={{ color: buttonColor }}>€{currentPrice}</p>
-                    </div>
-
-                    {/* Uber-style fare breakdown */}
-                    <div className="space-y-1.5 text-xs border-t border-border/50 pt-3">
-                      {quote.base_fee > 0 && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Base fare</span>
-                          <span>€{quote.base_fee}</span>
-                        </div>
-                      )}
-                      {quote.distance_charge > 0 && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Distance ({quote.distance_km} km)</span>
-                          <span>€{Math.round(quoteBaseDistance * (vehicleClasses[selectedClassIndex]?.multiplier ?? 1))}</span>
-                        </div>
-                      )}
-                      {quote.time_charge > 0 && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Time ({quote.duration_min} min)</span>
-                          <span>€{quote.time_charge}</span>
-                        </div>
-                      )}
-                      {quote.drop_off_fee > 0 && (
-                        <div className="flex justify-between text-muted-foreground">
-                          <span>Drop-off fee</span>
-                          <span>€{quote.drop_off_fee}</span>
-                        </div>
-                      )}
-                      {quote.minimum_fare > 0 && quote.price === Math.round(quote.minimum_fare) && (
-                        <div className="flex justify-between text-muted-foreground italic">
-                          <span>Minimum fare applied</span>
-                          <span>€{Math.round(quote.minimum_fare)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-semibold text-sm pt-1 border-t border-border/30">
-                        <span>Total</span>
-                        <span style={{ color: buttonColor }}>€{currentPrice}</span>
-                      </div>
-                    </div>
-
-                    <p className="text-[10px] text-muted-foreground text-center">
-                      {vehicleClasses[selectedClassIndex]?.label ?? 'Economy'} · Estimated fare
-                    </p>
-
-                    {config.whatsapp_number && (
-                      <Button
-                        className="w-full h-11 rounded-xl font-bold text-white gap-2"
-                        style={{ backgroundColor: '#25D366' }}
-                        onClick={handleWhatsApp}
-                      >
-                        <MessageCircle className="h-5 w-5" /> Book via WhatsApp
-                      </Button>
-                    )}
-                  </motion.div>
-                )}
-
-                {quote && quote.price === 0 && (
-                  <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 text-center">
-                    <AlertCircle className="h-5 w-5 mx-auto mb-2 text-destructive" />
-                    <p className="text-sm font-medium">
-                      {quote.error === 'no_formula' && 'Pricing formula not configured'}
-                      {quote.error === 'geocode_origin' && `Could not locate "${effectiveOrigin}"`}
-                      {quote.error === 'geocode_destination' && `Could not locate "${effectiveDest}"`}
-                      {quote.error === 'osrm_failed' && 'Could not calculate route distance'}
-                      {!quote.error && 'Price unavailable for this route'}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {quote.error === 'no_formula'
-                        ? 'The agency has not set up distance-based pricing yet.'
-                        : 'Please contact us directly for a custom quote.'}
-                    </p>
-                    {config.whatsapp_number && (
-                      <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={() => {
-                        const msg = `Hello ${agency.name}, I need a quote for transfer from ${effectiveOrigin} to ${effectiveDest}. Please advise.`;
-                        window.open(`https://wa.me/${config.whatsapp_number!.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
-                      }}>
-                        <MessageCircle className="h-3.5 w-3.5" /> Contact Us
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </>
-
+              </div>
+            )}
           </>
         )}
       </motion.div>
