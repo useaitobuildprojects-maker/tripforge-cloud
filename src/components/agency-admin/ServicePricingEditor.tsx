@@ -1796,6 +1796,31 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       {/* Add form - Vehicle info */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <h4 className="text-xs font-semibold text-foreground">Add Vehicle Pricing</h4>
+        <div className="rounded-md border border-accent/30 bg-accent/5 p-3 space-y-2">
+          <Label className="text-[11px] font-semibold text-accent">Pick from your fleet</Label>
+          <div className="flex gap-2 items-center">
+            <Select value={selectedVehicleId} onValueChange={handlePickFleetVehicle}>
+              <SelectTrigger className="text-xs h-9 flex-1">
+                <SelectValue placeholder={fleetVehicles.length ? 'Select an existing vehicle to auto-fill...' : 'No fleet vehicles yet — add one in Vehicles'} />
+              </SelectTrigger>
+              <SelectContent>
+                {fleetVehicles.map((v: any) => {
+                  const key = `${v.brand}|${v.model}|${v.year ?? ''}`.toLowerCase();
+                  const alreadyPriced = pricedVehicleKeys.has(key);
+                  return (
+                    <SelectItem key={v.id} value={v.id} className="text-xs">
+                      {v.brand} {v.model} {v.year ? `(${v.year})` : ''} {v.license_plate ? `· ${v.license_plate}` : ''}{alreadyPriced ? ' · already priced' : ''}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {selectedVehicleId && (
+              <Button type="button" variant="ghost" size="sm" className="text-xs h-9" onClick={() => setSelectedVehicleId('')}>Clear</Button>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">Selecting a vehicle pre-fills brand, model, year, transmission, fuel, seats, and image. You set the rates below.</p>
+        </div>
         <div className="grid grid-cols-4 gap-2">
           <div className="space-y-1"><Label className="text-[11px]">Vehicle Class *</Label><Input placeholder="Economy" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value)} className="text-xs" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Brand</Label><Input placeholder="Toyota" value={brand} onChange={(e) => setBrand(e.target.value)} className="text-xs" /></div>
