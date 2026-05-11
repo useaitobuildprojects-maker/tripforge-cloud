@@ -1495,6 +1495,47 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [editImgUploading, setEditImgUploading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [resyncing, setResyncing] = useState(false);
+
+  const resyncFromFleet = async () => {
+    if (!confirm('This will DELETE all current car rental pricing entries and re-create one row per vehicle in your fleet. Continue?')) return;
+    setResyncing(true);
+    try {
+      const { error: delErr } = await supabase.from('car_rental_pricing').delete().eq('agency_id', agencyId);
+      if (delErr) throw delErr;
+      let added = 0;
+      for (const v of fleetVehicles as any[]) {
+        const row = {
+          agency_id: agencyId,
+          vehicle_class: v.vehicle_class || 'Economy',
+          brand: v.brand || null,
+          model: v.model || null,
+          year: v.year || null,
+          transmission: v.transmission || 'automatic',
+          fuel_type: v.fuel_type || 'gasoline',
+          seats: v.seats || 5,
+          daily_rate: Number(v.daily_rate_base) || 0,
+          weekly_rate: null,
+          monthly_rate: null,
+          drop_off_fee: 0,
+          drop_off_mode: 'fixed' as const,
+          price_per_km: null,
+          free_km_per_day: 200,
+          extra_km_rate: 0.25,
+          description: null,
+          image_url: v.photo_url || pickImageFor(v.vehicle_class || 'default'),
+        };
+        const { error: insErr } = await supabase.from('car_rental_pricing').insert(row as any);
+        if (!insErr) added++;
+      }
+      await qcInvalidate();
+      toast.success(`Resynced from fleet: ${added} vehicle(s)`);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to resync');
+    } finally {
+      setResyncing(false);
+    }
+  };
 
   const pricedVehicleKeys = useMemo(() => {
     const set = new Set<string>();
