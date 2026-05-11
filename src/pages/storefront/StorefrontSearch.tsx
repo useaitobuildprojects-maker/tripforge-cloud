@@ -2,6 +2,7 @@ import { useOutletContext, useParams, useSearchParams, Link } from 'react-router
 import { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, MapPin, ArrowRight, Calendar, Users, Route, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { TemplateStyles } from '@/lib/template-styles';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -9,6 +10,7 @@ import RouteMap from '@/components/storefront/RouteMap';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
 import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import CityTourBookingForm from '@/components/storefront/CityTourBookingForm';
+import BookingCustomerDialog, { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
 import { geocodePlace, getDrivingRoute } from '@/lib/transfer-pricing';
 
 const StorefrontSearch = () => {
@@ -33,6 +35,8 @@ const StorefrontSearch = () => {
   const title = useMemo(() => SERVICE_LABELS[service] ?? 'Search', [service]);
 
   const [routeInfo, setRouteInfo] = useState<{ distance_km: number; duration_min: number } | null>(null);
+  const [bookingDraft, setBookingDraft] = useState<BookingDraft | null>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
   useEffect(() => {
     let cancelled = false;
     setRouteInfo(null);
@@ -56,7 +60,7 @@ const StorefrontSearch = () => {
   }
 
   const renderForm = () => {
-    if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} initialOrigin={pickup} initialDestination={dropoff} initialDate={start} initialPax={pax ? Number(pax) : undefined} hideRouteFields />;
+    if (service === 'transfer') return <TransferBookingForm agency={agency} config={cfg} buttonColor={buttonColor} initialOrigin={pickup} initialDestination={dropoff} initialDate={start} initialPax={pax ? Number(pax) : undefined} hideRouteFields onDraftReady={setBookingDraft} />;
     if (service === 'limo_tour') return <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCities={cities ? cities.split('|').filter(Boolean) : undefined} initialPax={pax ? Number(pax) : undefined} initialPackage={pkg === 'half' || pkg === 'full' ? pkg : undefined} initialStart={start || undefined} initialEnd={end || undefined} />;
     if (service === 'city_tour') return <CityTourBookingForm agency={agency} config={cfg} buttonColor={buttonColor} hideItineraryFields initialCity={pickup || cities} initialDate={start} initialPax={pax ? Number(pax) : undefined} />;
     return null;
@@ -153,6 +157,17 @@ const StorefrontSearch = () => {
                     )}
                   </div>
                 )}
+                {service === 'transfer' && bookingDraft && (
+                  <div className="p-4 pt-0">
+                    <Button
+                      className="w-full h-12 rounded-xl font-bold text-white"
+                      style={{ backgroundColor: accent }}
+                      onClick={() => setBookingOpen(true)}
+                    >
+                      Book this vehicle
+                    </Button>
+                  </div>
+                )}
               </div>
               <div className="rounded-md border p-4 text-xs" style={{ ...tk.surface, ...tk.border, ...tk.textBody }}>
                 <p className="font-extrabold text-sm mb-1" style={tk.textPrimary}>All fees included</p>
@@ -162,6 +177,16 @@ const StorefrontSearch = () => {
           </div>
         </div>
       </section>
+
+      {bookingDraft && (
+        <BookingCustomerDialog
+          open={bookingOpen}
+          onOpenChange={setBookingOpen}
+          draft={bookingDraft}
+          buttonColor={buttonColor}
+          agencyName={agency.name}
+        />
+      )}
     </div>
   );
 };

@@ -15,7 +15,7 @@ import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/
 import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 import { getVehicleClassImage } from '@/lib/vehicle-class-images';
-import BookingCustomerDialog, { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
+import { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   economy: Car,
@@ -32,9 +32,10 @@ interface Props {
   initialDate?: string; // yyyy-MM-dd or yyyy-MM-ddTHH:mm
   initialPax?: number;
   hideRouteFields?: boolean;
+  onDraftReady?: (draft: BookingDraft | null) => void;
 }
 
-const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields }: Props) => {
+const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields, onDraftReady }: Props) => {
   const { data: cityPricing = [] } = useCityPricing(agency.id);
 
   const agencyLocations = useMemo(() => {
@@ -62,7 +63,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [time, setTime] = useState(initialDate && initialDate.includes('T') ? initialDate.split('T')[1].slice(0, 5) : '');
   const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
   const [loading, setLoading] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
 
@@ -168,6 +168,10 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   };
 
   const draft = buildBookingDraft();
+
+  useEffect(() => {
+    onDraftReady?.(draft);
+  }, [draft, onDraftReady]);
 
   return (
     <div className="w-full">
@@ -417,15 +421,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       {vehicleClasses[selectedClassIndex]?.label ?? 'Economy'} · Estimated fare
                     </p>
 
-                    <Button
-                      className="h-12 rounded-xl font-bold text-white px-8"
-                      style={{ backgroundColor: buttonColor }}
-                      disabled={!draft}
-                      onClick={() => setBookingOpen(true)}
-                    >
-                      Book this vehicle
-                    </Button>
-
                     {config.whatsapp_number && (
                       <Button
                         className="w-full h-11 rounded-xl font-bold text-white gap-2"
@@ -468,16 +463,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
           </>
         )}
       </motion.div>
-
-      {draft && (
-        <BookingCustomerDialog
-          open={bookingOpen}
-          onOpenChange={setBookingOpen}
-          draft={draft}
-          buttonColor={buttonColor}
-          agencyName={agency.name}
-        />
-      )}
     </div>
   );
 };
