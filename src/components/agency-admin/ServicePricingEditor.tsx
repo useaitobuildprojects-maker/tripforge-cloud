@@ -1506,7 +1506,15 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       const { error: delErr } = await supabase.from('car_rental_pricing').delete().eq('agency_id', agencyId);
       if (delErr) throw delErr;
       let added = 0;
-      for (const v of fleetVehicles as any[]) {
+      // Dedupe fleet by brand|model|year so we insert one pricing row per unique vehicle model
+      const seen = new Set<string>();
+      const uniqueFleet = (fleetVehicles as any[]).filter((v) => {
+        const k = `${(v.brand || '').toLowerCase().trim()}|${(v.model || '').toLowerCase().trim()}|${v.year ?? ''}`;
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+      for (const v of uniqueFleet) {
         const row = {
           agency_id: agencyId,
           vehicle_class: v.vehicle_class || 'Economy',
@@ -1551,9 +1559,17 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     const fleetKeys = new Set(
       fleetVehicles.map(v => `${(v.brand || '').toLowerCase().trim()}|${(v.model || '').toLowerCase().trim()}|${v.year ?? ''}`)
     );
-    return prices.filter(p => {
+    const matched = prices.filter(p => {
       const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
       return fleetKeys.has(key);
+    });
+    // Dedupe by brand|model|year, keep the first (oldest) one
+    const seen = new Set<string>();
+    return matched.filter(p => {
+      const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
     });
   }, [prices, fleetVehicles]);
 
