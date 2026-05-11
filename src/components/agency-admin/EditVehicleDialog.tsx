@@ -203,14 +203,15 @@ const EditVehicleDialog = ({ vehicle, open, onOpenChange }: EditVehicleDialogPro
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="editHomeCity">Location (City)</Label>
-              <Input id="editHomeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" />
+              <Label htmlFor="editHomeCity">Location (City) *</Label>
+              <Input id="editHomeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="editHomeCountry">Location (Country)</Label>
-              <Input id="editHomeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" />
+              <Label htmlFor="editHomeCountry">Location (Country) *</Label>
+              <Input id="editHomeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" required />
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Used to calculate drop-off fees based on distance from the vehicle's home location.</p>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button type="submit" disabled={updateVehicle.isPending}>

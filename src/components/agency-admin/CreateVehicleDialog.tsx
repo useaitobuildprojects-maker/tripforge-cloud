@@ -46,7 +46,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
   };
 
   const handleSubmit = async () => {
-    if (!brand.trim() || !model.trim()) return;
+    if (!brand.trim() || !model.trim() || !homeCity.trim() || !homeCountry.trim()) return;
 
     let photo_url: string | undefined;
     if (photoFile) {
@@ -219,14 +219,15 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="homeCity">Location (City)</Label>
-              <Input id="homeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" />
+              <Label htmlFor="homeCity">Location (City) *</Label>
+              <Input id="homeCity" value={homeCity} onChange={(e) => setHomeCity(e.target.value)} placeholder="Istanbul" required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="homeCountry">Location (Country)</Label>
-              <Input id="homeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" />
+              <Label htmlFor="homeCountry">Location (Country) *</Label>
+              <Input id="homeCountry" value={homeCountry} onChange={(e) => setHomeCountry(e.target.value)} placeholder="Turkey" required />
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">Used to calculate drop-off fees based on distance from the vehicle's home location.</p>
 
           <div className="space-y-1.5">
             <Label>Photo</Label>
@@ -242,7 +243,7 @@ const CreateVehicleDialog = ({ agencyId }: Props) => {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} disabled={isPending || !brand.trim() || !model.trim()}>
+          <Button onClick={handleSubmit} disabled={isPending || !brand.trim() || !model.trim() || !homeCity.trim() || !homeCountry.trim()}>
             {isPending ? 'Adding...' : 'Add Vehicle'}
           </Button>
         </DialogFooter>
