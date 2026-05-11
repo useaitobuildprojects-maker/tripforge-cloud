@@ -35,6 +35,8 @@ const StorefrontSearch = () => {
   const title = useMemo(() => SERVICE_LABELS[service] ?? 'Search', [service]);
 
   const [routeInfo, setRouteInfo] = useState<{ distance_km: number; duration_min: number } | null>(null);
+  const [bookingDraft, setBookingDraft] = useState<BookingDraft | null>(null);
+  const [bookingOpen, setBookingOpen] = useState(false);
   useEffect(() => {
     let cancelled = false;
     setRouteInfo(null);
