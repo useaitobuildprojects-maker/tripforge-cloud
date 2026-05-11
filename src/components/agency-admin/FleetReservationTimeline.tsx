@@ -175,10 +175,12 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
 
                     {/* Reservation bars */}
                     {vRes.map((r) => {
-                      let start: Date, end: Date;
+                      let start: Date, end: Date, startRaw: Date, endRaw: Date;
                       try {
-                        start = startOfDay(parseISO(r.pickup_date));
-                        end = startOfDay(parseISO(r.return_date));
+                        startRaw = parseISO(r.pickup_date);
+                        endRaw = parseISO(r.return_date);
+                        start = startOfDay(startRaw);
+                        end = startOfDay(endRaw);
                       } catch { return null; }
                       if (end < windowStart || start > windowEnd) return null;
                       const clampedStart = start < windowStart ? windowStart : start;
@@ -188,17 +190,21 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
                       const left = offset * DAY_W + 4;
                       const width = span * DAY_W - 8;
                       const color = statusColor[r.status] ?? statusColor.confirmed;
+                      const pickupTime = format(startRaw, 'HH:mm');
+                      const returnTime = format(endRaw, 'HH:mm');
                       return (
                         <div
                           key={r.id}
-                          title={`${r.customer_name} · ${format(start, 'MMM d')} → ${format(end, 'MMM d, yyyy')} (${r.status})`}
+                          title={`${r.customer_name}\nPickup: ${format(startRaw, 'MMM d, yyyy HH:mm')}\nReturn: ${format(endRaw, 'MMM d, yyyy HH:mm')}\nStatus: ${r.status}`}
                           className={cn(
-                            'absolute top-1.5 bottom-1.5 rounded-md border px-2 flex items-center text-[11px] font-medium overflow-hidden whitespace-nowrap shadow-sm',
+                            'absolute top-1.5 bottom-1.5 rounded-md border pl-1.5 pr-1.5 flex items-center justify-between gap-1.5 text-[11px] font-medium overflow-hidden whitespace-nowrap shadow-sm',
                             color
                           )}
                           style={{ left, width: Math.max(width, 24) }}
                         >
-                          <span className="truncate">{r.customer_name}</span>
+                          <span className="font-mono text-[10px] opacity-75 tabular-nums shrink-0">{pickupTime}</span>
+                          <span className="truncate flex-1 text-center">{r.customer_name}</span>
+                          <span className="font-mono text-[10px] opacity-75 tabular-nums shrink-0">{returnTime}</span>
                         </div>
                       );
                     })}
