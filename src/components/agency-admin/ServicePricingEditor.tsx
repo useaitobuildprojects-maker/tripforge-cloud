@@ -1504,6 +1504,16 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     return set;
   }, [prices]);
 
+  const fleetMatchedPrices = useMemo(() => {
+    const fleetKeys = new Set(
+      fleetVehicles.map(v => `${(v.brand || '').toLowerCase().trim()}|${(v.model || '').toLowerCase().trim()}|${v.year ?? ''}`)
+    );
+    return prices.filter(p => {
+      const key = `${(p.brand || '').toLowerCase().trim()}|${(p.model || '').toLowerCase().trim()}|${p.year ?? ''}`;
+      return fleetKeys.has(key);
+    });
+  }, [prices, fleetVehicles]);
+
   const handlePickFleetVehicle = (vehicleId: string) => {
     setSelectedVehicleId(vehicleId);
     const v = fleetVehicles.find((x) => x.id === vehicleId) as any;
@@ -1564,11 +1574,11 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   };
 
   const regenerateImages = async () => {
-    if (!prices.length) { toast.info('No cars to update'); return; }
+    if (!fleetMatchedPrices.length) { toast.info('No cars to update'); return; }
     setRegenerating(true);
     try {
       let updated = 0;
-      for (const p of prices) {
+      for (const p of fleetMatchedPrices) {
         await updatePrice.mutateAsync({ id: p.id, agencyId, image_url: pickImageFor(p.vehicle_class) });
         updated++;
       }
@@ -1712,8 +1722,8 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   };
 
   const downloadCurrent = () => {
-    if (!prices.length) { toast.info('No pricing to export'); return; }
-    const data = prices.map(p => ({
+    if (!fleetMatchedPrices.length) { toast.info('No pricing to export'); return; }
+    const data = fleetMatchedPrices.map(p => ({
       'Vehicle Class': p.vehicle_class, Brand: p.brand ?? '', Model: p.model ?? '', Year: p.year ?? '',
       Transmission: p.transmission ?? '', 'Fuel Type': p.fuel_type ?? '', Seats: p.seats ?? '',
       'Daily Rate (€)': p.daily_rate, 'Weekly Rate (€)': p.weekly_rate ?? '', 'Monthly Rate (€)': p.monthly_rate ?? '',
@@ -1779,13 +1789,13 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         <Button variant="outline" size="sm" className="text-xs" onClick={seedDummy} disabled={seeding || addPrice.isPending}>
           <Sparkles className="h-3.5 w-3.5 mr-1" /> {seeding ? 'Seeding...' : 'Seed dummy cars'}
         </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !prices.length}>
+        <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !fleetMatchedPrices.length}>
           <ImageIcon className="h-3.5 w-3.5 mr-1" /> {regenerating ? 'Updating...' : 'Regenerate images'}
         </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
           <Download className="h-3.5 w-3.5 mr-1" /> Download Template
         </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!prices.length}>
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!fleetMatchedPrices.length}>
           <Download className="h-3.5 w-3.5 mr-1" /> Export Current
         </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
@@ -1907,7 +1917,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       </div>
 
       {/* Table */}
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
+      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : fleetMatchedPrices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
         <div className="border border-border rounded-lg overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="bg-secondary/50">
@@ -1926,7 +1936,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
               </tr>
             </thead>
             <tbody>
-              {prices.map((p) => (
+              {fleetMatchedPrices.map((p) => (
                 <tr key={p.id} className="border-t border-border hover:bg-secondary/20">
                   <td className="px-3 py-2">
                     <label className="block cursor-pointer group relative">
