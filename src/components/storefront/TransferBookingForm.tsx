@@ -32,6 +32,7 @@ interface Props {
   initialDate?: string; // yyyy-MM-dd or yyyy-MM-ddTHH:mm
   initialPax?: number;
   hideRouteFields?: boolean;
+  onDraftReady?: (draft: BookingDraft | null) => void;
 }
 
 const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields }: Props) => {
