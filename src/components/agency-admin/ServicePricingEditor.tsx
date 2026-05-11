@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCityPricing, useAddCityPricing, useUpdateCityPricing, useDeleteCityPricing, DistanceTier } from '@/hooks/use-city-pricing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -1495,6 +1496,48 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [editImgUploading, setEditImgUploading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [resyncing, setResyncing] = useState(false);
+  const qc = useQueryClient();
+
+  const resyncFromFleet = async () => {
+    if (!confirm('This will DELETE all current car rental pricing entries and re-create one row per vehicle in your fleet. Continue?')) return;
+    setResyncing(true);
+    try {
+      const { error: delErr } = await supabase.from('car_rental_pricing').delete().eq('agency_id', agencyId);
+      if (delErr) throw delErr;
+      let added = 0;
+      for (const v of fleetVehicles as any[]) {
+        const row = {
+          agency_id: agencyId,
+          vehicle_class: v.vehicle_class || 'Economy',
+          brand: v.brand || null,
+          model: v.model || null,
+          year: v.year || null,
+          transmission: v.transmission || 'automatic',
+          fuel_type: v.fuel_type || 'gasoline',
+          seats: v.seats || 5,
+          daily_rate: Number(v.daily_rate_base) || 0,
+          weekly_rate: null,
+          monthly_rate: null,
+          drop_off_fee: 0,
+          drop_off_mode: 'fixed' as const,
+          price_per_km: null,
+          free_km_per_day: 200,
+          extra_km_rate: 0.25,
+          description: null,
+          image_url: v.photo_url || pickImageFor(v.vehicle_class || 'default'),
+        };
+        const { error: insErr } = await supabase.from('car_rental_pricing').insert(row as any);
+        if (!insErr) added++;
+      }
+      qc.invalidateQueries({ queryKey: ['car-rental-pricing', agencyId] });
+      toast.success(`Resynced from fleet: ${added} vehicle(s)`);
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to resync');
+    } finally {
+      setResyncing(false);
+    }
+  };
 
   const pricedVehicleKeys = useMemo(() => {
     const set = new Set<string>();
@@ -1788,6 +1831,9 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       <div className="flex gap-2 flex-wrap">
         <Button variant="outline" size="sm" className="text-xs" onClick={seedDummy} disabled={seeding || addPrice.isPending}>
           <Sparkles className="h-3.5 w-3.5 mr-1" /> {seeding ? 'Seeding...' : 'Seed dummy cars'}
+        </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={resyncFromFleet} disabled={resyncing || !fleetVehicles.length}>
+          <Car className="h-3.5 w-3.5 mr-1" /> {resyncing ? 'Resyncing...' : 'Resync from fleet'}
         </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !fleetMatchedPrices.length}>
           <ImageIcon className="h-3.5 w-3.5 mr-1" /> {regenerating ? 'Updating...' : 'Regenerate images'}
