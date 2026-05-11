@@ -428,8 +428,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
 
                     {config.whatsapp_number && (
                       <Button
-                        variant="outline"
-                        className="w-full h-11 rounded-xl font-bold gap-2"
+                        className="w-full h-11 rounded-xl font-bold text-white gap-2"
                         style={{ backgroundColor: '#25D366' }}
                         onClick={handleWhatsApp}
                       >
