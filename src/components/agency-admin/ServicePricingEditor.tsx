@@ -23,6 +23,7 @@ import {
   useUpdateCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice, useUpdateCarRentalPrice,
 } from '@/hooks/use-service-pricing';
+import { useAgencyVehicles } from '@/hooks/use-vehicles';
 
 import { StorefrontConfig } from '@/types/agency';
 
@@ -1463,6 +1464,7 @@ const CityTourPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { ag
 // ── Car Rental Tab ──
 const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { agencyId: string; storefrontConfig: StorefrontConfig; onConfigChange: (c: StorefrontConfig) => void }) => {
   const { data: prices = [], isLoading } = useCarRentalPricing(agencyId);
+  const { data: fleetVehicles = [] } = useAgencyVehicles(agencyId);
   const addPrice = useAddCarRentalPrice();
   const deletePrice = useDeleteCarRentalPrice();
   const updatePrice = useUpdateCarRentalPrice();
@@ -1492,6 +1494,30 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [editing, setEditing] = useState<any | null>(null);
   const [editImgUploading, setEditImgUploading] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+
+  const pricedVehicleKeys = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of prices) {
+      if (p.brand && p.model) set.add(`${p.brand}|${p.model}|${p.year ?? ''}`.toLowerCase());
+    }
+    return set;
+  }, [prices]);
+
+  const handlePickFleetVehicle = (vehicleId: string) => {
+    setSelectedVehicleId(vehicleId);
+    const v = fleetVehicles.find((x) => x.id === vehicleId) as any;
+    if (!v) return;
+    setVehicleClass(v.vehicle_class || v.category || 'Economy');
+    setBrand(v.brand || '');
+    setModel(v.model || '');
+    setYear(v.year ? String(v.year) : new Date().getFullYear().toString());
+    setTransmission(v.transmission || 'automatic');
+    setFuelType(v.fuel_type || 'gasoline');
+    setSeats(v.seats ? String(v.seats) : '5');
+    if (v.photo_url) setImageUrl(v.photo_url);
+    if (v.daily_rate_base && !dailyRate) setDailyRate(String(v.daily_rate_base));
+  };
 
   const IMAGE_POOL: Record<string, string[]> = {
     economy: [
@@ -1671,6 +1697,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
     setDropOffMode('fixed'); setPricePerKm(''); setFreeKm('200'); setExtraKmRate('0.25');
     setImageUrl(null);
+    setSelectedVehicleId('');
   };
 
   const downloadTemplate = () => {
@@ -1770,6 +1797,31 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       {/* Add form - Vehicle info */}
       <div className="rounded-lg border border-border p-4 space-y-3">
         <h4 className="text-xs font-semibold text-foreground">Add Vehicle Pricing</h4>
+        <div className="rounded-md border border-accent/30 bg-accent/5 p-3 space-y-2">
+          <Label className="text-[11px] font-semibold text-accent">Pick from your fleet</Label>
+          <div className="flex gap-2 items-center">
+            <Select value={selectedVehicleId} onValueChange={handlePickFleetVehicle}>
+              <SelectTrigger className="text-xs h-9 flex-1">
+                <SelectValue placeholder={fleetVehicles.length ? 'Select an existing vehicle to auto-fill...' : 'No fleet vehicles yet — add one in Vehicles'} />
+              </SelectTrigger>
+              <SelectContent>
+                {fleetVehicles.map((v: any) => {
+                  const key = `${v.brand}|${v.model}|${v.year ?? ''}`.toLowerCase();
+                  const alreadyPriced = pricedVehicleKeys.has(key);
+                  return (
+                    <SelectItem key={v.id} value={v.id} className="text-xs">
+                      {v.brand} {v.model} {v.year ? `(${v.year})` : ''} {v.license_plate ? `· ${v.license_plate}` : ''}{alreadyPriced ? ' · already priced' : ''}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {selectedVehicleId && (
+              <Button type="button" variant="ghost" size="sm" className="text-xs h-9" onClick={() => setSelectedVehicleId('')}>Clear</Button>
+            )}
+          </div>
+          <p className="text-[10px] text-muted-foreground">Selecting a vehicle pre-fills brand, model, year, transmission, fuel, seats, and image. You set the rates below.</p>
+        </div>
         <div className="grid grid-cols-4 gap-2">
           <div className="space-y-1"><Label className="text-[11px]">Vehicle Class *</Label><Input placeholder="Economy" value={vehicleClass} onChange={(e) => setVehicleClass(e.target.value)} className="text-xs" /></div>
           <div className="space-y-1"><Label className="text-[11px]">Brand</Label><Input placeholder="Toyota" value={brand} onChange={(e) => setBrand(e.target.value)} className="text-xs" /></div>
