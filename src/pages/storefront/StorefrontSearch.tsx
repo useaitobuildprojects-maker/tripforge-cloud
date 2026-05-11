@@ -157,6 +157,17 @@ const StorefrontSearch = () => {
                     )}
                   </div>
                 )}
+                {service === 'transfer' && bookingDraft && (
+                  <div className="p-4 pt-0">
+                    <Button
+                      className="w-full h-12 rounded-xl font-bold text-white"
+                      style={{ backgroundColor: accent }}
+                      onClick={() => setBookingOpen(true)}
+                    >
+                      Book this vehicle
+                    </Button>
+                  </div>
+                )}
               </div>
               <div className="rounded-md border p-4 text-xs" style={{ ...tk.surface, ...tk.border, ...tk.textBody }}>
                 <p className="font-extrabold text-sm mb-1" style={tk.textPrimary}>All fees included</p>
@@ -166,6 +177,16 @@ const StorefrontSearch = () => {
           </div>
         </div>
       </section>
+
+      {bookingDraft && (
+        <BookingCustomerDialog
+          open={bookingOpen}
+          onOpenChange={setBookingOpen}
+          draft={bookingDraft}
+          buttonColor={buttonColor}
+          agencyName={agency.name}
+        />
+      )}
     </div>
   );
 };
