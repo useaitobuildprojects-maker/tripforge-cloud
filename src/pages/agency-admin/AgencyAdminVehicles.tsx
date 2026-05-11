@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Car, Search, Circle, Hash, KeyRound, Pencil, CalendarDays, Sparkles } from 'lucide-react';
+import { Car, Search, Circle, Hash, KeyRound, Pencil, Sparkles, CalendarRange } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,10 +9,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyVehicles, Vehicle } from '@/hooks/use-vehicles';
 import CreateVehicleDialog from '@/components/agency-admin/CreateVehicleDialog';
 import EditVehicleDialog from '@/components/agency-admin/EditVehicleDialog';
-import VehiclePricingDialog from '@/components/agency-admin/VehiclePricingDialog';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Calendar } from '@/components/ui/calendar';
+import { eachDayOfInterval, parseISO, format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 const DUMMY_VEHICLES = [
   { brand: 'Mercedes-Benz', model: 'S-Class', year: 2023, license_plate: 'AB-100-CD', category: 'luxury', transmission: 'automatic', seats: 5, fuel_type: 'gasoline', air_conditioning: true, mileage_policy: 'unlimited', daily_rate_base: 180, status: 'available', photo_url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800' },
@@ -36,9 +38,29 @@ const AgencyAdminVehicles = () => {
   const { data: vehicles = [], isLoading } = useAgencyVehicles(agency.id);
   const [search, setSearch] = useState('');
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
-  const [pricingVehicle, setPricingVehicle] = useState<Vehicle | null>(null);
   const [seeding, setSeeding] = useState(false);
   const qc = useQueryClient();
+
+  const { data: reservations = [] } = useQuery({
+    queryKey: ['agency-bookings', agency.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('id, customer_name, pickup_date, return_date, status, vehicle_id')
+        .eq('agency_id', agency.id)
+        .not('vehicle_id', 'is', null)
+        .order('pickup_date', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const vehicleById = new Map(vehicles.map((v) => [v.id, v]));
+  const reservedDays: Date[] = reservations.flatMap((b: any) => {
+    try {
+      return eachDayOfInterval({ start: parseISO(b.pickup_date), end: parseISO(b.return_date) });
+    } catch { return []; }
+  });
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -76,6 +98,66 @@ const AgencyAdminVehicles = () => {
             {seeding ? 'Seeding...' : 'Seed dummy vehicles'}
           </Button>
           <CreateVehicleDialog agencyId={agency.id} />
+        </div>
+      </motion.div>
+
+      {/* Fleet-wide reservations calendar */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="card-premium rounded-xl p-5 space-y-4"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarRange className="h-4 w-4 text-accent" />
+            <h2 className="text-sm font-semibold text-foreground">Reservations Calendar</h2>
+          </div>
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+            <span className="inline-block h-3 w-3 rounded-sm bg-accent/30 border border-accent/50" /> Reserved day
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-6">
+          <div className="flex justify-center">
+            <Calendar
+              mode="multiple"
+              numberOfMonths={2}
+              selected={[]}
+              onSelect={() => {}}
+              modifiers={{ reserved: reservedDays }}
+              modifiersClassNames={{ reserved: 'bg-accent/30 text-accent-foreground font-semibold' }}
+              className={cn('p-3 pointer-events-auto rounded-md border border-border')}
+            />
+          </div>
+
+          <div className="space-y-2 min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {reservations.length} reservation{reservations.length === 1 ? '' : 's'}
+            </p>
+            {reservations.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4">No reservations yet.</p>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                {reservations.map((b: any) => {
+                  const v = vehicleById.get(b.vehicle_id);
+                  return (
+                    <div key={b.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-3 gap-3">
+                      <div className="space-y-0.5 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {v ? `${v.brand} ${v.model}` : 'Vehicle'} <span className="text-muted-foreground font-normal">· {b.customer_name}</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(parseISO(b.pickup_date), 'MMM d, yyyy')} → {format(parseISO(b.return_date), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] capitalize shrink-0">{b.status}</Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
 
@@ -143,15 +225,6 @@ const AgencyAdminVehicles = () => {
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => setPricingVehicle(vehicle)}
-                        title="Pricing & Availability"
-                      >
-                        <CalendarDays className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={() => setEditingVehicle(vehicle)}
                       >
                         <Pencil className="h-3.5 w-3.5" />
@@ -188,12 +261,6 @@ const AgencyAdminVehicles = () => {
         vehicle={editingVehicle}
         open={!!editingVehicle}
         onOpenChange={(open) => !open && setEditingVehicle(null)}
-      />
-
-      <VehiclePricingDialog
-        vehicle={pricingVehicle}
-        open={!!pricingVehicle}
-        onOpenChange={(open) => !open && setPricingVehicle(null)}
       />
     </div>
   );
