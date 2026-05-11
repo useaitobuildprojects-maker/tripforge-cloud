@@ -63,7 +63,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [time, setTime] = useState(initialDate && initialDate.includes('T') ? initialDate.split('T')[1].slice(0, 5) : '');
   const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
   const [loading, setLoading] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
 
