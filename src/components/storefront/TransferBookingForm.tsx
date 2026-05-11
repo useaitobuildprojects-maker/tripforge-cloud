@@ -15,7 +15,7 @@ import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/
 import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 import { getVehicleClassImage } from '@/lib/vehicle-class-images';
-import BookingCustomerDialog, { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
+import { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   economy: Car,
