@@ -58,7 +58,8 @@ const AgencyAdminVehicles = () => {
 
   const filtered = vehicles.filter((v) =>
     `${v.brand} ${v.model}`.toLowerCase().includes(search.toLowerCase()) ||
-    v.license_plate?.toLowerCase().includes(search.toLowerCase())
+    v.license_plate?.toLowerCase().includes(search.toLowerCase()) ||
+    v.serial_number?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -133,6 +134,9 @@ const AgencyAdminVehicles = () => {
                           <> · <span className="capitalize">{vehicle.vehicle_class.replace('_', ' ')}</span></>
                         )}
                       </p>
+                      {vehicle.serial_number && (
+                        <p className="text-[10px] font-mono text-accent mt-1 tracking-wider">{vehicle.serial_number}</p>
+                      )}
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Button
