@@ -170,6 +170,10 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
 
   const draft = buildBookingDraft();
 
+  useEffect(() => {
+    onDraftReady?.(draft);
+  }, [draft, onDraftReady]);
+
   return (
     <div className="w-full">
       <motion.div
