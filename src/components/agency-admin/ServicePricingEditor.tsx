@@ -23,6 +23,7 @@ import {
   useUpdateCityTourPrice,
   useCarRentalPricing, useAddCarRentalPrice, useDeleteCarRentalPrice, useUpdateCarRentalPrice,
 } from '@/hooks/use-service-pricing';
+import { useAgencyVehicles } from '@/hooks/use-vehicles';
 
 import { StorefrontConfig } from '@/types/agency';
 
