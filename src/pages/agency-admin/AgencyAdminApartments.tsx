@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyApartments, useDeleteApartment, Apartment } from '@/hooks/use-apartments';
 import ApartmentDialog from '@/components/agency-admin/ApartmentDialog';
+import FleetReservationTimeline from '@/components/agency-admin/FleetReservationTimeline';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -20,6 +23,21 @@ const AgencyAdminApartments = () => {
   const deleteApartment = useDeleteApartment();
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<Apartment | null>(null);
+
+  const { data: reservations = [] } = useQuery({
+    queryKey: ['agency-apartment-bookings', agency.id],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('bookings')
+        .select('id, customer_name, pickup_date, return_date, status, apartment_id')
+        .eq('agency_id', agency.id)
+        .not('apartment_id', 'is', null)
+        .order('pickup_date', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!agency.id,
+  });
 
   if (!agency.services?.includes('apartment')) {
     return (
@@ -45,6 +63,33 @@ const AgencyAdminApartments = () => {
         </div>
         <ApartmentDialog agencyId={agency.id} />
       </motion.div>
+
+      {apartments.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="card-premium rounded-xl p-5"
+        >
+          <FleetReservationTimeline
+            title="Apartment Reservations"
+            emptyLabel="No apartments to display."
+            rows={apartments.map((a) => ({
+              id: a.id,
+              title: a.title,
+              subtitle: a.serial_number ?? `${a.city}, ${a.country}`,
+            }))}
+            reservations={(reservations as any[]).map((r) => ({
+              id: r.id,
+              customer_name: r.customer_name,
+              pickup_date: r.pickup_date,
+              return_date: r.return_date,
+              status: r.status,
+              resource_id: r.apartment_id,
+            }))}
+          />
+        </motion.div>
+      )}
 
       <div className="relative group max-w-sm">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
