@@ -454,16 +454,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
           </>
         )}
       </motion.div>
-
-      {draft && (
-        <BookingCustomerDialog
-          open={bookingOpen}
-          onOpenChange={setBookingOpen}
-          draft={draft}
-          buttonColor={buttonColor}
-          agencyName={agency.name}
-        />
-      )}
     </div>
   );
 };
