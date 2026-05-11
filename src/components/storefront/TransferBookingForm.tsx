@@ -421,25 +421,6 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                     <p className="text-[10px] text-muted-foreground text-center">
                       {vehicleClasses[selectedClassIndex]?.label ?? 'Economy'} · Estimated fare
                     </p>
-
-                    <Button
-                      className="h-12 rounded-xl font-bold text-white px-8"
-                      style={{ backgroundColor: buttonColor }}
-                      disabled={!draft}
-                      onClick={() => setBookingOpen(true)}
-                    >
-                      Book this vehicle
-                    </Button>
-
-                    {config.whatsapp_number && (
-                      <Button
-                        className="w-full h-11 rounded-xl font-bold text-white gap-2"
-                        style={{ backgroundColor: '#25D366' }}
-                        onClick={handleWhatsApp}
-                      >
-                        <MessageCircle className="h-5 w-5" /> Book via WhatsApp
-                      </Button>
-                    )}
                   </motion.div>
                 )}
 
