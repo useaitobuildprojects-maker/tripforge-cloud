@@ -1917,7 +1917,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
       </div>
 
       {/* Table */}
-      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : prices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
+      {isLoading ? <p className="text-xs text-muted-foreground">Loading...</p> : fleetMatchedPrices.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">No car rental pricing configured yet. Download the template to get started!</p> : (
         <div className="border border-border rounded-lg overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="bg-secondary/50">
