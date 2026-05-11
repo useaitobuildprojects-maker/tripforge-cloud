@@ -1574,11 +1574,11 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   };
 
   const regenerateImages = async () => {
-    if (!prices.length) { toast.info('No cars to update'); return; }
+    if (!fleetMatchedPrices.length) { toast.info('No cars to update'); return; }
     setRegenerating(true);
     try {
       let updated = 0;
-      for (const p of prices) {
+      for (const p of fleetMatchedPrices) {
         await updatePrice.mutateAsync({ id: p.id, agencyId, image_url: pickImageFor(p.vehicle_class) });
         updated++;
       }
