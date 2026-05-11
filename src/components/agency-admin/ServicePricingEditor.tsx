@@ -1789,13 +1789,13 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         <Button variant="outline" size="sm" className="text-xs" onClick={seedDummy} disabled={seeding || addPrice.isPending}>
           <Sparkles className="h-3.5 w-3.5 mr-1" /> {seeding ? 'Seeding...' : 'Seed dummy cars'}
         </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !prices.length}>
+        <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !fleetMatchedPrices.length}>
           <ImageIcon className="h-3.5 w-3.5 mr-1" /> {regenerating ? 'Updating...' : 'Regenerate images'}
         </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={downloadTemplate}>
           <Download className="h-3.5 w-3.5 mr-1" /> Download Template
         </Button>
-        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!prices.length}>
+        <Button variant="outline" size="sm" className="text-xs" onClick={downloadCurrent} disabled={!fleetMatchedPrices.length}>
           <Download className="h-3.5 w-3.5 mr-1" /> Export Current
         </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={() => fileRef.current?.click()} disabled={uploading}>
