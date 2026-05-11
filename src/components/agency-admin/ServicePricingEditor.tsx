@@ -1528,7 +1528,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         const { error: insErr } = await supabase.from('car_rental_pricing').insert(row as any);
         if (!insErr) added++;
       }
-      await qcInvalidate();
+      qc.invalidateQueries({ queryKey: ['car-rental-pricing', agencyId] });
       toast.success(`Resynced from fleet: ${added} vehicle(s)`);
     } catch (e: any) {
       toast.error(e.message || 'Failed to resync');
