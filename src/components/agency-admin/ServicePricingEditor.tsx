@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCityPricing, useAddCityPricing, useUpdateCityPricing, useDeleteCityPricing, DistanceTier } from '@/hooks/use-city-pricing';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -1496,6 +1497,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   const [regenerating, setRegenerating] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const [resyncing, setResyncing] = useState(false);
+  const qc = useQueryClient();
 
   const resyncFromFleet = async () => {
     if (!confirm('This will DELETE all current car rental pricing entries and re-create one row per vehicle in your fleet. Continue?')) return;
