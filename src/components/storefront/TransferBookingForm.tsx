@@ -35,7 +35,7 @@ interface Props {
   onDraftReady?: (draft: BookingDraft | null) => void;
 }
 
-const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields }: Props) => {
+const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initialDestination, initialDate, initialPax, hideRouteFields, onDraftReady }: Props) => {
   const { data: cityPricing = [] } = useCityPricing(agency.id);
 
   const agencyLocations = useMemo(() => {
