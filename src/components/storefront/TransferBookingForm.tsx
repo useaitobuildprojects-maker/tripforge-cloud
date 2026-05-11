@@ -418,7 +418,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                     </p>
 
                     <Button
-                      className="w-full h-12 rounded-xl font-bold text-white"
+                      className="h-12 rounded-xl font-bold text-white px-8"
                       style={{ backgroundColor: buttonColor }}
                       disabled={!draft}
                       onClick={() => setBookingOpen(true)}
