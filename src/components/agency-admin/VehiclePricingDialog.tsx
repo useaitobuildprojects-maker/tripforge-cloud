@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { CalendarDays, DollarSign, Plus, Trash2, Ban, Tag } from 'lucide-react';
+import { format, eachDayOfInterval, parseISO, isWithinInterval } from 'date-fns';
+import { CalendarDays, DollarSign, Plus, Trash2, Ban, Tag, CalendarRange } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { Vehicle } from '@/hooks/use-vehicles';
 import {
@@ -32,9 +34,26 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
+const useVehicleBookings = (vehicleId: string | undefined) => {
+  return useQuery({
+    queryKey: ['vehicle-bookings', vehicleId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('id, customer_name, pickup_date, return_date, status')
+        .eq('vehicle_id', vehicleId!)
+        .order('pickup_date', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!vehicleId,
+  });
+};
+
 const VehiclePricingDialog = ({ vehicle, open, onOpenChange }: Props) => {
   const { data: pricing = [], isLoading: pricingLoading } = useVehiclePricing(vehicle?.id);
   const { data: blocked = [], isLoading: blockedLoading } = useVehicleBlockedDates(vehicle?.id);
+  const { data: bookings = [] } = useVehicleBookings(vehicle?.id);
   const addPricing = useAddPricing();
   const deletePricing = useDeletePricing();
   const addBlocked = useAddBlockedDate();
@@ -117,6 +136,18 @@ const VehiclePricingDialog = ({ vehicle, open, onOpenChange }: Props) => {
 
   if (!vehicle) return null;
 
+  // Build day-level sets for calendar highlighting
+  const bookedDays: Date[] = bookings.flatMap((b: any) => {
+    try {
+      return eachDayOfInterval({ start: parseISO(b.pickup_date), end: parseISO(b.return_date) });
+    } catch { return []; }
+  });
+  const blockedDays: Date[] = blocked.flatMap((b) => {
+    try {
+      return eachDayOfInterval({ start: parseISO(b.start_date), end: parseISO(b.end_date) });
+    } catch { return []; }
+  });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
@@ -127,8 +158,11 @@ const VehiclePricingDialog = ({ vehicle, open, onOpenChange }: Props) => {
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="pricing" className="mt-2">
+        <Tabs defaultValue="calendar" className="mt-2">
           <TabsList className="w-full">
+            <TabsTrigger value="calendar" className="flex-1 gap-1.5">
+              <CalendarRange className="h-3.5 w-3.5" /> Calendar
+            </TabsTrigger>
             <TabsTrigger value="pricing" className="flex-1 gap-1.5">
               <DollarSign className="h-3.5 w-3.5" /> Seasonal Pricing
             </TabsTrigger>
@@ -136,6 +170,48 @@ const VehiclePricingDialog = ({ vehicle, open, onOpenChange }: Props) => {
               <Ban className="h-3.5 w-3.5" /> Blocked Dates
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="calendar" className="space-y-4 mt-4">
+            <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+              <span className="flex items-center gap-1.5"><span className="inline-block h-3 w-3 rounded-sm bg-accent/30 border border-accent/50" /> Booked</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-3 w-3 rounded-sm bg-destructive/30 border border-destructive/50" /> Blocked</span>
+            </div>
+            <div className="flex justify-center">
+              <Calendar
+                mode="multiple"
+                numberOfMonths={2}
+                selected={[]}
+                onSelect={() => {}}
+                modifiers={{ booked: bookedDays, blocked: blockedDays }}
+                modifiersClassNames={{
+                  booked: 'bg-accent/30 text-accent-foreground font-semibold',
+                  blocked: 'bg-destructive/30 text-destructive font-semibold line-through',
+                }}
+                className={cn('p-3 pointer-events-auto rounded-md border border-border')}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wider">Upcoming bookings</p>
+              {bookings.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">No bookings for this vehicle yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {bookings.map((b: any) => (
+                    <div key={b.id} className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-3">
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium text-foreground">{b.customer_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(parseISO(b.pickup_date), 'MMM d')} — {format(parseISO(b.return_date), 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] capitalize">{b.status}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
 
           <TabsContent value="pricing" className="space-y-5 mt-4">
             {pricingLoading ? (
