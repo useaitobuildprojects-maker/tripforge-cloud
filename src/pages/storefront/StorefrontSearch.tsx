@@ -2,6 +2,7 @@ import { useOutletContext, useParams, useSearchParams, Link } from 'react-router
 import { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, MapPin, ArrowRight, Calendar, Users, Route, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { TemplateStyles } from '@/lib/template-styles';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -9,6 +10,7 @@ import RouteMap from '@/components/storefront/RouteMap';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
 import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import CityTourBookingForm from '@/components/storefront/CityTourBookingForm';
+import BookingCustomerDialog, { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
 import { geocodePlace, getDrivingRoute } from '@/lib/transfer-pricing';
 
 const StorefrontSearch = () => {
