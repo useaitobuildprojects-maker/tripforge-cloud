@@ -1697,6 +1697,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
     setDailyRate(''); setWeeklyRate(''); setMonthlyRate(''); setDropOff(''); setDesc('');
     setDropOffMode('fixed'); setPricePerKm(''); setFreeKm('200'); setExtraKmRate('0.25');
     setImageUrl(null);
+    setSelectedVehicleId('');
   };
 
   const downloadTemplate = () => {
