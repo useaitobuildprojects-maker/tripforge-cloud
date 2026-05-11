@@ -1936,7 +1936,7 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
               </tr>
             </thead>
             <tbody>
-              {prices.map((p) => (
+              {fleetMatchedPrices.map((p) => (
                 <tr key={p.id} className="border-t border-border hover:bg-secondary/20">
                   <td className="px-3 py-2">
                     <label className="block cursor-pointer group relative">
