@@ -143,6 +143,7 @@ export type Database = {
           max_guests: number
           nightly_rate: number
           photos: string[]
+          serial_number: string | null
           status: string
           title: string
           updated_at: string
@@ -162,6 +163,7 @@ export type Database = {
           max_guests?: number
           nightly_rate?: number
           photos?: string[]
+          serial_number?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -181,6 +183,7 @@ export type Database = {
           max_guests?: number
           nightly_rate?: number
           photos?: string[]
+          serial_number?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -710,6 +713,7 @@ export type Database = {
           model: string
           photo_url: string | null
           seats: number | null
+          serial_number: string | null
           status: string
           transmission: string | null
           vehicle_class: string
@@ -732,6 +736,7 @@ export type Database = {
           model: string
           photo_url?: string | null
           seats?: number | null
+          serial_number?: string | null
           status?: string
           transmission?: string | null
           vehicle_class?: string
@@ -754,6 +759,7 @@ export type Database = {
           model?: string
           photo_url?: string | null
           seats?: number | null
+          serial_number?: string | null
           status?: string
           transmission?: string | null
           vehicle_class?: string
