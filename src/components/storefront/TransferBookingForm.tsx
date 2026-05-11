@@ -15,6 +15,7 @@ import { calculateTransferPrice, TransferQuote, getVehicleClasses } from '@/lib/
 import { useCityPricing } from '@/hooks/use-city-pricing';
 import LocationAutocomplete, { getAgencyLocations, LocationSelection } from '@/components/storefront/LocationAutocomplete';
 import { getVehicleClassImage } from '@/lib/vehicle-class-images';
+import BookingCustomerDialog, { BookingDraft } from '@/components/storefront/BookingCustomerDialog';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   economy: Car,
@@ -61,6 +62,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
   const [time, setTime] = useState(initialDate && initialDate.includes('T') ? initialDate.split('T')[1].slice(0, 5) : '');
   const [pax, setPax] = useState<number>(initialPax && initialPax > 0 ? initialPax : 1);
   const [loading, setLoading] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   const vehicleClasses = useMemo(() => getVehicleClasses(config), [config]);
 
@@ -133,6 +135,39 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
     const url = `https://wa.me/${config.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
+
+  const buildBookingDraft = (): BookingDraft | null => {
+    if (!quote || quote.price <= 0) return null;
+    const vc = vehicleClasses[selectedClassIndex];
+    const dateStr = date ? format(date, 'PPP') : 'Not specified';
+    const timeStr = time || '09:00';
+    const pickupDate = (() => {
+      if (!date) return new Date().toISOString();
+      const [hh, mm] = (time || '09:00').split(':').map(n => parseInt(n) || 0);
+      const d = new Date(date);
+      d.setHours(hh, mm, 0, 0);
+      return d.toISOString();
+    })();
+    return {
+      agency_id: agency.id,
+      service_type: 'transfer',
+      amount: currentPrice,
+      vehicle_id: null,
+      pickup_date: pickupDate,
+      return_date: pickupDate,
+      pickup_location: effectiveOrigin,
+      return_location: effectiveDest,
+      summary: [
+        `Transfer: ${effectiveOrigin} → ${effectiveDest}`,
+        `When: ${dateStr} at ${timeStr}`,
+        `Passengers: ${pax}`,
+        `Vehicle class: ${vc?.label ?? 'Economy'} (${vc?.seats ?? 3} seats)`,
+        quote.distance_km ? `Distance: ~${quote.distance_km} km${quote.duration_min ? ` · ~${quote.duration_min} min` : ''}` : '',
+      ].filter(Boolean).join('\n'),
+    };
+  };
+
+  const draft = buildBookingDraft();
 
   return (
     <div className="w-full">
@@ -382,9 +417,18 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                       {vehicleClasses[selectedClassIndex]?.label ?? 'Economy'} · Estimated fare
                     </p>
 
+                    <Button
+                      className="w-full h-12 rounded-xl font-bold text-white"
+                      style={{ backgroundColor: buttonColor }}
+                      disabled={!draft}
+                      onClick={() => setBookingOpen(true)}
+                    >
+                      Book this vehicle
+                    </Button>
+
                     {config.whatsapp_number && (
                       <Button
-                        className="w-full h-12 rounded-xl font-bold text-white gap-2"
+                        className="w-full h-11 rounded-xl font-bold text-white gap-2"
                         style={{ backgroundColor: '#25D366' }}
                         onClick={handleWhatsApp}
                       >
@@ -424,6 +468,16 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
           </>
         )}
       </motion.div>
+
+      {draft && (
+        <BookingCustomerDialog
+          open={bookingOpen}
+          onOpenChange={setBookingOpen}
+          draft={draft}
+          buttonColor={buttonColor}
+          agencyName={agency.name}
+        />
+      )}
     </div>
   );
 };
