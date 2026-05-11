@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import { addDays, differenceInCalendarDays, format, isSameDay, isWeekend, parseISO, startOfDay } from 'date-fns';
-import { ChevronLeft, ChevronRight, CalendarRange } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarRange, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { Vehicle } from '@/hooks/use-vehicles';
 
@@ -22,7 +27,11 @@ interface Props {
 const DAY_W = 56; // px per day column
 const ROW_H = 44;
 const LABEL_W = 180;
-const VISIBLE_DAYS = 14;
+const RANGE_OPTIONS = [
+  { label: '7 days', value: 7 },
+  { label: '14 days', value: 14 },
+  { label: '30 days', value: 30 },
+];
 
 const statusColor: Record<string, string> = {
   confirmed: 'bg-accent/30 border-accent/60 text-accent-foreground',
@@ -33,10 +42,12 @@ const statusColor: Record<string, string> = {
 
 const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
   const [anchor, setAnchor] = useState<Date>(() => startOfDay(new Date()));
+  const [visibleDays, setVisibleDays] = useState<number>(14);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const days = useMemo(
-    () => Array.from({ length: VISIBLE_DAYS }, (_, i) => addDays(anchor, i)),
-    [anchor]
+    () => Array.from({ length: visibleDays }, (_, i) => addDays(anchor, i)),
+    [anchor, visibleDays]
   );
   const windowStart = days[0];
   const windowEnd = days[days.length - 1];
@@ -55,25 +66,52 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4 text-accent" />
           <h2 className="text-sm font-semibold text-foreground">Reservations Calendar</h2>
-          <span className="text-xs text-muted-foreground ml-2">
-            {format(windowStart, 'MMM d')} — {format(windowEnd, 'MMM d, yyyy')}
-          </span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setAnchor((d) => addDays(d, -7))}>
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <Select value={String(visibleDays)} onValueChange={(v) => setVisibleDays(Number(v))}>
+            <SelectTrigger className="h-8 w-[110px] text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {RANGE_OPTIONS.map((o) => (
+                <SelectItem key={o.value} value={String(o.value)} className="text-xs">{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setAnchor((d) => addDays(d, -visibleDays))} title="Previous">
             <ChevronLeft className="h-4 w-4" />
           </Button>
+
+          <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs gap-1.5 min-w-[200px] justify-start font-normal">
+                <CalendarIcon className="h-3.5 w-3.5" />
+                {format(windowStart, 'MMM d')} — {format(windowEnd, 'MMM d, yyyy')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={anchor}
+                onSelect={(d) => { if (d) { setAnchor(startOfDay(d)); setPickerOpen(false); } }}
+                initialFocus
+                className={cn('p-3 pointer-events-auto')}
+              />
+            </PopoverContent>
+          </Popover>
+
           <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => setAnchor(startOfDay(new Date()))}>
             Today
           </Button>
-          <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setAnchor((d) => addDays(d, 7))}>
+          <Button variant="outline" size="sm" className="h-8 px-2" onClick={() => setAnchor((d) => addDays(d, visibleDays))} title="Next">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       <div className="border border-border rounded-md overflow-x-auto">
-        <div style={{ minWidth: LABEL_W + DAY_W * VISIBLE_DAYS }}>
+        <div style={{ minWidth: LABEL_W + DAY_W * visibleDays }}>
           {/* Header row */}
           <div className="flex sticky top-0 z-10 bg-card border-b border-border">
             <div
@@ -122,7 +160,7 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
                   </div>
 
                   {/* Day grid background */}
-                  <div className="flex relative" style={{ width: DAY_W * VISIBLE_DAYS }}>
+                  <div className="flex relative" style={{ width: DAY_W * visibleDays }}>
                     {days.map((d) => (
                       <div
                         key={d.toISOString()}
