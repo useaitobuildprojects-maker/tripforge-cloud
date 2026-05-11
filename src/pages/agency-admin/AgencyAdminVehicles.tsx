@@ -99,7 +99,23 @@ const AgencyAdminVehicles = () => {
         transition={{ duration: 0.4 }}
         className="card-premium rounded-xl p-5"
       >
-        <FleetReservationTimeline vehicles={vehicles} reservations={reservations as any} />
+        <FleetReservationTimeline
+          title="Fleet Reservations"
+          emptyLabel="No vehicles to display."
+          rows={vehicles.map((v) => ({
+            id: v.id,
+            title: `${v.brand} ${v.model}`,
+            subtitle: v.license_plate ?? v.serial_number ?? '',
+          }))}
+          reservations={(reservations as any[]).map((r) => ({
+            id: r.id,
+            customer_name: r.customer_name,
+            pickup_date: r.pickup_date,
+            return_date: r.return_date,
+            status: r.status,
+            resource_id: r.vehicle_id,
+          }))}
+        />
       </motion.div>
 
       {/* Search */}
