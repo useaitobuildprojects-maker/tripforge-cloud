@@ -8,20 +8,27 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { Vehicle } from '@/hooks/use-vehicles';
 
-interface Reservation {
+export interface TimelineRow {
+  id: string;
+  title: string;
+  subtitle?: string;
+}
+
+export interface TimelineReservation {
   id: string;
   customer_name: string;
   pickup_date: string;
   return_date: string;
   status: string;
-  vehicle_id: string;
+  resource_id: string;
 }
 
 interface Props {
-  vehicles: Vehicle[];
-  reservations: Reservation[];
+  rows: TimelineRow[];
+  reservations: TimelineReservation[];
+  title?: string;
+  emptyLabel?: string;
 }
 
 const DAY_W = 56; // px per day column
@@ -40,7 +47,7 @@ const statusColor: Record<string, string> = {
   cancelled: 'bg-muted border-border text-muted-foreground line-through',
 };
 
-const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
+const FleetReservationTimeline = ({ rows, reservations, title = 'Reservations Calendar', emptyLabel = 'No items to display.' }: Props) => {
   const [anchor, setAnchor] = useState<Date>(() => startOfDay(new Date()));
   const [visibleDays, setVisibleDays] = useState<number>(14);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -52,11 +59,9 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
   const windowStart = days[0];
   const windowEnd = days[days.length - 1];
 
-  const rows = vehicles;
-
-  const reservationsByVehicle = useMemo(() => {
-    const map = new Map<string, Reservation[]>();
-    for (const r of reservations) map.set(r.vehicle_id, [...(map.get(r.vehicle_id) ?? []), r]);
+  const reservationsByResource = useMemo(() => {
+    const map = new Map<string, TimelineReservation[]>();
+    for (const r of reservations) map.set(r.resource_id, [...(map.get(r.resource_id) ?? []), r]);
     return map;
   }, [reservations]);
 
@@ -65,7 +70,7 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4 text-accent" />
-          <h2 className="text-sm font-semibold text-foreground">Reservations Calendar</h2>
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         </div>
         <div className="flex items-center gap-1.5 flex-wrap justify-end">
           <Select value={String(visibleDays)} onValueChange={(v) => setVisibleDays(Number(v))}>
@@ -141,10 +146,10 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
 
           {/* Vehicle rows */}
           {rows.length === 0 ? (
-            <div className="px-4 py-6 text-sm text-muted-foreground text-center">No vehicles to display.</div>
+            <div className="px-4 py-6 text-sm text-muted-foreground text-center">{emptyLabel}</div>
           ) : (
             rows.map((v) => {
-              const vRes = reservationsByVehicle.get(v.id) ?? [];
+              const vRes = reservationsByResource.get(v.id) ?? [];
               return (
                 <div key={v.id} className="flex border-b border-border last:border-b-0 relative" style={{ height: ROW_H }}>
                   <div
@@ -152,11 +157,13 @@ const FleetReservationTimeline = ({ vehicles, reservations }: Props) => {
                     style={{ width: LABEL_W }}
                   >
                     <p className="text-xs font-semibold text-foreground truncate leading-tight">
-                      {v.brand} {v.model}
+                      {v.title}
                     </p>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate">
-                      {v.license_plate ?? v.serial_number ?? ''}
-                    </p>
+                    {v.subtitle && (
+                      <p className="text-[10px] text-muted-foreground font-mono truncate">
+                        {v.subtitle}
+                      </p>
+                    )}
                   </div>
 
                   {/* Day grid background */}
