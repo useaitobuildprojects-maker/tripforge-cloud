@@ -1832,6 +1832,9 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
         <Button variant="outline" size="sm" className="text-xs" onClick={seedDummy} disabled={seeding || addPrice.isPending}>
           <Sparkles className="h-3.5 w-3.5 mr-1" /> {seeding ? 'Seeding...' : 'Seed dummy cars'}
         </Button>
+        <Button variant="outline" size="sm" className="text-xs" onClick={resyncFromFleet} disabled={resyncing || !fleetVehicles.length}>
+          <Car className="h-3.5 w-3.5 mr-1" /> {resyncing ? 'Resyncing...' : 'Resync from fleet'}
+        </Button>
         <Button variant="outline" size="sm" className="text-xs" onClick={regenerateImages} disabled={regenerating || !fleetMatchedPrices.length}>
           <ImageIcon className="h-3.5 w-3.5 mr-1" /> {regenerating ? 'Updating...' : 'Regenerate images'}
         </Button>
