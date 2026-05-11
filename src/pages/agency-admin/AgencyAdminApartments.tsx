@@ -32,7 +32,7 @@ const AgencyAdminApartments = () => {
   }
 
   const filtered = apartments.filter((a) =>
-    `${a.title} ${a.city} ${a.country}`.toLowerCase().includes(search.toLowerCase())
+    `${a.title} ${a.city} ${a.country} ${a.serial_number ?? ''}`.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -93,6 +93,9 @@ const AgencyAdminApartments = () => {
                       <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                         <MapPin className="h-3 w-3" /> {apt.city}, {apt.country}
                       </p>
+                      {apt.serial_number && (
+                        <p className="text-[10px] font-mono text-accent mt-1 tracking-wider">{apt.serial_number}</p>
+                      )}
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => setEditing(apt)}>

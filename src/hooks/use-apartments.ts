@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 export interface Apartment {
   id: string;
   agency_id: string;
+  serial_number?: string | null;
   title: string;
   description: string | null;
   photos: string[];

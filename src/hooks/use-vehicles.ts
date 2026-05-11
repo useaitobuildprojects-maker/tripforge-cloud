@@ -13,6 +13,7 @@ export interface Vehicle {
   photo_url: string | null;
   daily_rate_base: number | null;
   vehicle_class?: string | null;
+  serial_number?: string | null;
   created_at: string;
 }
 
