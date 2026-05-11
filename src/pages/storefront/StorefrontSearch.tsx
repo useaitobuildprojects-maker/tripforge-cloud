@@ -1,7 +1,7 @@
 import { useOutletContext, useParams, useSearchParams, Link } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, MapPin, ArrowRight, Calendar, Users } from 'lucide-react';
+import { ChevronLeft, MapPin, ArrowRight, Calendar, Users, Route, Clock } from 'lucide-react';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { TemplateStyles } from '@/lib/template-styles';
 import StorefrontSeo from '@/components/storefront/StorefrontSeo';
@@ -9,6 +9,7 @@ import RouteMap from '@/components/storefront/RouteMap';
 import TransferBookingForm from '@/components/storefront/TransferBookingForm';
 import LimoBookingForm from '@/components/storefront/LimoBookingForm';
 import CityTourBookingForm from '@/components/storefront/CityTourBookingForm';
+import { geocodePlace, getDrivingRoute } from '@/lib/transfer-pricing';
 
 const StorefrontSearch = () => {
   const { slug, serviceType } = useParams<{ slug: string; serviceType: string }>();
@@ -30,6 +31,20 @@ const StorefrontSearch = () => {
   const pkg = params.get('package') || '';
 
   const title = useMemo(() => SERVICE_LABELS[service] ?? 'Search', [service]);
+
+  const [routeInfo, setRouteInfo] = useState<{ distance_km: number; duration_min: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    setRouteInfo(null);
+    if (service !== 'transfer' || !pickup || !dropoff || pickup === dropoff) return;
+    (async () => {
+      const [o, d] = await Promise.all([geocodePlace(pickup), geocodePlace(dropoff)]);
+      if (!o || !d || cancelled) return;
+      const r = await getDrivingRoute(o, d);
+      if (!cancelled && r) setRouteInfo(r);
+    })();
+    return () => { cancelled = true; };
+  }, [service, pickup, dropoff]);
 
   if (!agency.services?.includes(service)) {
     return (
@@ -100,13 +115,45 @@ const StorefrontSearch = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 min-w-0">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <div className="lg:col-span-3 min-w-0">
             {renderForm()}
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             <div className="lg:sticky lg:top-20 space-y-4">
-              <RouteMap origin={pickup} destination={dropoff} height={300} />
+              <div className="rounded-md border overflow-hidden" style={{ ...tk.surface, ...tk.border }}>
+                <RouteMap origin={pickup} destination={dropoff} height={360} />
+                {(pickup || dropoff) && (
+                  <div className="p-4 space-y-3">
+                    <div className="flex items-start gap-2 text-xs" style={tk.textBody}>
+                      <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: accent }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate" style={tk.textPrimary}>{pickup}</p>
+                        <p className="text-[11px]" style={tk.textMuted}>Pickup</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 text-xs" style={tk.textBody}>
+                      <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" style={{ color: accent }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold truncate" style={tk.textPrimary}>{dropoff}</p>
+                        <p className="text-[11px]" style={tk.textMuted}>Drop-off</p>
+                      </div>
+                    </div>
+                    {routeInfo && (
+                      <div className="flex items-center gap-4 pt-3 border-t" style={tk.border}>
+                        <div className="flex items-center gap-1.5 text-sm font-bold" style={tk.textPrimary}>
+                          <Route className="h-4 w-4" style={{ color: accent }} />
+                          {routeInfo.distance_km} km
+                        </div>
+                        <div className="flex items-center gap-1.5 text-sm font-bold" style={tk.textPrimary}>
+                          <Clock className="h-4 w-4" style={{ color: accent }} />
+                          ~{routeInfo.duration_min} min
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="rounded-md border p-4 text-xs" style={{ ...tk.surface, ...tk.border, ...tk.textBody }}>
                 <p className="font-extrabold text-sm mb-1" style={tk.textPrimary}>All fees included</p>
                 <p>Free cancellation up to 1 hour before pickup. Professional chauffeurs and meet-and-greet on every booking.</p>
