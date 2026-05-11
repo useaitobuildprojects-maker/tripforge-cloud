@@ -1722,8 +1722,8 @@ const CarRentalPricingTab = ({ agencyId, storefrontConfig, onConfigChange }: { a
   };
 
   const downloadCurrent = () => {
-    if (!prices.length) { toast.info('No pricing to export'); return; }
-    const data = prices.map(p => ({
+    if (!fleetMatchedPrices.length) { toast.info('No pricing to export'); return; }
+    const data = fleetMatchedPrices.map(p => ({
       'Vehicle Class': p.vehicle_class, Brand: p.brand ?? '', Model: p.model ?? '', Year: p.year ?? '',
       Transmission: p.transmission ?? '', 'Fuel Type': p.fuel_type ?? '', Seats: p.seats ?? '',
       'Daily Rate (€)': p.daily_rate, 'Weekly Rate (€)': p.weekly_rate ?? '', 'Monthly Rate (€)': p.monthly_rate ?? '',
