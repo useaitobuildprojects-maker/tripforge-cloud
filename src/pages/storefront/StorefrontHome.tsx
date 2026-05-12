@@ -340,6 +340,7 @@ const StorefrontHome = () => {
                       disabled={(d) => d < todayDate}
                       initialFocus
                       className={cn("p-3 pointer-events-auto")}
+                      modifiersStyles={{ selected: { backgroundColor: accent, color: '#ffffff' } }}
                     />
                   </PopoverContent>
                 </Popover>
@@ -399,6 +400,7 @@ const StorefrontHome = () => {
                       disabled={(d) => d < minReturnDateObj}
                       initialFocus
                       className={cn("p-3 pointer-events-auto")}
+                      modifiersStyles={{ selected: { backgroundColor: accent, color: '#ffffff' } }}
                     />
                   </PopoverContent>
                 </Popover>
