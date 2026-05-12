@@ -2,6 +2,7 @@ import { useOutletContext, useParams, useSearchParams, Link } from 'react-router
 import { useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, MapPin, ArrowRight, Calendar, Users, Route, Clock } from 'lucide-react';
+import { format, parseISO, isValid } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Agency, StorefrontConfig, ServiceType, SERVICE_LABELS } from '@/types/agency';
 import { TemplateStyles } from '@/lib/template-styles';
@@ -33,6 +34,15 @@ const StorefrontSearch = () => {
   const pkg = params.get('package') || '';
 
   const title = useMemo(() => SERVICE_LABELS[service] ?? 'Search', [service]);
+
+  const parseDT = (s: string) => {
+    if (!s) return null;
+    const d = s.includes('T') ? parseISO(s) : parseISO(`${s}T00:00`);
+    return isValid(d) ? d : null;
+  };
+  const startDt = parseDT(start);
+  const endDt = parseDT(end);
+  const hasTime = (s: string) => s.includes('T');
 
   const [routeInfo, setRouteInfo] = useState<{ distance_km: number; duration_min: number } | null>(null);
   const [bookingDraft, setBookingDraft] = useState<BookingDraft | null>(null);
@@ -92,10 +102,19 @@ const StorefrontSearch = () => {
                 </div>
               </>
             )}
-            {(start || end) && (
+            {startDt && (
               <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
                 <Calendar className="h-3.5 w-3.5" style={{ color: accent }} />
-                <span>{start}{end ? ` → ${end}` : ''}</span>
+                <span>
+                  {format(startDt, 'EEE, MMM d, yyyy')}
+                  {endDt ? ` → ${format(endDt, 'EEE, MMM d, yyyy')}` : ''}
+                </span>
+              </div>
+            )}
+            {startDt && hasTime(start) && (
+              <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold tabular-nums" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                <Clock className="h-3.5 w-3.5" style={{ color: accent }} />
+                <span>{format(startDt, 'HH:mm')}</span>
               </div>
             )}
             {pax && (
