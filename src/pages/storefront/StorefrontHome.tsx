@@ -344,22 +344,40 @@ const StorefrontHome = () => {
                   </PopoverContent>
                 </Popover>
                 {activeService === 'transfer' || activeService === 'city_tour' ? (
-                  <div className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
-                    <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
-                      <Select value={pickupTime} onValueChange={setPickupTime}>
-                        <SelectTrigger className="h-7 text-sm border-0 px-0 bg-transparent shadow-none focus:ring-0">
-                          <SelectValue placeholder={searchCopy.endDatePlaceholder} />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-64">
-                          {timeSlots.map(t => (
-                            <SelectItem key={t} value={t}>{t}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                        <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
+                          <p className={cn("text-sm truncate tabular-nums", !pickupTime && "text-muted-foreground")} style={pickupTime ? tk.textPrimary : undefined}>
+                            {pickupTime || searchCopy.endDatePlaceholder}
+                          </p>
+                        </div>
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-44 p-2 rounded-md border border-[#e5e7eb] shadow-[0_12px_40px_-8px_rgba(0,0,0,0.18)]" align="start">
+                      <div className="max-h-64 overflow-y-auto grid grid-cols-2 gap-1">
+                        {timeSlots.map(t => {
+                          const selected = t === pickupTime;
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => setPickupTime(t)}
+                              className={cn(
+                                "h-8 rounded-md text-xs font-semibold tabular-nums transition-colors",
+                                selected ? "text-white" : "hover:bg-muted"
+                              )}
+                              style={selected ? { backgroundColor: accent } : tk.textBody}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                 <Popover>
                   <PopoverTrigger asChild>
