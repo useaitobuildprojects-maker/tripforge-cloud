@@ -286,7 +286,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" modifiersStyles={{ selected: { backgroundColor: buttonColor, color: "#ffffff" } }} />
               </PopoverContent>
             </Popover>
 
@@ -304,7 +304,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+                <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" modifiersStyles={{ selected: { backgroundColor: buttonColor, color: "#ffffff" } }} />
               </PopoverContent>
             </Popover>
 
@@ -432,7 +432,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" />
+                          <Calendar mode="single" selected={stop.pickupDate} onSelect={(d) => updateStop(idx, { pickupDate: d })} disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))} initialFocus className="p-3 pointer-events-auto" modifiersStyles={{ selected: { backgroundColor: buttonColor, color: "#ffffff" } }} />
                         </PopoverContent>
                       </Popover>
                       <Popover>
@@ -443,7 +443,7 @@ const LimoBookingForm = ({ agency, config, buttonColor, variant = 'full', onSear
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" />
+                          <Calendar mode="single" selected={stop.dropoffDate} onSelect={(d) => updateStop(idx, { dropoffDate: d })} disabled={(d) => d < (stop.pickupDate ?? new Date(new Date().setHours(0, 0, 0, 0)))} initialFocus className="p-3 pointer-events-auto" modifiersStyles={{ selected: { backgroundColor: buttonColor, color: "#ffffff" } }} />
                         </PopoverContent>
                       </Popover>
                     </div>
