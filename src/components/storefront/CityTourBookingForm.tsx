@@ -233,6 +233,7 @@ const CityTourBookingForm = ({ agency, config, buttonColor, hideItineraryFields,
                       disabled={d => d < new Date(new Date().setHours(0, 0, 0, 0))}
                       initialFocus
                       className="p-3 pointer-events-auto"
+                      modifiersStyles={{ selected: { backgroundColor: buttonColor, color: '#ffffff' } }}
                     />
                   </PopoverContent>
                 </Popover>

@@ -250,6 +250,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                   disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
+                  modifiersStyles={{ selected: { backgroundColor: buttonColor, color: '#ffffff' } }}
                 />
               </PopoverContent>
             </Popover>
