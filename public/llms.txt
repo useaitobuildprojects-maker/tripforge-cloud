@@ -1,0 +1,11 @@
+# TravelHub
+
+> Multi-tenant travel platform for European and Turkish agencies offering car rentals, transfers, limo services, city tours, and apartment bookings through branded storefronts.
+
+## Pages
+
+- [Admin sign-in](/login): Agency and platform admin authentication.
+
+## Optional
+
+Each agency operates a branded storefront under `/agency/{slug}` with home, services, fleet, about, and contact routes. Routes are tenant-specific and not enumerated here.
