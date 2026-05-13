@@ -99,7 +99,7 @@ const StorefrontAbout = () => {
               {cfg.about_image_url ? (
                 <img src={cfg.about_image_url} alt={`About ${agency.name}`} className="w-full h-80 lg:h-[420px] object-cover" />
               ) : (
-                <img src={destTemple} alt="Travel" className="w-full h-80 lg:h-[420px] object-cover" />
+                <img src={destTemple} alt={`${agency.name} guides travelers through landmark destinations`} className="w-full h-80 lg:h-[420px] object-cover" />
               )}
             </div>
             <div className="absolute -bottom-6 -left-4 rounded-2xl shadow-lg p-5 border" style={{ ...tk.surface, ...tk.border }}>
