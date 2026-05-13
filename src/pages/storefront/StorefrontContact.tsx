@@ -62,7 +62,7 @@ const StorefrontContact = () => {
               <div className="h-12 w-12 rounded-xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: `${accent}12` }}>
                 <item.icon className="h-5 w-5" style={{ color: accent }} />
               </div>
-              <h3 className="font-bold text-sm mb-1" style={tk.textPrimary}>{item.title}</h3>
+              <h2 className="font-bold text-sm mb-1" style={tk.textPrimary}>{item.title}</h2>
               <p className="text-sm mb-0.5" style={tk.textBody}>{item.value}</p>
               <p className="text-xs" style={tk.textMuted}>{item.subtitle}</p>
             </motion.div>

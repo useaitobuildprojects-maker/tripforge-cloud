@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://tripforge-cloud.lovable.app/sitemap.xml

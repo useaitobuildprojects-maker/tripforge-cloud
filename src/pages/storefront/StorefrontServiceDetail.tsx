@@ -81,7 +81,28 @@ const StorefrontServiceDetail = () => {
 
   return (
     <div style={tk.surface}>
-      <StorefrontSeo agency={agency} page="fleet" fallbackTitle={`${heroText.title} | ${agency.name}`} fallbackDescription={heroText.subtitle} />
+      <StorefrontSeo
+        agency={agency}
+        page="fleet"
+        fallbackTitle={`${heroText.title} | ${agency.name}`}
+        fallbackDescription={heroText.subtitle}
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Service',
+          name: heroText.title,
+          description: heroText.subtitle,
+          provider: {
+            '@type': 'TravelAgency',
+            name: agency.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: agency.city,
+              addressCountry: agency.country,
+            },
+          },
+          areaServed: `${agency.city}, ${agency.country}`,
+        }}
+      />
 
       {/* Hero — compact navy band, Booking.com style */}
       <section className="relative" style={tk.surfaceDeep}>
