@@ -19,6 +19,8 @@ const StorefrontServiceDetail = lazy(() => import("./pages/storefront/Storefront
 const StorefrontSearch = lazy(() => import("./pages/storefront/StorefrontSearch"));
 const StorefrontContact = lazy(() => import("./pages/storefront/StorefrontContact"));
 const StorefrontAbout = lazy(() => import("./pages/storefront/StorefrontAbout"));
+const PaymentSuccess = lazy(() => import("./pages/storefront/PaymentSuccess"));
+const PaymentCancel = lazy(() => import("./pages/storefront/PaymentCancel"));
 const AgencyAdminLayout = lazy(() => import("./components/agency-admin/AgencyAdminLayout"));
 const AgencyAdminDashboard = lazy(() => import("./pages/agency-admin/AgencyAdminDashboard"));
 const AgencyAdminBookings = lazy(() => import("./pages/agency-admin/AgencyAdminBookings"));
