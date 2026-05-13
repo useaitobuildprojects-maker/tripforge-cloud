@@ -1,13 +1,11 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-interface ContactPayload {
-  name: string;
-  email: string;
-  phone?: string;
-  subject?: string;
-  message: string;
-  agency_id?: string;
+interface ReplyPayload {
+  message_id: string;
+  to: string;
+  subject: string;
+  body: string;
 }
 
 function b64url(str: string): string {
@@ -38,10 +36,44 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    const body = (await req.json()) as ContactPayload;
-    if (!body?.name || !body?.email || !body?.message) {
-      return new Response(JSON.stringify({ error: 'name, email and message are required' }), {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Missing authorization' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const body = (await req.json()) as ReplyPayload;
+    if (!body?.message_id || !body?.to || !body?.subject || !body?.body) {
+      return new Response(JSON.stringify({ error: 'message_id, to, subject and body are required' }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Verify the caller can access this message (RLS scoped client)
+    const { data: msg, error: msgErr } = await supabase
+      .from('contact_messages')
+      .select('id, agency_id, email')
+      .eq('id', body.message_id)
+      .maybeSingle();
+    if (msgErr || !msg) {
+      return new Response(JSON.stringify({ error: 'Message not found or access denied' }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -49,45 +81,19 @@ Deno.serve(async (req) => {
     const fromEmail = Deno.env.get('GMAIL_FROM_EMAIL');
     if (!fromEmail) throw new Error('GMAIL_FROM_EMAIL not configured');
 
-    // Persist the message so the agency admin can see/answer it later
-    if (body.agency_id) {
-      try {
-        const supabase = createClient(
-          Deno.env.get('SUPABASE_URL') ?? '',
-          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-        );
-        await supabase.from('contact_messages').insert({
-          agency_id: body.agency_id,
-          name: body.name,
-          email: body.email,
-          phone: body.phone || null,
-          subject: body.subject || null,
-          message: body.message,
-          status: 'new',
-        });
-      } catch (logErr) {
-        console.warn('Failed to log contact message', logErr);
-      }
-    }
-
     const accessToken = await getAccessToken();
 
-    const subject = body.subject?.trim() || `New contact form message from ${body.name}`;
-    const html = `
-      <h2>New contact form submission</h2>
-      <p><strong>Name:</strong> ${body.name}</p>
-      <p><strong>Email:</strong> ${body.email}</p>
-      ${body.phone ? `<p><strong>Phone:</strong> ${body.phone}</p>` : ''}
-      ${body.subject ? `<p><strong>Subject:</strong> ${body.subject}</p>` : ''}
-      <p><strong>Message:</strong></p>
-      <p style="white-space:pre-wrap">${body.message}</p>
-    `;
+    const escaped = body.body
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    const html = `<div style="font-family:Inter,Arial,sans-serif;font-size:14px;line-height:1.6;white-space:pre-wrap">${escaped}</div>`;
 
     const rfc2822 = [
       `From: ${fromEmail}`,
-      `To: ${fromEmail}`,
-      `Reply-To: ${body.name} <${body.email}>`,
-      `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`,
+      `To: ${body.to}`,
+      `Reply-To: ${fromEmail}`,
+      `Subject: =?UTF-8?B?${btoa(unescape(encodeURIComponent(body.subject)))}?=`,
       'MIME-Version: 1.0',
       'Content-Type: text/html; charset="UTF-8"',
       '',
@@ -110,11 +116,17 @@ Deno.serve(async (req) => {
       throw new Error(`gmail send failed: ${txt}`);
     }
 
+    // Mark as replied (RLS scoped — only succeeds for agency members / super admin)
+    await supabase
+      .from('contact_messages')
+      .update({ status: 'replied', replied_at: new Date().toISOString() })
+      .eq('id', body.message_id);
+
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    console.error('send-contact-email error', e);
+    console.error('send-contact-reply error', e);
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

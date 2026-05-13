@@ -33,8 +33,14 @@ const StorefrontContact = () => {
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.functions.invoke('send-contact-email', {
-        body: { ...form, agency_id: agency.id },
+      const { error } = await supabase.from('contact_messages').insert({
+        agency_id: agency.id,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim() || null,
+        subject: form.subject.trim() || null,
+        message: form.message.trim(),
+        status: 'new',
       });
       if (error) throw error;
       toast({ title: 'Message sent', description: "Thanks — we'll get back to you soon." });

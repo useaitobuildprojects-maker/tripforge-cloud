@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Mail, Phone, Reply, Trash2, Search, CheckCircle2, Inbox } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
@@ -31,6 +32,10 @@ const AgencyAdminMessages = () => {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'new' | 'replied'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replySubject, setReplySubject] = useState('');
+  const [replyBody, setReplyBody] = useState('');
+  const [sending, setSending] = useState(false);
 
   const load = async () => {
     if (!agency?.id) return;
@@ -95,13 +100,46 @@ const AgencyAdminMessages = () => {
     toast({ title: 'Message deleted' });
   };
 
-  const replyHref = (m: ContactMessage) => {
-    const subject = m.subject?.trim() ? `Re: ${m.subject}` : `Re: your message to ${agency?.name ?? 'us'}`;
-    const body = `\n\n---\nOn ${new Date(m.created_at).toLocaleString()}, ${m.name} wrote:\n${m.message
-      .split('\n')
-      .map((l) => `> ${l}`)
-      .join('\n')}`;
-    return `mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const openReply = (m: ContactMessage) => {
+    setReplySubject(m.subject?.trim() ? `Re: ${m.subject}` : `Re: your message to ${agency?.name ?? 'us'}`);
+    setReplyBody(
+      `Hi ${m.name},\n\n\n\n---\nOn ${new Date(m.created_at).toLocaleString()}, you wrote:\n${m.message
+        .split('\n')
+        .map((l) => `> ${l}`)
+        .join('\n')}`,
+    );
+    setReplyOpen(true);
+  };
+
+  const sendReply = async () => {
+    if (!selected) return;
+    if (!replySubject.trim() || !replyBody.trim()) {
+      toast({ title: 'Subject and message are required', variant: 'destructive' });
+      return;
+    }
+    setSending(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-reply', {
+        body: {
+          message_id: selected.id,
+          to: selected.email,
+          subject: replySubject.trim(),
+          body: replyBody,
+        },
+      });
+      if (error) throw error;
+      toast({ title: 'Reply sent', description: `Email sent to ${selected.email}` });
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === selected.id ? { ...m, status: 'replied', replied_at: new Date().toISOString() } : m,
+        ),
+      );
+      setReplyOpen(false);
+    } catch (err) {
+      toast({ title: 'Failed to send', description: (err as Error).message, variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -208,8 +246,8 @@ const AgencyAdminMessages = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-2">
-                <Button asChild onClick={() => selected.status === 'new' && markReplied(selected.id)}>
-                  <a href={replyHref(selected)}><Reply className="h-4 w-4" /> Reply by email</a>
+                <Button onClick={() => openReply(selected)}>
+                  <Reply className="h-4 w-4" /> Reply by email
                 </Button>
                 {selected.status === 'new' && (
                   <Button variant="outline" onClick={() => markReplied(selected.id)}>
@@ -224,6 +262,39 @@ const AgencyAdminMessages = () => {
           )}
         </Card>
       </div>
+
+      <Dialog open={replyOpen} onOpenChange={setReplyOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Reply to {selected?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">To</label>
+              <Input value={selected?.email ?? ''} disabled />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Subject</label>
+              <Input value={replySubject} onChange={(e) => setReplySubject(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Message</label>
+              <textarea
+                rows={12}
+                value={replyBody}
+                onChange={(e) => setReplyBody(e.target.value)}
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReplyOpen(false)} disabled={sending}>Cancel</Button>
+            <Button onClick={sendReply} disabled={sending}>
+              <Mail className="h-4 w-4" /> {sending ? 'Sending...' : 'Send reply'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
