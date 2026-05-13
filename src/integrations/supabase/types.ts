@@ -196,18 +196,22 @@ export type Database = {
           amount: number | null
           apartment_id: string | null
           created_at: string | null
+          currency: string
           customer_email: string | null
           customer_name: string
           customer_phone: string | null
           driver_id: string | null
           id: string
           notes: string | null
+          paid_at: string | null
+          payment_status: string
           pickup_date: string
           pickup_location: string | null
           return_date: string
           return_location: string | null
           service_type: string | null
           status: string | null
+          stripe_session_id: string | null
           vehicle_id: string | null
         }
         Insert: {
@@ -215,18 +219,22 @@ export type Database = {
           amount?: number | null
           apartment_id?: string | null
           created_at?: string | null
+          currency?: string
           customer_email?: string | null
           customer_name: string
           customer_phone?: string | null
           driver_id?: string | null
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_status?: string
           pickup_date: string
           pickup_location?: string | null
           return_date: string
           return_location?: string | null
           service_type?: string | null
           status?: string | null
+          stripe_session_id?: string | null
           vehicle_id?: string | null
         }
         Update: {
@@ -234,18 +242,22 @@ export type Database = {
           amount?: number | null
           apartment_id?: string | null
           created_at?: string | null
+          currency?: string
           customer_email?: string | null
           customer_name?: string
           customer_phone?: string | null
           driver_id?: string | null
           id?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_status?: string
           pickup_date?: string
           pickup_location?: string | null
           return_date?: string
           return_location?: string | null
           service_type?: string | null
           status?: string | null
+          stripe_session_id?: string | null
           vehicle_id?: string | null
         }
         Relationships: [
