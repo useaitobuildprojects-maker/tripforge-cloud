@@ -181,7 +181,9 @@ const StorefrontLayout = () => {
       </header>
 
       {/* Content */}
-      <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
+      <main>
+        <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
+      </main>
 
       {/* ═══ Footer — Expedia clean light ═══ */}
       <footer className="border-t" style={{ ...tk.surfaceAlt, ...tk.border }}>
@@ -198,11 +200,12 @@ const StorefrontLayout = () => {
               </p>
               <div className="flex items-center gap-2">
                 {[
-                  { url: cfg.facebook_url, Icon: Facebook },
-                  { url: cfg.twitter_url, Icon: Twitter },
-                  { url: cfg.instagram_url, Icon: Instagram },
-                ].filter(s => s.url).map(({ url, Icon }, i) => (
+                  { url: cfg.facebook_url, Icon: Facebook, label: 'Facebook' },
+                  { url: cfg.twitter_url, Icon: Twitter, label: 'Twitter' },
+                  { url: cfg.instagram_url, Icon: Instagram, label: 'Instagram' },
+                ].filter(s => s.url).map(({ url, Icon, label }, i) => (
                   <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                    aria-label={`${agency.name} on ${label}`}
                     className="h-9 w-9 rounded-full flex items-center justify-center transition-colors hover:opacity-80"
                     style={{ backgroundColor: iconBtnBg, color: accent }}>
                     <Icon className="h-4 w-4" />
