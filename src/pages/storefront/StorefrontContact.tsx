@@ -1,4 +1,7 @@
 import { useOutletContext, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 import { Agency, StorefrontConfig } from '@/types/agency';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Clock, Send, MessageCircle } from 'lucide-react';
@@ -18,6 +21,28 @@ const StorefrontContact = () => {
   const accent = buttonColor || EXP.brand;
   const ctaBg = buttonColor || EXP.cta;
   const ctaTextColor = EXP.ctaText;
+
+  const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      toast({ title: 'Missing info', description: 'Name, email and message are required.', variant: 'destructive' });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', { body: form });
+      if (error) throw error;
+      toast({ title: 'Message sent', description: "Thanks — we'll get back to you soon." });
+      setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (err) {
+      toast({ title: 'Failed to send', description: (err as Error).message, variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const contactItems = [
     { icon: Mail, title: 'Email Us', value: agency.contact_email, subtitle: 'We reply within 24 hours' },
@@ -99,33 +124,33 @@ const StorefrontContact = () => {
 
           <motion.div initial={{ opacity: 0, x: 24 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="rounded-3xl p-8 lg:p-10" style={tk.surfaceAlt}>
-              <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="c-name" className="text-sm font-medium" style={tk.textPrimary}>Full Name</Label>
-                    <Input id="c-name" placeholder="John Doe" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
+                    <Input id="c-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="John Doe" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="c-email" className="text-sm font-medium" style={tk.textPrimary}>Email</Label>
-                    <Input id="c-email" type="email" placeholder="john@example.com" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
+                    <Input id="c-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="john@example.com" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="c-phone" className="text-sm font-medium" style={tk.textPrimary}>Phone (optional)</Label>
-                  <Input id="c-phone" type="tel" placeholder="+1 (555) 000-0000" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
+                  <Input id="c-phone" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+1 (555) 000-0000" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="c-subject" className="text-sm font-medium" style={tk.textPrimary}>Subject</Label>
-                  <Input id="c-subject" placeholder="How can we help?" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
+                  <Input id="c-subject" value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="How can we help?" className="rounded-xl h-12" style={{ ...tk.inputSurface, ...tk.inputBorder }} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="c-message" className="text-sm font-medium" style={tk.textPrimary}>Message</Label>
-                  <textarea id="c-message" rows={5} placeholder="Tell us more about your travel plans..."
+                  <textarea id="c-message" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Tell us more about your travel plans..."
                     className="w-full rounded-xl border px-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
                     style={{ ...tk.inputSurface, ...tk.inputBorder }} />
                 </div>
-                <Button type="submit" className="w-full rounded-xl gap-2 h-12 font-semibold text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
-                  <Send className="h-4 w-4" /> Send Message
+                <Button type="submit" disabled={submitting} className="w-full rounded-xl gap-2 h-12 font-semibold text-sm hover:brightness-95" style={{ backgroundColor: ctaBg, color: ctaTextColor }}>
+                  <Send className="h-4 w-4" /> {submitting ? 'Sending...' : 'Send Message'}
                 </Button>
               </form>
             </div>
