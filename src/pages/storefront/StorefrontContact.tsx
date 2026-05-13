@@ -34,6 +34,7 @@ const StorefrontContact = () => {
     setSubmitting(true);
     try {
       const { error } = await supabase.functions.invoke('send-contact-email', { body: form });
+      // Note: agency_id is added to body below
       if (error) throw error;
       toast({ title: 'Message sent', description: "Thanks — we'll get back to you soon." });
       setForm({ name: '', email: '', phone: '', subject: '', message: '' });
