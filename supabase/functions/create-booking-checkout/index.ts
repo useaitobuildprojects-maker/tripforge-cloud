@@ -53,8 +53,8 @@ Deno.serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2024-11-20.acacia" });
     const origin = req.headers.get("origin") || "https://example.com";
     const slug = agency?.slug ?? "";
-    const successUrl = `${origin}/agency/${slug}?payment=success&booking=${booking.id}`;
-    const cancelUrl = `${origin}/agency/${slug}?payment=cancelled&booking=${booking.id}`;
+    const successUrl = `${origin}/agency/${slug}/payment-success?booking=${booking.id}`;
+    const cancelUrl = `${origin}/agency/${slug}/payment-cancel?booking=${booking.id}`;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
