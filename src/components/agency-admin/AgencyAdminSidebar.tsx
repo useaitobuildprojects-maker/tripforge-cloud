@@ -10,6 +10,7 @@ import {
   Users,
   ExternalLink,
   Building,
+  Mail,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +31,7 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
   const navItems = [
     { to: base, icon: LayoutDashboard, label: 'Dashboard', exact: true },
     { to: `${base}/bookings`, icon: CalendarDays, label: 'Bookings' },
+    { to: `${base}/messages`, icon: Mail, label: 'Messages' },
     { to: `${base}/drivers`, icon: Users, label: 'Drivers' },
     { to: `${base}/vehicles`, icon: Car, label: 'Vehicles' },
     ...(hasApartments ? [{ to: `${base}/apartments`, icon: Building, label: 'Apartments' }] : []),

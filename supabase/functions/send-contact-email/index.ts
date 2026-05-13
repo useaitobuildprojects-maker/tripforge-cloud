@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 interface ContactPayload {
   name: string;
@@ -6,6 +7,7 @@ interface ContactPayload {
   phone?: string;
   subject?: string;
   message: string;
+  agency_id?: string;
 }
 
 function b64url(str: string): string {
@@ -46,6 +48,27 @@ Deno.serve(async (req) => {
 
     const fromEmail = Deno.env.get('GMAIL_FROM_EMAIL');
     if (!fromEmail) throw new Error('GMAIL_FROM_EMAIL not configured');
+
+    // Persist the message so the agency admin can see/answer it later
+    if (body.agency_id) {
+      try {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+        );
+        await supabase.from('contact_messages').insert({
+          agency_id: body.agency_id,
+          name: body.name,
+          email: body.email,
+          phone: body.phone || null,
+          subject: body.subject || null,
+          message: body.message,
+          status: 'new',
+        });
+      } catch (logErr) {
+        console.warn('Failed to log contact message', logErr);
+      }
+    }
 
     const accessToken = await getAccessToken();
 
