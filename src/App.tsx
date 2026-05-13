@@ -90,6 +90,8 @@ const App = () => (
                     <Route path="fleet" element={<StorefrontServices />} />
                     <Route path="contact" element={<StorefrontContact />} />
                     <Route path="about" element={<StorefrontAbout />} />
+                    <Route path="payment-success" element={<PaymentSuccess />} />
+                    <Route path="payment-cancel" element={<PaymentCancel />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
