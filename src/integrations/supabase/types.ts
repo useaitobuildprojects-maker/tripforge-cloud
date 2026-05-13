@@ -455,6 +455,45 @@ export type Database = {
           },
         ]
       }
+      contact_messages: {
+        Row: {
+          agency_id: string
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          replied_at: string | null
+          status: string
+          subject: string | null
+        }
+        Insert: {
+          agency_id: string
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Update: {
+          agency_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          replied_at?: string | null
+          status?: string
+          subject?: string | null
+        }
+        Relationships: []
+      }
       drivers: {
         Row: {
           agency_id: string
