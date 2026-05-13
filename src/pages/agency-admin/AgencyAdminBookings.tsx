@@ -1,13 +1,38 @@
 import { motion } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
-import { CalendarDays, Info } from 'lucide-react';
+import { CalendarDays, Info, CreditCard, Loader2, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
 import { Agency } from '@/types/agency';
 import { useAgencyBookings } from '@/hooks/use-agency-admin';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const AgencyAdminBookings = () => {
   const { agency } = useOutletContext<{ agency: Agency }>();
   const { data: bookings, isLoading, isError } = useAgencyBookings(agency.id);
+  const [chargingId, setChargingId] = useState<string | null>(null);
+
+  const handleCharge = async (bookingId: string) => {
+    setChargingId(bookingId);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { booking_id: bookingId },
+      });
+      if (error) throw error;
+      if (!data?.url) throw new Error('No checkout URL returned');
+      window.open(data.url, '_blank');
+    } catch (err: any) {
+      toast({
+        title: 'Could not start checkout',
+        description: err?.message ?? 'Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setChargingId(null);
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-[1200px]">
@@ -62,6 +87,7 @@ const AgencyAdminBookings = () => {
                   <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Status</th>
                   <th className="px-6 py-3.5 text-left text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Date</th>
                   <th className="px-7 py-3.5 text-right text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Amount</th>
+                  <th className="px-6 py-3.5 text-right text-[10px] font-bold text-muted-foreground uppercase tracking-[0.14em] bg-secondary/40">Payment</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,6 +111,28 @@ const AgencyAdminBookings = () => {
                     </td>
                     <td className="px-7 py-4 text-right text-[14px] font-bold text-foreground tabular-nums">
                       €{Number(booking.amount).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      {booking.payment_status === 'paid' ? (
+                        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-500">
+                          <CheckCircle2 className="h-3.5 w-3.5" /> Paid
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={chargingId === booking.id || !Number(booking.amount)}
+                          onClick={() => handleCharge(booking.id)}
+                          className="h-8 gap-1.5 text-[12px]"
+                        >
+                          {chargingId === booking.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <CreditCard className="h-3.5 w-3.5" />
+                          )}
+                          {booking.payment_status === 'pending' ? 'Resume' : 'Confirm & Charge'}
+                        </Button>
+                      )}
                     </td>
                   </motion.tr>
                 ))}
