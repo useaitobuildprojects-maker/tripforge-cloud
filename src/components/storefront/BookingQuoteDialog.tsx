@@ -150,6 +150,29 @@ const BookingQuoteDialog = ({ vehicle, open, onOpenChange, buttonColor, numDays:
       setConfirmation(data?.id ?? null);
       setStep('success');
       toast.success('Booking request received');
+
+      // Fire-and-forget customer confirmation email (don't block on failure)
+      try {
+        await supabase.functions.invoke('send-booking-confirmation', {
+          body: {
+            customer_name: parsed.data.name,
+            customer_email: parsed.data.email,
+            reference: (data?.id ?? '').slice(0, 8).toUpperCase(),
+            agency_name: vehicle.agency_name,
+            vehicle: `${vehicle.brand} ${vehicle.model} (${vehicle.year})`,
+            pickup_date: new Date(parsed.data.pickup_date).toISOString(),
+            return_date: new Date(parsed.data.return_date).toISOString(),
+            pickup_location: parsed.data.pickup_location || undefined,
+            return_location: parsed.data.return_location || undefined,
+            amount: quote.total,
+            currency: 'EUR',
+            service_type: 'Car Rental',
+            notes: noteParts,
+          },
+        });
+      } catch (mailErr) {
+        console.warn('Booking confirmation email failed', mailErr);
+      }
     } catch (err: any) {
       console.error('Booking error', err);
       toast.error(err?.message || 'Could not submit booking. Please try again.');
