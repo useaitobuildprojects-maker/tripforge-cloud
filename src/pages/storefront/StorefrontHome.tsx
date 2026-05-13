@@ -236,6 +236,27 @@ const StorefrontHome = () => {
         page="home"
         fallbackTitle={agency.meta_title || `${agency.name} | ${agency.city}, ${agency.country}`}
         fallbackDescription={agency.meta_description || `Premium travel services by ${agency.name} in ${agency.city}, ${agency.country}.`}
+        jsonLd={[
+          {
+            '@context': 'https://schema.org',
+            '@type': 'TravelAgency',
+            name: agency.name,
+            url: agency.domain ? `https://${agency.domain}` : undefined,
+            image: agency.logo_url || agency.og_image || undefined,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: agency.city,
+              addressCountry: agency.country,
+            },
+            email: agency.contact_email || undefined,
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: agency.name,
+            url: agency.domain ? `https://${agency.domain}` : undefined,
+          },
+        ]}
       />
 
       {/* ═══════════════ HERO — Booking.com style ═══════════════ */}
@@ -490,7 +511,7 @@ const StorefrontHome = () => {
                     style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                     {dest.tag}
                   </span>
-                  <button className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors">
+                  <button aria-label={`Save ${dest.name} to favorites`} className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors">
                     <Heart className="h-4 w-4" style={{ color: accent }} />
                   </button>
                 </div>
@@ -581,7 +602,7 @@ const StorefrontHome = () => {
                           <div className="h-40 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
                         )}
                         <div className="p-4">
-                          <h4 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h4>
+                          <h3 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h3>
                           <p className="text-[11px] mt-0.5" style={tk.textMuted}>{vehicle.year}</p>
                           <div className="flex items-center gap-1.5 mt-2">
                             <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>4.7</span>
