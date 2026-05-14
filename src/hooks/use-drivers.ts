@@ -12,6 +12,7 @@ export interface Driver {
   current_lng: number | null;
   status: 'available' | 'on_trip' | 'offline';
   created_at: string;
+  auth_user_id: string | null;
 }
 
 export const useAgencyDrivers = (agencyId: string | undefined) => {
