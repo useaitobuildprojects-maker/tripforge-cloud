@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Building,
   Mail,
+  MapPin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,6 +34,7 @@ const AgencyAdminSidebar = ({ agency }: AgencyAdminSidebarProps) => {
     { to: `${base}/bookings`, icon: CalendarDays, label: 'Bookings' },
     { to: `${base}/messages`, icon: Mail, label: 'Messages' },
     { to: `${base}/drivers`, icon: Users, label: 'Drivers' },
+    { to: `${base}/live-map`, icon: MapPin, label: 'Live Map' },
     { to: `${base}/vehicles`, icon: Car, label: 'Vehicles' },
     ...(hasApartments ? [{ to: `${base}/apartments`, icon: Building, label: 'Apartments' }] : []),
     { to: `${base}/analytics`, icon: BarChart3, label: 'Analytics' },
