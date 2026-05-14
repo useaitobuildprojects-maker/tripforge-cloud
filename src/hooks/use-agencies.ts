@@ -50,7 +50,7 @@ export const useAgencyBySlug = (slug: string) => {
     queryFn: async (): Promise<Agency | null> => {
       const { data, error } = await supabase
         .from('agencies')
-        .select('*')
+        .select('id,name,slug,domain,logo_url,favicon_url,status,services,country,city,contact_email,created_at,meta_title,meta_description,og_image,page_seo,storefront_template,button_color,background_color,storefront_config,one_way_fee')
         .eq('slug', slug)
         .maybeSingle();
 
