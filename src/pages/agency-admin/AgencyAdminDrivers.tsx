@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, UserCheck, Circle, Search, Pencil } from 'lucide-react';
+import { MapPin, Phone, Mail, UserCheck, Circle, Search, Pencil, KeyRound, CheckCircle2 } from 'lucide-react';
 import { Agency } from '@/types/agency';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAgencyDrivers, Driver } from '@/hooks/use-drivers';
 import CreateDriverDialog from '@/components/agency-admin/CreateDriverDialog';
 import EditDriverDialog from '@/components/agency-admin/EditDriverDialog';
+import CreateDriverAccountDialog from '@/components/agency-admin/CreateDriverAccountDialog';
 
 const statusConfig = {
   available: { label: 'Available', className: 'bg-success/10 text-success border-success/20' },
@@ -21,6 +22,7 @@ const AgencyAdminDrivers = () => {
   const { data: drivers = [], isLoading } = useAgencyDrivers(agency.id);
   const [search, setSearch] = useState('');
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
+  const [accountDriver, setAccountDriver] = useState<Driver | null>(null);
 
   const filtered = drivers.filter((d) =>
     d.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -121,6 +123,25 @@ const AgencyAdminDrivers = () => {
                     </div>
                   )}
                 </div>
+
+                <div className="mt-4 pt-3 border-t border-border/50">
+                  {driver.auth_user_id ? (
+                    <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/20">
+                      <CheckCircle2 className="h-3 w-3 mr-1" /> Login enabled
+                    </Badge>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-[11px] gap-1.5"
+                      disabled={!driver.email}
+                      onClick={() => setAccountDriver(driver)}
+                    >
+                      <KeyRound className="h-3 w-3" />
+                      {driver.email ? 'Create login' : 'Add email first'}
+                    </Button>
+                  )}
+                </div>
               </motion.div>
             );
           })}
@@ -132,6 +153,17 @@ const AgencyAdminDrivers = () => {
         open={!!editingDriver}
         onOpenChange={(open) => !open && setEditingDriver(null)}
       />
+
+      {accountDriver && (
+        <CreateDriverAccountDialog
+          open={!!accountDriver}
+          onOpenChange={(open) => !open && setAccountDriver(null)}
+          driverId={accountDriver.id}
+          driverName={accountDriver.full_name}
+          driverEmail={accountDriver.email}
+          agencyId={agency.id}
+        />
+      )}
     </div>
   );
 };
