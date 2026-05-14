@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import { APIProvider, Map, AdvancedMarker, InfoWindow } from '@vis.gl/react-google-maps';
-import { formatDistanceToNow } from 'date-fns';
 import { Car, MapPin, Phone, Circle } from 'lucide-react';
 import { Agency } from '@/types/agency';
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAgencyDrivers } from '@/hooks/use-drivers';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,15 +52,19 @@ const AgencyAdminLiveMap = () => {
   const selected = drivers.find((d) => d.id === selectedId);
 
   return (
-    <div className="space-y-6 max-w-[1400px]">
-      <div>
+    <div className="space-y-8 max-w-[1200px]">
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <p className="text-[11px] font-semibold text-accent uppercase tracking-[0.2em] mb-1">Operations</p>
         <h1 className="text-[30px] font-display font-bold text-foreground leading-tight">Live Driver Map</h1>
         <p className="text-sm text-muted-foreground mt-1.5 font-light">Real-time location of every driver currently signed in.</p>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
-        <Card className="overflow-hidden h-[640px]">
+        <div className="card-premium rounded-xl overflow-hidden h-[640px]">
           {!GOOGLE_KEY ? (
             <div className="h-full flex items-center justify-center text-sm text-muted-foreground">Google Maps key missing.</div>
           ) : (
@@ -100,11 +103,11 @@ const AgencyAdminLiveMap = () => {
               </Map>
             </APIProvider>
           )}
-        </Card>
+        </div>
 
-        <Card className="p-4 space-y-3 max-h-[640px] overflow-y-auto">
+        <div className="card-premium rounded-xl p-5 space-y-3 max-h-[640px] overflow-y-auto">
           <div className="flex items-center justify-between">
-            <h3 className="font-display font-bold">Drivers</h3>
+            <h3 className="font-display font-bold text-sm">Drivers</h3>
             <Badge variant="outline">{drivers.length}</Badge>
           </div>
           {isLoading ? (
@@ -119,7 +122,7 @@ const AgencyAdminLiveMap = () => {
                   <button
                     key={d.id}
                     onClick={() => hasLoc && setSelectedId(d.id)}
-                    className={`w-full text-left p-3 rounded-md border transition ${selectedId === d.id ? 'border-accent bg-accent/5' : 'border-border hover:bg-muted/50'} ${!hasLoc ? 'opacity-60' : ''}`}
+                    className={`w-full text-left p-3 rounded-xl border transition ${selectedId === d.id ? 'border-accent bg-accent/5' : 'border-border hover:bg-muted/50'} ${!hasLoc ? 'opacity-60' : ''}`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-medium text-sm truncate">{d.full_name}</p>
@@ -138,7 +141,7 @@ const AgencyAdminLiveMap = () => {
               })}
             </div>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   );
