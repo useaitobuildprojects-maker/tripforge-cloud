@@ -65,7 +65,7 @@ const DriverDashboard = () => {
             current_lng: longitude,
             current_location_updated_at: new Date().toISOString(),
             status: driver.status === 'offline' ? 'available' : driver.status,
-          })
+          } as never)
           .eq('id', driver.id);
         if (!error) setTracking({ ok: true, lastAt: new Date() });
       },
