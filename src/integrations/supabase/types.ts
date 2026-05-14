@@ -502,6 +502,7 @@ export type Database = {
           created_at: string | null
           current_lat: number | null
           current_lng: number | null
+          current_location_updated_at: string | null
           email: string | null
           full_name: string
           id: string
@@ -515,6 +516,7 @@ export type Database = {
           created_at?: string | null
           current_lat?: number | null
           current_lng?: number | null
+          current_location_updated_at?: string | null
           email?: string | null
           full_name: string
           id?: string
@@ -528,6 +530,7 @@ export type Database = {
           created_at?: string | null
           current_lat?: number | null
           current_lng?: number | null
+          current_location_updated_at?: string | null
           email?: string | null
           full_name?: string
           id?: string
@@ -840,6 +843,7 @@ export type Database = {
         Args: { p_email: string; p_full_name: string; p_password: string }
         Returns: string
       }
+      current_driver_id: { Args: never; Returns: string }
       delete_user_account: {
         Args: { target_user_id: string }
         Returns: boolean
