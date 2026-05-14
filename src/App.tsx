@@ -29,6 +29,9 @@ const AgencyAdminDrivers = lazy(() => import("./pages/agency-admin/AgencyAdminDr
 const AgencyAdminVehicles = lazy(() => import("./pages/agency-admin/AgencyAdminVehicles"));
 const AgencyAdminApartments = lazy(() => import("./pages/agency-admin/AgencyAdminApartments"));
 const AgencyAdminMessages = lazy(() => import("./pages/agency-admin/AgencyAdminMessages"));
+const AgencyAdminLiveMap = lazy(() => import("./pages/agency-admin/AgencyAdminLiveMap"));
+const DriverLogin = lazy(() => import("./pages/driver/DriverLogin"));
+const DriverDashboard = lazy(() => import("./pages/driver/DriverDashboard"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Agencies = lazy(() => import("./pages/Agencies"));
 const Bookings = lazy(() => import("./pages/Bookings"));
@@ -59,6 +62,8 @@ const App = () => (
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/login" element={<Login />} />
+                  <Route path="/driver/login" element={<DriverLogin />} />
+                  <Route path="/driver" element={<DriverDashboard />} />
                   <Route
                     element={
                       <ProtectedRoute requiredRole="super_admin">
@@ -81,6 +86,7 @@ const App = () => (
                     <Route path="vehicles" element={<AgencyAdminVehicles />} />
                     <Route path="apartments" element={<AgencyAdminApartments />} />
                     <Route path="messages" element={<AgencyAdminMessages />} />
+                    <Route path="live-map" element={<AgencyAdminLiveMap />} />
                     <Route path="analytics" element={<ComingSoon title="Analytics" />} />
                     <Route path="settings" element={<AgencyAdminSettings />} />
                   </Route>
