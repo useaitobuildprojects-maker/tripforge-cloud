@@ -839,6 +839,10 @@ export type Database = {
     }
     Functions: {
       confirm_user_email: { Args: { target_user_id: string }; Returns: boolean }
+      create_driver_user: {
+        Args: { p_driver_id: string; p_password: string }
+        Returns: string
+      }
       create_user_admin: {
         Args: { p_email: string; p_full_name: string; p_password: string }
         Returns: string
