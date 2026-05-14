@@ -1,0 +1,1 @@
+REVOKE SELECT (revenue, total_bookings, commission_rate) ON public.agencies FROM anon;
