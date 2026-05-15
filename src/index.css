@@ -71,6 +71,39 @@
   html {
     font-family: var(--font-sans);
   }
+
+  /* Accessibility: visible keyboard focus across the storefront.
+     We exclude shadcn/Radix primitives that already ship correct focus rings
+     (they use [data-radix-*] attributes or built-in focus-visible styles). */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Skip-to-content link — visible only when focused */
+  .skip-to-content {
+    position: absolute;
+    left: 1rem;
+    top: -100px;
+    z-index: 100;
+    padding: 0.625rem 1rem;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    border: 2px solid hsl(var(--ring));
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: top 0.15s ease;
+  }
+  .skip-to-content:focus {
+    top: 0.75rem;
+    outline: none;
+  }
 }
 
 @layer utilities {

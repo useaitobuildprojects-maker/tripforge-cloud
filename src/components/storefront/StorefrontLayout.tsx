@@ -87,6 +87,10 @@ const StorefrontLayout = () => {
 
   return (
     <div className={`min-h-screen ${fontClass}`} style={bodyStyle}>
+      {/* Skip-to-content for keyboard / screen-reader users */}
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
       {/* ═══ Nav ═══ */}
       <header
         className="sticky top-0 z-50 border-b"
@@ -106,7 +110,7 @@ const StorefrontLayout = () => {
               )}
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1" aria-label="Primary">
               {navLinks.map((link) => {
                 const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
                 return (
@@ -114,7 +118,8 @@ const StorefrontLayout = () => {
                     key={link.label}
                     to={link.to}
                     data-active={isActive ? 'true' : undefined}
-                    className="px-3 py-2 rounded-md text-sm font-semibold transition-colors"
+                    aria-current={isActive ? 'page' : undefined}
+                    className="px-3 py-2 rounded-md text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                     style={{
                       color: headerText,
                       backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
@@ -141,10 +146,12 @@ const StorefrontLayout = () => {
             </div>
 
             <button
-              className="md:hidden h-9 w-9 rounded-md flex items-center justify-center"
+              className="md:hidden h-11 w-11 rounded-md flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{ backgroundColor: iconBtnBg, color: headerText }}
-              aria-label="Toggle menu"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -152,14 +159,15 @@ const StorefrontLayout = () => {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t px-4 py-4 space-y-1" style={{ backgroundColor: headerBg, borderColor: 'rgba(255,255,255,0.1)' }}>
+          <nav id="mobile-nav" aria-label="Mobile" className="md:hidden border-t px-4 py-4 space-y-1" style={{ backgroundColor: headerBg, borderColor: 'rgba(255,255,255,0.1)' }}>
             {navLinks.map((link) => {
               const isActive = (link.label === 'Home' && page === 'home') || link.to.endsWith(page);
               return (
                 <Link
                   key={link.label}
                   to={link.to}
-                  className="flex items-center justify-between text-base font-semibold py-3 px-3 rounded-md transition-colors"
+                  aria-current={isActive ? 'page' : undefined}
+                  className="flex items-center justify-between text-base font-semibold py-3 px-3 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   style={{ color: headerText, backgroundColor: isActive ? 'rgba(255,255,255,0.15)' : 'transparent' }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -176,12 +184,12 @@ const StorefrontLayout = () => {
             >
               <Phone className="h-4 w-4" /> Contact us
             </Link>
-          </div>
+          </nav>
         )}
       </header>
 
       {/* Content */}
-      <main>
+      <main id="main-content" tabIndex={-1} className="focus:outline-none">
         <Outlet context={{ agency, templateStyles: ts, buttonColor: btnColor, config: cfg }} />
       </main>
 
