@@ -325,9 +325,9 @@ const StorefrontHome = () => {
                   <LimoBookingForm agency={agency} config={cfg} buttonColor={buttonColor} variant="hero" onSearch={handleSearch} />
                 </div>
               ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-1.5 p-1.5 pb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2 sm:gap-1.5 p-2 sm:p-1.5 sm:pb-3">
                 {activeService !== 'city_tour' && (
-                  <div className="md:col-span-3 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                  <div className="min-h-12 sm:min-h-0 md:col-span-3 px-3 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2.5" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                     <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.originLabel}</p>
@@ -335,7 +335,7 @@ const StorefrontHome = () => {
                     </div>
                   </div>
                 )}
-                <div className={cn("px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5", activeService === 'city_tour' ? "md:col-span-5" : "md:col-span-2")} style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                <div className={cn("min-h-12 sm:min-h-0 px-3 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2.5", activeService === 'city_tour' ? "md:col-span-5" : "md:col-span-2")} style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                   <MapPin className="h-4 w-4 shrink-0" style={{ color: accent }} />
                   <div className="flex-1 min-w-0">
                     <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{activeService === 'city_tour' ? 'Tour location' : searchCopy.destinationLabel}</p>
@@ -344,7 +344,7 @@ const StorefrontHome = () => {
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="min-h-12 sm:min-h-0 md:col-span-2 px-3 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.startDateLabel}</p>
@@ -369,7 +369,7 @@ const StorefrontHome = () => {
                 {activeService === 'transfer' || activeService === 'city_tour' ? (
                   <Popover>
                     <PopoverTrigger asChild>
-                      <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                      <button type="button" className="min-h-12 sm:min-h-0 md:col-span-2 px-3 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                         <Clock className="h-4 w-4 shrink-0" style={{ color: accent }} />
                         <div className="flex-1 min-w-0">
                           <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
@@ -404,7 +404,7 @@ const StorefrontHome = () => {
                 ) : (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-2 px-3 py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="min-h-12 sm:min-h-0 md:col-span-2 px-3 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2.5 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Calendar className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.endDateLabel}</p>
