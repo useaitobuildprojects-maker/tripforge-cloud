@@ -141,6 +141,15 @@
     @apply bg-card border border-border;
   }
 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   .glass-hover {
     @apply bg-card border border-border hover:border-accent/25 transition-all duration-300;
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.03);
