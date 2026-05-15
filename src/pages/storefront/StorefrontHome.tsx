@@ -610,33 +610,33 @@ const StorefrontHome = () => {
                         ) : (
                           <div className="h-40 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
                         )}
-                        <div className="p-4">
-                          <h3 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h3>
-                          <p className="text-[11px] mt-0.5" style={tk.textMuted}>{vehicle.year}</p>
+                        <div className="p-5">
+                          <h3 className="text-lg tracking-tight leading-tight group-hover:underline underline-offset-4 decoration-1" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{vehicle.brand} {vehicle.model}</h3>
+                          <p className="text-[11px] mt-0.5 font-light" style={tk.textMuted}>{vehicle.year}</p>
                           <div className="flex items-center gap-1.5 mt-2">
-                            <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>4.7</span>
-                            <span className="text-xs font-bold" style={tk.textPrimary}>Very good</span>
-                            <span className="text-xs" style={tk.textMuted}>· 450+ reviews</span>
+                            <Star className="h-3.5 w-3.5 fill-current" style={{ color: accent }} />
+                            <span className="text-xs font-semibold" style={tk.textPrimary}>4.7</span>
+                            <span className="text-xs font-light" style={tk.textMuted}>· 450+ reviews</span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]" style={tk.textMuted}>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-[11px] font-light" style={tk.textMuted}>
                             <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
                             <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
                           </div>
-                          <p className="text-[11px] mt-2 font-bold" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
-                          <div className="flex items-end justify-between mt-3 pt-3 border-t" style={tk.border}>
+                          <p className="text-[11px] mt-3 font-medium" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
+                          <div className="flex items-end justify-between mt-4 pt-4 border-t" style={tk.border}>
                             <div>
                               {vehicle.daily_rate ? (
                                 <>
-                                  <p className="text-[10px] line-through" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
-                                  <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-normal" style={tk.textMuted}> /day</span></p>
-                                  <p className="text-[10px]" style={tk.textMuted}>Incl. taxes & fees</p>
+                                  <p className="text-[10px] line-through font-light" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
+                                  <p className="text-2xl tracking-tight leading-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-light" style={tk.textMuted}> /day</span></p>
+                                  <p className="text-[10px] font-light mt-0.5" style={tk.textMuted}>Incl. taxes & fees</p>
                                 </>
                               ) : (
-                                <p className="text-sm" style={tk.textMuted}>Contact</p>
+                                <p className="text-sm font-light" style={tk.textMuted}>Contact</p>
                               )}
                             </div>
-                            <Button size="sm" className="rounded-md text-xs font-extrabold h-9 px-4 hover:brightness-95"
+                            <Button size="sm" className="rounded-md text-xs font-semibold tracking-wide h-10 px-5 hover:brightness-95"
                               style={{ backgroundColor: accent, color: '#ffffff' }}
                               onClick={() => setBookingVehicle(mv)}>
                               {cfg.cta_text || 'See availability'}
