@@ -274,27 +274,27 @@ const StorefrontHome = () => {
         </div>
 
         <div className={cn(
-          "relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-10",
-          "pb-6 sm:pb-8",
+          "relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-10",
+          "pb-5 sm:pb-8",
           activeService === 'limo_tour' ? "md:pb-60" : "md:pb-32"
         )}>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className={`text-white text-[1.65rem] sm:text-4xl lg:text-5xl leading-[1.12] max-w-[23rem] sm:max-w-3xl ${ts.heroTitleClass}`}
+            className={`text-white text-2xl sm:text-4xl lg:text-5xl leading-[1.12] max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
             style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="mt-2 sm:mt-3 text-sm sm:text-base md:text-lg leading-relaxed text-white/85 max-w-[22rem] sm:max-w-2xl"
+            className="mt-1.5 sm:mt-3 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/85 max-w-[21rem] sm:max-w-2xl"
           >
             {cfg.hero_subtitle || `Search low prices on vehicles, transfers and tours across ${agency.city}.`}
           </motion.p>
 
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="relative mt-4 sm:mt-5 md:mt-0 md:absolute md:left-6 md:right-6 lg:left-8 lg:right-8 md:-bottom-7 max-w-7xl mx-auto">
+            className="relative mt-3 sm:mt-5 md:mt-0 md:absolute md:left-6 md:right-6 lg:left-8 lg:right-8 md:-bottom-7 max-w-7xl mx-auto">
             <div className="shadow-2xl border" style={{ ...tk.surface, ...tk.border, borderRadius: shape.cardRadius }}>
               <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
