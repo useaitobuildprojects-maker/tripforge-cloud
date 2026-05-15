@@ -551,7 +551,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ VEHICLE LISTINGS ═══════════════ */}
-      <section ref={vehiclesRef} className="py-10 scroll-mt-8" style={tk.surfaceAlt}>
+      <section ref={vehiclesRef} className="py-16 md:py-20 scroll-mt-8" style={tk.surfaceAlt}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
@@ -565,10 +565,11 @@ const StorefrontHome = () => {
             </motion.div>
           )}
 
-          <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
-            <div>
-              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>Top vehicles in {agency.city}</h2>
-              <p className="text-sm mt-1" style={tk.textMuted}><span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
+          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+            <div className="max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] mb-3" style={{ color: accent }}>The fleet</p>
+              <h2 className={`text-3xl md:text-4xl tracking-tight leading-tight ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>Top vehicles in {agency.city}</h2>
+              <p className="text-sm mt-3 font-light" style={tk.textMuted}><span className="font-medium" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
             </div>
           </div>
 
