@@ -278,16 +278,22 @@ const StorefrontHome = () => {
           "pb-5 sm:pb-8",
           activeService === 'limo_tour' ? "md:pb-60" : "md:pb-32"
         )}>
+          <motion.p
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+            className="hidden sm:block text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-4"
+          >
+            {agency.city} · Curated travel
+          </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className={`text-white text-2xl sm:text-4xl lg:text-5xl leading-[1.12] max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
+            className={`text-white text-[1.7rem] sm:text-5xl lg:text-[3.75rem] leading-[1.05] tracking-tight max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
             style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="mt-1.5 sm:mt-3 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/85 max-w-[21rem] sm:max-w-2xl"
+            className="mt-2 sm:mt-5 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/80 max-w-[21rem] sm:max-w-xl font-light"
           >
             {cfg.hero_subtitle || `Search low prices on vehicles, transfers and tours across ${agency.city}.`}
           </motion.p>
