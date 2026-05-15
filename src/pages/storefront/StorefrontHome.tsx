@@ -278,16 +278,22 @@ const StorefrontHome = () => {
           "pb-5 sm:pb-8",
           activeService === 'limo_tour' ? "md:pb-60" : "md:pb-32"
         )}>
+          <motion.p
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+            className="hidden sm:block text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-4"
+          >
+            {agency.city} · Curated travel
+          </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className={`text-white text-2xl sm:text-4xl lg:text-5xl leading-[1.12] max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
+            className={`text-white text-[1.7rem] sm:text-5xl lg:text-[3.75rem] leading-[1.05] tracking-tight max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
             style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="mt-1.5 sm:mt-3 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/85 max-w-[21rem] sm:max-w-2xl"
+            className="mt-2 sm:mt-5 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/80 max-w-[21rem] sm:max-w-xl font-light"
           >
             {cfg.hero_subtitle || `Search low prices on vehicles, transfers and tours across ${agency.city}.`}
           </motion.p>
@@ -469,17 +475,17 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ TRUST STRIP ═══════════════ */}
-      <section className="pt-12 pb-4" style={tk.surface}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <section className="pt-16 md:pt-24 pb-4" style={tk.surface}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           {TRUST_ITEMS.map((item) => (
-            <div key={item.title} className="flex items-start gap-3 p-3 rounded-md border" style={{ ...tk.surface, ...tk.border }}>
-              <div className="h-9 w-9 rounded-md flex items-center justify-center shrink-0"
+            <div key={item.title} className="flex items-start gap-4 p-5 rounded-md border" style={{ ...tk.surface, ...tk.border }}>
+              <div className="h-10 w-10 rounded-full flex items-center justify-center shrink-0"
                 style={{ backgroundColor: ts.isDark ? 'rgba(255,255,255,0.06)' : EXP.brandSoftBg, color: accent }}>
                 <item.icon className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-extrabold" style={tk.textPrimary}>{item.title}</p>
-                <p className="text-xs mt-0.5 leading-relaxed" style={tk.textMuted}>{item.desc}</p>
+                <p className="text-[15px] font-semibold tracking-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{item.title}</p>
+                <p className="text-xs mt-1 leading-relaxed font-light" style={tk.textMuted}>{item.desc}</p>
               </div>
             </div>
           ))}
@@ -487,52 +493,53 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ DEAL CARDS ═══════════════ */}
-      <section className="py-10" style={tk.surface}>
+      <section className="py-16 md:py-20" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
-            <div>
-              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
+          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+            <div className="max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] mb-3" style={{ color: accent }}>Editor's picks</p>
+              <h2 className={`text-3xl md:text-4xl tracking-tight leading-tight ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
                 Deals for the weekend
               </h2>
-              <p className="text-sm mt-1" style={tk.textMuted}>Save on stays for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} – {new Date(Date.now() + 2*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.</p>
+              <p className="text-sm mt-3 font-light leading-relaxed" style={tk.textMuted}>A curated selection of stays for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} – {new Date(Date.now() + 2*86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.</p>
             </div>
-            <Link to={`/agency/${slug}/services`} className="hidden md:inline-flex items-center gap-1 text-sm font-bold" style={{ color: accent }}>
+            <Link to={`/agency/${slug}/services`} className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] hover:gap-2.5 transition-all" style={{ color: accent }}>
               See all deals <ChevronRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {DESTINATIONS.map((dest, i) => (
               <motion.div key={dest.name} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
-                className="group rounded-md overflow-hidden border hover:shadow-lg transition-all duration-200 cursor-pointer"
+                className="group rounded-md overflow-hidden border hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
                 style={{ ...tk.surface, ...tk.border }}>
-                <div className="relative h-44 overflow-hidden">
-                  <img src={dest.image} alt={dest.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-sm text-[10px] font-extrabold uppercase tracking-wide"
+                <div className="relative h-56 overflow-hidden">
+                  <img src={dest.image} alt={dest.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                  <span className="absolute top-3 left-3 px-2.5 py-1 rounded-sm text-[10px] font-semibold uppercase tracking-[0.18em]"
                     style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                     {dest.tag}
                   </span>
-                  <button aria-label={`Save ${dest.name} to favorites`} className="absolute top-2 right-2 h-8 w-8 rounded-full bg-white/95 flex items-center justify-center hover:bg-white transition-colors">
+                  <button aria-label={`Save ${dest.name} to favorites`} className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white/95 flex items-center justify-center hover:bg-white shadow-md transition-colors">
                     <Heart className="h-4 w-4" style={{ color: accent }} />
                   </button>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-base font-extrabold mb-1 hover:underline" style={{ color: accent }}>{dest.name}</h3>
-                  <p className="text-xs mb-2" style={tk.textMuted}>
+                <div className="p-6">
+                  <h3 className="text-xl tracking-tight mb-1.5 group-hover:underline underline-offset-4 decoration-1" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{dest.name}</h3>
+                  <p className="text-xs mb-3 font-light" style={tk.textMuted}>
                     <MapPin className="h-3 w-3 inline mr-1" />{dest.location} · {dest.nights} nights
                   </p>
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>{dest.rating}</span>
-                    <span className="text-xs font-bold" style={tk.textPrimary}>Excellent</span>
-                    <span className="text-xs" style={tk.textMuted}>· {dest.reviews.toLocaleString()} reviews</span>
+                  <div className="flex items-center gap-1.5 mb-4">
+                    <Star className="h-3.5 w-3.5 fill-current" style={{ color: accent }} />
+                    <span className="text-xs font-semibold" style={tk.textPrimary}>{dest.rating}</span>
+                    <span className="text-xs font-light" style={tk.textMuted}>· {dest.reviews.toLocaleString()} reviews</span>
                   </div>
-                  <div className="flex items-end justify-between pt-2 border-t" style={tk.border}>
+                  <div className="flex items-end justify-between pt-4 border-t" style={tk.border}>
                     <div>
-                      <p className="text-[10px] line-through" style={tk.textMuted}>${Math.round(dest.price * 1.25)}</p>
-                      <p className="text-xl font-extrabold leading-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
+                      <p className="text-[10px] line-through font-light" style={tk.textMuted}>${Math.round(dest.price * 1.25)}</p>
+                      <p className="text-2xl leading-tight tracking-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>
                         ${dest.price}
                       </p>
-                      <p className="text-[10px]" style={tk.textMuted}>per person · taxes incl.</p>
+                      <p className="text-[10px] font-light mt-0.5" style={tk.textMuted}>per person · taxes incl.</p>
                     </div>
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" style={{ color: accent }} />
                   </div>
@@ -544,7 +551,7 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ VEHICLE LISTINGS ═══════════════ */}
-      <section ref={vehiclesRef} className="py-10 scroll-mt-8" style={tk.surfaceAlt}>
+      <section ref={vehiclesRef} className="py-16 md:py-20 scroll-mt-8" style={tk.surfaceAlt}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {searchActive && (pickupLocation || pickupDate || dropoffLocation || dropoffDate) && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
@@ -558,10 +565,11 @@ const StorefrontHome = () => {
             </motion.div>
           )}
 
-          <div className="flex items-end justify-between mb-5 gap-4 flex-wrap">
-            <div>
-              <h2 className={`text-2xl md:text-3xl ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>Top vehicles in {agency.city}</h2>
-              <p className="text-sm mt-1" style={tk.textMuted}><span className="font-bold" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
+          <div className="flex items-end justify-between mb-10 gap-4 flex-wrap">
+            <div className="max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] mb-3" style={{ color: accent }}>The fleet</p>
+              <h2 className={`text-3xl md:text-4xl tracking-tight leading-tight ${ts.heroTitleClass}`} style={{ ...tk.textPrimary, fontFamily: typo.heading }}>Top vehicles in {agency.city}</h2>
+              <p className="text-sm mt-3 font-light" style={tk.textMuted}><span className="font-medium" style={tk.textPrimary}>{filteredVehicles.length}</span> available · sorted by our top picks</p>
             </div>
           </div>
 
@@ -602,33 +610,33 @@ const StorefrontHome = () => {
                         ) : (
                           <div className="h-40 flex items-center justify-center" style={tk.surfaceAlt}><Car className="h-12 w-12" style={tk.textFaint} /></div>
                         )}
-                        <div className="p-4">
-                          <h3 className="font-extrabold text-base leading-tight hover:underline" style={{ color: accent }}>{vehicle.brand} {vehicle.model}</h3>
-                          <p className="text-[11px] mt-0.5" style={tk.textMuted}>{vehicle.year}</p>
+                        <div className="p-5">
+                          <h3 className="text-lg tracking-tight leading-tight group-hover:underline underline-offset-4 decoration-1" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{vehicle.brand} {vehicle.model}</h3>
+                          <p className="text-[11px] mt-0.5 font-light" style={tk.textMuted}>{vehicle.year}</p>
                           <div className="flex items-center gap-1.5 mt-2">
-                            <span className="px-1.5 py-0.5 rounded-sm text-[11px] font-extrabold text-white" style={{ backgroundColor: accent }}>4.7</span>
-                            <span className="text-xs font-bold" style={tk.textPrimary}>Very good</span>
-                            <span className="text-xs" style={tk.textMuted}>· 450+ reviews</span>
+                            <Star className="h-3.5 w-3.5 fill-current" style={{ color: accent }} />
+                            <span className="text-xs font-semibold" style={tk.textPrimary}>4.7</span>
+                            <span className="text-xs font-light" style={tk.textMuted}>· 450+ reviews</span>
                           </div>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px]" style={tk.textMuted}>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-[11px] font-light" style={tk.textMuted}>
                             <span className="flex items-center gap-1"><Fuel className="h-3 w-3" /> {vehicle.fuel_type || 'Petrol'}</span>
                             <span className="flex items-center gap-1"><Settings2 className="h-3 w-3" /> {vehicle.transmission || 'Manual'}</span>
                             <span className="flex items-center gap-1"><Users className="h-3 w-3" /> {vehicle.seats || 5}</span>
                           </div>
-                          <p className="text-[11px] mt-2 font-bold" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
-                          <div className="flex items-end justify-between mt-3 pt-3 border-t" style={tk.border}>
+                          <p className="text-[11px] mt-3 font-medium" style={{ color: 'hsl(155 50% 36%)' }}>✓ Free cancellation</p>
+                          <div className="flex items-end justify-between mt-4 pt-4 border-t" style={tk.border}>
                             <div>
                               {vehicle.daily_rate ? (
                                 <>
-                                  <p className="text-[10px] line-through" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
-                                  <p className="text-xl font-extrabold leading-tight" style={tk.textPrimary}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-normal" style={tk.textMuted}> /day</span></p>
-                                  <p className="text-[10px]" style={tk.textMuted}>Incl. taxes & fees</p>
+                                  <p className="text-[10px] line-through font-light" style={tk.textMuted}>{Math.round(vehicle.daily_rate * 1.2).toLocaleString()}€</p>
+                                  <p className="text-2xl tracking-tight leading-tight" style={{ ...tk.textPrimary, fontFamily: typo.heading }}>{vehicle.daily_rate.toLocaleString()}€<span className="text-xs font-light" style={tk.textMuted}> /day</span></p>
+                                  <p className="text-[10px] font-light mt-0.5" style={tk.textMuted}>Incl. taxes & fees</p>
                                 </>
                               ) : (
-                                <p className="text-sm" style={tk.textMuted}>Contact</p>
+                                <p className="text-sm font-light" style={tk.textMuted}>Contact</p>
                               )}
                             </div>
-                            <Button size="sm" className="rounded-md text-xs font-extrabold h-9 px-4 hover:brightness-95"
+                            <Button size="sm" className="rounded-md text-xs font-semibold tracking-wide h-10 px-5 hover:brightness-95"
                               style={{ backgroundColor: accent, color: '#ffffff' }}
                               onClick={() => setBookingVehicle(mv)}>
                               {cfg.cta_text || 'See availability'}
@@ -640,8 +648,8 @@ const StorefrontHome = () => {
                   })}
                 </div>
               )}
-              <div className="text-center mt-10">
-                <Link to={`/agency/${slug}/fleet`} className="inline-flex items-center gap-1 text-sm font-bold hover:gap-2 transition-all" style={{ color: accent }}>
+              <div className="text-center mt-12">
+                <Link to={`/agency/${slug}/fleet`} className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] hover:gap-2.5 transition-all" style={{ color: accent }}>
                   View entire fleet <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -651,19 +659,19 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ INSPIRATION CTA ═══════════════ */}
-      <section className="py-10" style={tk.surface}>
+      <section className="py-16 md:py-20" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-md overflow-hidden relative h-[260px] md:h-[320px]" style={{ backgroundColor: EXP.brandDeep }}>
+          <div className="rounded-md overflow-hidden relative h-[320px] md:h-[420px]" style={{ backgroundColor: EXP.brandDeep }}>
             <div className="absolute inset-0 overflow-hidden">
-              <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
             </div>
-            <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}66 100%)` }} />
-            <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
-              <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1" /> Plan ahead</p>
-              <h2 className={`text-white text-2xl md:text-4xl leading-tight ${ts.heroTitleClass}`} style={headingFontStyle}>Where to next?</h2>
-              <p className="text-white/85 mt-2 text-sm md:text-base">Discover top destinations and member-only offers from {agency.name}.</p>
-              <Link to={`/agency/${slug}/services`} className="mt-5 w-fit">
-                <Button className="rounded-md font-extrabold gap-2 h-11 px-6 text-sm hover:brightness-95"
+            <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep}F2 0%, ${EXP.brandDeep}55 100%)` }} />
+            <div className="relative h-full flex flex-col justify-center px-8 md:px-16 max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] mb-4" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1.5" /> Plan ahead</p>
+              <h2 className={`text-white text-3xl md:text-5xl leading-[1.05] tracking-tight ${ts.heroTitleClass}`} style={headingFontStyle}>Where to next?</h2>
+              <p className="text-white/80 mt-4 text-sm md:text-base font-light leading-relaxed">Discover top destinations and member-only offers from {agency.name}.</p>
+              <Link to={`/agency/${slug}/services`} className="mt-7 w-fit">
+                <Button className="rounded-md font-semibold tracking-wide gap-2 h-12 px-7 text-sm hover:brightness-95"
                   style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                   Explore destinations <ArrowRight className="h-4 w-4" />
                 </Button>
