@@ -145,7 +145,7 @@ const StorefrontSearch = () => {
           <div className="lg:col-span-2">
             <div className="lg:sticky lg:top-20 space-y-4">
               <div className="rounded-md border overflow-hidden" style={{ ...tk.surface, ...tk.border }}>
-                <RouteMap origin={pickup} destination={dropoff} height={260} className="lg:!h-[360px]" />
+                <RouteMap origin={pickup} destination={dropoff} height={typeof window !== 'undefined' && window.innerWidth < 640 ? 220 : 320} />
                 {(pickup || dropoff) && (
                   <div className="p-4 space-y-3">
                     <div className="flex items-start gap-2 text-xs" style={tk.textBody}>
