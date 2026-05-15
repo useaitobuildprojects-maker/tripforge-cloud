@@ -429,7 +429,7 @@ const StorefrontHome = () => {
                 )}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button type="button" className="md:col-span-1 px-2 py-0.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
+                    <button type="button" className="min-h-12 sm:min-h-0 md:col-span-1 px-3 sm:px-2 py-2 sm:py-0.5 rounded-md border-2 flex items-center gap-2 text-left hover:border-[#cbd5e1] transition-colors" style={{ ...tk.inputSurface, borderColor: 'hsl(var(--border))' }}>
                       <Users className="h-4 w-4 shrink-0" style={{ color: accent }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={tk.textMuted}>{searchCopy.countLabel}</p>
@@ -452,7 +452,7 @@ const StorefrontHome = () => {
                 </Popover>
                 <div className="sm:col-span-2 md:col-span-2 flex items-stretch">
                   <button
-                    className="w-full px-6 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
+                    className="w-full min-h-12 sm:min-h-0 px-6 py-3 sm:py-0 rounded-md font-bold text-sm inline-flex items-center justify-center gap-2 transition-all hover:brightness-95 tracking-tight"
                     style={{ backgroundColor: accent, color: '#ffffff' }}
                     onClick={() => handleSearch()}
                   >
