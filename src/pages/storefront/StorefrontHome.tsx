@@ -275,7 +275,8 @@ const StorefrontHome = () => {
 
         <div className={cn(
           "relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10",
-          activeService === 'limo_tour' ? "pb-56 sm:pb-60" : "pb-28 sm:pb-32"
+          "pb-10",
+          activeService === 'limo_tour' ? "md:pb-60" : "md:pb-32"
         )}>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
@@ -293,7 +294,7 @@ const StorefrontHome = () => {
 
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="absolute left-4 right-4 sm:left-6 sm:right-6 lg:left-8 lg:right-8 -bottom-7 max-w-7xl mx-auto">
+            className="relative mt-8 md:mt-0 md:absolute md:left-6 md:right-6 lg:left-8 lg:right-8 md:-bottom-7 max-w-7xl mx-auto">
             <div className="shadow-2xl border" style={{ ...tk.surface, ...tk.border, borderRadius: shape.cardRadius }}>
               <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
