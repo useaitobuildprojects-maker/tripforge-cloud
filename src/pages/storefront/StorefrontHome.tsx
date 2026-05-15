@@ -280,7 +280,7 @@ const StorefrontHome = () => {
         )}>
           <motion.p
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="hidden sm:block text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-4"
+            className="hidden sm:block text-[11px] font-semibold uppercase tracking-[0.28em] text-white/85 mb-4"
           >
             {agency.city} · Curated travel
           </motion.p>
