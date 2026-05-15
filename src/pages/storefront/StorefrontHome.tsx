@@ -266,11 +266,16 @@ const StorefrontHome = () => {
           <img
             src={cfg.home_hero_image || defaultHeroImage}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover opacity-40"
+            className="absolute inset-0 w-full h-full object-cover opacity-30 sm:opacity-40"
             width={1920}
             height={1080}
           />
-          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${EXP.brandDeep}E0 0%, ${EXP.brandDeep}F5 100%)` }} />
+          {/* Base brand wash — deeper on mobile for readability */}
+          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${EXP.brandDeep}E8 0%, ${EXP.brandDeep}F0 50%, ${EXP.brandDeep} 100%)` }} />
+          {/* Mobile top-anchor: extra density behind headline text */}
+          <div className="absolute inset-x-0 top-0 h-[55%] sm:hidden" style={{ background: `linear-gradient(180deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}80 60%, transparent 100%)` }} />
+          {/* Luxury editorial vignette — draws eye to center, darkens edges */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(ellipse 85% 70% at 50% 35%, transparent 35%, ${EXP.brandDeep}90 100%)` }} />
         </div>
 
         <div className={cn(
