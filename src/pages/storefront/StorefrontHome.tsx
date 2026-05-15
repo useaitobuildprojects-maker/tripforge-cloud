@@ -274,33 +274,33 @@ const StorefrontHome = () => {
         </div>
 
         <div className={cn(
-          "relative max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-10",
-          "pb-5 sm:pb-8",
+          "relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-10 sm:pt-10",
+          "pb-6 sm:pb-8",
           activeService === 'limo_tour' ? "md:pb-60" : "md:pb-32"
         )}>
           <motion.p
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="hidden sm:block text-[11px] font-semibold uppercase tracking-[0.28em] text-white/85 mb-4"
+            className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.24em] sm:tracking-[0.28em] text-white/85 mb-3 sm:mb-4"
           >
             {agency.city} · Curated travel
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            className={`text-white text-[1.7rem] sm:text-5xl lg:text-[3.75rem] leading-[1.05] tracking-tight max-w-[22rem] sm:max-w-3xl ${ts.heroTitleClass}`}
+            className={`text-white text-[2.25rem] sm:text-5xl lg:text-[3.75rem] leading-[1.05] tracking-tight max-w-[18rem] sm:max-w-3xl ${ts.heroTitleClass}`}
             style={headingFontStyle}
           >
             {cfg.hero_title || `Find your next trip in ${agency.city}`}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="mt-2 sm:mt-5 text-[13px] sm:text-base md:text-lg leading-relaxed text-white/80 max-w-[21rem] sm:max-w-xl font-light"
+            className="mt-3 sm:mt-5 text-sm sm:text-base md:text-lg leading-relaxed text-white/80 max-w-[20rem] sm:max-w-xl font-light"
           >
             {cfg.hero_subtitle || `Search low prices on vehicles, transfers and tours across ${agency.city}.`}
           </motion.p>
 
           {/* Search card sitting at bottom of hero, with yellow border */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-            className="relative mt-3 sm:mt-5 md:mt-0 md:absolute md:left-6 md:right-6 lg:left-8 lg:right-8 md:-bottom-7 max-w-7xl mx-auto">
+            className="relative mt-6 sm:mt-5 md:mt-0 md:absolute md:left-6 md:right-6 lg:left-8 lg:right-8 md:-bottom-7 max-w-7xl mx-auto">
             <div className="shadow-2xl border" style={{ ...tk.surface, ...tk.border, borderRadius: shape.cardRadius }}>
               <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
