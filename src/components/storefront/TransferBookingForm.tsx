@@ -303,7 +303,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                   }`}
                   style={isSelected ? { borderColor: buttonColor } : undefined}
                 >
-                  <div className="h-16 w-24 shrink-0 rounded-lg bg-muted/30 flex items-center justify-center overflow-hidden">
+                  <div className="h-14 w-16 sm:h-16 sm:w-24 shrink-0 rounded-lg bg-muted/30 flex items-center justify-center overflow-hidden">
                     <img
                       src={vc.image_url || getVehicleClassImage(vc.category)}
                       alt={vc.label || vc.category}
@@ -312,7 +312,7 @@ const TransferBookingForm = ({ agency, config, buttonColor, initialOrigin, initi
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate">{vc.label || `${vc.category} ${vc.seats}s`}</p>
+                    <p className="text-sm font-bold leading-tight">{vc.label || `${vc.category} ${vc.seats}s`}</p>
                     <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
                       <Users className="h-3 w-3" /> {vc.seats}
                     </p>
