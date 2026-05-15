@@ -648,8 +648,8 @@ const StorefrontHome = () => {
                   })}
                 </div>
               )}
-              <div className="text-center mt-10">
-                <Link to={`/agency/${slug}/fleet`} className="inline-flex items-center gap-1 text-sm font-bold hover:gap-2 transition-all" style={{ color: accent }}>
+              <div className="text-center mt-12">
+                <Link to={`/agency/${slug}/fleet`} className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.2em] hover:gap-2.5 transition-all" style={{ color: accent }}>
                   View entire fleet <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -659,19 +659,19 @@ const StorefrontHome = () => {
       </section>
 
       {/* ═══════════════ INSPIRATION CTA ═══════════════ */}
-      <section className="py-10" style={tk.surface}>
+      <section className="py-16 md:py-20" style={tk.surface}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-md overflow-hidden relative h-[260px] md:h-[320px]" style={{ backgroundColor: EXP.brandDeep }}>
+          <div className="rounded-md overflow-hidden relative h-[320px] md:h-[420px]" style={{ backgroundColor: EXP.brandDeep }}>
             <div className="absolute inset-0 overflow-hidden">
-              <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <img src={adventureMountain} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
             </div>
-            <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep} 0%, ${EXP.brandDeep}66 100%)` }} />
-            <div className="relative h-full flex flex-col justify-center px-8 md:px-14 max-w-xl">
-              <p className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1" /> Plan ahead</p>
-              <h2 className={`text-white text-2xl md:text-4xl leading-tight ${ts.heroTitleClass}`} style={headingFontStyle}>Where to next?</h2>
-              <p className="text-white/85 mt-2 text-sm md:text-base">Discover top destinations and member-only offers from {agency.name}.</p>
-              <Link to={`/agency/${slug}/services`} className="mt-5 w-fit">
-                <Button className="rounded-md font-extrabold gap-2 h-11 px-6 text-sm hover:brightness-95"
+            <div className="absolute inset-0" style={{ background: `linear-gradient(90deg, ${EXP.brandDeep}F2 0%, ${EXP.brandDeep}55 100%)` }} />
+            <div className="relative h-full flex flex-col justify-center px-8 md:px-16 max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] mb-4" style={{ color: EXP.cta }}><Plane className="h-3.5 w-3.5 inline mr-1.5" /> Plan ahead</p>
+              <h2 className={`text-white text-3xl md:text-5xl leading-[1.05] tracking-tight ${ts.heroTitleClass}`} style={headingFontStyle}>Where to next?</h2>
+              <p className="text-white/80 mt-4 text-sm md:text-base font-light leading-relaxed">Discover top destinations and member-only offers from {agency.name}.</p>
+              <Link to={`/agency/${slug}/services`} className="mt-7 w-fit">
+                <Button className="rounded-md font-semibold tracking-wide gap-2 h-12 px-7 text-sm hover:brightness-95"
                   style={{ backgroundColor: EXP.cta, color: EXP.ctaText }}>
                   Explore destinations <ArrowRight className="h-4 w-4" />
                 </Button>
