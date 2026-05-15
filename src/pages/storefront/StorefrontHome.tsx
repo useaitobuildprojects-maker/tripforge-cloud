@@ -310,7 +310,7 @@ const StorefrontHome = () => {
               <div style={{ ...tk.surface, borderRadius: `calc(${shape.cardRadius} - 1px)` }}>
               {/* Service tabs */}
               {enabledServices.length > 0 && (
-                <div className="flex flex-nowrap overflow-x-auto items-center gap-1.5 sm:gap-2 px-2 sm:px-3 pt-2 sm:pt-3 pb-1.5 sm:pb-1 scrollbar-hide">
+                <div className="flex flex-nowrap overflow-x-auto items-center gap-3 sm:gap-2 px-3 sm:px-3 pt-3 sm:pt-3 pb-2 sm:pb-1 scrollbar-hide snap-x snap-mandatory">
                   {enabledServices.map((service) => {
                     const Icon = SERVICE_ICONS[service] ?? Car;
                     const isActive = activeService === service;
@@ -318,12 +318,12 @@ const StorefrontHome = () => {
                       <button
                         key={service}
                         onClick={() => setActiveService(service)}
-                        className="inline-flex shrink-0 items-center gap-1.5 sm:gap-2 px-3 sm:px-4 h-8 sm:h-9 text-xs sm:text-sm font-semibold rounded-full border-2 transition-all whitespace-nowrap"
+                        className="inline-flex shrink-0 items-center gap-2 sm:gap-2 px-4 sm:px-4 h-11 sm:h-9 text-sm sm:text-sm font-semibold rounded-full border-2 transition-all whitespace-nowrap snap-start"
                         style={isActive
                           ? { color: '#ffffff', backgroundColor: accent, borderColor: accent }
                           : { ...tk.textBody, backgroundColor: 'transparent', borderColor: 'hsl(var(--border))' }}
                       >
-                        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        <Icon className="h-4 w-4 sm:h-4 sm:w-4" />
                         <span>{SERVICE_LABELS[service] ?? service}</span>
                       </button>
                     );
