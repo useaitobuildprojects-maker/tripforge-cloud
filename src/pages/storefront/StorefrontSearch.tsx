@@ -82,44 +82,44 @@ const StorefrontSearch = () => {
 
       {/* Trip summary bar */}
       <section className="border-b" style={{ ...tk.surface, ...tk.border }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center gap-3">
           <Link to={`/agency/${slug}`} className="inline-flex items-center gap-1 text-xs font-bold hover:underline shrink-0" style={tk.textBody}>
-            <ChevronLeft className="h-4 w-4" /> Edit search
+            <ChevronLeft className="h-4 w-4" /> <span className="hidden sm:inline">Edit search</span><span className="sm:hidden">Edit</span>
           </Link>
-          <div className="flex-1 min-w-0 flex flex-wrap items-center gap-2">
+          <div className="flex-1 min-w-0 flex sm:flex-wrap items-center gap-2 overflow-x-auto sm:overflow-visible scrollbar-hide -mx-1 px-1">
             {pickup && (
-              <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
-                <MapPin className="h-3.5 w-3.5" style={{ color: accent }} />
-                <span className="truncate max-w-[220px]">{pickup}</span>
+              <div className="inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-9 rounded-md border text-xs sm:text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                <MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
+                <span className="truncate max-w-[140px] sm:max-w-[220px]">{pickup}</span>
               </div>
             )}
             {dropoff && (
               <>
-                <ArrowRight className="h-4 w-4" style={tk.textMuted} />
-                <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
-                  <MapPin className="h-3.5 w-3.5" style={{ color: accent }} />
-                  <span className="truncate max-w-[220px]">{dropoff}</span>
+                <ArrowRight className="h-4 w-4 shrink-0" style={tk.textMuted} />
+                <div className="inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-9 rounded-md border text-xs sm:text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                  <MapPin className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
+                  <span className="truncate max-w-[140px] sm:max-w-[220px]">{dropoff}</span>
                 </div>
               </>
             )}
             {startDt && (
-              <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
-                <Calendar className="h-3.5 w-3.5" style={{ color: accent }} />
+              <div className="inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-9 rounded-md border text-xs sm:text-sm font-semibold whitespace-nowrap" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                <Calendar className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
                 <span>
-                  {format(startDt, 'EEE, MMM d, yyyy')}
-                  {endDt ? ` → ${format(endDt, 'EEE, MMM d, yyyy')}` : ''}
+                  <span className="sm:hidden">{format(startDt, 'MMM d')}</span>
+                  <span className="hidden sm:inline">{format(startDt, 'EEE, MMM d, yyyy')}{endDt ? ` → ${format(endDt, 'EEE, MMM d, yyyy')}` : ''}</span>
                 </span>
               </div>
             )}
             {startDt && hasTime(start) && (
-              <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold tabular-nums" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
-                <Clock className="h-3.5 w-3.5" style={{ color: accent }} />
+              <div className="inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-9 rounded-md border text-xs sm:text-sm font-semibold tabular-nums" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                <Clock className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
                 <span>{format(startDt, 'HH:mm')}</span>
               </div>
             )}
             {pax && (
-              <div className="inline-flex items-center gap-2 px-3 h-9 rounded-md border-2 text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
-                <Users className="h-3.5 w-3.5" style={{ color: accent }} />
+              <div className="inline-flex shrink-0 items-center gap-1.5 px-2.5 sm:px-3 h-8 sm:h-9 rounded-md border text-xs sm:text-sm font-semibold" style={{ ...tk.inputSurface, ...tk.inputBorder, ...tk.textPrimary }}>
+                <Users className="h-3.5 w-3.5 shrink-0" style={{ color: accent }} />
                 <span>{pax} pax</span>
               </div>
             )}
@@ -145,7 +145,9 @@ const StorefrontSearch = () => {
           <div className="lg:col-span-2">
             <div className="lg:sticky lg:top-20 space-y-4">
               <div className="rounded-md border overflow-hidden" style={{ ...tk.surface, ...tk.border }}>
-                <RouteMap origin={pickup} destination={dropoff} height={360} />
+                <div className="h-[220px] sm:h-[280px] lg:h-[360px]">
+                  <RouteMap origin={pickup} destination={dropoff} height={360} />
+                </div>
                 {(pickup || dropoff) && (
                   <div className="p-4 space-y-3">
                     <div className="flex items-start gap-2 text-xs" style={tk.textBody}>
